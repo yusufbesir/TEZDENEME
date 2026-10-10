@@ -1,0 +1,7 @@
+{
+  "name": "ajan-paneli",
+  "author": { "name": "yusufbesir" },
+  "version": "0.1.0",
+  "description": "Beyin, scout, implementer ve verifier ajanlarını piksel art kartlarla gösteren Ajanlar paneli, /ajanlar ve /rapor komutları",
+  "types": "./types/index.d.ts"
+}
