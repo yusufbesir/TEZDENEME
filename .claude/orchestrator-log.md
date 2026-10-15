@@ -38,3 +38,4 @@
 | 2026-10-15 | Dosya dönüştürücü güvenlik denetimi [İP:Dosya dönüştürücü#eSZiVv] | verifier (güvenlik denetçisi) / claude-sonnet-5-5 | alınamadı | Geçti; 3 orta, 11 düşük bulgu. Düzeltme implementer'a verildi. |
 | 2026-10-15 | Dosya dönüştürücü güvenlik düzeltmeleri [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 8 madde, 76 test geçti. |
 | 2026-10-15 | Dosya dönüştürücü düzeltmelerini doğrula [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 76 test, tüm video/ses biçimleri beyaz listeyle çalışıyor, LibreOffice ağ kesme etkili. Opak görsel→ICO hatasını orkestratör tek satırla düzeltti. |
+| 2026-10-15 | LibreOffice makro/bağlantı sertleştirmesi (orkestratör, tek dosya) [İP:Dosya dönüştürücü#eSZiVv] | Opus (ana oturum) | — | 76 test geçti; ayarların LibreOffice profilinde kaldığı gerçek dönüşümle görüldü. |
