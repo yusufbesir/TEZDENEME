@@ -23,6 +23,7 @@ def _parser():
     s.add_argument("--hakem-model")
     s.add_argument("--hakem-gerekce")
     s.add_argument("--kullanici")
+    s.add_argument("--onay-mesaji", help="Kullanıcının sohbetteki onay mesajının kimliği (cmsg_...)")
     n = alt.add_parser("sonuc", help="Gerçek doğru cevabı kaydet")
     n.add_argument("--karar", required=True)
     n.add_argument("--dogru", required=True)
@@ -47,7 +48,8 @@ def main(argv=None):
             _yaz(karar.danis(girdi))
         elif args.komut == "sonuclandir":
             _yaz(karar.sonuclandir(args.karar, hakem_secimi=args.hakem, hakem_model=args.hakem_model,
-                                   hakem_gerekce=args.hakem_gerekce, kullanici_secimi=args.kullanici))
+                                   hakem_gerekce=args.hakem_gerekce, kullanici_secimi=args.kullanici,
+                                   onay_mesaji=args.onay_mesaji))
         elif args.komut == "sonuc":
             _yaz(karar.sonuc_isle(args.karar, args.dogru))
         elif args.komut == "rapor":

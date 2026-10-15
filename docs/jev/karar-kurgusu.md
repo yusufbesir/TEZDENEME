@@ -19,19 +19,21 @@ Etiket: [İP:Jev'i projeye bağlama#TMGrRs]
    - `bagimsiz_kontrol`: ayrışma ya da kararsızlık → hakem → `sonuclandir`.
    - `kullanici_onayi`: kritik kategori.
    - `claude_karari`: Jev'e erişilemedi (degraded), Claude devam eder ve bunu açıkça söyler.
-3. Hakem ya da kullanıcı kararı → `hakem` / `kullanici_karari` kaydı.
+3. Hakem ya da kullanıcı kararı → `hakem` / `kullanici_karari` kaydı. `--kullanici` yalnız normal kategoride ve kullanıcının sohbetteki onay mesajının kimliğiyle (`--onay-mesaji cmsg_...`) çalışır; kayıt `dogrulanmamis` işaretlidir ve onayın kanıtı değildir. Kritik kategorilerde araca yazılmaz; karar kullanıcının sohbetteki açık onayıyla ilerler.
 4. Gerçek sonuç anlaşılınca → `gercek_sonuc` kaydı.
 
 ## Jev'e ne gider, ne gitmez
 - Gider: soru, kısa bağlam (en fazla 4.000 karakter), seçenek açıklamaları.
 - Gitmez: Claude'un seçimi ve gerekçesi, dosya içerikleri, gizli bilgi. Gizli bilgi desenine uyan bir metin varsa istek hiç gönderilmez (`gizli_girdi`) ve deftere bu metin yerine yalnızca `<gizli>` yazılır.
-- Kanal: yalnızca Vercel AI Gateway (`ai-gateway.vercel.sh`, model `typesafe-ai/jev`). Uç nokta ve model koda sabittir, ortam değişkeniyle değiştirilemez; yönlendirmeler reddedilir.
+- Kanal (bulut yolu): Vercel AI Gateway (`ai-gateway.vercel.sh`, model `typesafe-ai/jev`). Uç nokta ve model bu yolda koda sabittir, ortam değişkeniyle değiştirilemez; yönlendirmeler reddedilir. Bu sabitlikler YALNIZ bulut yolu için geçerlidir.
+- Kanal (cihaz yolu): isteği bu paket değil, cihazdaki mevcut Hafıza OS modülü (`jev_cagri.py` → `jev_client`) yapar. Uç noktayı o modülün ayar dosyası belirler ve o modülün kendi uç nokta politikası (yalnız sağlayıcının resmi HTTPS host'u ya da loopback, yönlendirme reddi) uygulanır. Bu paket o yolda yalnız dönen yanıtı doğrular.
+- Model adı: Vercel AI Gateway yalnız sürümsüz `typesafe-ai/jev` adını kabul eder (11 Ekim 2026 testinde `jev-1.13.0` gibi sabit adlar 404 verdi); sabit sürüm yalnız TypeSafe'in doğrudan API'siyle mümkündür ve kullanıcı izni şu an yalnız Vercel için olduğundan sağlayıcının bildirdiği model her kayıtta tutulur ve `rapor` (`jev_modelleri`, `uyarilar`) değişimi gösterir.
 
 ## Nerede çalışır
 | Ortam | Yol | Gereken |
 |---|---|---|
-| Cihaz (D:\YusufII) | Mevcut `HAFIZAM1\jev-araclar\jev_cagri.py` (anahtarı kendi dosyasından okur) | Bir şey gerekmez |
-| Bulut iş parçacıkları | Doğrudan Vercel AI Gateway | Bulut ortamında `AI_GATEWAY_API_KEY` ortam değişkeni ve `ai-gateway.vercel.sh` alan adı izni |
+| Cihaz (D:\YusufII) | Mevcut `HAFIZAM1\jev-araclar\jev_cagri.py` → `jev_client` isteği yapar (anahtarı ve uç noktayı kendi ayar dosyasından alır, kendi uç nokta politikasını uygular); bu paket yalnız yanıtı doğrular | Bir şey gerekmez |
+| Bulut iş parçacıkları | Doğrudan Vercel AI Gateway (sabit uç nokta ve model, yönlendirme reddi bu pakette) | Bulut ortamında `AI_GATEWAY_API_KEY` ortam değişkeni ve `ai-gateway.vercel.sh` alan adı izni |
 
 Bulut ortamı kurulana kadar bulut oturumları `claude_karari` (Jev'e erişilemedi) durumunda çalışır ve bunu açıkça yazar.
 
@@ -43,8 +45,8 @@ Bulut ortamı kurulana kadar bulut oturumları `claude_karari` (Jev'e erişileme
 
 ## Defter
 - Bulutta: `/mnt/project-files/jev-kararlar/kararlar.jsonl` (bütün iş parçacıkları ortak kullanır).
-- Cihazda: `D:\YusufII\HAFIZAM1\jev-araclar\kayit\kararlar.jsonl`.
-- Yalnız ekleme yapılır, satır silinmez. `JEV_KAYIT` ile değiştirilebilir.
+- Cihazda (Windows): `D:\YusufII\HAFIZAM1\jev-araclar\kayit\kararlar.jsonl` (yol `jev/ayar.py` içindedir).
+- Yalnız ekleme yapılır, satır silinmez. `JEV_KAYIT` ile değiştirilebilir; yol mutlak, `.jsonl` uzantılı ve sembolik bağsız olmalıdır.
 
 ## Birlikte çalışılanlar
 - implementer (claude-sonnet-5-5): `jev/` paketi ve testleri.

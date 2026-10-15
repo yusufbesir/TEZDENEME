@@ -1,4 +1,12 @@
-"""Jev'e taşıma katmanı. sor() asla istisna fırlatmaz."""
+"""Jev'e taşıma katmanı. sor() asla istisna fırlatmaz.
+
+İki yol vardır. Bulut yolunda (_bulut_tasima) bu paket isteği kendisi yapar: uç nokta ve model
+koda sabittir, yönlendirmeler reddedilir. Cihaz yolunda isteği cihazdaki mevcut Hafıza OS modülü
+(jev_cagri.py -> jev_client) yapar; uç noktayı onun ayar dosyası belirler ve o modülün kendi uç nokta
+politikası (yalnız sağlayıcının resmi HTTPS host'u ya da loopback, yönlendirme reddi) uygulanır.
+Sabit uç nokta/model ve yönlendirme reddi bu yüzden YALNIZ bulut yolu için geçerlidir; cihaz
+yolunda bu paket yalnız dönen yanıtı doğrular.
+"""
 
 import importlib.util
 import json
@@ -10,11 +18,16 @@ import time
 import urllib.error
 import urllib.request
 
-UC_NOKTA = "https://ai-gateway.vercel.sh/v1/systemone"  # SABİT
-MODEL = "typesafe-ai/jev"  # SABİT
+from . import ayar
+
+UC_NOKTA = "https://ai-gateway.vercel.sh/v1/systemone"  # SABİT (yalnız bulut yolu)
+# Vercel AI Gateway yalnız sürümsüz `typesafe-ai/jev` adını kabul ediyor (11 Ekim 2026 testinde
+# `jev-1.13.0` gibi sabit adlar 404 verdi); sabit sürüm yalnız TypeSafe'in doğrudan API'siyle mümkün
+# ve kullanıcı izni şu an yalnız Vercel için. Bu yüzden sağlayıcının bildirdiği model her kayıtta
+# tutulur ve rapor değişimi gösterir.
+MODEL = "typesafe-ai/jev"
 ANAHTAR_ORTAM = "AI_GATEWAY_API_KEY"
 ARACLAR_ORTAM = "JEV_ARACLAR"
-VARSAYILAN_ARACLAR = r"D:\YusufII\HAFIZAM1\jev-araclar"
 MAKS_YANIT = 1024 * 1024
 MAKS_GOVDE = 24000
 
@@ -130,7 +143,8 @@ def yanit_dogrula(raw, questions):
 
 
 def _bulut_tasima(body, timeout):
-    """Sabit uç noktaya POST. Anahtar yalnızca Authorization başlığına girer."""
+    """Bulut yolu: sabit uç noktaya POST, yönlendirme reddedilir. Anahtar yalnızca Authorization
+    başlığına girer. Bu sabitlikler cihaz yolunda geçerli değildir."""
     anahtar = os.environ.get(ANAHTAR_ORTAM, "")
     veri = json.dumps(body, ensure_ascii=False).encode("utf-8")
     istek = urllib.request.Request(
@@ -151,13 +165,14 @@ def _bulut_tasima(body, timeout):
 
 
 def _araclar_dizini():
-    return os.environ.get(ARACLAR_ORTAM) or VARSAYILAN_ARACLAR
+    """JEV_ARACLAR ya da (yalnız Windows'ta) ayar.CIHAZ_KOK; yoksa None."""
+    return os.environ.get(ARACLAR_ORTAM) or ayar.varsayilan_cihaz_koku()
 
 
 def tasima_yolu():
     """'cihaz' | 'bulut' | 'yok' (ağ çağrısı yapmaz). Göreli araç yolu cihaz yolunu kapatır."""
     dizin = _araclar_dizini()
-    if os.path.isabs(dizin) and os.path.isfile(os.path.join(dizin, "jev_cagri.py")):
+    if dizin and os.path.isabs(dizin) and os.path.isfile(os.path.join(dizin, "jev_cagri.py")):
         return "cihaz"
     if os.environ.get(ANAHTAR_ORTAM):
         return "bulut"
@@ -165,6 +180,8 @@ def tasima_yolu():
 
 
 def _cihaz_cagri(state, questions, timeout):
+    """Cihaz yolu: isteği Hafıza OS modülü (jev_cagri -> jev_client) yapar; uç noktayı onun ayar
+    dosyası belirler ve onun uç nokta politikası geçerlidir. Bu paket yalnız yanıtı doğrular."""
     dizin = os.path.realpath(_araclar_dizini())
     dosya = os.path.join(dizin, "jev_cagri.py")
     eski_yol = list(sys.path)
@@ -182,7 +199,8 @@ def _cihaz_cagri(state, questions, timeout):
 
 
 def _cihaz_sonuc(ham, questions, t0):
-    """Cihaz çıktısını doğrulayıp sözlüğü yeniden kurar; ham alanlar aktarılmaz."""
+    """Cihaz çıktısını doğrulayıp sözlüğü yeniden kurar; ham alanlar aktarılmaz.
+    Bu paketin cihaz yolunda yaptığı tek şey budur (istek modülde yapılır)."""
     kod = ham.get("code")
     kod = kod if isinstance(kod, str) and CIHAZ_KOD.match(kod) else None
     model = ham.get("model")

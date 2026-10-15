@@ -4,19 +4,33 @@ import json
 import os
 from datetime import datetime, timezone
 
+from . import ayar
 from .istemci import metin_gizli_mi
 
 ORTAM = "JEV_KAYIT"
 
 
+def _ortam_yolu(yol):
+    """JEV_KAYIT: mutlak, .jsonl uzantılı; dosyanın kendisi sembolik bağ olamaz.
+
+    Üst dizinlerde sembolik bağa izin verilir (/mnt/project-files bir bağ olabilir);
+    dosyanın kendisi ayrıca O_NOFOLLOW ile açılır."""
+    hata = ValueError("JEV_KAYIT mutlak ve .jsonl uzantılı bir dosya yolu olmalı.")
+    if not os.path.isabs(yol) or not yol.endswith(".jsonl"):
+        raise hata
+    if os.path.islink(yol) or ".." in yol.replace("\\", "/").split("/"):
+        raise hata
+    return yol
+
+
 def varsayilan_yol():
     ortam = os.environ.get(ORTAM)
     if ortam:
-        return ortam
+        return _ortam_yolu(ortam)
     if os.path.isdir("/mnt/project-files"):
         return "/mnt/project-files/jev-kararlar/kararlar.jsonl"
-    cihaz = r"D:\YusufII\HAFIZAM1\jev-araclar"
-    if os.path.isdir(cihaz):
+    cihaz = ayar.varsayilan_cihaz_koku()
+    if cihaz and os.path.isdir(cihaz):
         return os.path.join(cihaz, "kayit", "kararlar.jsonl")
     return os.path.join(os.path.expanduser("~"), ".jev-kararlar", "kararlar.jsonl")
 

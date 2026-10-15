@@ -16,3 +16,5 @@
 | 2026-10-15 | Güvenlik düzeltmelerini yeniden doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Kaldı yalnız belgede (hash cümlesi); orkestratör tek satırı düzeltti, kod kontrolleri geçti (44 test, cihaz biçimi uçtan uca). |
 | 2026-10-15 | criteria sözlük düzeltmesini doğrula (cihazda HTTP 400 teşhisi sonrası) [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. 45 test. |
 | 2026-10-15 | Bağımsız hakem: canlı denemedeki ayrışma kararı (Claude C, Jev A) [İP:Jev'i projeye bağlama#TMGrRs] | verifier (hakem) / claude-sonnet-5-5 | 8.220 toplam | A seçti; 2/3 çoğunluk A, Claude'un bilerek zayıf seçimi düzeltildi. |
+| 2026-10-15 | Baş Denetmen PR #10 bulgularını düzelt [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 64.083 toplam | Başarılı. 6 madde, 55 test. Orkestratör JEV_KAYIT kısıtını üst dizin bağına izin verecek biçimde daralttı. |
+| 2026-10-15 | Denetmen düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. |

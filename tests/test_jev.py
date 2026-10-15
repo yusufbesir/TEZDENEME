@@ -217,8 +217,8 @@ class SonuclandirTesti(Temel):
 
     def test_kullanici_karari_ve_hatalar(self):
         kid = self._karar(sahte([FARKLI]))
-        r = karar.sonuclandir(kid, kullanici_secimi="C", kayit_yolu=self.yol)
-        self.assertEqual((r["eylem"], r["secilen"]), ("uygula", "C"))
+        r = karar.sonuclandir(kid, kullanici_secimi="C", onay_mesaji="cmsg_abcdefghij12", kayit_yolu=self.yol)
+        self.assertEqual((r["eylem"], r["secilen"]), ("kullanici_secimi_kaydedildi", "C"))
         self.assertEqual(kayit.oku(self.yol)[-1]["olay"], "kullanici_karari")
         with self.assertRaises(ValueError):
             karar.sonuclandir(kid, hakem_secimi="Z", kayit_yolu=self.yol)
@@ -238,7 +238,7 @@ class RaporTesti(Temel):
         karar.sonuclandir(k2, hakem_secimi="A", kayit_yolu=self.yol)
         karar.sonuc_isle(k1, "A", kayit_yolu=self.yol)
         karar.sonuc_isle(k2, "B", kayit_yolu=self.yol)
-        karar.sonuclandir(k5, kullanici_secimi="A", kayit_yolu=self.yol)
+        kayit.ekle(k5, "kullanici_karari", {"secilen": "A", "dogrulanmamis": True}, self.yol)
         r = karar.rapor(self.yol)
         self.assertEqual(r["toplam_karar"], 5)
         self.assertEqual(r["jev_yok"], 1)
@@ -447,12 +447,15 @@ class GuvenlikDuzeltmeTesti(Temel):
     # 4
     def test_kullanici_karari_dogrulanmamis(self):
         kid = self.danis(girdi(), sahte([FARKLI]))["karar_id"]
-        r = karar.sonuclandir(kid, kullanici_secimi="B", kayit_yolu=self.yol)
+        r = karar.sonuclandir(kid, kullanici_secimi="B", onay_mesaji="cmsg_abcdefghij12", kayit_yolu=self.yol)
         self.assertTrue(r["dogrulanmamis"])
         self.assertIn("Bu kayıt, kullanıcı onayının kanıtı değildir; "
                       "kullanıcının sohbetteki cevabına dayanmalıdır.", r["not"])
         self.assertTrue(kayit.oku(self.yol)[-1]["dogrulanmamis"])
         self.assertEqual(karar.rapor(self.yol)["kullanici_karari_dogrulanmamis"], 1)
+        self.assertEqual(kayit.oku(self.yol)[-1]["onay_mesaji"], "cmsg_abcdefghij12")
+        self.assertIn("Bu kayıt onayın kanıtı değildir; onay mesajı: " + "cmsg_abcdefghij12", r["ozet"])
+        self.assertNotIn("Kesin karar", r["ozet"])
 
     def test_skill_cumlesi(self):
         yol = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -510,10 +513,6 @@ class GuvenlikDuzeltmeTesti(Temel):
         self.assertEqual(kayit.oku(self.yol)[-1]["jev_kod"], ["ok", "sure_asimi"])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class CihazGercekBicimTesti(unittest.TestCase):
     """jev_cagri.sor'un gerçek dönüş biçimi: code=None, üst düzey confidence, choice=seçenek id."""
 
@@ -545,3 +544,121 @@ class BomTesti(unittest.TestCase):
                                env={**os.environ, "JEV_KAYIT": os.path.join(d, "k.jsonl"), "JEV_ARACLAR": "/yok"})
             self.assertEqual(r.returncode, 2)
             self.assertNotIn("BOM", r.stdout + r.stderr)
+
+
+class YeniKurallarTesti(Temel):
+    def test_onay_mesaji_zorunlu(self):
+        kid = self.danis(girdi(), sahte([FARKLI]))["karar_id"]
+        for kotu in (None, "", "msg_abcdefghij12", "cmsg_kisa", "cmsg_abc defghij12", "xcmsg_abcdefghij12"):
+            with self.assertRaises(ValueError) as e:
+                karar.sonuclandir(kid, kullanici_secimi="A", onay_mesaji=kotu, kayit_yolu=self.yol)
+            self.assertIn("--onay-mesaji cmsg_", str(e.exception))
+        self.assertEqual([k["olay"] for k in kayit.oku(self.yol)].count("kullanici_karari"), 0)
+
+    def test_kritikte_kullanici_yolu_kapali(self):
+        for kat in ("mimari", "guvenlik", "veri_butunlugu", "geri_alinamaz"):
+            kid = self.danis(girdi(kategori=kat), sahte([FARKLI]))["karar_id"]
+            with self.assertRaises(ValueError) as e:
+                karar.sonuclandir(kid, kullanici_secimi="A", onay_mesaji="cmsg_abcdefghij12", kayit_yolu=self.yol)
+            self.assertIn("Kritik kararlarda kullanıcı kararı bu araçla kaydedilmez", str(e.exception))
+
+    def test_cli_onay_mesaji(self):
+        kid = self.danis(girdi(), sahte([FARKLI]))["karar_id"]
+        with mock.patch.dict(os.environ, {"JEV_KAYIT": self.yol}):
+            with contextlib.redirect_stderr(io.StringIO()) as e:
+                self.assertEqual(cli.main(["sonuclandir", "--karar", kid, "--kullanici", "A"]), 2)
+            self.assertIn("--onay-mesaji", e.getvalue())
+            tampon = io.StringIO()
+            with contextlib.redirect_stdout(tampon):
+                self.assertEqual(cli.main(["sonuclandir", "--karar", kid, "--kullanici", "A",
+                                           "--onay-mesaji", "cmsg_abcdefghij12"]), 0)
+            self.assertEqual(json.loads(tampon.getvalue())["eylem"], "kullanici_secimi_kaydedildi")
+
+    def test_docs_ve_skill_guncel(self):
+        kok = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(kok, ".claude", "skills", "jev-karar", "SKILL.md"), encoding="utf-8") as f:
+            skill = f.read()
+        self.assertIn("--onay-mesaji cmsg_", skill)
+        self.assertNotIn("--kullanici <seçenek>\n", skill.replace("--onay-mesaji", "X"))
+        with open(os.path.join(kok, "docs", "jev", "karar-kurgusu.md"), encoding="utf-8") as f:
+            doc = f.read()
+        for parca in ("YALNIZ bulut yolu", "jev_client", "loopback", "yalnız dönen yanıtı doğrular",
+                      "sürümsüz `typesafe-ai/jev`"):
+            self.assertIn(parca, doc)
+
+    def test_istemci_yorumu_ve_etiket(self):
+        with open(istemci.__file__, encoding="utf-8") as f:
+            kaynak = f.read()
+        self.assertIn("MODEL = \"typesafe-ai/jev\"\n", kaynak)
+        self.assertNotIn("MODEL = \"typesafe-ai/jev\"  # SABİT", kaynak)
+        self.assertIn("jev-1.13.0", kaynak)
+        self.assertIn("UC_NOKTA", kaynak)
+
+    def test_cihaz_koku_ayar(self):
+        from jev import ayar
+        self.assertEqual(ayar.CIHAZ_KOK, r"D:\YusufII\HAFIZAM1\jev-araclar")
+        for ad in ("istemci.py", "kayit.py"):
+            with open(os.path.join(os.path.dirname(ayar.__file__), ad), encoding="utf-8") as f:
+                self.assertNotIn("YusufII", f.read())
+        with mock.patch.object(ayar.os, "name", "posix"):
+            self.assertIsNone(ayar.varsayilan_cihaz_koku())
+            with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
+                self.assertEqual(istemci.tasima_yolu(), "yok")
+        with mock.patch.object(ayar.os, "name", "nt"):
+            self.assertEqual(ayar.varsayilan_cihaz_koku(), ayar.CIHAZ_KOK)
+            with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
+                self.assertEqual(istemci._araclar_dizini(), ayar.CIHAZ_KOK)
+
+    def test_jev_kayit_yol_kisiti(self):
+        hata = "JEV_KAYIT mutlak ve .jsonl uzantılı bir dosya yolu olmalı."
+        for kotu in ("goreli/k.jsonl", os.path.join(self.dizin.name, "k.txt")):
+            with mock.patch.dict(os.environ, {"JEV_KAYIT": kotu}):
+                with self.assertRaises(ValueError) as e:
+                    kayit.varsayilan_yol()
+                self.assertEqual(str(e.exception), hata)
+        if hasattr(os, "symlink"):
+            gercek = os.path.join(self.dizin.name, "gercek.jsonl")
+            open(gercek, "w").close()
+            bag = os.path.join(self.dizin.name, "bag.jsonl")
+            os.symlink(gercek, bag)
+            dizin_bag = os.path.join(self.dizin.name, "dizinbag")
+            os.symlink(self.dizin.name, dizin_bag)
+            for kotu in (bag, os.path.join(self.dizin.name, "x", "..", "k.jsonl")):
+                with mock.patch.dict(os.environ, {"JEV_KAYIT": kotu}):
+                    with self.assertRaises(ValueError):
+                        kayit.varsayilan_yol()
+            # Üst dizin bağına izin verilir (/mnt/project-files gibi).
+            ust = os.path.join(dizin_bag, "yeni.jsonl")
+            with mock.patch.dict(os.environ, {"JEV_KAYIT": ust}):
+                self.assertEqual(kayit.varsayilan_yol(), ust)
+        iyi = os.path.join(os.path.realpath(self.dizin.name), "iyi.jsonl")
+        with mock.patch.dict(os.environ, {"JEV_KAYIT": iyi}):
+            self.assertEqual(kayit.varsayilan_yol(), iyi)
+
+    def test_rapor_model_degisimi(self):
+        def m(ad):
+            def t(body, timeout):
+                r = sahte([YUKSEK])(body, timeout)
+                r["model"] = ad
+                return r
+            return t
+        self.danis(girdi(), m("jev-a"))
+        r = karar.rapor(self.yol)
+        self.assertEqual(r["jev_modelleri"], {"jev-a": 1})
+        self.assertEqual(r["uyarilar"], [])
+        self.danis(girdi(), m("jev-b"))
+        self.danis(girdi(), m("jev-b"))
+        r = karar.rapor(self.yol)
+        self.assertEqual(r["jev_modelleri"], {"jev-a": 1, "jev-b": 2})
+        self.assertEqual(r["uyarilar"], ["Jev modeli kayıtlar arasında değişti; eşikleri yeniden gözden geçir."])
+
+    def test_kalibrasyon_dusuk_kova(self):
+        kid = self.danis(girdi(), sahte([("A", {"A": 0.4, "B": 0.35, "C": 0.25}, 0.4)]))["karar_id"]
+        karar.sonuc_isle(kid, "A", kayit_yolu=self.yol)
+        k = karar.rapor(self.yol)["kalibrasyon"]
+        self.assertEqual(k["0.0-0.5"]["sayi"], 1)
+        self.assertEqual(k["0.0-0.5"]["dogruluk"], 1.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

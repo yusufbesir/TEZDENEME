@@ -34,12 +34,13 @@ Jev önerir, Claude karar verir. Jev'in "genelde doğru" seçmesi her seferinde 
      python3 -m jev sonuclandir --karar <id> --hakem <seçenek> --hakem-model claude-sonnet-5-5 --hakem-gerekce "..."
      ```
      Çoğunluk (2/3) varsa `uygula`, yoksa `kullaniciya_sor`. Kritik kategoride çoğunluk olsa da `kullanici_onayi` döner; çoğunluğun seçimi `oneri` alanındadır.
-   - `kullaniciya_sor` / `kullanici_onayi`: Kullanıcıya tek soru sor; seçenekleri, senin seçimini, Jev'in seçimini ve olasılığını göster, önerini işaretle. Cevabı kaydet:
-     ```bash
-     python3 -m jev sonuclandir --karar <id> --kullanici <seçenek>
-     ```
-     `--kullanici` yalnız kullanıcı sohbette açıkça seçtikten sonra yazılır; kendi seçimini kullanıcı kararı diye kaydetme.
-     `--kullanici` yalnız kullanıcı sohbette açıkça seçtikten sonra yazılır; kendi seçimini kullanıcı kararı diye kaydetme.
+   - `kullaniciya_sor` / `kullanici_onayi`: Kullanıcıya tek soru sor; seçenekleri, senin seçimini, Jev'in seçimini ve olasılığını göster, önerini işaretle.
+     - Kritik kategoride (mimari, güvenlik, veri bütünlüğü, geri alınamaz) cevap araca yazılmaz; karar kullanıcının sohbetteki açık onayıdır, onunla ilerle.
+     - Normal kategoride cevabı, kullanıcının onay mesajının kimliğiyle kaydet:
+       ```bash
+       python3 -m jev sonuclandir --karar <id> --kullanici <seçenek> --onay-mesaji cmsg_<kimlik>
+       ```
+       `--kullanici` yalnız kullanıcı sohbette açıkça seçtikten sonra yazılır; kendi seçimini kullanıcı kararı diye kaydetme. Kayıt onayın kanıtı değildir (`dogrulanmamis`); `--onay-mesaji` yoksa ya da biçimi bozuksa araç reddeder.
    - `claude_karari` (Jev'e erişilemedi): kendi seçiminle devam et ve yanıtta **"Jev'e erişilemedi"** diye açıkça yaz.
 6. Sonradan hangi seçeneğin gerçekten doğru olduğu anlaşılırsa: `python3 -m jev sonuc --karar <id> --dogru <seçenek>`. Bu, Jev'in kalibrasyonunu ölçer.
 
