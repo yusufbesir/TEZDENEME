@@ -1,8 +1,20 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Yayın imzası: android/key.properties dosyası depoya girmez (.gitignore).
+// Anahtar deposu (*.jks) ve şifreler yalnızca geliştiricinin cihazında durur.
+val anahtarOzellikleri = Properties()
+val anahtarDosyasi = rootProject.file("key.properties")
+val yayinImzasiVar = anahtarDosyasi.exists()
+if (yayinImzasiVar) {
+    FileInputStream(anahtarDosyasi).use { anahtarOzellikleri.load(it) }
 }
 
 android {
@@ -30,11 +42,27 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (yayinImzasiVar) {
+            create("yayin") {
+                keyAlias = anahtarOzellikleri["keyAlias"] as String
+                keyPassword = anahtarOzellikleri["keyPassword"] as String
+                storeFile = file(anahtarOzellikleri["storeFile"] as String)
+                storePassword = anahtarOzellikleri["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            if (yayinImzasiVar) {
+                signingConfig = signingConfigs.getByName("yayin")
+            } else {
+                // key.properties yoksa yalnızca yerel deneme için hata ayıklama anahtarı kullanılır.
+                // Dağıtım derlemesi key.properties olmadan yapılmamalıdır (bkz. docs/IMZA.md).
+                logger.warn("UYARI: android/key.properties yok; release derlemesi hata ayıklama anahtarıyla imzalanıyor. Dağıtma!")
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 }
