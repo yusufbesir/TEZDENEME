@@ -22,3 +22,4 @@
 | 2026-10-15 | Adım Adım: Baş Denetmen bulguları (kıvrık kesme, sıfırlama yedekleri, açılış izni, ad kırpma, imza notu) | koordinatör (Fable) / claude-fable-5-1 | – | Uygulandı; test sonucu PR'a yazılacak. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
 | 2026-10-15 | Adım Adım: çeldirici "2" ekleri, "kap" yazımı, Dinle açıklamaları | implementer / claude-sonnet-5-5 | 38.735 toplam | Başarılı. 16 çeldirici, 14 açıklama; 14 içerik testi geçti. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
 | 2026-10-15 | Adım Adım: Baş Denetmen düzeltmelerinin doğrulanması (3. tur) | verifier / claude-sonnet-5-5 | 41.558 toplam | Geçti. 101 test; 1 orta (value/textContent çift doğru), 3 düşük içerik notu; orkestratör düzeltti. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
+| 2026-10-15T15:10Z | Eski egitim-uygulamasi klasörünü kaldır, PR #13 aç | Fable (kendisi, tek dosyalık iş) | - | Açıldı, Yusuf onayı bekleniyor |

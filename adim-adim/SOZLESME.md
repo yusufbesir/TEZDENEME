@@ -52,7 +52,7 @@ class DosyaDepo implements Depo { DosyaDepo(Directory klasor); ... }
 - `ingilizce_a1.dart` → `final Kurs ingilizceA1` (id `ingilizce-1`, alan dil): en az 4 ünite, 12 ders; eski sürümün 10 dersi taşınır ve genişletilir; her derste en az 1 `Dinle` alıştırması (okunacak İngilizce cümle, seçenekler İngilizce yazımlar).
 - `html_1.dart`, `css_1.dart`, `js_1.dart` → `html1`, `css1`, `js1` (alan kod): eski sürümün 6'şar dersi taşınır; her derste en az 1 `Kod` alıştırması (`kod` içinde `___`).
 - `icerik.dart` → `final List<Kurs> tumKurslar`, `Kurs? kursBul(String id)`.
-- Kaynak: /tmp/claude-0/-home-claude-TEZDENEME/a7bebf22-1eff-5824-a689-494af342a61b/scratchpad/eski/egitim-uygulamasi/icerik/*.js (özgün içerik, önceki oturum yazdı; aynen aktarılabilir). Açıklamalar Türkçe, dil kurallarına uygun.
+- Kaynak: eski HTML sürümünün içerik dosyaları (git geçmişinde `egitim-uygulamasi/icerik/*.js`, main dalındaki ce629fa1 öncesi; özgün içerik, önceki oturum yazdı; aynen aktarılabilir). Açıklamalar Türkçe, dil kurallarına uygun.
 - `test/icerik_test.dart`: id'ler benzersiz, her ders 8-10 alıştırma, dogru indeksleri aralık içinde, Sirala.dogru ile kelimeler aynı küme, Eslestir 3-5 çift, Kod ve Bosluk sorularında `___` var, her kurs JSON gidiş-dönüşte eşit.
 
 ## C — Arayüz
