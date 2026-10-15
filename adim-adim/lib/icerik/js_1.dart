@@ -381,10 +381,11 @@ const Kurs js1 = Kurs(
             ),
             Bosluk(
               soru:
-                  'let el = document.getElementById("kod"); el.___ = "ABC-123"; yazıyı değiştirir.',
-              secenekler: ['value', 'write', 'textContent', 'say'],
+                  'let el = document.getElementById("kod"); el.___ = "ABC-123"; bir <p> öğesinin yazısını değiştirir.',
+              secenekler: ['innerHTML', 'write', 'textContent', 'say'],
               dogru: 2,
-              aciklama: 'textContent bir öğenin metnini güvenle değiştirir.',
+              aciklama:
+                  'textContent metni güvenle değiştirir; innerHTML kodu yorumlar, kullanıcı metni için kullanılmaz.',
             ),
             Bosluk(
               soru: 'el.classList.___("gizli"); öğeye sınıf ekler.',
@@ -471,7 +472,7 @@ const Kurs js1 = Kurs(
                   'preventDefault olayın varsayılan davranışını iptal eder.',
             ),
             Secim(
-              soru: 'Tuşa basma olayının adı nedir?',
+              soru: 'Tuşa basıldığı an tetiklenen olayın adı nedir?',
               secenekler: ['keyup', 'keydown', 'typed', 'keyclick'],
               dogru: 1,
               aciklama: 'keydown, tuşa basıldığı an tetiklenir.',

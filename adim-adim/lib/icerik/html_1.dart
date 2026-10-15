@@ -212,7 +212,8 @@ const Kurs html1 = Kurs(
                   'label bir alana ad verir ve tıklanınca alana odaklanır.',
             ),
             Bosluk(
-              soru: '<input type="___" name="parola">',
+              soru:
+                  'Yazılanı noktalarla gizleyen alan: <input type="___" name="parola">',
               secenekler: ['hidden', 'star', 'password', 'secret'],
               dogru: 2,
               aciklama: 'Yazılanı noktalarla gizleyen tür password türüdür.',

@@ -83,7 +83,7 @@ const Kurs ingilizceA1 = Kurs(
               secenekler: [
                 'Hello, my game is Ali.',
                 'Hello, my name is Ali.',
-                'Hello, my name is Ally.',
+                'Hello, my name is Emily.',
               ],
               dogru: 1,
               aciklama:
