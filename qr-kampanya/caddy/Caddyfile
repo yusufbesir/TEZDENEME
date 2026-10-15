@@ -17,12 +17,27 @@
 		-Server
 	}
 
-	# Yüklenen görseller doğrudan Caddy tarafından sunulur (salt okunur).
-	handle_path /medya/* {
-		root * /srv/medya
-		header Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'none'; sandbox"
-		header Cache-Control "public, max-age=86400"
-		file_server
+	# İç uçlar (/ic/*) dışarıya kapalıdır; yalnızca Caddy'nin app'e yaptığı alt istekler kullanır.
+	handle /ic/* {
+		respond 404
+	}
+
+	# Yüklenen görseller doğrudan Caddy tarafından sunulur (salt okunur), ama önce app'e yetki sorulur:
+	# forward_auth alt isteği GET /ic/medya-yetki gönderir (asıl yol X-Forwarded-Uri, yöntem X-Forwarded-Method
+	# başlığında; çerezler dahil istek başlıkları kopyalanır). 2xx ise dosya sunulur, değilse app'in yanıtı (404) döner.
+	# Yayında olmayan sayfaların görselleri yalnızca panelde yetkili oturumla açılır.
+	handle /medya/* {
+		route {
+			forward_auth app:8000 {
+				uri /ic/medya-yetki
+				header_up X-Forwarded-Proto {scheme}
+			}
+			uri strip_prefix /medya
+			root * /srv/medya
+			header Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'none'; sandbox"
+			header Cache-Control "private, max-age=3600"
+			file_server
+		}
 	}
 
 	handle {

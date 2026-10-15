@@ -15,7 +15,7 @@ from qr.middleware import ip_anahtari
 from qr.models import DenemeSayaci, DenetimKaydi
 from qr.sayac import GirisDenemesi, ad_normalle
 
-from .yardimci import PAROLA, TemelTest
+from .yardimci import PAROLA, TemelTest, betik_dizini
 
 VARYANTLAR = [
     "editor", "ｅditor", "eｄitor", "edｉtor", "ediｔor", "editｏr", "editoｒ",
@@ -110,9 +110,7 @@ class Y4Ipv6(TemelTest):
         self.assertEqual(kodlar[3:], [429, 429])
 
     def test_yedek_dongusu_temizlik_icerir(self):
-        import pathlib
-
-        betik = (pathlib.Path(__file__).resolve().parents[3] / "scripts" / "yedek-dongu.sh").read_text()
+        betik = (betik_dizini() / "yedek-dongu.sh").read_text()
         self.assertIn("DELETE FROM qr_denemesayaci WHERE bitis < now()", betik)
 
 

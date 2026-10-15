@@ -65,6 +65,9 @@
   <p>Son yedek: <strong>{{ yedek.zaman }}</strong></p>
   <p>Durum: <span class="{% if yedek.basarili %}basari-metin{% else %}hata-metin{% endif %}">{{ yedek.durum }}</span></p>
   <p>Dosya: {{ yedek.dosya|default:"-" }} · Boyut: {{ yedek.boyut }}</p>
+  <p>Sunucudaki yedek sayısı: {% if yedek.yerel_sayi is not None %}{{ yedek.yerel_sayi }}{% else %}-{% endif %} · En eski: {{ yedek.en_eski|default:"-" }}</p>
+  <p>Sunucu dışı kopya son doğrulama: {% if yedek.uzak_zaman %}<strong>{{ yedek.uzak_zaman }}</strong>{% else %}<strong>yok</strong>{% endif %}</p>
   {% else %}<p>{{ yedek.mesaj }}</p>{% endif %}
+  {% if yedek.uzak_uyari %}<div class="uyari-kutu" id="uzak-kopya-uyari">Sunucu dışı kopya doğrulanmadı; eski yedekler silinmiyor, disk dolabilir — docs/YEDEKLEME.md</div>{% endif %}
 </div>
 {% endblock %}

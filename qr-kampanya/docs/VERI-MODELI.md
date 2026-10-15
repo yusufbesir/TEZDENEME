@@ -27,6 +27,16 @@
 | `qr_mfacihazi` | Kullanıcının doğrulama uygulaması anahtarı | kullanıcı | — | Kullanıcıyla birlikte |
 | `onbellek` | Giriş denemesi sayaçları | — | — | Geçici veri |
 
+## Veritabanı rolleri
+
+| Rol | Kim kullanır | Yetki |
+|---|---|---|
+| `POSTGRES_USER` (süper kullanıcı) | Yalnızca veritabanı konteyneri ve bakım | Her şey. Uygulamaya verilmez. |
+| `qr_sahip` | `hazirlik` servisi (migrasyonlar), yedek servisi | Tabloların sahibi; tablo oluşturur/değiştirir. Süper kullanıcı değildir. |
+| `qr_uygulama` | Çalışan uygulama (`app`) | Yalnızca SELECT/INSERT/UPDATE/DELETE. Tablo silemez, tetikleyici kapatamaz, TRUNCATE yapamaz. `qr_qrkod`, `qr_kampanyasayfasi`, `qr_hedefgecmisi`'nde DELETE, `qr_denetimkaydi`'nda UPDATE/DELETE yetkisi yoktur. |
+
+Roller `db/init/10-roller.sh` ile kurulur (migrasyon `0005` ek yetki kısıtlarını uygular). Kontrol: `bash scripts/rol-dogrulama.sh`.
+
 ## QR kod alanları
 
 Zorunlu olanlar yalnızca **kısa kod** (boşsa otomatik üretilir) ve **hedef** (harici URL veya sistem sayfası). Diğerleri isteğe bağlıdır: ad, tür, ürün, kampanya, mağaza, başlangıç/bitiş, bitiş sonrası adres, durum, açıklama, etiketler. Oluşturan/değiştiren kullanıcı ve tarihler otomatik tutulur.

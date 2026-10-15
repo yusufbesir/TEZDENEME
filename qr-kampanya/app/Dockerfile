@@ -11,11 +11,12 @@ WORKDIR /app
 COPY requirements.txt .
 # İnternetsiz (çevrimdışı) derleme için: önceden indirilmiş paketler "tekerlekler/"
 # klasöründe varsa oradan kurulur, yoksa PyPI'den. Normal kurulumda klasör yoktur.
+# Her iki yolda da requirements.txt'deki hash'ler zorunludur (--require-hashes); uyuşmayan paket kurulmaz.
 RUN --mount=type=bind,source=.,target=/baglam \
     if [ -d /baglam/tekerlekler ]; then \
-      pip install --no-index --find-links /baglam/tekerlekler -r requirements.txt; \
+      pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt; \
     else \
-      pip install -r requirements.txt; \
+      pip install --require-hashes --no-deps -r requirements.txt; \
     fi
 
 # Uygulama root olmayan kullanıcıyla çalışır. Uygulama kodu (/app) root'a aittir ve uygulama kullanıcısı

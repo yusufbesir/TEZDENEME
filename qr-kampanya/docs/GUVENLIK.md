@@ -25,22 +25,28 @@ Sistem internete açık bir üretim uygulaması olarak tasarlandı: HTTPS zorunl
 | Açık yönlendirme | `/k/<kod>` yalnızca yöneticinin kaydettiği hedefe gider; istekten gelen bir adrese yönlendirme yapan uç yoktur. |
 | SSRF | Sunucu, kullanıcı tarafından girilen URL'leri **hiçbir zaman çağırmaz**. “Hedefi test et” bağlantıyı kullanıcının tarayıcısında açar. |
 | Dosya yükleme | Yalnızca JPG/PNG/WebP, 5 MB sınırı, Pillow ile görsel doğrulaması, rastgele dosya adı; SVG/HTML yüklenemez; görseller ayrı ve sıkı CSP ile sunulur. |
+| Görsellere erişim | Caddy her `/medya/` isteğinde önce uygulamaya sorar (`forward_auth` → `/ic/medya-yetki`). Yalnızca **yayındaki** sayfaların görselleri herkese açıktır; taslak ve arşiv sayfaların görsellerini yalnızca panele MFA ile giriş yapmış ve sayfa görme yetkisi olan kullanıcılar görür. Diğer her istek 404. `/ic/*` dışarıya kapalıdır. |
 | Gizli bilgiler | `.env` (izin 600, `.gitignore`'da). Kaynak kodda parola/anahtar yok. Zayıf `DJANGO_SECRET_KEY` ile üretimde uygulama başlamaz. |
 | Veritabanı erişimi | PostgreSQL portu yayınlanmaz; `ic` Docker ağı internete kapalı (`internal: true`). |
+| Veritabanı rolleri | Uygulama süper kullanıcıyla bağlanmaz. `qr_sahip` tabloların sahibidir ve yalnızca tek seferlik `hazirlik` servisinde (migrasyon) ve yedekte kullanılır. Uygulama `qr_uygulama` ile bağlanır: yalnızca okuma/ekleme/güncelleme/silme yetkisi vardır, tablo silemez, tetikleyici kapatamaz, TRUNCATE yapamaz. QR, sayfa ve hedef geçmişi tablolarında DELETE, denetim kaydında UPDATE/DELETE yetkisi de geri alınmıştır (tetikleyicilere ek). Uygulama konteyneri süper kullanıcı ve sahip parolalarını almaz. Kontrol: `bash scripts/rol-dogrulama.sh`. |
 | MFA kurulum anahtarı | Onaylanmamış TOTP anahtarı veritabanına yazılmaz; her bekleyen girişte yeniden üretilip yalnızca o oturumda tutulur. İlk kod doğrulanınca kaydedilir. MFA sıfırlanınca kullanıcının bütün oturumları sonlanır. |
 | Konteyner | Uygulama root olmayan kullanıcıyla çalışır; kod root'a aittir ve salt okunur kök dosya sistemiyle çalışır (`read_only`, `cap_drop: ALL`, `no-new-privileges`); yalnızca `/veri` yazılabilir. İmajlar sürümle sabit (`latest` yok). |
 | Denetim kaydı | Giriş/çıkış, başarısız giriş, oluşturma, düzenleme, hedef değişikliği, durum değişikliği, içe/dışa aktarma, kullanıcı ve ayar değişiklikleri. Kayıtlar değiştirilemez ve silinemez. |
 | Güvenli hata mesajları | Üretimde `DEBUG=0`; hata sayfaları ayrıntı göstermez; sağlık ucu yalnızca `ok/hata` döner. |
-| Hız sınırlama | Yönlendirme ucunda IP başına dakikada 120 istek (ayarlanabilir); giriş denemesi sınırı. |
+| Hız sınırlama | Yönlendirme ucunda IP başına dakikada 120 istek (ayarlanabilir; IPv6 adresleri /64 öneki olarak sayılır); giriş denemesi sınırı. |
 | Günlükler | Docker günlük döndürme (10 MB × 5). Caddy erişim günlüklerinde istemci IP'si maskelenir (IPv4 /24, IPv6 /48), çerez ve `X-Forwarded-For` yazılmaz; veritabanında IP saklanmaz. |
-| Yedekleme | Günlük otomatik, doğrulanmış yedek; geri yükleme testi betiği; sunucu dışı kopya betiği. |
+| Yedekleme | Günlük otomatik, doğrulanmış yedek; **age ile şifreli** (açık anahtarla şifrelenir, özel anahtar yedek konteynerinde yoktur); sha256 ile bütünlük kontrolü; geri yükleme testi betiği. Eski yerel yedekler yalnızca sunucu dışı kopyası rclone ile doğrulandıysa silinir; doğrulama yoksa hiçbir yedek silinmez ve panel uyarı gösterir. |
+| Bağımlılıklar | Bütün Python paketleri (geçişliler dahil) sürüm ve **hash** ile sabittir (`--require-hashes`); hash'i tutmayan paket kurulmaz. `scripts/guvenlik-tarama.sh` (pip-audit) bilinen zafiyetleri tarar. Son tarama: `docs/kanit/pip-audit-2026-10-15.txt` (zafiyet yok). |
 
 ## Üretime geçmeden önce kontrol listesi
 
 Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 
 - [ ] `.env` içinde `DJANGO_DEBUG=0`, `MFA_ZORUNLU=1`, `GUVENLI_CEREZ` tanımlı değil veya `1`.
-- [ ] `DJANGO_SECRET_KEY` ve `POSTGRES_PASSWORD` `kurulum.sh` ile üretildi (örnek değerler değil).
+- [ ] `DJANGO_SECRET_KEY`, `POSTGRES_PASSWORD`, `POSTGRES_SAHIP_PAROLA`, `POSTGRES_UYGULAMA_PAROLA` `kurulum.sh` ile üretildi (örnek değerler değil).
+- [ ] Yedek özel anahtarı (`gizli/yedek-anahtari.txt`) parola yöneticisine kopyalandı. Bu anahtar olmadan yedekler açılamaz.
+- [ ] `bash scripts/rol-dogrulama.sh` **GEÇTİ** dedi.
+- [ ] `bash scripts/guvenlik-tarama.sh` zafiyet bulmadı.
 - [ ] `.env` izinleri `600` (`ls -l .env`) ve dosyanın bir kopyası parola yöneticisinde.
 - [ ] `SITE_ALAN_ADI`, `SITE_ADRESI`, `DJANGO_ALLOWED_HOSTS`, `ACME_EPOSTA` gerçek değerlerle değiştirildi.
 - [ ] `https://` ile açılıyor, tarayıcı kilit simgesi gösteriyor; `http://` adresi HTTPS'e yönleniyor.
@@ -62,6 +68,11 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - MFA gizli anahtarları veritabanında düz metin tutulur; veritabanı yedeklerini bu nedenle gizli bilgi gibi koruyun.
 - Hesap kilidi ödünleşimi: hesap başına sayaç (IP döndüren saldırganı durdurmak için) bir saldırganın meşru kullanıcıyı geçici olarak kilitlemesine de izin verir. Azaltımlar: IP veya kullanıcı+IP sayacı zaten reddediyorsa hesap sayacı artırılmaz (tek bir IP hesabı kilitli tutamaz); kilit `GIRIS_KILIT_SURESI_SN` sonra kendiliğinden kalkar; kullanıcı adı NFKC + küçük harfe normalleştirilerek sayılır; IPv6 adresleri /64 öneki olarak sayılır. Acil durumda yönetici sunucudan sayaçları sıfırlar (denetim kaydı yazılır): `docker compose exec app python manage.py sayac_sifirla KULLANICI_ADI [--ip IP]`.
 - Bot ayrımı tarayıcı kimliği (User-Agent) desenine dayanır; kendini gizleyen botlar insan gibi sayılabilir.
+- Yetki modeli rol tabanlıdır (Yönetici / Editör / İzleyici) ve bütün kampanyalara uygulanır. Kampanya başına erişim (bir kullanıcının yalnızca belirli kampanyaları görmesi) istenen özellikler arasında yoktu; bu yüzden eklenmedi. Gerekirse ayrı bir geliştirme olarak eklenebilir.
+- Süper kullanıcıya veritabanı konteynerinin içinden (yerel soket) parolasız erişilebilir; bu, sunucu yöneticisinin bakım yoludur. Sunucuya root erişimi olan herkes veritabanının tamamına erişebilir.
+- age (yedek şifreleme aracı) sürüm arşivinin sha256 değeri, kurulum sırasında indirilen dosyadan hesaplanıp sabitlendi; age'in yayımladığı imzalı bir değerle karşılaştırılamadı. pip-tools ve pip-audit araçlarının kendisi hash'siz kurulur (bunlar uygulama imajına girmez).
+- `db` ve `yedek` konteynerleri salt okunur dosya sistemiyle çalışmaz (PostgreSQL ve yedekleme yazma ister).
+- Sağlayıcı hash desteklemiyorsa `rclone check` yalnızca boyut karşılaştırır; tam doğrulama için `YEDEK_UZAK_INDIREREK=1` (veriyi indirir).
 
 
 ## Not: ziyaretçi özeti anonim değil, takma adlıdır

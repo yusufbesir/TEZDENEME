@@ -1,6 +1,6 @@
 """Pano (ana sayfa)."""
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from django.conf import settings
@@ -13,18 +13,43 @@ from . import istatistik
 from .yardimci import etkin_bitis_ekle, insan_boyutu, qr_bitis_q, tarih_araligi, yetki
 
 
+UZAK_DOGRULAMA_ESIGI_GUN = 7
+
+
+def _zaman_oku(deger):
+    """ISO zaman metnini aware datetime'a çevirir; geçersizse None."""
+    if not deger or not isinstance(deger, str):
+        return None
+    try:
+        zaman = datetime.fromisoformat(deger)
+    except ValueError:
+        return None
+    if timezone.is_naive(zaman):
+        zaman = timezone.make_aware(zaman, timezone.get_current_timezone())
+    return zaman
+
+
+def uzak_kopya_uyarisi_gerekli(uzak_zamani):
+    """Sunucu dışı kopya hiç doğrulanmamış veya 7 günden eskiyse True (eski yedekler bu durumda silinmez)."""
+    zaman = _zaman_oku(uzak_zamani)
+    return zaman is None or timezone.now() - zaman > timedelta(days=UZAK_DOGRULAMA_ESIGI_GUN)
+
+
 def yedek_durumu():
-    """Yedekleme betiğinin yazdığı JSON durum dosyasını okur (zaman, durum, dosya, boyut)."""
+    """Yedekleme betiğinin yazdığı JSON durum dosyasını okur (zaman, durum, dosya, boyut, yerel sayı,
+    en eski yerel yedek, son uzak doğrulama zamanı)."""
     yol = Path(settings.YEDEK_DURUM_DOSYASI)
     try:
         veri = json.loads(yol.read_text(encoding="utf-8"))
     except FileNotFoundError:
-        return {"var": False, "mesaj": "Henüz yedek bilgisi yok"}
+        return {"var": False, "mesaj": "Henüz yedek bilgisi yok", "uzak_uyari": True}
     except (OSError, ValueError):
-        return {"var": False, "mesaj": "Yedek durum dosyası okunamadı"}
+        return {"var": False, "mesaj": "Yedek durum dosyası okunamadı", "uzak_uyari": True}
     if not isinstance(veri, dict):
-        return {"var": False, "mesaj": "Yedek durum dosyası okunamadı"}
+        return {"var": False, "mesaj": "Yedek durum dosyası okunamadı", "uzak_uyari": True}
     durum = str(veri.get("durum", ""))
+    uzak = veri.get("uzak_dogrulama_zamani")
+    sayi = veri.get("yerel_yedek_sayisi")
     return {
         "var": True,
         "zaman": str(veri.get("zaman", "")),
@@ -32,6 +57,10 @@ def yedek_durumu():
         "basarili": durum.lower() in ("basarili", "başarılı", "ok", "tamam", "success"),
         "dosya": Path(str(veri.get("dosya", ""))).name,
         "boyut": insan_boyutu(veri.get("boyut")) if veri.get("boyut") not in (None, "") else "-",
+        "yerel_sayi": sayi if isinstance(sayi, int) and not isinstance(sayi, bool) else None,
+        "en_eski": str(veri["en_eski_yerel_yedek"]) if veri.get("en_eski_yerel_yedek") else "",
+        "uzak_zaman": str(uzak) if uzak else "",
+        "uzak_uyari": uzak_kopya_uyarisi_gerekli(uzak),
     }
 
 

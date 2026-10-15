@@ -8,9 +8,11 @@ import hashlib
 import hmac
 import logging
 import re
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.db import connection
+from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -18,8 +20,8 @@ from django.views.decorators.http import require_safe
 
 from .dogrulama import url_gecerli_mi
 from .hiz import hiz_sinirlayici
-from .middleware import istemci_ip
-from .models import GenelAyarlar, KampanyaSayfasi, QRKod, Tarama
+from .middleware import ip_anahtari, istemci_ip
+from .models import GenelAyarlar, KampanyaSayfasi, QRKod, SayfaGorseli, Tarama
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +89,7 @@ def _tarama_kaydet(request, qr, sonuc):
 
 @require_safe
 def qr_yonlendir(request, kod):
-    if not hiz_sinirlayici.izin_ver(istemci_ip(request), settings.YONLENDIRME_HIZ_SINIRI):
+    if not hiz_sinirlayici.izin_ver(ip_anahtari(istemci_ip(request)), settings.YONLENDIRME_HIZ_SINIRI):
         return HttpResponse("Çok fazla istek. Lütfen biraz sonra tekrar deneyin.", status=429, content_type="text/plain; charset=utf-8")
 
     qr = (
@@ -147,6 +149,63 @@ def sayfa_goster(request, slug):
     elif sayfa.bitis and an >= sayfa.bitis:
         durum = "bitti"
     return render(request, "qr/genel/sayfa.html", {"sayfa": sayfa, "zaman_durumu": durum, "ayar": GenelAyarlar.al()})
+
+
+def _medya_adi(xuri):
+    """X-Forwarded-Uri'den MEDIA_ROOT'a göreli dosya adı; güvenilmez/bozuk girdide None."""
+    if not xuri:
+        return None
+    yol = xuri.split("#", 1)[0].split("?", 1)[0]
+    yol = unquote(yol)  # Caddy de yolu bir kez çözer
+    if "\x00" in yol or "\\" in yol or not yol.startswith("/medya/"):
+        return None
+    ad = yol[len("/medya/"):]
+    parcalar = ad.split("/")
+    if not ad or any(p in ("", ".", "..") for p in parcalar):
+        return None
+    return ad
+
+
+def _medya_herkese_acik_mi(ad):
+    """Ad, yayındaki bir sayfanın kapak/logo/galeri görseli mi? (sayfa_goster ile aynı yayın koşulu)"""
+    yayinda = KampanyaSayfasi.Durum.YAYINDA
+    if KampanyaSayfasi.objects.filter(durum=yayinda).filter(Q(kapak_gorseli=ad) | Q(logo=ad)).exists():
+        return True
+    return SayfaGorseli.objects.filter(sayfa__durum=yayinda, gorsel=ad).exists()
+
+
+def medya_yetki(request):
+    """Caddy forward_auth alt isteği (/ic/medya-yetki). 200 = dosya sunulabilir, 404 = hayır.
+    Sır sızdırmamak için reddedilen her durumda 404 döner. Denetim kaydı yazmaz, oturum oluşturmaz."""
+
+    def ret():
+        yanit = HttpResponse(status=404)
+        yanit["Cache-Control"] = "no-store"
+        return yanit
+
+    if request.method not in ("GET", "HEAD"):
+        return ret()
+    if request.META.get("HTTP_X_FORWARDED_METHOD", "").upper() not in ("GET", "HEAD"):
+        return ret()
+    ad = _medya_adi(request.META.get("HTTP_X_FORWARDED_URI", ""))
+    if ad is None:
+        return ret()
+    izinli = _medya_herkese_acik_mi(ad)
+    if not izinli:
+        # login() yalnızca MFA doğrulaması (veya MFA gerekmiyorsa parola) sonrası çağrılır; bekleyen
+        # MFA durumu oturum kullanıcısı sayılmaz. Bu yüzden is_authenticated panelin MFA kuralını yansıtır.
+        k = request.user
+        izinli = k.is_authenticated and k.is_active and k.has_perm("qr.view_kampanyasayfasi")
+        if izinli:
+            izinli = (
+                KampanyaSayfasi.objects.filter(Q(kapak_gorseli=ad) | Q(logo=ad)).exists()
+                or SayfaGorseli.objects.filter(gorsel=ad).exists()
+            )
+    if not izinli:
+        return ret()
+    yanit = HttpResponse(status=200)
+    yanit["Cache-Control"] = "no-store"
+    return yanit
 
 
 @require_safe

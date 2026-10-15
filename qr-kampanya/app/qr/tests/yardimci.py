@@ -33,7 +33,23 @@ TEST_AYARLARI = dict(
     HESAP_DENEME_SINIRI=10,
     IP_DENEME_SINIRI=20,
     GIRIS_HIZ_SINIRI=0,
+    # Ortamdan bağımsız: .env'deki MFA_ZORUNLU=1 testleri etkilemesin (MFA gerektiren testler kendi
+    # override_settings(MFA_ZORUNLU=True) ayarını verir).
+    MFA_ZORUNLU=False,
 )
+
+def betik_dizini():
+    """scripts/ klasörü: depoda proje kökünde, Docker testinde /scripts (test.sh salt okunur bağlar).
+    SCRIPTS_DIZINI ortam değişkeni verilmişse o kullanılır."""
+    import os
+    from pathlib import Path
+
+    adaylar = [os.environ.get("SCRIPTS_DIZINI"), Path(__file__).resolve().parents[3] / "scripts", "/scripts"]
+    for aday in adaylar:
+        if aday and (Path(aday) / "yedek-al.sh").is_file():
+            return Path(aday)
+    raise FileNotFoundError(f"scripts klasörü bulunamadı (denenen: {[str(a) for a in adaylar if a]})")
+
 
 PAROLA = "Cok-Guclu-Parola-2026!"
 Kullanici = get_user_model()

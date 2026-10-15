@@ -81,12 +81,30 @@ cd /opt/qr-kampanya
 bash scripts/kurulum.sh
 ```
 
-Betik sırasıyla: alan adınızı ve e-postanızı sorar, `.env` dosyasını güçlü rastgele parolalarla oluşturur, konteynerleri başlatır ve ilk yönetici hesabını oluşturmanızı ister. İlk girişte panel, telefonunuzdaki doğrulama uygulamasıyla (Google Authenticator, Microsoft Authenticator vb.) MFA kurulumunu ister.
+Betik sırasıyla: alan adınızı ve e-postanızı sorar (alan adı girdiyseniz e-posta **zorunludur**; alan adı boşsa yerel deneme yer tutucusu yazılır), `.env` dosyasını güçlü rastgele parolalarla oluşturur, konteynerleri derleyip başlatır, **yedek şifreleme anahtarını üretir** ve ilk yönetici hesabını oluşturmanızı ister.
+
+**Veritabanı parolaları (üç tane, hepsini betik üretir):** `POSTGRES_PASSWORD` yalnızca bakım için olan en yetkili hesaptır; `POSTGRES_SAHIP_PAROLA` veritabanının sahibi `qr_sahip` hesabıdır (güncelleme ve yedek bunu kullanır); `POSTGRES_UYGULAMA_PAROLA` web uygulamasının kısıtlı `qr_uygulama` hesabıdır. Uygulama yalnızca kayıt okuyup ekleyebilir; tabloları silemez, koruma kurallarını kapatamaz. `.env` dosyasını yedeklediğiniz yeri güvenli tutun ve kimseyle paylaşmayın.
+
+**`hazirlik` servisi:** Her başlatmada, uygulamadan önce kısa süre çalışıp biter (durumu `exited` görünmesi normaldir). Veritabanı güncellemelerini yapar. Başarısız olursa uygulama başlamaz; nedenini görmek için `docker compose logs hazirlik` komutunu kullanın. İlk girişte panel, telefonunuzdaki doğrulama uygulamasıyla (Google Authenticator, Microsoft Authenticator vb.) MFA kurulumunu ister.
+
+**Yedek anahtarı (çok önemli):** Yedekler şifreli alınır. Betik `gizli/yedek-anahtari.txt` dosyasını üretir ve ekrana büyük bir uyarı yazar. Bu dosyanın içeriğini **hemen parola yöneticinize (Bitwarden, 1Password vb.) kopyalayın**. Dosya kaybolursa yedekleriniz açılamaz; kimse kurtaramaz. Yedek servisi yalnızca açık anahtarı (`.env` içindeki `YEDEK_ALICI`) bilir, özel anahtarı bilmez; yani sunucu ele geçirilse bile yedekler açılamaz. Anahtarı parola yöneticisine koyduktan sonra dosyayı sunucudan silebilirsiniz; yalnızca geri yükleme ve geri yükleme testi sırasında geçici olarak geri konur. Ayrıntı: [YEDEKLEME.md](YEDEKLEME.md).
+
+### Eski bir kurulumu güncelliyorsanız (veritabanı roller eklenmeden önce kurulmuşsa)
+
+`bash scripts/guncelle.sh` bütün adımı kendisi yapar: `.env` dosyasının **sonuna** eksik iki parolayı ekler (var olan satırlara dokunmaz; kurulum betiği bunu ekrana yazar), rolleri oluşturur, sahipliği devreder ve yedek şifreleme anahtarı yoksa üretir (var olan anahtara ve `.env` satırlarına dokunmaz). Betiği kullanmadan elle yapmak isterseniz `.env` içine `POSTGRES_SAHIP_PAROLA` ve `POSTGRES_UYGULAMA_PAROLA` satırlarını uzun rastgele değerlerle ekleyin, sonra:
+
+```bash
+docker compose up -d db
+docker compose exec db sh /docker-entrypoint-initdb.d/10-roller.sh
+docker compose up -d
+```
+
+Bu komut güvenle tekrar çalıştırılabilir (verileri silmez). Kontrol: `bash scripts/rol-dogrulama.sh` sonunda `SONUÇ: GEÇTİ` yazmalıdır.
 
 ## 5. Kontrol ve uçtan uca test
 
 ```bash
-docker compose ps                         # 4 servis "running", app "healthy"
+docker compose ps -a                      # db, app, caddy, yedek "running" (app "healthy"); hazirlik "exited (0)"
 curl -I https://qr.ornekfirma.com/saglik  # HTTP/2 200
 docker compose logs caddy --tail 50       # sertifika alındı mı
 ```

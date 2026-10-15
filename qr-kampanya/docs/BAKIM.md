@@ -7,7 +7,7 @@
 | Ne zaman | Ne yapılır |
 |---|---|
 | Her hafta | Panel ana ekranında son yedeğin “başarılı” olduğuna bakın. |
-| Her ay | `bash scripts/geri-yukleme-testi.sh` · sunucu güncellemeleri (`sudo apt update && sudo apt upgrade`) · disk: `df -h` |
+| Her ay | `bash scripts/geri-yukleme-testi.sh` · sunucu güncellemeleri (`sudo apt update && sudo apt upgrade`) · disk: `df -h` · `bash scripts/guvenlik-tarama.sh` (bilinen güvenlik açığı taraması; “temiz” demeli, açık bulursa aşağıdaki bağımlılık güncellemesini yapın) |
 | Güvenlik duyurusunda | Bağımlılık güncellemesi (aşağıda) |
 | Yılda bir | Alan adı yenilemesini, sunucu dışı yedeklerin varlığını ve yönetici hesaplarını gözden geçirin. |
 
@@ -19,19 +19,23 @@ cd /opt/qr-kampanya
 bash scripts/guncelle.sh
 ```
 
-Betik önce yedek alır, imajları yeniden derler, servisleri yeniden başlatır (migrasyonlar otomatik uygulanır) ve sağlık kontrolü yapar. Veriler Docker birimlerinde (`db-veri`, `medya`) tutulduğu için konteynerlerin yeniden oluşturulması veri kaybettirmez.
+Betik sırasıyla: imajları derler; veritabanını başlatıp rolleri günceller; şifreli bir güncelleme öncesi yedeği alır; migrasyonları ayrı çalıştırır (başarısız olursa eski uygulamaya dokunmaz ve yedeğin adını, geri dönüş komutunu yazar); uygulamayı yeniler; Caddy'yi yeni yapılandırmayla yeniden oluşturup doğrular ve sağlık kontrolü yapar. Caddy yenilenirken birkaç saniyelik kesinti olur. Veriler Docker birimlerinde (`db-veri`, `medya`) tutulduğu için konteynerlerin yeniden oluşturulması veri kaybettirmez.
 
 **Asla çalıştırmayın:** `docker compose down -v` (`-v` bütün veritabanını ve görselleri siler).
 
 ## Bağımlılık güncellemesi (güvenlik)
 
-Sürümler `app/requirements.txt` ve `docker-compose.yml` içinde sabittir. Güncelleme adımları:
+Kullanılan Python paketlerinin tam listesi ve “parmak izleri” (hash) `app/requirements.txt` dosyasında kilitlidir; bu dosya **elle düzenlenmez**. Sizin değiştireceğiniz tek dosya `app/requirements.in`'dir (yalnızca ana paketler ve sürümleri). Güncelleme adımları:
 
-1. Django güvenlik duyuruları: https://www.djangoproject.com/weblog/ (5.2.x serisi içindeki yamalar geriye uyumludur).
-2. `app/requirements.txt` içinde sürümü artırın (ör. `Django==5.2.19`).
-3. Testleri çalıştırın: `bash scripts/test.sh` — hepsi geçmeli.
-4. `bash scripts/guncelle.sh`.
-5. PostgreSQL için yalnızca **küçük sürüm** (17.x → 17.y) güncellemesi `docker-compose.yml`'de etiketi değiştirerek yapılabilir. Büyük sürüm (17 → 18) yükseltmesi yedek + geri yükleme ile yapılmalıdır; tek başına etiket değiştirmeyin.
+1. Duyuruyu izleyin: Django güvenlik duyuruları https://www.djangoproject.com/weblog/ (5.2.x serisi içindeki yamalar geriye uyumludur).
+2. `app/requirements.in` içinde sürümü artırın (ör. `Django==5.2.19`).
+3. Kilit dosyasını yeniden üretin: `bash scripts/bagimlilik-kilitle.sh` (Docker ve internet gerekir; birkaç dakika sürebilir).
+4. Güvenlik taramasını çalıştırın: `bash scripts/guvenlik-tarama.sh` — bilinen açık bulursa hata verir; temiz çıkmalı.
+5. Testleri çalıştırın: `bash scripts/test.sh` — hepsi geçmeli.
+6. `bash scripts/guncelle.sh`.
+7. PostgreSQL için yalnızca **küçük sürüm** (17.x → 17.y) güncellemesi `docker-compose.yml`'de etiketi değiştirerek yapılabilir. Büyük sürüm (17 → 18) yükseltmesi yedek + geri yükleme ile yapılmalıdır; tek başına etiket değiştirmeyin.
+
+Not: Kurulum sırasında hash'i uyuşmayan paket reddedilir; bu bilinçli bir korumadır. İki tarama/kilit aracının (pip-tools, pip-audit) kendi kurulumu hash'siz yapılır; bunlar yalnızca bakım aracıdır, uygulama imajına girmez.
 
 Django 5.2 LTS'nin desteği 2028 Nisan'da biter; o tarihten önce bir sonraki LTS sürümüne geçiş planlanmalıdır.
 

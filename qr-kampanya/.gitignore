@@ -10,3 +10,6 @@ app/staticfiles/
 app/medya/
 test-sonuclari/
 app/tekerlekler/
+yedek/paketler/*
+!yedek/paketler/.gitkeep
+gizli/

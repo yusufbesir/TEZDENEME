@@ -1,33 +1,103 @@
 #!/usr/bin/env bash
 # Yedeğin gerçekten geri yüklenebildiğini GÜVENLİ biçimde test eder:
-# en son yedeği GEÇİCİ bir PostgreSQL konteynerine yükler, tablo satır sayılarını
-# canlı veritabanıyla karşılaştırır, sonra geçici konteyneri kaldırır.
-# Canlı veritabanına HİÇBİR değişiklik yapmaz.
-#   bash scripts/geri-yukleme-testi.sh [yedek-dosyası]
+#   1) sha256 dosyasıyla bütünlük doğrulaması (uyuşmazsa DURUR)
+#   2) geçici, ağsız bir konteynerde (yedek imajı) özel anahtarla şifreyi çözer ve pg_restore ile yükler
+#      (--no-owner --no-acl: geçici veritabanında qr_sahip/qr_uygulama rolleri yok; amaç verinin yüklenebilmesidir)
+#   3) tablo sayılarını canlı veritabanıyla karşılaştırır
+#   4) görsel arşivini çözüp tar ile listeleyebildiğini doğrular
+#   5) geçici konteyneri kaldırır. Canlı veritabanına HİÇBİR değişiklik yapılmaz.
+# Özel anahtar sunucuda tutulmaz; anahtarı parola yöneticinizdeki kopyadan geçici olarak geri koyun.
+# Bütün çıktı ekrana ve yedekler/geri-yukleme-testi-ZAMAN.log dosyasına yazılır (anahtar içeriği asla yazılmaz).
+#   bash scripts/geri-yukleme-testi.sh [db-ZAMAN.dump.age] [anahtar-dosyası]
+#   (anahtar yolu: ikinci argüman veya YEDEK_ANAHTAR_DOSYASI; varsayılan ./gizli/yedek-anahtari.txt)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; . ./.env; set +a
-YEDEK="${1:-$(ls -1t ${YEDEK_DIZINI:-./yedekler}/db-*.dump 2>/dev/null | head -1)}"
-[ -n "$YEDEK" ] && [ -f "$YEDEK" ] || { echo "Yedek dosyası bulunamadı."; exit 1; }
-GECICI=qr-geri-yukleme-testi-$$
-GECICI_PAROLA=$(python3 -c "import secrets;print(secrets.token_hex(16))")
-temizle() { docker rm -f "$GECICI" >/dev/null 2>&1 || true; }
-trap temizle EXIT
+. scripts/yedek-ortak.sh
 
-echo "Test edilen yedek: $YEDEK"
-docker run -d --name "$GECICI" --network none -e POSTGRES_PASSWORD="$GECICI_PAROLA" -e POSTGRES_USER=test -e POSTGRES_DB=test postgres:17.6-alpine >/dev/null
-for i in $(seq 1 30); do docker exec "$GECICI" pg_isready -U test -d test >/dev/null 2>&1 && break; sleep 1; done
-sleep 2
-docker cp "$YEDEK" "$GECICI:/tmp/yedek.dump"
-docker exec "$GECICI" pg_restore --no-owner -U test -d test /tmp/yedek.dump
+DIZIN="${YEDEK_DIZINI:-./yedekler}"
+mkdir -p "$DIZIN"
+LOG="$DIZIN/geri-yukleme-testi-$(date +%Y%m%d-%H%M%S).log"
 
-SORGU="SELECT 'qrkod', count(*) FROM qr_qrkod UNION ALL SELECT 'kampanya', count(*) FROM qr_kampanya UNION ALL SELECT 'sayfa', count(*) FROM qr_kampanyasayfasi UNION ALL SELECT 'hedefgecmisi', count(*) FROM qr_hedefgecmisi UNION ALL SELECT 'denetim', count(*) FROM qr_denetimkaydi UNION ALL SELECT 'kullanici', count(*) FROM auth_user ORDER BY 1;"
-YEDEKTEKI=$(docker exec "$GECICI" psql -U test -d test -At -c "$SORGU")
-CANLI=$(docker compose exec -T db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -c "$SORGU")
-echo "Tablo | yedekte | canlıda"
-paste -d'|' <(echo "$YEDEKTEKI") <(echo "$CANLI" | cut -d'|' -f2)
-if [ "$YEDEKTEKI" = "$CANLI" ]; then
-  echo "SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı."
-else
-  echo "SONUÇ: FARK VAR - yedek alındıktan sonra yeni kayıt eklenmiş olabilir; yedek yine de geri yüklenebildi."
-fi
+YEDEK=""; ANAHTAR_ARG=""
+for arg in "$@"; do
+  case "$(basename "$arg")" in db-*.dump.age) YEDEK="$arg" ;; *) ANAHTAR_ARG="$arg" ;; esac
+done
+
+calistir() {
+  if [ -z "$YEDEK" ]; then
+    # En yeni GEÇERLİ adlı yedek (geçersiz adlı dosyalar sessizce atlanır).
+    local aday
+    while IFS= read -r aday; do
+      if ortak_ad_gecerli_mi "$(basename "$aday")"; then YEDEK="$aday"; break; fi
+    done < <(ls -1t "$DIZIN"/db-*.dump.age 2>/dev/null || true)
+  fi
+  [ -n "$YEDEK" ] && [ -f "$YEDEK" ] || { echo "Şifreli yedek dosyası (db-ZAMAN.dump.age) bulunamadı."; return 1; }
+  YEDEK_AD=$(basename "$YEDEK")
+  ortak_ad_gecerli_mi "$YEDEK_AD" && [[ "$YEDEK_AD" == db-* ]] \
+    || { echo "SONUÇ: BAŞARISIZ - geçersiz yedek dosya adı reddedildi (beklenen: db-YYYYMMDD-HHMMSS.dump.age)."; return 1; }
+  YEDEK_DIZIN=$(cd "$(dirname "$YEDEK")" && pwd)
+  ZAMAN=$(ortak_zaman "$YEDEK_AD")
+  MEDYA_AD="medya-$ZAMAN.tar.gz.age"
+  ANAHTAR=$(ortak_anahtar_yolu "${ANAHTAR_ARG:-${YEDEK_ANAHTAR_DOSYASI:-./gizli/yedek-anahtari.txt}}")
+  ortak_imaj_var_mi
+
+  echo "== Geri yükleme testi $(date -Iseconds) =="
+  echo "Test edilen yedek: $YEDEK_DIZIN/$YEDEK_AD"
+  echo "Özel anahtar dosyası: $ANAHTAR (içeriği yazılmaz)"
+
+  echo "-- 1/4 Bütünlük (sha256) doğrulaması"
+  if [ -f "$YEDEK_DIZIN/$MEDYA_AD" ]; then
+    ortak_sha256_dogrula "$YEDEK_DIZIN" "$YEDEK_AD" "$MEDYA_AD" || { echo "SONUÇ: BAŞARISIZ - bütünlük doğrulanamadı."; return 1; }
+  else
+    ortak_sha256_dogrula "$YEDEK_DIZIN" "$YEDEK_AD" || { echo "SONUÇ: BAŞARISIZ - bütünlük doğrulanamadı."; return 1; }
+    echo "UYARI: $MEDYA_AD yok; görsel yedeği test edilemedi."
+  fi
+
+  GECICI=qr-geri-yukleme-testi-$$
+  trap 'docker rm -fv "$GECICI" >/dev/null 2>&1 || true' EXIT
+  # Ağsız geçici veritabanı: parola gerekmez (dışarıdan erişim imkânsız), anahtar ve yedek salt okunur bağlanır.
+  docker run -d --name "$GECICI" --network none --tmpfs /tmp:mode=1777,size=2g \
+    -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_USER=test -e POSTGRES_DB=test \
+    -v "$ANAHTAR":/anahtar/yedek-anahtari.txt:ro -v "$YEDEK_DIZIN":/yedekler:ro \
+    "$YEDEK_IMAJI" >/dev/null
+  for i in $(seq 1 60); do docker exec "$GECICI" pg_isready -U test -d test >/dev/null 2>&1 && break; sleep 1; done
+  sleep 2
+
+  echo "-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)"
+  # Dosya adı kabuk metnine GÖMÜLMEZ; konum argümanı ($1) olarak geçirilir.
+  docker exec "$GECICI" sh -c 'age -d -i /anahtar/yedek-anahtari.txt -o /tmp/yedek.dump "/yedekler/$1" && pg_restore --no-owner --no-acl -U test -d test /tmp/yedek.dump; s=$?; rm -f /tmp/yedek.dump; exit $s' _ "$YEDEK_AD" \
+    || { echo "SONUÇ: BAŞARISIZ - yedek çözülemedi/yüklenemedi (anahtar yanlış olabilir)."; return 1; }
+
+  echo "-- 3/4 Tablo sayıları"
+  SORGU="SELECT 'qrkod', count(*) FROM qr_qrkod UNION ALL SELECT 'kampanya', count(*) FROM qr_kampanya UNION ALL SELECT 'sayfa', count(*) FROM qr_kampanyasayfasi UNION ALL SELECT 'hedefgecmisi', count(*) FROM qr_hedefgecmisi UNION ALL SELECT 'denetim', count(*) FROM qr_denetimkaydi UNION ALL SELECT 'kullanici', count(*) FROM auth_user ORDER BY 1;"
+  YEDEKTEKI=$(docker exec "$GECICI" psql -U test -d test -At -c "$SORGU")
+  CANLI=$(docker compose exec -T db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -c "$SORGU" 2>/dev/null || true)
+  echo "Tablo | yedekte | canlıda"
+  if [ -n "$CANLI" ]; then
+    paste -d'|' <(echo "$YEDEKTEKI") <(echo "$CANLI" | cut -d'|' -f2)
+  else
+    echo "$YEDEKTEKI"
+    echo "UYARI: canlı veritabanına ulaşılamadı; sayı karşılaştırması atlandı."
+  fi
+
+  echo "-- 4/4 Görsel arşivi"
+  if [ -f "$YEDEK_DIZIN/$MEDYA_AD" ]; then
+    SAYI=$(docker exec "$GECICI" sh -c 'set -o pipefail; age -d -i /anahtar/yedek-anahtari.txt "/yedekler/$1" | tar -tzf - | wc -l' _ "$MEDYA_AD") \
+      || { echo "SONUÇ: BAŞARISIZ - görsel arşivi çözülemedi veya tar ile listelenemedi."; return 1; }
+    echo "Görsel arşivi çözüldü ve tar ile listelendi: $SAYI girdi."
+  fi
+
+  if [ -z "$CANLI" ]; then
+    echo "SONUÇ: GEÇTİ - yedek sha256 ile doğrulandı, çözüldü ve geri yüklendi (canlı karşılaştırma yapılamadı)."
+  elif [ "$YEDEKTEKI" = "$CANLI" ]; then
+    echo "SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı."
+  else
+    echo "SONUÇ: GEÇTİ (sayılar farklı) - yedek alındıktan sonra yeni kayıt eklenmiş olabilir; yedek geri yüklenebildi."
+  fi
+}
+
+calistir 2>&1 | tee -a "$LOG"
+SONUC=${PIPESTATUS[0]}
+echo "Günlük: $LOG"
+exit "$SONUC"

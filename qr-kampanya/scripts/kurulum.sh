@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # İlk kurulum. Proje klasöründe çalıştırın:  bash scripts/kurulum.sh
 # - .env yoksa oluşturur ve güçlü rastgele parolalar üretir (mevcut .env'nin ÜZERİNE YAZMAZ)
+# - yedek şifreleme anahtarını üretir (gizli/yedek-anahtari.txt; parola yöneticinize kopyalayın)
 # - konteynerleri derler ve başlatır
 # - ilk yönetici hesabını oluşturmanızı ister
 set -euo pipefail
@@ -21,11 +22,17 @@ else
     if [ -z "$ALAN" ] || [[ "$ALAN" =~ ^[A-Za-z0-9.-]+$ ]]; then break; fi
     echo "Geçersiz alan adı: yalnızca harf, rakam, nokta ve tire kullanılabilir (https:// veya / yazmayın)."
   done
-  while true; do
-    read -rp "Let's Encrypt bildirim e-postası (boş bırakılabilir): " EPOSTA
-    if [ -z "$EPOSTA" ] || [[ "$EPOSTA" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then break; fi
-    echo "Geçersiz e-posta adresi; örnek: ad@firmaniz.com"
-  done
+  if [ -z "$ALAN" ]; then
+    # Yerel denemede sertifika alınmaz; Caddy yine de dolu bir e-posta ister, bu yüzden yer tutucu yazılır.
+    EPOSTA="yerel-deneme@example.com"
+  else
+    # Alan adı girildiyse e-posta ZORUNLUDUR (Let's Encrypt bildirimleri; boşsa Caddy başlamaz).
+    while true; do
+      read -rp "Let's Encrypt bildirim e-postası (zorunlu): " EPOSTA
+      if [[ "$EPOSTA" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then break; fi
+      echo "Geçersiz veya boş e-posta adresi; örnek: ad@firmaniz.com"
+    done
+  fi
   cp .env.example .env
   if [ -z "$ALAN" ]; then
     sed -i "s|^SITE_ALAN_ADI=.*|SITE_ALAN_ADI=localhost|; s|^SITE_ADRESI=.*|SITE_ADRESI=http://localhost|; s|^SITE_SEMA=.*|SITE_SEMA=http|; s|^DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1|" .env
@@ -35,19 +42,49 @@ else
     sed -i "s|^SITE_ALAN_ADI=.*|SITE_ALAN_ADI=$ALAN|; s|^SITE_ADRESI=.*|SITE_ADRESI=$ALAN|; s|^DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=$ALAN|" .env
   fi
   sed -i "s|^ACME_EPOSTA=.*|ACME_EPOSTA=$EPOSTA|" .env
-  sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$(rastgele 64)|; s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(rastgele 32)|" .env
+  sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$(rastgele 64)|; s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(rastgele 32)|; s|^POSTGRES_SAHIP_PAROLA=.*|POSTGRES_SAHIP_PAROLA=$(rastgele 32)|; s|^POSTGRES_UYGULAMA_PAROLA=.*|POSTGRES_UYGULAMA_PAROLA=$(rastgele 32)|" .env
   chmod 600 .env
   echo ".env oluşturuldu (izinler 600). Bu dosyayı kimseyle paylaşmayın, Git'e eklemeyin."
 fi
 
+# Eski kurulumlarda ACME_EPOSTA boşsa Caddy başlamaz: yalnızca boşsa yer tutucu eklenir (dolu değere dokunulmaz).
+if grep -q '^ACME_EPOSTA=$' .env; then
+  sed -i 's|^ACME_EPOSTA=$|ACME_EPOSTA=yerel-deneme@example.com|' .env
+  echo "UYARI: ACME_EPOSTA boştu; yer tutucu yazıldı. Gerçek alan adı kullanıyorsanız .env içinde kendi e-postanızı yazın."
+elif ! grep -q '^ACME_EPOSTA=' .env; then
+  [ -z "$(tail -c1 .env)" ] || echo >> .env
+  echo "ACME_EPOSTA=yerel-deneme@example.com" >> .env
+fi
+
+# Eski kurulumlarda eksik olabilecek anahtarlar: mevcut satırlara DOKUNULMAZ, yalnızca sona eklenir.
+for ANAHTAR in POSTGRES_SAHIP_PAROLA POSTGRES_UYGULAMA_PAROLA; do
+  if ! grep -q "^${ANAHTAR}=" .env; then
+    [ -z "$(tail -c1 .env)" ] || echo >> .env
+    echo "${ANAHTAR}=$(rastgele 32)" >> .env
+    echo ".env dosyasının SONUNA eksik anahtar eklendi: ${ANAHTAR} (diğer satırlar değiştirilmedi)."
+  fi
+done
+
 mkdir -p yedekler && chmod 700 yedekler
 docker compose build
+# Yedek şifreleme anahtarı (age): özel anahtar gizli/ klasörüne yazılır, açık anahtar .env'ye eklenir.
+bash scripts/yedek-anahtari-hazirla.sh
+# Önce veritabanı: roller (qr_sahip, qr_uygulama) ilk kurulumda otomatik oluşur; var olan veritabanında
+# betik elle (idempotent) çalıştırılır. Sonra hazırlık (migrasyon) ve uygulama başlar.
+docker compose up -d db
+for i in $(seq 1 60); do
+  if docker compose ps db --format '{{.Health}}' 2>/dev/null | grep -q healthy; then break; fi
+  sleep 2
+done
+docker compose exec -T db sh /docker-entrypoint-initdb.d/10-roller.sh
 docker compose up -d
 echo "Servisler başlatılıyor..."
 for i in $(seq 1 60); do
   if docker compose ps app --format '{{.Health}}' 2>/dev/null | grep -q healthy; then break; fi
   sleep 2
 done
+# Kurulum betiği yeniden çalıştırılırsa Caddy eski Caddyfile ile kalmasın (dosya izlenmez): zorla yeniden oluştur.
+docker compose up -d --force-recreate --no-deps caddy
 docker compose ps
 
 if [ "$(docker compose exec -T app python manage.py shell -c 'from django.contrib.auth import get_user_model;print(get_user_model().objects.filter(is_superuser=True).count())')" = "0" ]; then

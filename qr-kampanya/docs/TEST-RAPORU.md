@@ -4,7 +4,7 @@
 
 ## Özet
 
-- **Otomatik testler:** 217 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`).
+- **Otomatik testler:** 264 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15.txt`.
 - **Uçtan uca testler** bulut geliştirme ortamında, gerçek Docker Compose yığınıyla (PostgreSQL 17.6, Caddy 2.10.2, uygulama imajı; sıkılaştırılmış ayarlar ve MFA zorunlu) yapıldı. Alan adı ve VPS henüz olmadığı için HTTPS yerine `http://localhost:8080` kullanıldı.
 - **Yapılamayanlar (açıkça):** gerçek alan adında HTTPS sertifikası alma ve fiziksel baskıdan telefonla okuma. Bunlar VPS kurulumunda yapılmalı (bkz. sonda).
 - Bağımsız denetim: gereksinim doğrulaması **Geçti**; güvenlik denetimi iki tur yapıldı, bulunan Orta bulgular düzeltildi (bkz. “Güvenlik denetimi”).
@@ -27,8 +27,8 @@
 | 12 | Kampanya sayfası oluşturma/düzenleme | Form, görsel yükleme, taslak/yayın | ✅ Kapak görseli yüklendi, Caddy'den 200 sunuldu | Otomatik + uçtan uca |
 | 13 | Yetkisiz erişim | Giriş yok → giriş sayfası; yetkisiz rol → 403; MFA'sız panel yok | ✅ | Otomatik + uçtan uca + güvenlik denetimi |
 | 14 | Yönetici işlem geçmişi | Denetim kaydı, değiştirilemez | ✅ DB tetikleyicisi UPDATE/DELETE'i engelliyor | Otomatik |
-| 15 | Veritabanı yedeği | Günlük yedek + doğrulama + durum | ✅ `db-*.dump`, `medya-*.tar.gz`, `sha256`, panel durumu “başarılı” | Uçtan uca |
-| 16 | Yedekten geri yükleme | Geçici veritabanına yükleme, sayılar eşit | ✅ `geri-yukleme-testi.sh`: **GEÇTİ** (6 tablo sayısı eşit) | Uçtan uca |
+| 15 | Veritabanı yedeği | Günlük şifreli yedek + doğrulama + durum | ✅ `db-*.dump.age`, `medya-*.tar.gz.age` (age ile şifreli), `sha256`, panel durumu “başarılı”; yedek konteynerinde özel anahtar yok | Uçtan uca |
+| 16 | Yedekten geri yükleme | sha256 kontrolü, şifre çözme, geçici veritabanına yükleme, sayılar eşit | ✅ `geri-yukleme-testi.sh`: **GEÇTİ** (iki ayrı temiz kurulumda; ham çıktılar `docs/kanit/geri-yukleme-testi-*.txt`). Bozulmuş yedek ve yanlış anahtar reddedildi. | Uçtan uca |
 | 17 | Konteyner yeniden başlatma | Veri kaybı yok | ✅ `restart` ve `down` + `up` sonrası QR hedefi ve görseller yerinde | Uçtan uca |
 | 18 | Mobil tarayıcı uyumluluğu | Taşma yok, konsol/CSP hatası yok | ✅ iPhone 13 ve Pixel 7 öykünmesi (Chromium/Playwright): kampanya sayfası ve panel | Uçtan uca (öykünme) |
 | 19 | Fiziksel baskıdan okuma | Basılı QR telefonla okunur | ⚠️ **Yapılmadı.** Dijital PNG'ler OpenCV ile okundu; fiziksel baskı testi sizin tarafınızdan yapılmalı | — |
@@ -47,10 +47,25 @@
 - 1. tur: 4 Orta (MFA kurulum anahtarının paylaşılması, IP değiştirerek deneme kilidini atlatma, giriş ucunda Argon2 ile kaynak tüketimi, Excel dosyasıyla CPU tüketimi) ve 10 Düşük/Bilgi bulgu. Hepsi düzeltildi.
 - 2. tur: 10 bulgu kapandı; 2 yeni Orta (Unicode kullanıcı adı varyantlarıyla sayaç atlatma, tek satırda hücre tekrarıyla bellek tüketimi) ve 2 Düşük bulgu çıktı; bunlar da düzeltildi. Son durum doğrulayıcı tarafından aşağıda onaylandı.
 
+## Bağımsız denetmen bulguları (15 Ekim, ikinci denetim)
+
+| # | Bulgu | Yapılan | Kanıt |
+|---|---|---|---|
+| 1 | Yedekler şifrelenmiyor | age ile asimetrik şifreleme; özel anahtar yalnızca sunucudaki `gizli/` klasöründe ve parola yöneticisinde, yedek konteynerinde yok | Uçtan uca: yalnızca `.age` dosyaları, `file` çıktısı “age encrypted file” |
+| 2 | Eski yedekler uzak kopya olmadan siliniyor; geri yükleme kanıtı yok | Yerel silme yalnızca `disari-kopyala.sh`'de, uzakta rclone ile doğrulanmış tam yedekler için; en yeni yedek hiç silinmez; uzak kopya yoksa hiçbir şey silinmez ve panel uyarır | rclone (local arka uç) ile deneme; `docs/kanit/geri-yukleme-testi-*.txt` |
+| 3 | Uygulama hesabı süper kullanıcı | `qr_sahip` / `qr_uygulama` rolleri, `hazirlik` servisi | `scripts/rol-dogrulama.sh`: DROP, DISABLE TRIGGER, TRUNCATE, DELETE, UPDATE denetim, CREATE reddedildi; eski sürümden yükseltme `docs/kanit/yukseltme-testi-2026-10-15.txt` |
+| 4 | Bağımlılıklar hash'siz, tarama yok | 16 paket hash'li kilit dosyası, `--require-hashes`; `guvenlik-tarama.sh` | Bozuk hash ile kurulum reddedildi; `docs/kanit/pip-audit-2026-10-15.txt`: zafiyet yok |
+| 5 | Taslak sayfa görselleri herkese açık | Caddy `forward_auth` + `/ic/medya-yetki` | Uçtan uca: yayındaki görsel 200, taslak anonim 404, yetkili oturumla 200, `../` türevleri 404 |
+| 6 | Kampanya başına erişim | İstenen özellikler arasında yok; eklenmedi, `GUVENLIK.md`'de sınırlama olarak yazıldı | — |
+| 7 | Düşük bulgular | IPv6 /64 yönlendirme hız sınırında; geri yüklemede sha256 doğrulaması; tek işlemli geri yükleme; dosya adı doğrulaması. `db`/`yedek` konteyner sıkılaştırması sınırlama olarak kaldı | Birim testleri |
+
+Düzeltmelerden sonra iki tur iç güvenlik denetimi (Opus) yapıldı; ilk turdaki Orta bulgu (eski kurulumu güncellerken yedeğin rol oluşmadan alınması) düzeltildi ve eski sürümden yükseltme uçtan uca denendi.
+
 ## VPS'te yapılması gereken testler
 
 1. `https://ALAN-ADINIZ/saglik` → 200 ve tarayıcıda kilit simgesi (Let's Encrypt).
 2. `http://` adresinin `https://`'e yönlenmesi.
 3. Bir QR'ı yazıcıdan basıp iki farklı telefonla (iPhone kamera, Android kamera/Google Lens) okutmak; hedefi değiştirip aynı baskıyı yeniden okutmak.
 4. Dışarıdan `nc -zv SUNUCU_IP 5432` bağlanamamalı.
-5. `bash scripts/test.sh` ve `bash scripts/geri-yukleme-testi.sh` sunucuda.
+5. `bash scripts/test.sh`, `bash scripts/rol-dogrulama.sh`, `bash scripts/guvenlik-tarama.sh` ve `bash scripts/geri-yukleme-testi.sh` sunucuda.
+6. `disari-kopyala.sh` gerçek uzak hedefle bir kez çalışmalı ve panelde “sunucu dışı kopya doğrulandı” görünmeli.
