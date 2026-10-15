@@ -43,3 +43,5 @@
 | 2026-10-15 | Güncelleme temizliği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Kaldı: 1 orta (boş manifest), 3 düşük, NSIS kaldırmada RMDir /r riski. implementer'a döndü. |
 | 2026-10-15 | Güvenlik turu 2 düzeltmeleri (güncelleme, NSIS, imza, parse5) [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 104 test; NSIS çalışma zamanı Windows'ta denenmedi. |
 | 2026-10-15 | İkinci tur doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 104 test, 52 HTML atlatma denemesi, NSIS derlemesi. Orkestratör kök-mutlak yerel yolları da uzak saydı (tek satır). |
+| 2026-10-15 | Kaldırıcı junction/hardlink/liste SHA/ayrılmış ad/kullanıcı başına kurulum [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | ~91k | Başarılı. 107 test, NSIS derlemesi; Windows çalışma zamanı denenmedi. |
+| 2026-10-15 | Kaldırıcı güvenlik turu doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~45k | Geçti. 107 test; makensis yok, NSIS okunarak denetlendi; 4 düşük not. |
