@@ -18,3 +18,6 @@
 | 2026-10-15 | Dönüştürücü bağımsız doğrulama [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~32k | Geçti (92 test) |
 | 2026-10-15 | Modern arayüz + dönüştürücü bağlama [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer / claude-sonnet-5-5 | ~86k | Tamamlandı (99 test) |
 | 2026-10-15 | Arayüz bağımsız doğrulama (gerçek tarayıcı) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~57k | Geçti (12 biçim indirme, 4 genişlik ekran görüntüsü) |
+| 2026-10-15 | Önizleme sekmesi [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer / claude-sonnet-5-5 | ~80k | Tamamlandı (104 test) |
+| 2026-10-15 | Dışa aktar sekmesi + gruplu biçim menüsü [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer / claude-sonnet-5-5 | ~91k | Tamamlandı (110 test) |
+| 2026-10-15 | Önizleme + Dışa aktar bağımsız doğrulama (yalnız bulut Chromium) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~64k | Geçti (110 test, 12 biçim indirme) |
