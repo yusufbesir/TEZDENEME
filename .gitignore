@@ -1,0 +1,4 @@
+# Yayın imza anahtarları hiçbir alt klasörden depoya girmez (depo herkese açık).
+*.jks
+*.keystore
+**/key.properties

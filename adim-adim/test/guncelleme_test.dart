@@ -242,12 +242,25 @@ void main() {
         'a//b',
         './a',
         'a/.',
+        'adimadim.',
+        'a/b. ',
+        'a /b',
+        'CON',
+        'con',
+        'nul.txt',
+        'a/COM1',
+        'LPT9.log',
       ]) {
         expect(
           () => SurumManifesti.fromJson(m(y)),
           throwsA(isA<ManifestHatasi>()),
           reason: y,
         );
+      }
+    });
+    test('ayrılmış ada benzeyen sıradan adlar kabul edilir', () {
+      for (final y in ['CON1', 'COM0', 'COM10', 'nulx', 'a.con', 'lpt']) {
+        expect(SurumManifesti.fromJson(m(y)).dosyalar, hasLength(1), reason: y);
       }
     });
     test('yolKati false ise yol kabul edilir', () {

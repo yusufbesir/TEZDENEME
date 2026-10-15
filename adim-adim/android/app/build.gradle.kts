@@ -17,6 +17,18 @@ if (yayinImzasiVar) {
     FileInputStream(anahtarDosyasi).use { anahtarOzellikleri.load(it) }
 }
 
+// Dağıtım derlemesi: Gradle'a `-Pdagitim=true` verilir
+// (ör. `cd android && gradlew -Pdagitim=true assembleRelease`, ya da
+// `android/gradle.properties` içinde `dagitim=true`). Bu bayrak açıkken
+// key.properties yoksa derleme DURUR; hata ayıklama anahtarına asla düşülmez.
+val dagitimDerlemesi = (project.findProperty("dagitim") as String?)?.toBoolean() ?: false
+if (dagitimDerlemesi && !yayinImzasiVar) {
+    throw GradleException(
+        "Dağıtım derlemesi (-Pdagitim=true) için android/key.properties gerekli; " +
+            "hata ayıklama anahtarıyla dağıtım yapılmaz. Bkz. docs/IMZA.md"
+    )
+}
+
 android {
     namespace = "tr.adimadim.adim_adim"
     compileSdk = flutter.compileSdkVersion

@@ -1,23 +1,63 @@
 # Android yayın imzası
 [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 
-Release derlemesi artık hata ayıklama anahtarıyla değil, geliştiricinin cihazındaki ayrı bir yayın anahtar deposuyla imzalanır.
+Release derlemesi hata ayıklama anahtarıyla değil, geliştiricinin cihazındaki ayrı bir yayın anahtar deposuyla imzalanır.
 
 ## Dosyalar
-- `android/key.properties` (depoya girmez, `.gitignore`): `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
-- Anahtar deposu `*.jks` (depoya girmez): önerilen konum cihazda, depo klasörünün dışında, örneğin `D:\YusufII\Araclar\anahtar\adim-adim-yayin.jks`.
-- `android/app/build.gradle.kts`: `key.properties` varsa `yayin` imza yapılandırmasını kullanır; yoksa uyarı basar ve hata ayıklama anahtarına düşer (yalnız yerel deneme için).
+- `android/key.properties` (depoya girmez; hem kök hem `adim-adim/` hem `android/` `.gitignore` engeller): `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
+- Anahtar deposu `adim-adim-yayin.jks` (depoya girmez). Konum aşağıda.
+- `android/app/build.gradle.kts`: `key.properties` varsa `yayin` imza yapılandırmasını kullanır. Yoksa:
+  - sıradan derlemede uyarı basar ve hata ayıklama anahtarına düşer (yalnız yerel deneme),
+  - **dağıtım derlemesinde (`-Pdagitim=true`) derlemeyi durdurur.**
+
+## Anahtar deposunun konumu
+Varsayılan ve önerilen konum, yalnız oturum açan kullanıcının erişebildiği kullanıcı profili:
+
+```
+%USERPROFILE%\.anahtar\adim-adim-yayin.jks
+```
+
+`D:\YusufII\Araclar\anahtar` gibi `D:\YusufII` altındaki bir konum önerilmez: o ağaçta
+`Authenticated Users` için miras alınmış **Modify** izni vardır; aynı makinede oturum açan
+her hesap anahtarı okuyabilir ve değiştirebilir. Yine de orada tutulmak isteniyorsa klasöre
+mirası kesen ve yalnız kullanıcıya izin veren ayrı bir ACL uygulanmalıdır (yalnız sahibinin
+onayıyla; betik bunu kendiliğinden yapmaz):
+
+```
+icacls "D:\YusufII\Araclar\anahtar" /inheritance:r /grant:r "%USERNAME%:(OI)(CI)F" /grant:r "SYSTEM:(OI)(CI)F"
+```
 
 ## Anahtar deposu oluşturma (cihazda, bir kez)
+JDK gerekir (`keytool`). Depo türü PKCS12 (JKS özel biçimdir ve keytool'da kullanımdan kalkmıştır):
+
 ```
-keytool -genkeypair -v -keystore D:\YusufII\Araclar\anahtar\adim-adim-yayin.jks -storetype JKS -alias adimadim -keyalg RSA -keysize 4096 -validity 10950
+mkdir %USERPROFILE%\.anahtar
+keytool -genkeypair -v -keystore %USERPROFILE%\.anahtar\adim-adim-yayin.jks -storetype PKCS12 -alias adimadim -keyalg RSA -keysize 4096 -validity 10950
 ```
-Ardından `android/key.properties` dosyasını yukarıdaki alanlarla doldurun. Şifreler yalnızca bu dosyada ve bir parola yöneticisinde durur; notlara, sohbete ya da depoya yazılmaz.
+
+Ardından `adim-adim/android/key.properties` dosyasını doldurun (`storeFile` tam yol, ters bölüler `\\` ya da `/` ile):
+
+```
+storePassword=...
+keyPassword=...
+keyAlias=adimadim
+storeFile=C:/Users/<kullanici>/.anahtar/adim-adim-yayin.jks
+```
+
+Şifreler yalnızca bu dosyada ve bir parola yöneticisinde durur; notlara, sohbete ya da depoya yazılmaz.
+
+## Dağıtım derlemesi
+```
+cd adim-adim/android
+gradlew -Pdagitim=true assembleRelease
+```
+ya da `android/gradle.properties` içine `dagitim=true` yazıp `flutter build apk --release`.
+`key.properties` yoksa derleme şu hatayla durur: "Dağıtım derlemesi (-Pdagitim=true) için android/key.properties gerekli".
 
 ## Yedek
 Anahtar deposunun kaybı uygulamanın güncellenememesi demektir. `.jks` dosyasını ve şifreleri ayrı, güvenli bir yere (parola yöneticisi ya da şifreli harici disk) yedekleyin.
 
 ## Kurallar
-- `key.properties` ve `*.jks` hiçbir zaman commit edilmez; `.gitignore` bunu engeller.
+- `key.properties` ve `*.jks` hiçbir zaman commit edilmez; kök ve alt `.gitignore` dosyaları bunu engeller.
 - Şifreler kasa notlarına ve Mem0'a yazılmaz.
-- Yayın derlemesi `key.properties` olmadan dağıtılmaz.
+- Yayın derlemesi `key.properties` olmadan dağıtılmaz; `-Pdagitim=true` bunu zorlar.

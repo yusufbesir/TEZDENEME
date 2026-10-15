@@ -26,8 +26,21 @@ String? yolHatasi(String yol) {
   for (final parca in yol.split('/')) {
     if (parca.isEmpty) return 'boş yol parçası';
     if (parca == '.' || parca == '..') return '"$parca" parçası içeriyor';
+    if (parca.endsWith('.') || parca.endsWith(' ')) {
+      return '"$parca" parçası nokta ya da boşlukla bitiyor';
+    }
+    if (_windowsAyrilmisAd(parca)) return '"$parca" Windows ayrılmış adı';
   }
   return null;
+}
+
+/// Windows ayrılmış aygıt adları (CON, PRN, AUX, NUL, COM1-9, LPT1-9).
+/// Uzantılı biçimleri de (`nul.txt`) ayrılmıştır; büyük/küçük harf fark etmez.
+bool _windowsAyrilmisAd(String parca) {
+  final govde = parca.split('.').first.toUpperCase();
+  const sabit = {'CON', 'PRN', 'AUX', 'NUL'};
+  if (sabit.contains(govde)) return true;
+  return RegExp(r'^(COM|LPT)[1-9]$').hasMatch(govde);
 }
 
 /// Manifestteki tek dosya kaydı.

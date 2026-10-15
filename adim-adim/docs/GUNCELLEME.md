@@ -8,7 +8,8 @@ dosyaları arka planda siler. Yalnızca Windows'ta çalışır.
 
 ## Manifestler
 - `surum.manifest.json`: güncel sürüm. Biçim: `{surum, dosyalar:[{yol, boyut, sha256}]}`.
-  Yollar göreli ve `/` ayırıcılıdır; `..`, mutlak yol, sürücü harfi ve ters bölü reddedilir.
+  Yollar göreli ve `/` ayırıcılıdır; `..`, mutlak yol, sürücü harfi, ters bölü, sonu nokta ya da
+  boşlukla biten parçalar (`adimadim.`) ve Windows ayrılmış adları (CON, NUL, COM1, `nul.txt`...) reddedilir.
 - `eski.manifest.json`: önceki sürümün manifesti (güncelleyici taşır).
 - Üretim: `dart run tool/manifest_olustur.dart <klasor> <surum>`.
 
@@ -22,8 +23,12 @@ dosyaları arka planda siler. Yalnızca Windows'ta çalışır.
 
 ## Akış
 Güncelleyici: yeni paketi doğrula → uygulama çalışıyorsa kapatılmasını iste ve çık →
-`surum.manifest.json`'u `eski.manifest.json` yap → kopyala → hedefte yeniden doğrula
-(başarısızsa manifesti geri al, hata ver). Uygulama açılışında temizleyici:
+paketi hedefin yanındaki geçici klasöre kopyala ve orada yeniden doğrula (doğrulanan kopya
+taşınan kopyadır) → hedefte yazılacak her yolda bağlantı/junction ara, varsa hiç başlamadan dur →
+`surum.manifest.json`'u `eski.manifest.json` yap → her dosyayı önce yedekle, sonra geçiciden taşı →
+hedefte son doğrulama. Herhangi bir adım başarısızsa üzerine yazılanlar yedekten geri yüklenir,
+eklenen yeni dosyalar ve açılan boş klasörler kaldırılır, eski manifest geri gelir; geri alma tam
+değilse yedek klasörü korunur ve yolu bildirilir. Uygulama açılışında temizleyici:
 `eski.manifest.json` yoksa `gerekYok`; yeni sürüm doğrulanamazsa `dogrulanamadi` (hiçbir şey silinmez);
 aksi halde adaylar (eski − yeni) yol, bağlantı ve SHA-256 denetiminden geçerse silinir,
 sonra boş kalan dizinler kaldırılır. Silme hatası yoksa `eski.manifest.json` silinir.
