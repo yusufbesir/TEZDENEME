@@ -39,24 +39,31 @@ Not: Kurulum sırasında hash'i uyuşmayan paket reddedilir; bu bilinçli bir ko
 
 Django 5.2 LTS'nin desteği 2028 Nisan'da biter; o tarihten önce bir sonraki LTS sürümüne geçiş planlanmalıdır.
 
-## Günlükler (log)
+## Taban imaj digest'lerini güncellemek (sabitleme)
 
-```bash
-docker compose logs app --tail 200      # uygulama ve erişim günlükleri
-docker compose logs caddy --tail 200    # HTTPS ve istek günlükleri
-docker compose logs yedek --tail 50     # yedekleme
-cat yedekler/yedek-gunlugu.log
-```
+Dış imajlar `ad:etiket@sha256:...` biçiminde **digest ile sabitlenmiştir**: `postgres` ve `caddy` `docker-compose.yml` içinde, `python` `app/Dockerfile` içinde, `postgres` ayrıca `yedek/Dockerfile` içinde. Etiket aynı kalsa bile kayıt defterindeki içerik sonradan değiştirilirse (ele geçirilmiş hesap, yeniden yayımlama) sabitlenmiş digest bunu reddeder. Digest, çok mimarili **liste (index)** özetidir; böylece amd64 ve arm64 sunucularda aynı satır çalışır. Digest'i elle uydurmayın, yazmayın: her zaman kayıt defterinden alın.
 
-Docker günlükleri dosya başına 10 MB, servis başına 5 dosya ile sınırlıdır (otomatik döner, diski doldurmaz).
+Ne zaman: güvenlik yaması (ör. `postgres` 17.x küçük sürüm, `caddy` yaması, Python/Debian güvenlik güncellemesi) çıktığında veya etiketi bilinçli değiştirdiğinizde.
 
-## Sorun giderme
+1. Yeni etiketi seçin (ör. `postgres:17.7-alpine`). PostgreSQL için yalnızca küçük sürüm; büyük sürüm için yukarıdaki yedek + geri yükleme kuralı geçerlidir.
+2. Çok mimarili digest'i alın (internet gerekir; ikisinden biri):
+   ```bash
+   docker buildx imagetools inspect postgres:17.7-alpine          # ilk satırlardaki "Digest: sha256:..." (MediaType ...image.index...)
+   # veya:
+   docker pull postgres:17.7-alpine && docker image inspect postgres:17.7-alpine --format '{{index .RepoDigests 0}}'
+   ```
+   Not: `RepoDigests`, bazı Docker sürümlerinde yalnızca makinenizin mimarisine ait tek imajın digest'ini verebilir; `MediaType` "index" (liste) değilse `imagetools inspect` çıktısındaki en üst `Digest` değerini kullanın.
+3. Değeri ilgili satırlarda değiştirin (etiket ve digest birlikte): `docker-compose.yml` (`db`, `caddy`), `app/Dockerfile` (`FROM python:...`), `yedek/Dockerfile` (`FROM postgres:...`). `db` ve `yedek` aynı postgres digest'ini kullanmalıdır (yedek aracı `pg_dump` sürümü sunucuyla uyumlu olsun).
+4. Doğrulayın: `docker compose config` hatasız olmalı; `docker compose build` ve ardından `bash scripts/test.sh`.
+5. `bash scripts/guncelle.sh`. Sonra `bash scripts/geri-yukleme-testi.sh` ile yedeğin hâlâ geri yüklendiğini görün.
 
-| Belirti | Kontrol |
-|---|---|
-| Site açılmıyor | `docker compose ps` · `docker compose logs caddy` · DNS kaydı |
-| “Sertifika alınamadı” | DNS VPS'i gösteriyor mu, 80 ve 443 portları açık mı |
-| app “unhealthy” | `docker compose logs app` · `docker compose logs db` |
-| Disk doluyor | `docker system df` · `du -sh yedekler` · `YEDEK_SAKLAMA_GUN`'ü azaltın |
-| Yönetici MFA cihazını kaybetti | Başka bir Yönetici panelden sıfırlar; tek yönetici varsa: `docker compose exec app python manage.py mfa_sifirla KULLANICI_ADI` |
-| Hesap kilitlendi (“Çok fazla başarısız deneme”) | Kilit 15 dk sonra kendiliğinden kalkar; hemen açmak için: `docker compose exec app python manage.py sayac_sifirla KULLANICI_ADI` (gerekirse `--ip IP`). Denetim kaydına “sayac_sifirlandi” yazılır. Tekrarlıyorsa denetim kayıtlarında saldırgan IP'sini arayın. |
+Kontrol: çalışan imajın sabitlenen digest ile aynı olduğunu görmek için `docker compose images` veya `docker image inspect <imaj> --format '{{index .RepoDigests 0}}'`.
+
+## Yedek servisinin kullanıcısı (root değil)
+
+Yedek konteyneri `10002:10002` kullanıcısıyla, ek grup `999` (uygulama imajındaki `uygulama` grubu), `cap_drop: [ALL]`, `read_only: true` ve `no-new-privileges` ile çalışır; yazdığı tek yerler `yedekler/` dizini, `yedek-durum` birimi ve bellek tmpfs'i olan `/tmp`'dir. UID bilerek app'ten (10001) farklıdır: konteyner kaçışında app süreci yedek dosyalarının sahibi olup onları silemesin. `medya` birimi (salt okunur) app'in grubu 999 üzerinden okunur; bu yüzden medya dosyalarında **grup okuma izni** (dosya g+r, dizin g+rx) gerekir.
+
+- `yedekler/` ve içindeki dosyalar **10002'ye aittir (kip 700/600)**: sunucuda okumak/kopyalamak için root kullanın (`sudo`). `yedek-durum` birimi 10002:999, dizin 2750, `son-durum.json` 640 (panel yalnızca okur).
+- `guncelle.sh` ve `kurulum.sh`, eski kurulumlardaki root sahipliğini `scripts/yedek-dizini-hazirla.sh` ile (yalnızca `chown`/`chmod`, silme yok) devreder; elle: `bash scripts/yedek-dizini-hazirla.sh`.
+- `guncelle.sh`, mevcut medya dosyalarına `scripts/medya-izni-hazirla.sh` ile g+r/g+rx ekler (yalnızca izin ekler). Okunamayan bir medya dosyası kalırsa `yedek-al.sh` **başarısız** olur ve hata mesajında dosyayı yazar (sessizce atlamaz); çözüm: `bash scripts/medya-izni-hazirla.sh`.
+- Yeni yüklenen görsellerin de grup tarafından okunabilmesi için uygulama ayarlarında dosya kipi grup okumayı içermelidir (varsayılan 0o644 zaten içerir; `FILE_UPLOAD_PERMISSIONS = 0o640` ve `FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o750` gibi sıkılaştırmada grup biti KORUNMALI; ayrıca Caddy'nin medyayı okuyabilmesi için bkz. proje notları).

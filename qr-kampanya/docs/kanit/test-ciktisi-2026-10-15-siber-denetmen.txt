@@ -1,0 +1,405 @@
+Found 397 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+Roller güncellendi.
+./tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py:61: UserWarning: No directory at: /home/claude/TEZDENEME/qr-kampanya/app/staticfiles/
+  mw_instance = middleware(adapted_handler)
+..2026-10-16 02:45:17,478 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,489 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,501 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,511 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,521 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,534 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,543 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,552 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,564 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,574 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,584 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,598 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,607 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,616 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,629 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,639 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,649 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,665 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,674 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,683 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,698 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:17,711 WARNING django.request Too Many Requests: /panel/giris
+.Roller güncellendi.
+.......Roller güncellendi.
+.2026-10-16 02:45:18,456 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,467 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,477 WARNING django.request Too Many Requests: /panel/giris
+.2026-10-16 02:45:18,571 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,577 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,584 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,590 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,601 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,610 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,617 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,624 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,631 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,638 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,644 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,651 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,658 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,664 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,672 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,678 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,685 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,692 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,699 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,705 WARNING django.request Too Many Requests: /panel/giris
+.Roller güncellendi.
+2026-10-16 02:45:18,869 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,871 WARNING django.request Too Many Requests: /panel/giris
+..2026-10-16 02:45:18,974 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,982 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:18,991 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:19,000 WARNING django.request Too Many Requests: /panel/giris
+..Roller güncellendi.
+......2026-10-16 02:45:19,382 WARNING django.request Not Found: /panel/qr/7/sil
+2026-10-16 02:45:19,382 WARNING django.request Not Found: /panel/qr/7/delete
+2026-10-16 02:45:19,388 WARNING django.request Method Not Allowed (POST): /panel/qr/7/
+...Roller güncellendi.
+......Roller güncellendi.
+...Roller güncellendi.
+....Roller güncellendi.
+2026-10-16 02:45:21,119 WARNING django.request Too Many Requests: /panel/giris
+.2026-10-16 02:45:21,149 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-16 02:45:21,151 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-16 02:45:21,158 WARNING django.request Too Many Requests: /panel/mfa/kurulum
+2026-10-16 02:45:21,159 WARNING django.request Too Many Requests: /panel/mfa/kurulum
+..Roller güncellendi.
+..2026-10-16 02:45:21,849 WARNING django.request Too Many Requests: /panel/giris
+.2026-10-16 02:45:21,973 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:22,084 WARNING django.request Too Many Requests: /panel/giris
+.2026-10-16 02:45:22,192 WARNING django.request Too Many Requests: /panel/giris
+.2026-10-16 02:45:22,363 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-16 02:45:22,375 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:22,389 WARNING django.request Too Many Requests: /panel/giris
+...Roller güncellendi.
+.....Roller güncellendi.
+...Roller güncellendi.
+.....Roller güncellendi.
+.Roller güncellendi.
+...2026-10-16 02:45:24,248 WARNING qr.hiz Hız sınırı sayacı yazılamadı; istek sınırsız geçirildi (fail-open): relation "olmayan_tablo" does not exist
+LINE 1: INSERT INTO olmayan_tablo VALUES ('hiz:29868465:70cc061aa37b...
+                    ^
+.....2026-10-16 02:45:24,365 WARNING django.request Too Many Requests: /k/PAY001
+2026-10-16 02:45:24,366 WARNING django.request Too Many Requests: /k/PAY001
+.Roller güncellendi.
+.Roller güncellendi.
+......Roller güncellendi.
+........Roller güncellendi.
+.....Roller güncellendi.
+....2026-10-16 02:45:26,130 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/199eba8f-be39-4af4-8b38-00527b49de96/uygula
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/ice_aktarma.py", line 194, in ice_aktarma_uygula
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+.Roller güncellendi.
+.2026-10-16 02:45:26,376 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/eslestir
+2026-10-16 02:45:26,383 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/onizle
+2026-10-16 02:45:26,390 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/hatalar.csv
+2026-10-16 02:45:26,397 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/sonuc
+2026-10-16 02:45:26,403 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/rapor.csv
+2026-10-16 02:45:26,410 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/zip
+2026-10-16 02:45:26,417 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/uygula
+2026-10-16 02:45:26,425 WARNING django.request Not Found: /panel/qr/ice-aktar/3144c070-c1a6-4993-b160-98860f689e55/iptal
+.2026-10-16 02:45:26,439 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/ice-aktar/yukle
+..2026-10-16 02:45:26,545 WARNING django.request Method Not Allowed (GET): /panel/qr/ice-aktar/d74bc17e-0877-411f-a142-d3f432740b54/uygula
+...2026-10-16 02:45:26,672 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:26,679 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/yukle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:26,686 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/d59d840e-650e-4104-b5a6-9f41a9835f36/uygula
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:26,693 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/ornek-ice-aktarma.csv
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+.2026-10-16 02:45:26,746 WARNING django.request Not Found: /panel/qr/ice-aktar/14d6b285-ce48-4cc8-87f0-7327118790db/onizle
+2026-10-16 02:45:26,754 WARNING django.request Not Found: /panel/qr/ice-aktar/14d6b285-ce48-4cc8-87f0-7327118790db/uygula
+...Roller güncellendi.
+..2026-10-16 02:45:27,092 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,113 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,114 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,114 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,115 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,115 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,115 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,116 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,116 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,116 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,116 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,117 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,117 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,117 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,118 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,118 WARNING django.request Not Found: /ic/medya-yetki
+...2026-10-16 02:45:27,294 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,329 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,345 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,371 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,386 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,405 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,417 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,420 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,423 WARNING django.request Not Found: /ic/medya-yetki
+.2026-10-16 02:45:27,434 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,435 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-16 02:45:27,435 WARNING django.request Not Found: /ic/medya-yetki
+..2026-10-16 02:45:27,483 WARNING django.request Not Found: /ic/medya-yetki
+.Roller güncellendi.
+2026-10-16 02:45:27,644 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-16 02:45:27,647 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-16 02:45:27,650 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-16 02:45:27,653 WARNING django.request Too Many Requests: /k/HIZ001
+.2026-10-16 02:45:27,701 WARNING django.request Too Many Requests: /k/HIZ002
+.Roller güncellendi.
+.....2026-10-16 02:45:28,248 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/96/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:28,257 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/96/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+.....2026-10-16 02:45:28,597 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-16 02:45:28,606 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+.......2026-10-16 02:45:28,835 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/kullanicilar/95/mfa-sifirla
+...2026-10-16 02:45:28,936 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/98/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/mfa.py", line 364, in kullanici_mfa_sifirla
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+....Roller güncellendi.
+....2026-10-16 02:45:29,407 WARNING django.request Forbidden (Permission denied): /panel/qr/65/png
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..Roller güncellendi.
+........Roller güncellendi.
+2026-10-16 02:45:30,502 WARNING django.request Gone: /k/TOP-A
+...2026-10-16 02:45:30,599 WARNING django.request Forbidden (Permission denied): /panel/qr/toplu
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/qrler.py", line 244, in qr_toplu
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..2026-10-16 02:45:30,716 WARNING django.request Method Not Allowed (GET): /panel/qr/toplu
+....Roller güncellendi.
+2026-10-16 02:45:31,297 WARNING django.request Not Found: /k/YOKYOKYOK
+.Roller güncellendi.
+.......Roller güncellendi.
+..2026-10-16 02:45:32,462 WARNING django.request Method Not Allowed (GET): /panel/sayfalar/50/gorsel/31/sil
+..2026-10-16 02:45:32,554 WARNING django.request Forbidden (Permission denied): /panel/sayfalar/52/gorsel/33/sil
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..2026-10-16 02:45:32,641 WARNING django.request Not Found: /s/yaz-firsati
+2026-10-16 02:45:32,680 WARNING django.request Not Found: /s/yaz-firsati
+....Roller güncellendi.
+.......Roller güncellendi.
+.2026-10-16 02:45:33,440 WARNING qr.alanlar Şifreli alan çözülemedi (gizli_anahtar); MFA_SIFRELEME_ANAHTARI bu kaydı açamıyor.
+2026-10-16 02:45:33,456 WARNING qr.alanlar Şifreli alan çözülemedi (gizli_anahtar); MFA_SIFRELEME_ANAHTARI bu kaydı açamıyor.
+2026-10-16 02:45:33,458 WARNING qr.alanlar Şifreli alan çözülemedi (gizli_anahtar); MFA_SIFRELEME_ANAHTARI bu kaydı açamıyor.
+..........Roller güncellendi.
+....Roller güncellendi.
+......Roller güncellendi.
+..Roller güncellendi.
+.2026-10-16 02:45:34,995 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/yeni
+2026-10-16 02:45:34,997 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/cikis
+.2026-10-16 02:45:35,004 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/giris
+.2026-10-16 02:45:35,042 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/toplu
+.Roller güncellendi.
+2026-10-16 02:45:35,229 WARNING django.request Method Not Allowed (POST): /panel/denetim/
+.Roller güncellendi.
+..2026-10-16 02:45:35,560 WARNING django.request Too Many Requests: /panel/giris
+2026-10-16 02:45:35,633 WARNING django.request Too Many Requests: /panel/giris
+.....Roller güncellendi.
+...2026-10-16 02:45:36,071 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/162/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yonetim.py", line 65, in kullanici_duzenle
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..Roller güncellendi.
+2026-10-16 02:45:36,217 WARNING django.request Method Not Allowed (GET): /panel/cikis
+.2026-10-16 02:45:36,247 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,255 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,262 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/165/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,268 WARNING django.request Forbidden (Permission denied): /panel/ayarlar
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+...2026-10-16 02:45:36,309 WARNING django.request Forbidden (Permission denied): /panel/qr/201/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,316 WARNING django.request Forbidden (Permission denied): /panel/kampanyalar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,322 WARNING django.request Forbidden (Permission denied): /panel/sayfalar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..2026-10-16 02:45:36,454 WARNING django.request Forbidden (Permission denied): /panel/qr/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-16 02:45:36,460 WARNING django.request Forbidden (Permission denied): /panel/qr/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+.2026-10-16 02:45:36,481 WARNING django.request Forbidden (Permission denied): /panel/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+..Roller güncellendi.
+2026-10-16 02:45:36,795 WARNING django.request Gone: /k/ARS001
+.........2026-10-16 02:45:36,963 WARNING django.request Not Found: /k/YOKBOYLEKOD
+...........................................................................................ssss.............................................
+----------------------------------------------------------------------
+Ran 397 tests in 64.791s
+
+OK (skipped=4)
+Destroying test database for alias 'default'...

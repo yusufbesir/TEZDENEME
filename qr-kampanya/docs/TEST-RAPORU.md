@@ -4,7 +4,7 @@
 
 ## Özet
 
-- **Otomatik testler:** 354 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`; gerçek rclone gerektiren testler `QR_TEST_RCLONE` verilince çalışır). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15-basdenetmen.txt`; önceki 338 testlik koşu `docs/kanit/test-ciktisi-2026-10-15-yedek-riskleri.txt` (önceki 264 testlik koşu: `docs/kanit/test-ciktisi-2026-10-15.txt`).
+- **Otomatik testler:** 397 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`; gerçek rclone gerektiren testler `QR_TEST_RCLONE` verilince çalışır). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15-siber-denetmen.txt`; önceki 354 testlik koşu `docs/kanit/test-ciktisi-2026-10-15-basdenetmen.txt`, önceki 338 testlik koşu `docs/kanit/test-ciktisi-2026-10-15-yedek-riskleri.txt` (önceki 264 testlik koşu: `docs/kanit/test-ciktisi-2026-10-15.txt`).
 - **Uçtan uca testler** bulut geliştirme ortamında, gerçek Docker Compose yığınıyla (PostgreSQL 17.6, Caddy 2.10.2, uygulama imajı; sıkılaştırılmış ayarlar ve MFA zorunlu) yapıldı. Alan adı ve VPS henüz olmadığı için HTTPS yerine `http://localhost:8080` kullanıldı.
 - **Yapılamayanlar (açıkça):** gerçek alan adında HTTPS sertifikası alma ve fiziksel baskıdan telefonla okuma. Bunlar VPS kurulumunda yapılmalı (bkz. sonda).
 - Bağımsız denetim: gereksinim doğrulaması **Geçti**; güvenlik denetimi iki tur yapıldı, bulunan Orta bulgular düzeltildi (bkz. “Güvenlik denetimi”).
@@ -37,6 +37,7 @@
 ## Ek ölçümler
 
 - Hız sınırı: aynı IP'den 400 ardışık tarama → 120 yönlendirme, 280 “429 çok fazla istek”.
+- Hız sınırı veritabanına taşındıktan sonra: 4 Gunicorn işçisiyle sınır tam 120'de kalıyor (işçiler arası paylaşımlı); uçtan uca denemede sınır 5'e ayarlanınca 30 istekten 5'i 302, 25'i 429. Yönlendirme veriminde yaklaşık %20 düşüş ölçüldü (her istekte bir DB yazımı).
 - 5.000 satır içe aktarma: önizleme 1,9 sn, uygulama 32 sn, ZIP 35 sn. 20.000 satır birkaç dakika sürebilir (istek zaman aşımı 300 sn).
 - QR hata düzeltme seviyesi M (%15); baskıda en az 2 × 2 cm önerilir.
 
@@ -91,3 +92,15 @@ Bağımsız doğrulama Geçti, güvenlik denetimi (Opus) Geçti: Kritik/Yüksek/
 4. Dışarıdan `nc -zv SUNUCU_IP 5432` bağlanamamalı.
 5. `bash scripts/test.sh`, `bash scripts/rol-dogrulama.sh`, `bash scripts/guvenlik-tarama.sh` ve `bash scripts/geri-yukleme-testi.sh` sunucuda.
 6. `disari-kopyala.sh` gerçek uzak hedefle bir kez çalışmalı ve panelde “sunucu dışı kopya doğrulandı” görünmeli.
+
+## Siber Güvenlik Denetmeni bulguları (15 Ekim, gece)
+
+| # | Bulgu | Yapılan | Kanıt |
+|---|---|---|---|
+| 1 | TOTP gizli anahtarları veritabanında düz metin | Fernet/MultiFernet ile şifreleme (`MFA_SIFRELEME_ANAHTARI`, döndürme destekli), migrasyon 0006 mevcut kayıtları tek işlemde şifreler; çözülemeyen kayıtla giriş yok | 21 birim testi; uçtan uca: DB'de `gAAAAA…` (140 karakter), dökümde düz base32 yok; 9993d61'den yükseltmede mevcut sır şifrelendi ve kullanıcı yeniden kurulum yapmadan girdi |
+| 2 | Hız sınırı işçi başına | Sayaç `qr_denemesayaci` tablosunda, `INSERT … ON CONFLICT … RETURNING` ile atomik; anahtarlar IP yerine HMAC özeti | Uçtan uca: 3 işçide 30 istekten 5'i geçti; tabloda IP metni yok |
+| 3 | Yedek konteyneri root | 10002:10002 (uygulamadan ayrı), grup 999 ile medya okuma, `cap_drop: ALL`, `read_only`, `no-new-privileges`; db `cap_drop: ALL` + 5 yetki; eski kurulumlar için `yedek-dizini-hazirla.sh`, `medya-izni-hazirla.sh` | Uçtan uca `docker inspect`; okunamayan medya dosyasında yedek açık hatayla başarısız oluyor |
+| 4 | Düşük: imaj digest, XML | `postgres`, `caddy`, `python` index digest ile sabit; Excel için `defusedxml` | 8 XML testi; `docker image inspect` mediaType index |
+| — | Denetimin Düşük notları | Hata sayfasında Türkçe adlı sırlar gizlenir; yedek betiklerinde sembolik bağlantı izlenmez; GID 999 açıkça verilir | `test_hata_filtresi.py`; uçtan uca `id uygulama` → `gid=999` |
+
+Süreç: bağımsız doğrulama (Sonnet, uçtan uca Docker: taze kurulum ve 9993d61'den yükseltme) **Geçti**; güvenlik denetimi (Opus) **Geçti**, Kritik/Yüksek/Orta yok. Ham çıktı: `docs/kanit/siber-denetmen-e2e-2026-10-15.txt`. Açık kalan Düşükler `docs/GUVENLIK.md` → Bilinen sınırlamalar. Ayrıca bulunan, bu değişiklikten önce de var olan bir hata: `kurulum.sh` ilk yönetici hesabını sormuyor (geçici çözüm: `docker compose exec app python manage.py createsuperuser`).

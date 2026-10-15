@@ -4,6 +4,7 @@ Bütün gizli ve ortama bağlı değerler ortam değişkenlerinden (.env) okunur
 Kaynak koda parola, anahtar veya alan adı yazılmaz.
 """
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -170,6 +171,22 @@ IP_DENEME_SINIRI = int(env("IP_DENEME_SINIRI", "20"))
 GIRIS_HIZ_SINIRI = int(env("GIRIS_HIZ_SINIRI", "10"))
 YONLENDIRME_HIZ_SINIRI = int(env("YONLENDIRME_HIZ_SINIRI", "120"))  # IP başına dakikada
 MFA_ZORUNLU = env_bool("MFA_ZORUNLU", not DEBUG)
+
+# MFA (TOTP) gizli anahtarlarının veritabanında şifrelenmesi için Fernet anahtarı (urlsafe base64, 32 bayt).
+# Virgülle ayrılmış birden çok anahtar = döndürme (ilki yeni şifreleme için). DJANGO_SECRET_KEY'den TÜRETİLMEZ.
+# Yalnızca `manage.py test` için sabit bir TEST anahtarı kullanılır (gerçek bir sır değildir); üretimde zorunludur.
+_TEST_MFA_ANAHTARI = "dGVzdC1hbmFodGFyaS15YWxuaXpjYS10ZXN0LWljaW4="
+MFA_SIFRELEME_ANAHTARI = env("MFA_SIFRELEME_ANAHTARI", "")
+if not MFA_SIFRELEME_ANAHTARI and len(sys.argv) > 1 and sys.argv[1] == "test":
+    MFA_SIFRELEME_ANAHTARI = _TEST_MFA_ANAHTARI
+try:
+    from qr.sifreleme import SifrelemeHatasi, anahtarlari_hazirla
+
+    anahtarlari_hazirla(MFA_SIFRELEME_ANAHTARI)
+except SifrelemeHatasi as _hata:
+    raise ImproperlyConfigured(str(_hata)) from None
+# Hata sayfası ve raporlarında Türkçe adlı sırlar da (ör. MFA_SIFRELEME_ANAHTARI) gizlensin.
+DEFAULT_EXCEPTION_REPORTER_FILTER = "qr.hata_filtresi.GizliAyarFiltresi"
 YEDEK_DURUM_DOSYASI = env("YEDEK_DURUM_DOSYASI", "/yedek-durum/son-durum.json")
 
 LOGGING = {

@@ -14,6 +14,21 @@ for ANAHTAR in POSTGRES_SAHIP_PAROLA POSTGRES_UYGULAMA_PAROLA; do
     echo ".env dosyasının SONUNA eksik anahtar eklendi: ${ANAHTAR} (diğer satırlar değiştirilmedi)."
   fi
 done
+# MFA gizli anahtarlarını veritabanında şifreleyen Fernet anahtarı (32 bayt, urlsafe base64). Yoksa üretilir ve .env'nin
+# SONUNA eklenir (var olan satırlara dokunulmaz). Bu anahtar kaybolursa MFA kayıtları çözülemez (yönetici `mfa_sifirla` ile
+# sıfırlar): .env dosyasının yedeğini parola yöneticinizde saklayın (docs/KURULUM.md, docs/YEDEKLEME.md).
+mfa_anahtari_uret() { python3 -c "import base64,secrets;print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())" 2>/dev/null || openssl rand -base64 32 | tr '+/' '-_' | tr -d '\n'; }
+if grep -qE '^MFA_SIFRELEME_ANAHTARI=.' .env; then
+  :
+elif grep -qE '^MFA_SIFRELEME_ANAHTARI=' .env; then
+  echo "HATA: .env içinde MFA_SIFRELEME_ANAHTARI satırı var ama boş. Dolu bir anahtar yazın veya satırı silin (betik yeni anahtar üretir)."; exit 1
+else
+  [ -z "$(tail -c1 .env)" ] || echo >> .env
+  echo "MFA_SIFRELEME_ANAHTARI=$(mfa_anahtari_uret)" >> .env
+  echo "BİLGİ: .env dosyasının SONUNA MFA_SIFRELEME_ANAHTARI eklendi (MFA gizli anahtarlarını şifreler; diğer satırlar değiştirilmedi)."
+  echo "       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md)."
+fi
+# Bu adım migrasyondan (hazırlık) ÖNCE olmalıdır: 0006 migrasyonu mevcut MFA kayıtlarını bu anahtarla şifreler.
 # Sıralama ÖNEMLİ: güncelleme öncesi şifreli yedek qr_sahip ile alınır; eski kurulumda bu rol henüz yoktur.
 # Bu yüzden önce veritabanı (yeni ortamla) ayağa kalkar ve roller kurulur (10-roller.sh idempotent ve
 # yıkıcı değildir: veri silmez/değiştirmez), SONRA yedek alınır, EN SON yeni uygulama başlatılır.
@@ -75,6 +90,11 @@ ASAMA="yedek"
 # Anahtar dosyası da, .env'de YEDEK_ALICI de yoksa yeni anahtar üretilir (ekranda bir kez gösterilir, EVET ile sunucudan
 # kaldırılır). Mevcut anahtara dokunulmaz; YEDEK_ALICI varken anahtar dosyası yoksa (sunucudan kaldırılmış) YENİ ANAHTAR ÜRETİLMEZ.
 bash scripts/yedek-anahtari-hazirla.sh
+# Yedek servisi artık root değil (10002): eski kurulumlarda root'a ait yedekler/ dizini ve yedek-durum birimi ona devredilir
+# (yalnızca sahiplik değişir, hiçbir şey silinmez; tekrar çalıştırmak güvenlidir).
+bash scripts/yedek-dizini-hazirla.sh
+# Medya dosyalarına grup okuma izni (yalnızca ekleme): yedek kullanıcısı medyayı app'in grubu üzerinden okur.
+bash scripts/medya-izni-hazirla.sh
 # YEDEK_ALICI .env'ye yeni eklenmiş olabilir; konteyner ortamı yeniden okusun.
 docker compose up -d --no-deps yedek
 YEDEK_CIKTI=$(docker compose exec -T yedek sh /betikler/yedek-al.sh 2>&1) || { echo "$YEDEK_CIKTI"; exit 1; }

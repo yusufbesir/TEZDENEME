@@ -21,6 +21,7 @@ x-uygulama-ayarlari: &uygulama-ayarlari
   HSTS_SN:
   OTURUM_SURESI_SN:
   MFA_ZORUNLU:
+  MFA_SIFRELEME_ANAHTARI:
   GIRIS_DENEME_SINIRI:
   GIRIS_KILIT_SURESI_SN:
   HESAP_DENEME_SINIRI:
@@ -43,7 +44,7 @@ x-uygulama-sikilastirma: &uygulama-sikilastirma
 
 services:
   db:
-    image: postgres:17.6-alpine
+    image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-qrkampanya}
@@ -53,6 +54,10 @@ services:
       POSTGRES_SAHIP_PAROLA: ${POSTGRES_SAHIP_PAROLA:?POSTGRES_SAHIP_PAROLA .env içinde tanımlanmalı}
       POSTGRES_UYGULAMA_PAROLA: ${POSTGRES_UYGULAMA_PAROLA:?POSTGRES_UYGULAMA_PAROLA .env içinde tanımlanmalı}
     security_opt: [no-new-privileges:true]
+    # Postgres imajının giriş noktası root olarak başlar, veri dizinini hazırlar ve postgres kullanıcısına geçer:
+    # yalnızca bunun için gereken yetkiler bırakılır, gerisi kapalıdır.
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
     volumes:
       - db-veri:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d:ro
@@ -115,7 +120,7 @@ services:
       start_period: 40s
 
   caddy:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
     restart: unless-stopped
     environment:
       SITE_ADRESI: ${SITE_ADRESI:?SITE_ADRESI .env içinde tanımlanmalı}
@@ -156,6 +161,13 @@ services:
       YEDEK_SAKLAMA_GUN: ${YEDEK_SAKLAMA_GUN:-14}
       TARAMA_SAKLAMA_GUN: ${TARAMA_SAKLAMA_GUN:-730}
       TZ: Europe/Istanbul
+    # Root DEĞİL (pg_dump ağ üzerinden bağlanır, root gerekmez) ve app'ten FARKLI UID (10002): konteyner kaçışında app süreci
+    # yedek dosyalarının sahibi olamaz. Medya (salt okunur) app'in grubu 999 üzerinden okunur (app imajında "uygulama" GID'i).
+    # Yazılabilen yer yalnızca /yedekler, /yedek-durum ve /tmp (tmpfs).
+    user: "10002:10002"
+    group_add: ["999"]
+    cap_drop: [ALL]
+    read_only: true
     security_opt: [no-new-privileges:true]
     entrypoint: ["/bin/sh", "/betikler/yedek-dongu.sh"]
     tmpfs:

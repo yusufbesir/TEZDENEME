@@ -2,7 +2,7 @@
 from django.test import override_settings
 from django.urls import reverse
 
-from qr.hiz import hiz_sinirlayici
+from qr.models import DenemeSayaci  # noqa
 from qr.models import DenetimKaydi, KampanyaSayfasi, MFACihazi, SayfaGorseli
 
 from .yardimci import TemelTest, png_dosyasi
@@ -147,7 +147,7 @@ class MedyaYetkiTest(TemelTest):
 class YonlendirmeHizSiniriIPv6Test(TemelTest):
     def setUp(self):
         super().setUp()
-        hiz_sinirlayici._sayac = {}
+        DenemeSayaci.objects.filter(anahtar__startswith="hiz:").delete()
 
     @override_settings(YONLENDIRME_HIZ_SINIRI=3)
     def test_ayni_64_farkli_adresler_ayni_kovayi_paylasir(self):

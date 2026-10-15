@@ -75,7 +75,9 @@ ortak_coz() {
   local m1 m2
   m1=$(ortak_mount "$1" /anahtar/yedek-anahtari.txt ro) || return 1
   m2=$(ortak_mount "$2" /yedekler ro) || return 1
-  docker run --rm --log-driver none --network none --cap-drop ALL --security-opt no-new-privileges:true \
+  # DAC_READ_SEARCH: yedek dosyaları yedek kullanıcısına ait ve 600 izinli; yetkisiz root bunları okuyamaz. Bu yetki yalnızca
+  # OKUMA içindir (yazma/sahiplik yetkisi yok); yedek ve anahtar zaten salt okunur bağlanır.
+  docker run --rm --log-driver none --network none --cap-drop ALL --cap-add DAC_READ_SEARCH --security-opt no-new-privileges:true \
     --mount "$m1" --mount "$m2" \
     --entrypoint age "$YEDEK_IMAJI" -d -i /anahtar/yedek-anahtari.txt "/yedekler/$3"
 }

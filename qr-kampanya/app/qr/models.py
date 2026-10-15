@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from .alanlar import SifreliMetinAlani
 from .dogrulama import guvenli_url_dogrula
 
 KISA_KOD_DESENI = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{1,62}[A-Za-z0-9]$")
@@ -383,10 +384,11 @@ class GenelAyarlar(models.Model):
 
 
 class MFACihazi(models.Model):
-    """Kullanıcının TOTP (doğrulama uygulaması) gizli anahtarı."""
+    """Kullanıcının TOTP (doğrulama uygulaması) gizli anahtarı. Anahtar veritabanında Fernet ile şifreli saklanır
+    (MFA_SIFRELEME_ANAHTARI); Python tarafında düz metindir. Düz metin hiçbir yerde loglanmaz."""
 
     kullanici = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="mfa")
-    gizli_anahtar = models.CharField(max_length=64)
+    gizli_anahtar = SifreliMetinAlani()
     onayli = models.BooleanField(default=False)
     son_kullanilan_adim = models.BigIntegerField(default=0)
     olusturma = models.DateTimeField(auto_now_add=True)

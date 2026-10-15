@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Sürümü sabit Python tabanı (Debian bookworm, slim)
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -21,7 +21,9 @@ RUN --mount=type=bind,source=.,target=/baglam \
 
 # Uygulama root olmayan kullanıcıyla çalışır. Uygulama kodu (/app) root'a aittir ve uygulama kullanıcısı
 # tarafından DEĞİŞTİRİLEMEZ; yalnızca /veri (medya, statik) uygulama kullanıcısına yazılabilirdir.
-RUN useradd --system --uid 10001 --home /app uygulama \
+# Grup GID 999 açıkça verilir: yedek servisi medyayı bu grup (compose group_add: "999") üzerinden okur.
+RUN groupadd --system --gid 999 uygulama \
+    && useradd --system --uid 10001 --gid uygulama --home /app uygulama \
     && mkdir -p /veri/medya /veri/static \
     && chown -R uygulama /veri
 COPY . .

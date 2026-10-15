@@ -77,7 +77,11 @@ case "$HEDEF" in
   *)   HEDEF_AD="(yerel-yol)" ;;
 esac
 
-gunluge() { echo "$(date -Iseconds) $*" | tee -a "$GUNLUK"; }
+# Yedek konteyneri root olmayan kullanıcıyla çalışır: bu betik (root) yeni dosya açarsa dosya, yedek dizininin sahibine
+# devredilir; yoksa konteyner günlüğe ekleyemez / uzak-dogrulama.json'u okuyamaz (panel bilgisi kaybolurdu).
+# Sembolik bağlantı izlenmez: konteynerin bıraktığı bir bağlantı root ile başka bir dosyanın sahibini değiştirmesin.
+sahip_uyumla() { local f; for f in "$@"; do [ -L "$f" ] || chown -h --reference="$DIZIN" -- "$f" 2>/dev/null || true; done; }
+gunluge() { echo "$(date -Iseconds) $*" | tee -a "$GUNLUK"; sahip_uyumla "$GUNLUK"; }
 
 # JSON metin değerleri için kaçış: \ " ve kontrol karakterleri (serbest metin JSON'u bozmasın/enjekte etmesin).
 json_kacis() {
@@ -530,7 +534,7 @@ for ad in ${DOGRULANAN[@]+"${DOGRULANAN[@]}"}; do LISTE+="${LISTE:+, }\"$ad\""; 
   NOT=""; [ "$YEREL_HEDEF" = "1" ] && NOT="yerel hedef, sunucu dışı sayılmadı"
   [ "$ONAYSIZ" = "1" ] && NOT="sunucu dışı kopya doğrulandı ama onaylanmadı (YEDEK_UZAK_ONAYLI_HEDEF)"
   printf '{\n  "zaman": %s,\n  "son_deneme": "%s",\n  "hedef": "%s",\n  "yontem": "%s",\n  "not": "%s",\n  "dogrulanan": [%s]\n}\n' \
-    "$ZAMAN_DEGERI" "$(json_kacis "$SIMDI")" "$(json_kacis "$HEDEF_AD")" "$(json_kacis "$YONTEM")" "$(json_kacis "$NOT")" "$LISTE" > "$DOGRULAMA.tmp" && mv "$DOGRULAMA.tmp" "$DOGRULAMA" )
+    "$ZAMAN_DEGERI" "$(json_kacis "$SIMDI")" "$(json_kacis "$HEDEF_AD")" "$(json_kacis "$YONTEM")" "$(json_kacis "$NOT")" "$LISTE" > "$DOGRULAMA.tmp" && sahip_uyumla "$DOGRULAMA.tmp" && mv "$DOGRULAMA.tmp" "$DOGRULAMA" )
 if [ "$YEREL_HEDEF" = "1" ]; then
   gunluge "dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → $HEDEF_AD; yerel yedek SİLİNMEDİ"
   echo "Yerel hedef nedeniyle silme yapılmadı."

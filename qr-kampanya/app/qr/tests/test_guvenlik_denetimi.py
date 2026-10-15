@@ -19,7 +19,6 @@ from django.utils import timezone
 from openpyxl import Workbook
 
 from qr import ice_aktarma as ia_modul
-from qr.hiz import hiz_sinirlayici
 from qr.models import DenemeSayaci, DenetimKaydi, HedefGecmisi, MFACihazi, QRKod
 from qr.sayac import dene
 
@@ -202,7 +201,7 @@ class SayacEszamanlilikTesti(TransactionTestCase):
 class GirisDoSTesti(TemelTest):
     def setUp(self):
         super().setUp()
-        hiz_sinirlayici._sayac.clear()
+        DenemeSayaci.objects.filter(anahtar__startswith="hiz:").delete()
 
     def test_hiz_asilinca_429_ve_parola_dogrulamasi_calismaz(self):
         ip = {"HTTP_X_FORWARDED_FOR": "203.0.113.9"}
@@ -220,7 +219,7 @@ class GirisDoSTesti(TemelTest):
     def test_mfa_uclari_da_sinirlanir(self):
         ip = {"HTTP_X_FORWARDED_FOR": "203.0.113.20"}
         for yol in ("/panel/mfa/dogrula", "/panel/mfa/kurulum"):
-            hiz_sinirlayici._sayac.clear()
+            DenemeSayaci.objects.filter(anahtar__startswith="hiz:").delete()
             kodlar = [self.client.post(yol, {"kod": "000000"}, **ip).status_code for _ in range(5)]
             self.assertEqual(kodlar[3:], [429, 429], yol)
 

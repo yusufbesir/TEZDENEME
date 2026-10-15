@@ -20,7 +20,8 @@ MEDYA_SIFRELI="$HEDEF/medya-$ZAMAN.tar.gz.age"
 umask 077
 mkdir -p "$HEDEF"
 
-temizle() { rm -f "$DB_DUZ" "$DB_SIFRELI.tmp" "$MEDYA_SIFRELI.tmp"; }
+TAR_HATA="$GECICI/tar-hata-$ZAMAN.txt"
+temizle() { rm -f "$DB_DUZ" "$DB_SIFRELI.tmp" "$MEDYA_SIFRELI.tmp" "$TAR_HATA"; }
 trap temizle EXIT
 # SIGTERM/SIGINT/SIGHUP'ta da (docker stop, Ctrl+C) düz geçici döküm silinir; sonra normal EXIT tuzağı çalışır.
 trap 'exit 143' TERM
@@ -39,7 +40,7 @@ durum_yaz() { # $1=durum $2=mesaj
   printf '{"zaman": "%s", "durum": "%s", "dosya": "%s", "boyut": %s, "mesaj": "%s", "yerel_yedek_sayisi": %s, "en_eski_yerel_yedek": %s, "uzak_dogrulama_zamani": %s}\n' \
     "$(date -Iseconds)" "$1" "$(basename "$DB_SIFRELI")" "${boyut:-0}" "$2" "${sayi:-0}" \
     "$(json_metin "$en_eski")" "$(json_metin "$uzak")" > "$DURUM.tmp" \
-    && chmod 644 "$DURUM.tmp" && mv "$DURUM.tmp" "$DURUM"
+    && chmod 640 "$DURUM.tmp" && mv "$DURUM.tmp" "$DURUM"
   echo "$(date -Iseconds) $1 $(basename "$DB_SIFRELI") $2" >> "$GUNLUK"
 }
 
@@ -65,7 +66,12 @@ mv "$DB_SIFRELI.tmp" "$DB_SIFRELI"
 # 2) Görseller: tar çıktısı doğrudan age'e akar; düz arşiv hiçbir yere yazılmaz.
 [ -d /veri/medya ] || hata "görsel dizini (/veri/medya) bulunamadı"
 # pipefail: tar hata verirse eksik arşiv "başarılı" sayılmaz.
-( set -o pipefail; tar -czf - -C /veri medya | age -r "$YEDEK_ALICI" -o "$MEDYA_SIFRELI.tmp" ) || hata "görsel yedeği başarısız"
+# Okunamayan dosya varsa (ör. medya birimindeki 600 kipli dosya; yedek kullanıcısı app'in grubuyla okur, bkz. docs/BAKIM.md)
+# yedek BAŞARISIZ sayılır ve dosya adı yazılır; sessizce atlanmaz. tar'ın hata çıktısı yalnızca bellek tmpfs'ine yazılır.
+if ! ( set -o pipefail; tar -czf - -C /veri medya 2>"$TAR_HATA" | age -r "$YEDEK_ALICI" -o "$MEDYA_SIFRELI.tmp" ); then
+  ayrinti=$(head -n 3 "$TAR_HATA" 2>/dev/null | tr '\n"\\' '; /' | cut -c1-300)
+  hata "görsel yedeği başarısız (okunamayan dosya olabilir; docs/BAKIM.md): ${ayrinti:-ayrıntı yok}"
+fi
 age_dosyasi_mi "$MEDYA_SIFRELI.tmp" || hata "şifreli görsel yedeği doğrulanamadı"
 mv "$MEDYA_SIFRELI.tmp" "$MEDYA_SIFRELI"
 

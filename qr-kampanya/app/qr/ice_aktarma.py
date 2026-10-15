@@ -7,13 +7,14 @@ Sunucu dosyadaki URL'leri ASLA çağırmaz; yalnızca biçimini doğrular.
 import csv
 import io
 import posixpath
-import xml.etree.ElementTree as ET
 import zipfile
-from xml.parsers import expat
+from xml.parsers import expat  # yalnızca akış tarayıcısı: DOCTYPE/ENTITY işleyicileri istisna fırlatır (varlık genişletme yok)
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+import defusedxml.ElementTree as ET  # XXE / billion laughs / harici varlık: reddedilir (DefusedXmlException)
+from defusedxml import DefusedXmlException
 from django.core.exceptions import ValidationError
 
 from .dogrulama import guvenli_url_dogrula
@@ -158,7 +159,7 @@ def _ilk_sayfa_yolu(arsiv):
                         yol = hedef.lstrip("/") if hedef.startswith("/") else posixpath.normpath(posixpath.join("xl", hedef))
                         if yol in adlar:
                             return yol
-    except (ET.ParseError, expat.ExpatError, DosyaHatasi):
+    except (ET.ParseError, DefusedXmlException, expat.ExpatError, DosyaHatasi):
         pass
     adaylar = sorted(a for a in adlar if a.startswith("xl/worksheets/") and a.endswith(".xml"))
     return adaylar[0] if adaylar else None
@@ -170,7 +171,10 @@ def _guvenli_xml_kok(arsiv, ad):
         raise DosyaHatasi(_XLSX_ACILAMADI)
     if b"<!DOCTYPE" in veri or b"<!ENTITY" in veri:
         raise DosyaHatasi(_XLSX_ACILAMADI)
-    return ET.fromstring(veri)
+    try:
+        return ET.fromstring(veri)
+    except DefusedXmlException:
+        raise DosyaHatasi(_XLSX_ACILAMADI) from None
 
 
 def _sayfa_hucre_kontrol(arsiv, yol):

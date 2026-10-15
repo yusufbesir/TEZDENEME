@@ -65,8 +65,25 @@ for ANAHTAR in POSTGRES_SAHIP_PAROLA POSTGRES_UYGULAMA_PAROLA; do
   fi
 done
 
+# MFA gizli anahtarlarını veritabanında şifreleyen Fernet anahtarı (32 bayt, urlsafe base64). Yoksa üretilir ve .env'nin
+# SONUNA eklenir (var olan satırlara dokunulmaz). Bu anahtar kaybolursa MFA kayıtları çözülemez (yönetici `mfa_sifirla` ile
+# sıfırlar): .env dosyasının yedeğini parola yöneticinizde saklayın (docs/KURULUM.md, docs/YEDEKLEME.md).
+mfa_anahtari_uret() { python3 -c "import base64,secrets;print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())" 2>/dev/null || openssl rand -base64 32 | tr '+/' '-_' | tr -d '\n'; }
+if grep -qE '^MFA_SIFRELEME_ANAHTARI=.' .env; then
+  :
+elif grep -qE '^MFA_SIFRELEME_ANAHTARI=' .env; then
+  echo "HATA: .env içinde MFA_SIFRELEME_ANAHTARI satırı var ama boş. Dolu bir anahtar yazın veya satırı silin (betik yeni anahtar üretir)."; exit 1
+else
+  [ -z "$(tail -c1 .env)" ] || echo >> .env
+  echo "MFA_SIFRELEME_ANAHTARI=$(mfa_anahtari_uret)" >> .env
+  echo "BİLGİ: .env dosyasının SONUNA MFA_SIFRELEME_ANAHTARI eklendi (MFA gizli anahtarlarını şifreler; diğer satırlar değiştirilmedi)."
+  echo "       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md)."
+fi
+
 mkdir -p yedekler && chmod 700 yedekler
 docker compose build
+# Yedek servisi root olmayan kullanıcıyla (10002) çalışır: yedekler/ dizini ona devredilir (silme yok).
+bash scripts/yedek-dizini-hazirla.sh
 # Yedek şifreleme anahtarı (age): özel anahtar gizli/ klasörüne yazılır, açık anahtar .env'ye eklenir.
 bash scripts/yedek-anahtari-hazirla.sh
 # Önce veritabanı: roller (qr_sahip, qr_uygulama) ilk kurulumda otomatik oluşur; var olan veritabanında

@@ -27,6 +27,7 @@ from ..middleware import istemci_ip
 from ..models import GenelAyarlar, MFACihazi
 from ..sayac import GirisDenemesi, tam_giris
 from ..servisler import denetim_yaz, kullanici_oturumlarini_sonlandir, qr_svg
+from ..sifreleme import SifrelemeHatasi, belirec_bicimli_mi, coz, sifrele
 from .yardimci import yetki
 
 Kullanici = get_user_model()
@@ -46,6 +47,23 @@ def _simdi():
     return time.time()
 
 
+# --- Oturumdaki onaysız anahtar ---
+# Onaysız TOTP anahtarı oturum tablosunda da düz metin durmasın diye oturuma şifreli yazılır.
+
+def _oturuma_yaz(gizli):
+    return sifrele(gizli)
+
+
+def _oturumdan_oku(deger):
+    """Oturumdaki değeri çözer; bozuk/çözülemeyen ya da eski (şifresiz) biçimde None döner (yeni anahtar üretilir)."""
+    if not isinstance(deger, str) or not belirec_bicimli_mi(deger):
+        return None
+    try:
+        return coz(deger)
+    except SifrelemeHatasi:
+        return None
+
+
 # --- Kod doğrulama ---
 
 def _normalle(kod):
@@ -56,7 +74,7 @@ def _normalle(kod):
 def _eslesen_adim(gizli, kod):
     """Kod gizli anahtarla (±PENCERE adım) eşleşiyorsa zaman adımını, yoksa None döndürür."""
     kod = _normalle(kod)
-    if not kod:
+    if not kod or not gizli:  # gizli None: kayıt çözülemedi (şifreleme anahtarı kayıp/yanlış) -> hiçbir kod eşleşmez
         return None
     totp = pyotp.TOTP(gizli, digits=HANE, interval=ADIM_SN)
     simdiki = int(_simdi() // ADIM_SN)
@@ -127,7 +145,7 @@ def bekleyen_baslat(request, kullanici, kurulum):
     veri = {"uid": kullanici.pk, "ts": int(_simdi()), "next": _guvenli_next(request), "kurulum": bool(kurulum)}
     if kurulum:
         # Onaysız TOTP anahtarı her bekleyen girişte yeniden üretilir ve yalnızca bu oturumda tutulur.
-        veri["gizli"] = pyotp.random_base32()
+        veri["gizli"] = _oturuma_yaz(pyotp.random_base32())
     request.session[OTURUM_ANAHTARI] = veri
 
 
@@ -246,9 +264,10 @@ def kurulum(request):
         messages.error(request, SURE_DOLDU)
         request.session.pop(OTURUM_ANAHTARI, None)
         return redirect("panel:giris")
-    gizli = veri.get("gizli")
-    if not gizli:  # eski biçimli bekleyen kayıt
-        gizli = veri["gizli"] = pyotp.random_base32()
+    gizli = _oturumdan_oku(veri.get("gizli"))
+    if not gizli:  # eski biçimli/çözülemeyen bekleyen kayıt
+        gizli = pyotp.random_base32()
+        veri["gizli"] = _oturuma_yaz(gizli)
         request.session[OTURUM_ANAHTARI] = veri
     baglam = _kurulum_baglami(kullanici, gizli, reverse("panel:mfa_kurulum"))
     if request.method == "POST":
@@ -283,9 +302,10 @@ def hesap_mfa_kur(request):
     if cihaz is not None and cihaz.onayli:
         messages.info(request, "İki adımlı doğrulama zaten açık.")
         return redirect("panel:hesap")
-    gizli = request.session.get(KURULUM_OTURUM_ANAHTARI)
-    if not isinstance(gizli, str) or not gizli:
-        gizli = request.session[KURULUM_OTURUM_ANAHTARI] = pyotp.random_base32()  # yalnızca bu oturumda tutulur
+    gizli = _oturumdan_oku(request.session.get(KURULUM_OTURUM_ANAHTARI))
+    if not gizli:
+        gizli = pyotp.random_base32()
+        request.session[KURULUM_OTURUM_ANAHTARI] = _oturuma_yaz(gizli)  # yalnızca bu oturumda, şifreli tutulur
     baglam = _kurulum_baglami(request.user, gizli, reverse("panel:hesap_mfa_kur"))
     if request.method == "POST":
         sonuc, durum = _kurulum_onayla(request, request.user, gizli)

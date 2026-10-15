@@ -6,7 +6,7 @@
 # Derleme makinesi internete çıkamıyorsa arşivi önceden şuraya koyun (git'e eklenmez):
 #   yedek/paketler/age-v1.3.2-linux-amd64.tar.gz   (veya ...-arm64.tar.gz)
 # Arşiv oradaysa indirme yapılmaz; iki yolda da aynı hash doğrulaması çalışır.
-FROM postgres:17.6-alpine
+FROM postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
 
 ARG TARGETARCH
 ARG AGE_SURUMU=v1.3.2
@@ -40,3 +40,16 @@ RUN --mount=type=bind,source=paketler,target=/paketler \
     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/; \
     rm -rf /tmp/age-kur; \
     age --version
+
+# Çalışma kullanıcısı (root DEĞİL), UID/GID 10002: uygulama (app, UID 10001) ile BİLEREK farklıdır; konteyner kaçışında app
+# süreci host'ta yedek dosyalarının sahibi olup onları silemesin/değiştirmesin. Medya birimi (salt okunur) app'in grubu
+# üzerinden okunur: compose'da group_add: ["999"] (999 = app imajındaki "uygulama" grubunun GID'i).
+# Compose servisi bu kullanıcıyla (user: 10002:10002) çalıştırır. Dockerfile'da "USER" BİLEREK yoktur:
+# aynı imaj scripts/geri-yukleme-testi.sh içinde geçici postgres sunucusu olarak (kendi giriş noktasıyla) kullanılır.
+# /yedekler ve /yedek-durum bu kullanıcıya ait oluşturulur (yeni adlandırılmış birim ilk kullanımda bu sahipliği miras alır).
+# /yedek-durum: grup 999 (app) okuyabilsin diye 2750 (setgid: yeni dosyalar grup 999 alır).
+RUN addgroup -g 10002 -S yedek \
+    && adduser -S -D -H -u 10002 -G yedek -s /sbin/nologin yedek \
+    && mkdir -p /yedekler /yedek-durum \
+    && chown yedek:yedek /yedekler && chmod 700 /yedekler \
+    && chown 10002:999 /yedek-durum && chmod 2750 /yedek-durum

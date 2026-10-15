@@ -5,9 +5,11 @@ Burada her artırma tek bir `UPDATE ... SET sayi = sayi + 1` ile yapılır; sat�
 istekleri sıraya koyar. Kilit kontrolü ve sayma TEK adımdır (`dene`): önce sayılır, sınır aşıldıysa
 istek reddedilir (parola doğrulaması hiç çalışmaz). Başarılı doğrulamada `iade`/`sifirla` çağrılır.
 
-Anahtarlar ham kullanıcı adı/IP içermez (SHA-256 özeti).
+Anahtarlar ham kullanıcı adı/IP içermez: SECRET_KEY'den türetilen HMAC-SHA256 özeti (düz SHA-256 IPv4 uzayında
+kaba kuvvetle çözülebilirdi).
 """
 import hashlib
+import hmac
 import random
 import unicodedata
 from datetime import timedelta
@@ -40,7 +42,8 @@ def kullaniciyi_bul(ad):
 
 def anahtar_uret(onek, *parcalar):
     ham = "|".join(ad_normalle(p) if isinstance(p, str) else str(p) for p in parcalar)
-    return f"{onek}:{hashlib.sha256(ham.encode()).hexdigest()}"[:100]
+    ozet = hmac.new(settings.SECRET_KEY.encode(), b"sayac|" + ham.encode(), hashlib.sha256).hexdigest()
+    return f"{onek}:{ozet}"[:100]
 
 
 def dene(anahtar, sinir, sure_sn):
