@@ -477,4 +477,42 @@ void main() {
       );
     });
   });
+
+  group('gosterilenSeri', () {
+    test('son çalışma bugün ya da dünse seri aynen görünür', () {
+      const d = OgrenciDurumu(seri: 5, sonGun: '2026-10-14');
+      expect(Motor.gosterilenSeri(d, '2026-10-14'), 5);
+      expect(Motor.gosterilenSeri(d, '2026-10-15'), 5);
+    });
+    test('iki gün ve daha fazla boşlukta 0 görünür, sonGun yoksa 0', () {
+      const d = OgrenciDurumu(seri: 5, sonGun: '2026-10-12');
+      expect(Motor.gosterilenSeri(d, '2026-10-15'), 0);
+      expect(
+        Motor.gosterilenSeri(const OgrenciDurumu(seri: 3), '2026-10-15'),
+        0,
+      );
+    });
+  });
+
+  group('OgrenciDurumu gün ve saat denetimi', () {
+    test('gerçek takvim günleri geçerli, sahte günler geçersiz', () {
+      expect(OgrenciDurumu.gunGecerli('2026-02-28'), isTrue);
+      expect(OgrenciDurumu.gunGecerli('2026-02-30'), isFalse);
+      expect(OgrenciDurumu.gunGecerli('9999-99-99'), isFalse);
+      expect(OgrenciDurumu.gunGecerli('1999-12-31'), isFalse);
+    });
+    test('saat 00-23 ve dakika 00-59 aralığında olmalı', () {
+      expect(OgrenciDurumu.saatGecerli('08:47'), isTrue);
+      expect(OgrenciDurumu.saatGecerli('99:99'), isFalse);
+      expect(OgrenciDurumu.saatGecerli('23:60'), isFalse);
+      final d = OgrenciDurumu.fromJson({'hatirlatmaSaati': '99:99'});
+      expect(d.hatirlatmaSaati, isNull);
+    });
+    test('sayaçlarda aşırı büyük değer atılır', () {
+      final d = OgrenciDurumu.fromJson({
+        'gunlukXp': {'2026-10-15': 1 << 50, '2026-10-14': 20},
+      });
+      expect(d.gunlukXp, {'2026-10-14': 20});
+    });
+  });
 }

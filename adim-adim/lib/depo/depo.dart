@@ -58,22 +58,65 @@ class DosyaDepo implements Depo {
     try {
       final f = _dosya;
       if (!await f.exists()) return const OgrenciDurumu();
-      if (await f.length() > enBuyukBayt) return const OgrenciDurumu();
-      final metin = utf8.decode(await f.readAsBytes());
-      return OgrenciDurumu.fromJson(jsonDecode(metin));
+      // Sembolik bağ izlenmez; yalnızca gerçek dosya okunur.
+      if (await FileSystemEntity.isLink(f.path)) return const OgrenciDurumu();
+      if (await f.length() > enBuyukBayt) {
+        await _bozukKenaraAl(f);
+        return const OgrenciDurumu();
+      }
+      final baytlar = await f.readAsBytes();
+      if (baytlar.length > enBuyukBayt) {
+        await _bozukKenaraAl(f);
+        return const OgrenciDurumu();
+      }
+      final ham = jsonDecode(utf8.decode(baytlar));
+      if (ham is! Map) {
+        await _bozukKenaraAl(f);
+        return const OgrenciDurumu();
+      }
+      return OgrenciDurumu.fromJson(ham);
+    } on FormatException {
+      await _bozukKenaraAl(_dosya);
+      return const OgrenciDurumu();
     } catch (_) {
       return const OgrenciDurumu();
     }
   }
 
+  /// Bozuk dosyayı silmez ya da ezmez; tarih ekiyle kenara alır ki ilerleme
+  /// gerekirse elle kurtarılabilsin.
+  Future<void> _bozukKenaraAl(File f) async {
+    try {
+      final damga = DateTime.now().toIso8601String().replaceAll(':', '-');
+      await f.rename('${f.path}.bozuk-$damga');
+    } catch (_) {
+      // Kenara alınamazsa bir sonraki kayıt üzerine yazar.
+    }
+  }
+
+  /// Yazmalar sıraya alınır; iki kayıt aynı .tmp dosyasını paylaşmaz.
+  Future<void> _kuyruk = Future.value();
+
   @override
-  Future<void> kaydet(OgrenciDurumu d) async {
+  Future<void> kaydet(OgrenciDurumu d) {
+    final sonuc = _kuyruk.then((_) => _yaz(d));
+    _kuyruk = sonuc.catchError((_) {});
+    return sonuc;
+  }
+
+  Future<void> _yaz(OgrenciDurumu d) async {
     final f = _dosya;
     await f.parent.create(recursive: true);
     final gecici = _gecici;
     // Önce geçici dosyaya yaz ve diske aktar, sonra yeniden adlandır (atomik).
     await gecici.writeAsString(jsonEncode(d.toJson()), flush: true);
-    await gecici.rename(f.path);
+    try {
+      await gecici.rename(f.path);
+    } on FileSystemException {
+      // Windows'ta hedef o anda okunuyorsa rename kısa süre reddedilebilir.
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await gecici.rename(f.path);
+    }
   }
 
   @override

@@ -14,3 +14,5 @@
 | 2026-10-15 | Adım Adım: motor (seviye, seri, Leitner, cevap kontrolü) ve DosyaDepo | implementer / claude-sonnet-5-5 | 60.121 toplam | Başarılı. 74 test geçti, analyze temiz. |
 | 2026-10-15 | Adım Adım: 4 kursu Dart'a aktar, Dinle ve Kod alıştırmaları ekle | implementer / claude-sonnet-5-5 | 67.867 toplam | Başarılı. 31 ders, 12 test geçti. |
 | 2026-10-15 | Adım Adım: arayüz (5 ekran, 7 alıştırma bileşeni, tema, Riverpod, go_router, ses ve bildirim servisleri) | implementer / claude-sonnet-5-5 | 120.907 toplam | Başarılı. 91 test geçti (toplam), analyze temiz. |
+| 2026-10-15 | Adım Adım: bağımsız doğrulama (analyze, 91 test, sözleşme uyumu, kart kimliği, Türkçe tarama) | verifier / claude-sonnet-5-5 | 64.247 toplam | Geçti. 2 orta bulgu (seri gösterimi, gün sağlayıcısı), 3 düşük; orkestratör düzeltti. |
+| 2026-10-15 | Adım Adım: güvenlik incelemesi (ağ, yerel veri, girdi, izinler, lisanslar) | güvenlik denetçisi (general-purpose) / claude-sonnet-5-5 | 123.148 toplam | 1 yüksek, 6 orta, 6 düşük bulgu; docs/GUVENLIK.md. Düzeltmeler orkestratör + implementer. |

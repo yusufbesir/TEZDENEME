@@ -53,7 +53,26 @@ class OgrenciDurumu {
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-  static bool gunGecerli(String s) => _gunDeseni.hasMatch(s);
+
+  /// Biçim ve takvim denetimi: 'YYYY-MM-DD', 2000-2100 arası, gerçek bir gün
+  /// (ör. 2026-02-30 geçersiz).
+  static bool gunGecerli(String s) {
+    if (!_gunDeseni.hasMatch(s)) return false;
+    final yil = int.parse(s.substring(0, 4));
+    final ay = int.parse(s.substring(5, 7));
+    final gun = int.parse(s.substring(8, 10));
+    if (yil < 2000 || yil > 2100 || ay < 1 || ay > 12 || gun < 1) return false;
+    final t = DateTime.utc(yil, ay, gun);
+    return t.year == yil && t.month == ay && t.day == gun;
+  }
+
+  /// 'HH:MM', 00-23 ve 00-59 aralığında.
+  static bool saatGecerli(String s) {
+    if (!RegExp(r'^\d{2}:\d{2}$').hasMatch(s)) return false;
+    final saat = int.parse(s.substring(0, 2));
+    final dakika = int.parse(s.substring(3, 5));
+    return saat <= 23 && dakika <= 59;
+  }
 
   OgrenciDurumu copyWith({
     int? xp,
@@ -83,26 +102,27 @@ class OgrenciDurumu {
       ad: ad ?? this.ad,
       koyuTema: koyuTemaSil ? null : (koyuTema ?? this.koyuTema),
       sesAcik: sesAcik ?? this.sesAcik,
-      hatirlatmaSaati:
-          hatirlatmaSil ? null : (hatirlatmaSaati ?? this.hatirlatmaSaati),
+      hatirlatmaSaati: hatirlatmaSil
+          ? null
+          : (hatirlatmaSaati ?? this.hatirlatmaSaati),
     );
   }
 
   Map<String, Object?> toJson() => {
-        'surum': 1,
-        'xp': xp,
-        'seri': seri,
-        'enSeri': enSeri,
-        'sonGun': sonGun,
-        'kartlar': {for (final e in kartlar.entries) e.key: e.value.toJson()},
-        'tamamlanan': tamamlanan,
-        'gunlukXp': gunlukXp,
-        'gunlukHedef': gunlukHedef,
-        'ad': ad,
-        'koyuTema': koyuTema,
-        'sesAcik': sesAcik,
-        'hatirlatmaSaati': hatirlatmaSaati,
-      };
+    'surum': 1,
+    'xp': xp,
+    'seri': seri,
+    'enSeri': enSeri,
+    'sonGun': sonGun,
+    'kartlar': {for (final e in kartlar.entries) e.key: e.value.toJson()},
+    'tamamlanan': tamamlanan,
+    'gunlukXp': gunlukXp,
+    'gunlukHedef': gunlukHedef,
+    'ad': ad,
+    'koyuTema': koyuTema,
+    'sesAcik': sesAcik,
+    'hatirlatmaSaati': hatirlatmaSaati,
+  };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
   /// Anahtarlar yalnızca beklenen biçimde (ders/kart kimliği, gün) kabul edilir.
@@ -126,13 +146,19 @@ class OgrenciDurumu {
         for (final e in v.entries) {
           final k = e.key;
           final d = e.value;
-          if (k is String && k.length <= 120 && anahtarUygun(k) && d is int && d >= 0) {
+          if (k is String &&
+              k.length <= 120 &&
+              anahtarUygun(k) &&
+              d is int &&
+              d >= 0 &&
+              d <= (1 << 40)) {
             m[k] = d;
           }
         }
       }
       return m;
     }
+
     final sonGun = j['sonGun'];
     final saat = j['hatirlatmaSaati'];
     return OgrenciDurumu(
@@ -144,11 +170,12 @@ class OgrenciDurumu {
       tamamlanan: sayac(j['tamamlanan'], (k) => !k.contains('#')),
       gunlukXp: sayac(j['gunlukXp'], gunGecerli),
       gunlukHedef: tamsayi(j['gunlukHedef'], 30, min: 10, max: 500),
-      ad: (j['ad'] is String && (j['ad'] as String).length <= 40) ? j['ad'] as String : '',
+      ad: (j['ad'] is String && (j['ad'] as String).length <= 40)
+          ? j['ad'] as String
+          : '',
       koyuTema: j['koyuTema'] is bool ? j['koyuTema'] as bool : null,
       sesAcik: j['sesAcik'] is bool ? j['sesAcik'] as bool : true,
-      hatirlatmaSaati:
-          (saat is String && RegExp(r'^\d{2}:\d{2}$').hasMatch(saat)) ? saat : null,
+      hatirlatmaSaati: (saat is String && saatGecerli(saat)) ? saat : null,
     );
   }
 }

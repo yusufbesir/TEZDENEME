@@ -103,6 +103,17 @@ abstract final class Motor {
     return 10 + d * 2 + bonus;
   }
 
+  /// Ekranda gösterilecek seri. Son çalışma günü bugünden ya da dünden eskiyse
+  /// seri fiilen kopmuştur; ders bitirilmeden sayı güncellenmez, bu yüzden
+  /// gösterimde 0 verilir.
+  static int gosterilenSeri(OgrenciDurumu d, [String? bugun]) {
+    final sonGun = d.sonGun;
+    if (sonGun == null) return 0;
+    final fark = gunFarki(sonGun, bugun ?? Motor.bugun());
+    if (fark < 0 || fark > 1) return 0;
+    return d.seri;
+  }
+
   static OgrenciDurumu dersBitir(
     OgrenciDurumu d,
     String dersId,

@@ -20,10 +20,11 @@ Kaynaklar: https://docs.flutter.dev/platform-integration/desktop · https://plat
 ## Seçilen paketler ve neden
 - `flutter_riverpod`: durum yönetimi; etkin, 5 platform.
 - `go_router`: yönlendirme; resmî, özellik tamamlanmış.
-- `shared_preferences`, `path_provider`: ayarlar ve veri dosyası konumu.
+- `path_provider`: veri dosyası konumu (ayarlar da aynı JSON dosyasında).
 - `flutter_tts`: dinleme alıştırmaları için metin okuma (Android, iOS, Windows, macOS).
 - `flutter_local_notifications`: günlük hatırlatma (Windows'ta MSIX paketleme gerekir).
-- `drift` ve `sqlite3_flutter_libs` pubspec'te hazır duruyor ama ilk sürümde kullanılmadı: kod üreticisi (`drift_dev`) bu derleme ortamındaki Dart sürümüyle çözümlenemedi. İlk sürümde ilerleme verisi tek bir JSON dosyasında (atomik yazma) tutulur; veri büyüdüğünde Drift'e geçiş planlandı.
+- `timezone`, `flutter_localizations`: bildirim zamanlaması ve Türkçe sistem metinleri.
+- Veri tabanı (Drift) ilk sürümde kullanılmadı: kod üreticisi (`drift_dev`) bu derleme ortamındaki Dart sürümüyle çözümlenemedi; güvenlik denetçisi de kullanılmayan yerel kütüphanenin kaldırılmasını önerdi. İlerleme verisi tek bir JSON dosyasında (atomik ve sıralı yazma) tutulur; veri büyüdüğünde Drift'e geçiş planlandı.
 
 ## Doğrulama sınırı
 Bu ortamda Android/iOS/Windows derleyici yok; `flutter analyze` ve `flutter test` ile doğrulandı. Windows kurulumu (`flutter build windows`) Yusuf'un bilgisayarında ya da bir CI işinde alınacak.
