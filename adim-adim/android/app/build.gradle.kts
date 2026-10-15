@@ -17,16 +17,20 @@ if (yayinImzasiVar) {
     FileInputStream(anahtarDosyasi).use { anahtarOzellikleri.load(it) }
 }
 
-// Dağıtım derlemesi: Gradle'a `-Pdagitim=true` verilir
-// (ör. `cd android && gradlew -Pdagitim=true assembleRelease`, ya da
-// `android/gradle.properties` içinde `dagitim=true`). Bu bayrak açıkken
-// key.properties yoksa derleme DURUR; hata ayıklama anahtarına asla düşülmez.
-val dagitimDerlemesi = (project.findProperty("dagitim") as String?)?.toBoolean() ?: false
-if (dagitimDerlemesi && !yayinImzasiVar) {
-    throw GradleException(
-        "Dağıtım derlemesi (-Pdagitim=true) için android/key.properties gerekli; " +
-            "hata ayıklama anahtarıyla dağıtım yapılmaz. Bkz. docs/IMZA.md"
-    )
+// Dağıtım koruması: android/gradle.properties içinde `dagitim=true` VARSAYILANDIR.
+// Bir release görevi (assembleRelease, bundleRelease...) çalışacaksa ve key.properties
+// yoksa derleme DURUR; hata ayıklama anahtarıyla dağıtım sessizce üretilmez.
+// Yalnız yerel deneme için bilinçli kapatma: `flutter build apk --release` yerine
+// `cd android && gradlew -Pdagitim=false assembleRelease`. Debug derlemeleri etkilenmez.
+val dagitimKorumasi = (project.findProperty("dagitim") as String?)?.toBoolean() ?: true
+gradle.taskGraph.whenReady {
+    val releaseGorevi = allTasks.any { it.project == project && it.name.contains("Release") }
+    if (releaseGorevi && dagitimKorumasi && !yayinImzasiVar) {
+        throw GradleException(
+            "Release derlemesi için android/key.properties gerekli; hata ayıklama anahtarıyla " +
+                "dağıtım yapılmaz. Yalnız yerel deneme için -Pdagitim=false verin. Bkz. docs/IMZA.md"
+        )
+    }
 }
 
 android {
@@ -70,9 +74,9 @@ android {
             if (yayinImzasiVar) {
                 signingConfig = signingConfigs.getByName("yayin")
             } else {
-                // key.properties yoksa yalnızca yerel deneme için hata ayıklama anahtarı kullanılır.
-                // Dağıtım derlemesi key.properties olmadan yapılmamalıdır (bkz. docs/IMZA.md).
-                logger.warn("UYARI: android/key.properties yok; release derlemesi hata ayıklama anahtarıyla imzalanıyor. Dağıtma!")
+                // key.properties yoksa yalnız -Pdagitim=false ile (yerel deneme) buraya düşülür;
+                // aksi halde yukarıdaki taskGraph denetimi release görevini durdurur.
+                logger.warn("UYARI: android/key.properties yok; release derlemesi hata ayıklama anahtarıyla imzalanır. Dağıtma!")
                 signingConfig = signingConfigs.getByName("debug")
             }
         }

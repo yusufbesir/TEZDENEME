@@ -7,8 +7,8 @@ Release derlemesi hata ayıklama anahtarıyla değil, geliştiricinin cihazında
 - `android/key.properties` (depoya girmez; hem kök hem `adim-adim/` hem `android/` `.gitignore` engeller): `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
 - Anahtar deposu `adim-adim-yayin.jks` (depoya girmez). Konum aşağıda.
 - `android/app/build.gradle.kts`: `key.properties` varsa `yayin` imza yapılandırmasını kullanır. Yoksa:
-  - sıradan derlemede uyarı basar ve hata ayıklama anahtarına düşer (yalnız yerel deneme),
-  - **dağıtım derlemesinde (`-Pdagitim=true`) derlemeyi durdurur.**
+  - **her release görevinde (assembleRelease, bundleRelease, `flutter build apk --release`) derlemeyi durdurur**; `android/gradle.properties` içinde `dagitim=true` varsayılandır, bayrak unutulamaz,
+  - yalnız `-Pdagitim=false` açıkça verilirse uyarı basar ve hata ayıklama anahtarına düşer (yerel deneme).
 
 ## Anahtar deposunun konumu
 Varsayılan ve önerilen konum, yalnız oturum açan kullanıcının erişebildiği kullanıcı profili:
@@ -48,11 +48,12 @@ storeFile=C:/Users/<kullanici>/.anahtar/adim-adim-yayin.jks
 
 ## Dağıtım derlemesi
 ```
-cd adim-adim/android
-gradlew -Pdagitim=true assembleRelease
+cd adim-adim
+flutter build apk --release      # ya da flutter build appbundle
 ```
-ya da `android/gradle.properties` içine `dagitim=true` yazıp `flutter build apk --release`.
-`key.properties` yoksa derleme şu hatayla durur: "Dağıtım derlemesi (-Pdagitim=true) için android/key.properties gerekli".
+Ek bayrak gerekmez; koruma varsayılan açıktır. `key.properties` yoksa derleme şu hatayla durur:
+"Release derlemesi için android/key.properties gerekli". Yalnız yerel deneme için:
+`cd android && gradlew -Pdagitim=false assembleRelease` (debug anahtarı, dağıtılmaz).
 
 ## Yedek
 Anahtar deposunun kaybı uygulamanın güncellenememesi demektir. `.jks` dosyasını ve şifreleri ayrı, güvenli bir yere (parola yöneticisi ya da şifreli harici disk) yedekleyin.
@@ -60,4 +61,4 @@ Anahtar deposunun kaybı uygulamanın güncellenememesi demektir. `.jks` dosyas�
 ## Kurallar
 - `key.properties` ve `*.jks` hiçbir zaman commit edilmez; kök ve alt `.gitignore` dosyaları bunu engeller.
 - Şifreler kasa notlarına ve Mem0'a yazılmaz.
-- Yayın derlemesi `key.properties` olmadan dağıtılmaz; `-Pdagitim=true` bunu zorlar.
+- Yayın derlemesi `key.properties` olmadan dağıtılmaz; `dagitim=true` varsayılanı bunu zorlar, `-Pdagitim=false` yalnız yerel deneme içindir.

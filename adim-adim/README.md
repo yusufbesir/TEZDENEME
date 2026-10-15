@@ -15,11 +15,11 @@ Türkçe arayüzlü, çevrimdışı çalışan dil ve kodlama öğrenme uygulama
 flutter pub get
 flutter run -d windows      # ya da -d android, -d chrome değil
 flutter build windows       # Windows kurulumu (build/windows/x64/runner/Release)
-flutter build apk           # Android
+flutter build apk           # Android (release: android/key.properties zorunlu, bkz. docs/IMZA.md)
 ```
 Testler: `flutter analyze && flutter test`
 
-Yayın imzası: Android release derlemesi `android/key.properties` varsa ayrı yayın anahtar deposuyla imzalanır; dosya ve `*.jks` depoya girmez. Kurulum için bkz. `docs/IMZA.md`. `key.properties` yoksa derleme uyarı basar ve yalnız yerel deneme için debug anahtarına düşer.
+Yayın imzası: Android release derlemesi `android/key.properties` varsa ayrı yayın anahtar deposuyla imzalanır; dosya ve `*.jks` depoya girmez. Kurulum için bkz. `docs/IMZA.md`. `key.properties` yoksa release derlemesi varsayılan olarak DURUR (`dagitim=true`); yalnız yerel deneme için `cd android && gradlew -Pdagitim=false assembleRelease` ile debug anahtarına düşülür.
 
 ## Klasörler
 - `lib/model` içerik ve öğrenci durumu modelleri
