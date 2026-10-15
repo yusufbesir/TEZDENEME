@@ -23,3 +23,5 @@
 | 2026-10-15 | Önizleme + Dışa aktar bağımsız doğrulama (yalnız bulut Chromium) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~64k | Geçti (110 test, 12 biçim indirme) |
 2026-10-15 | Güncelleme sonrası eski sürüm temizliği (temizlik.js, preload, IPC, SHA256 kapısı) | implementer / claude-sonnet-5-5 | 59,101 + 70,569 alt-ajan token | Tamamlandı, 112 kök + 30 masaüstü test
 2026-10-15 | Temizlik özelliği bağımsız doğrulama | verifier / claude-sonnet-5-5 | 38,013 alt-ajan token | Geçti
+2026-10-15 | 1.1.1 hardlink (nlink) düzeltmesi + exe derleme | orkestratör (kendisi, tek dosya) | ana oturum | Tamamlandı (31 + 112 test)
+2026-10-15 | 1.1.1 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti
