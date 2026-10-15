@@ -45,7 +45,7 @@ Bulut ortamı kurulana kadar bulut oturumları `claude_karari` (Jev'e erişileme
 
 ## Defter
 - Bulutta: `/mnt/project-files/jev-kararlar/kararlar.jsonl` (bütün iş parçacıkları ortak kullanır).
-- Cihazda (Windows): `<jev-araclar>\kayit\kararlar.jsonl`. Kök `JEV_ARACLAR` ortam değişkeninden gelir ya da `jev_cagri.py` paketin iki üst dizininde duruyorsa paketin yanında kendiliğinden bulunur.
+- Cihazda (Windows): `<jev-araclar>\kayit\kararlar.jsonl`. Cihaz kökü `JEV_ARACLAR` ortam değişkeniyle açıkça (mutlak yol olarak) verilmelidir; otomatik keşif yoktur, böylece yazılabilir komşu klasörlerden kod çalıştırılmaz. Windows'ta bir kez `setx JEV_ARACLAR "<jev-araclar klasörünün tam yolu>"` çalıştırıp yeni bir terminal açın. `jev_cagri.py` yüklenmeden önce isteğe bağlı SHA-256 pini denetlenir; pin önerilir: bir kez `setx JEV_CAGRI_SHA256 <değer>` çalıştırın (değer `(Get-FileHash <jev-araclar>\jev_cagri.py -Algorithm SHA256).Hash` çıktısıdır) ve `jev_cagri.py` bilerek değiştirildiğinde pini güncelleyin. Özet uyuşmazsa ya da dosya sembolik bağsa dosya çalıştırılmaz. Pin tanımsızsa dosya yine yüklenir. Pin yalnız `jev_cagri.py` dosyasını kapsar; onun aynı klasörden içe aktardığı modüller (örn. `jev_client`) ayrıca doğrulanmaz, bu yüzden `JEV_ARACLAR` klasörü yalnız sizin yazabildiğiniz bir yerde olmalıdır.
 - Yalnız ekleme yapılır, satır silinmez. `JEV_KAYIT` ile değiştirilebilir; yol mutlak, `.jsonl` uzantılı ve sembolik bağsız olmalıdır.
 
 ## Birlikte çalışılanlar

@@ -7,7 +7,9 @@
       "kisa_commit": "1be8e34",
       "hedef": "skill-kutuphanesi/addyosmani__agent-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "1be8e34187e34647bb83adc3a1323b26ae6f6abe"
+      "tam_commit": "1be8e34187e34647bb83adc3a1323b26ae6f6abe",
+      "dosya_sayisi": 32,
+      "icerik_ozeti": "e690c3153ff86e7af29cc0626e738c0ac3ac2c9e07edf4598abaf2625364a0a6"
     },
     {
       "depo": "Agents365-ai/drawio-skill",
@@ -15,7 +17,9 @@
       "kisa_commit": "88fd923",
       "hedef": "skill-kutuphanesi/Agents365-ai__drawio-skill",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "88fd9236bc532aac4c25cb008a8bd59bc650b904"
+      "tam_commit": "88fd9236bc532aac4c25cb008a8bd59bc650b904",
+      "dosya_sayisi": 80,
+      "icerik_ozeti": "f5b83986ea3a21c9e52fe77f6afe879cb6713b5f21956f36df3aeda44153989b"
     },
     {
       "depo": "AgriciDaniel/claude-ads",
@@ -23,7 +27,9 @@
       "kisa_commit": "ac21644",
       "hedef": "skill-kutuphanesi/AgriciDaniel__claude-ads",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "ac21644933910419529bcf81efb95a9ca71edf81"
+      "tam_commit": "ac21644933910419529bcf81efb95a9ca71edf81",
+      "dosya_sayisi": 46,
+      "icerik_ozeti": "d233d7ed43df80fd5a8600ccf91b1fff1776cb40db3239b266ff237640585e92"
     },
     {
       "depo": "AgriciDaniel/claude-obsidian",
@@ -31,7 +37,9 @@
       "kisa_commit": "32ac5a0",
       "hedef": "skill-kutuphanesi/AgriciDaniel__claude-obsidian",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "32ac5a02c4e082e4a5628ca810776375e134708e"
+      "tam_commit": "32ac5a02c4e082e4a5628ca810776375e134708e",
+      "dosya_sayisi": 32,
+      "icerik_ozeti": "7daec5fe9f26724cf29101dae55a5738ed22934f2be22de75418f856d3d71260"
     },
     {
       "depo": "alirezarezvani/claude-skills",
@@ -39,7 +47,9 @@
       "kisa_commit": "19392f7",
       "hedef": "skill-kutuphanesi/alirezarezvani__claude-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "19392f7a08264ed00486a251f5b2098321771f94"
+      "tam_commit": "19392f7a08264ed00486a251f5b2098321771f94",
+      "dosya_sayisi": 2183,
+      "icerik_ozeti": "6ee6cb46fd52328db175d5230fce486b0b246a90369eca87b5ac4c1a17899242"
     },
     {
       "depo": "anbeime/skill",
@@ -47,7 +57,9 @@
       "kisa_commit": "e92662c",
       "hedef": "skill-kutuphanesi/anbeime__skill",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "e92662cd57d01dc312553c75187fa15f0e265ede"
+      "tam_commit": "e92662cd57d01dc312553c75187fa15f0e265ede",
+      "dosya_sayisi": 66,
+      "icerik_ozeti": "f65e35879b2bb124ac0f36310571053b1ea8be80fa90ea7dd98ddaed579fca04"
     },
     {
       "depo": "anthropics/skills",
@@ -55,7 +67,9 @@
       "kisa_commit": "dbd4588",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44"
+      "tam_commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "dosya_sayisi": 161,
+      "icerik_ozeti": "1745b23a5ddc04a8d91dbf8e5a2e7012409619cf547348566ab35a669d692665"
     },
     {
       "depo": "blader/humanizer",
@@ -63,7 +77,9 @@
       "kisa_commit": "225a6f3",
       "hedef": "skill-kutuphanesi/blader__humanizer",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8"
+      "tam_commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+      "dosya_sayisi": 8,
+      "icerik_ozeti": "02b1f2cca1a61dd4f526a795e931310f6144635a2cf447cfcf40da9c7c3b9adb"
     },
     {
       "depo": "cathrynlavery/diagram-design",
@@ -71,7 +87,9 @@
       "kisa_commit": "246d6d7",
       "hedef": "skill-kutuphanesi/cathrynlavery__diagram-design",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "246d6d71d752245403d2bf28d27f124192584d18"
+      "tam_commit": "246d6d71d752245403d2bf28d27f124192584d18",
+      "dosya_sayisi": 280,
+      "icerik_ozeti": "3e4ae0153368292c9f44db96727483574be69bd5bdfa4dba0f3c45d19490f1fd"
     },
     {
       "depo": "coreyhaines31/marketingskills",
@@ -79,7 +97,9 @@
       "kisa_commit": "1efedbc",
       "hedef": "skill-kutuphanesi/coreyhaines31__marketingskills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff"
+      "tam_commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+      "dosya_sayisi": 322,
+      "icerik_ozeti": "06a9805a3956ac275aa905940bb15e6836b3d91ea4ac663566b09b33573aa67b"
     },
     {
       "depo": "deanpeters/Product-Manager-Skills",
@@ -87,7 +107,9 @@
       "kisa_commit": "1b5a524",
       "hedef": "skill-kutuphanesi/deanpeters__Product-Manager-Skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "1b5a524ebb95e9497fa3f25002d8b8ec528d4444"
+      "tam_commit": "1b5a524ebb95e9497fa3f25002d8b8ec528d4444",
+      "dosya_sayisi": 223,
+      "icerik_ozeti": "6a08facf983d9a27d8256efd5d9fc288584de3e38ae7c770d234d6aaf5bca9a8"
     },
     {
       "depo": "DietrichGebert/ponytail",
@@ -95,7 +117,9 @@
       "kisa_commit": "9b58c1f",
       "hedef": "skill-kutuphanesi/DietrichGebert__ponytail",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "9b58c1ffb790c075ca32e70a89cf1d80588f4abf"
+      "tam_commit": "9b58c1ffb790c075ca32e70a89cf1d80588f4abf",
+      "dosya_sayisi": 7,
+      "icerik_ozeti": "4eedcfe3bd6d5beb29963815be9945325d92163520f5456e956fc3e7d4f198f7"
     },
     {
       "depo": "google-labs-code/stitch-skills",
@@ -103,7 +127,9 @@
       "kisa_commit": "0337446",
       "hedef": "skill-kutuphanesi/google-labs-code__stitch-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "0337446dadde6f8c94210444e2aa9d546126480f"
+      "tam_commit": "0337446dadde6f8c94210444e2aa9d546126480f",
+      "dosya_sayisi": 76,
+      "icerik_ozeti": "8c7d90f74e2d60b9cfbf2eb00fa9604cd50638778325455086233a660e5badff"
     },
     {
       "depo": "huggingface/skills",
@@ -111,7 +137,9 @@
       "kisa_commit": "c3ff942",
       "hedef": "skill-kutuphanesi/huggingface__skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "c3ff942be3e07116b475253f0a8fc4f54682c1a8"
+      "tam_commit": "c3ff942be3e07116b475253f0a8fc4f54682c1a8",
+      "dosya_sayisi": 160,
+      "icerik_ozeti": "401b97ecb899a43f319dfc2a43d0e2a0b41dafd91563f6013b934b302543bf1f"
     },
     {
       "depo": "Jeffallan/claude-skills",
@@ -119,7 +147,9 @@
       "kisa_commit": "1be15d8",
       "hedef": "skill-kutuphanesi/Jeffallan__claude-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "1be15d8064f88fc25216442406d40add8fd23b53"
+      "tam_commit": "1be15d8064f88fc25216442406d40add8fd23b53",
+      "dosya_sayisi": 426,
+      "icerik_ozeti": "53e1d54ed64667b33c08509164b3a513474fe1bdc217a4405417535cb4c2faea"
     },
     {
       "depo": "JimLiu/baoyu-skills",
@@ -127,7 +157,9 @@
       "kisa_commit": "1567581",
       "hedef": "skill-kutuphanesi/JimLiu__baoyu-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "1567581c26ec29f4216c6e6835415bf30343b0e3"
+      "tam_commit": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+      "dosya_sayisi": 475,
+      "icerik_ozeti": "f29cb8b4fff8c0122d489cdce340b030b193d01d91e9f6f64bec2ed92e5e3642"
     },
     {
       "depo": "jnMetaCode/superpowers-zh",
@@ -135,7 +167,9 @@
       "kisa_commit": "2daf57c",
       "hedef": "skill-kutuphanesi/jnMetaCode__superpowers-zh",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "2daf57c0fb157521de24c62ac9c3254630eefbed"
+      "tam_commit": "2daf57c0fb157521de24c62ac9c3254630eefbed",
+      "dosya_sayisi": 6,
+      "icerik_ozeti": "3ece9f9037dfc21e85d3cac5f57c10edc5509af81e2df1009f0a3fbcff6dfa7f"
     },
     {
       "depo": "juliusbrussee/caveman",
@@ -143,7 +177,9 @@
       "kisa_commit": "2e08b91",
       "hedef": "skill-kutuphanesi/juliusbrussee__caveman",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "2e08b9177c07bb7249a8a2d1a6758e5db281d002"
+      "tam_commit": "2e08b9177c07bb7249a8a2d1a6758e5db281d002",
+      "dosya_sayisi": 53,
+      "icerik_ozeti": "30d3ab3b889a67d298e621c63bfb8ab8661f95a1d9ebd50570c5b861187173d2"
     },
     {
       "depo": "K-Dense-AI/scientific-agent-skills",
@@ -151,7 +187,9 @@
       "kisa_commit": "92ace75",
       "hedef": "skill-kutuphanesi/K-Dense-AI__scientific-agent-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "92ace75ac21efe19a620434e0ca4e356081fe807"
+      "tam_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "dosya_sayisi": 2026,
+      "icerik_ozeti": "7a224e8862be8da13efaeedc2c6af9263c447d31be5bccc467194af08c1c7219"
     },
     {
       "depo": "kepano/obsidian-skills",
@@ -159,7 +197,9 @@
       "kisa_commit": "3ccff53",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "3ccff5338ea700537839b21900aa5358a0402c98"
+      "tam_commit": "3ccff5338ea700537839b21900aa5358a0402c98",
+      "dosya_sayisi": 11,
+      "icerik_ozeti": "47d00af59eefbbb6c0b7bcf369893eaa5d3e18214259518a21df956e6ba17361"
     },
     {
       "depo": "KKKKhazix/khazix-skills",
@@ -167,7 +207,9 @@
       "kisa_commit": "322346d",
       "hedef": "skill-kutuphanesi/KKKKhazix__khazix-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "322346ded8129436b3f64707789a73e732ae24d9"
+      "tam_commit": "322346ded8129436b3f64707789a73e732ae24d9",
+      "dosya_sayisi": 112,
+      "icerik_ozeti": "3fb13594e9d64b6d4fb4724382b03ed21fc8edb2f3132983186dcef4618feff7"
     },
     {
       "depo": "Leonxlnx/taste-skill",
@@ -175,7 +217,9 @@
       "kisa_commit": "717446e",
       "hedef": "skill-kutuphanesi/Leonxlnx__taste-skill",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "717446e07a78d4e6d7918b1fde1a263378eebac9"
+      "tam_commit": "717446e07a78d4e6d7918b1fde1a263378eebac9",
+      "dosya_sayisi": 15,
+      "icerik_ozeti": "fe17f48c9d6e3c6468969ffaccf10811b46d8fc222622281e21dccf6f962ea41"
     },
     {
       "depo": "mattpocock/skills",
@@ -183,7 +227,9 @@
       "kisa_commit": "49dd158",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "49dd158d1076134a641b33efb035946536778336"
+      "tam_commit": "49dd158d1076134a641b33efb035946536778336",
+      "dosya_sayisi": 79,
+      "icerik_ozeti": "9d10b2dc2a801ff1ffc26f3393fdd6ae758c87a11eba09bb85b18a11b655e938"
     },
     {
       "depo": "mattpocock/skills",
@@ -191,7 +237,9 @@
       "kisa_commit": "49dd158",
       "hedef": "skill-kutuphanesi/mattpocock__skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "49dd158d1076134a641b33efb035946536778336"
+      "tam_commit": "49dd158d1076134a641b33efb035946536778336",
+      "dosya_sayisi": 25,
+      "icerik_ozeti": "6d965ad842bf9f4e39df1f4c75ac6bcde989db6e559296b95b7fcdf31d7a64a4"
     },
     {
       "depo": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -199,7 +247,9 @@
       "kisa_commit": "50d8a7d",
       "hedef": "skill-kutuphanesi/nextlevelbuilder__ui-ux-pro-max-skill",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "50d8a7de0900119855614541f15a1a616691eb33"
+      "tam_commit": "50d8a7de0900119855614541f15a1a616691eb33",
+      "dosya_sayisi": 106,
+      "icerik_ozeti": "e1d46866947910285b1a5096f30595648c8c156a1b7b75903be989d59c55ea93"
     },
     {
       "depo": "nidhinjs/prompt-master",
@@ -207,7 +257,9 @@
       "kisa_commit": "2bd9251",
       "hedef": "skill-kutuphanesi/nidhinjs__prompt-master",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "2bd92518e26bf659e21e3d9ab90573fcf3ddeccb"
+      "tam_commit": "2bd92518e26bf659e21e3d9ab90573fcf3ddeccb",
+      "dosya_sayisi": 6,
+      "icerik_ozeti": "9743da2fea55b349e5d0b306082eb952ff29203221465beafb23d7761ff1560c"
     },
     {
       "depo": "NVIDIA/SkillSpector",
@@ -215,7 +267,9 @@
       "kisa_commit": "5edc347",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "5edc347c320bd516f8ff38df200a63831bf92e80"
+      "tam_commit": "5edc347c320bd516f8ff38df200a63831bf92e80",
+      "dosya_sayisi": 1,
+      "icerik_ozeti": "0e1a24c3abe87cd494bd19b38e54a72328cbb467e7f8a4d32458123b94cf4e8b"
     },
     {
       "depo": "obra/superpowers",
@@ -223,7 +277,9 @@
       "kisa_commit": "bb92a77",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      "tam_commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+      "dosya_sayisi": 74,
+      "icerik_ozeti": "5ede696031691e4a6a59b80d99284d587c33c356f2d78aa3068ffbc1c08762b8"
     },
     {
       "depo": "openai/skills",
@@ -231,7 +287,9 @@
       "kisa_commit": "49f948f",
       "hedef": "skill-kutuphanesi/openai__skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "49f948faa9258a0c61caceaf225e179651397431"
+      "tam_commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "dosya_sayisi": 759,
+      "icerik_ozeti": "aac4a238849f9607a6ad3d8218e3380facfd342d04d359aec85e0276fc75e5e3"
     },
     {
       "depo": "Orchestra-Research/AI-Research-SKILLs",
@@ -239,7 +297,9 @@
       "kisa_commit": "773a529",
       "hedef": "skill-kutuphanesi/Orchestra-Research__AI-Research-SKILLs",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "773a52944ba4747a18bd4ae9ade53fff041adcbc"
+      "tam_commit": "773a52944ba4747a18bd4ae9ade53fff041adcbc",
+      "dosya_sayisi": 416,
+      "icerik_ozeti": "b605df08ddd4a4a6b25a14c344c40b5354680be50e1dfd180f2c83925a4700a4"
     },
     {
       "depo": "OthmanAdi/planning-with-files",
@@ -247,7 +307,9 @@
       "kisa_commit": "7056ed2",
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
-      "tam_commit": "7056ed2f2b86a8a9e18840f625ac66a48fa07693"
+      "tam_commit": "7056ed2f2b86a8a9e18840f625ac66a48fa07693",
+      "dosya_sayisi": 32,
+      "icerik_ozeti": "67be2ae586035af51b73d36082796e4bb6b602be99bbd282c6ebbf0ca725ece3"
     },
     {
       "depo": "phuryn/pm-skills",
@@ -255,7 +317,9 @@
       "kisa_commit": "c68487d",
       "hedef": "skill-kutuphanesi/phuryn__pm-skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "c68487d721e419ec87af1ae6412a842978eab785"
+      "tam_commit": "c68487d721e419ec87af1ae6412a842978eab785",
+      "dosya_sayisi": 66,
+      "icerik_ozeti": "31796d370d58122536e2721334aacbaf7437ae5170a311f75200eab709abdeae"
     },
     {
       "depo": "titanwings/distilly",
@@ -263,7 +327,9 @@
       "kisa_commit": "b830d3d",
       "hedef": "skill-kutuphanesi/titanwings__distilly",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "b830d3dcbde006370f141155795b89021e3a947b"
+      "tam_commit": "b830d3dcbde006370f141155795b89021e3a947b",
+      "dosya_sayisi": 73,
+      "icerik_ozeti": "51c926b41321b2124e54176306e1a9c458769cb45d3cf2b1d9487b5f27d05efb"
     },
     {
       "depo": "tt-a1i/archify",
@@ -271,7 +337,9 @@
       "kisa_commit": "58ab0b9",
       "hedef": "skill-kutuphanesi/tt-a1i__archify",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "58ab0b98d2d0def8e49dced705c7b566936723ec"
+      "tam_commit": "58ab0b98d2d0def8e49dced705c7b566936723ec",
+      "dosya_sayisi": 316,
+      "icerik_ozeti": "db7bf79f26a6ce4d456f9d7a8128fb81acfd1eecbc439b4b32198854f0c4ad35"
     },
     {
       "depo": "vercel-labs/skills",
@@ -279,7 +347,9 @@
       "kisa_commit": "13e4063",
       "hedef": "skill-kutuphanesi/vercel-labs__skills",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "13e4063a1cf913f5606d57d42ab83a86f5001e04"
+      "tam_commit": "13e4063a1cf913f5606d57d42ab83a86f5001e04",
+      "dosya_sayisi": 2,
+      "icerik_ozeti": "9b0122b6200f6c290816e5b7f04b1c369e1d7dad3d139d96268b634f5e54f514"
     },
     {
       "depo": "virgiliojr94/book-to-skill",
@@ -287,7 +357,9 @@
       "kisa_commit": "e180fc4",
       "hedef": "skill-kutuphanesi/virgiliojr94__book-to-skill",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "e180fc46365e8c1aab0120778cc8a40b9515324b"
+      "tam_commit": "e180fc46365e8c1aab0120778cc8a40b9515324b",
+      "dosya_sayisi": 47,
+      "icerik_ozeti": "ad2e4eddd31f5c8372d2c10b867cff4569e3ed49a1b6e9f61e9636e8202718a1"
     },
     {
       "depo": "wanshuiyin/Auto-claude-code-research-in-sleep",
@@ -295,7 +367,9 @@
       "kisa_commit": "26b95cf",
       "hedef": "skill-kutuphanesi/wanshuiyin__Auto-claude-code-research-in-sleep",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "26b95cfa0d8747078e9e43b42e20952709e561b8"
+      "tam_commit": "26b95cfa0d8747078e9e43b42e20952709e561b8",
+      "dosya_sayisi": 139,
+      "icerik_ozeti": "49a85688c910a6eb6bef3330092bca1804d60f1bc7d7603a535784ebea6816df"
     },
     {
       "depo": "wshobson/agents",
@@ -303,7 +377,9 @@
       "kisa_commit": "46891e7",
       "hedef": "skill-kutuphanesi/wshobson__agents",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "46891e7e60da0e52baf1050b7b6391b64e84c6d9"
+      "tam_commit": "46891e7e60da0e52baf1050b7b6391b64e84c6d9",
+      "dosya_sayisi": 433,
+      "icerik_ozeti": "595344e48054f76f18500349370bb54d17cbc783d20d5f5676f0d32cba585bb1"
     },
     {
       "depo": "yusufkaraaslan/Skill_Seekers",
@@ -311,7 +387,9 @@
       "kisa_commit": "5b5d8df",
       "hedef": "skill-kutuphanesi/yusufkaraaslan__Skill_Seekers",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "5b5d8dfca263fa76e6daae9f292890b311ef36aa"
+      "tam_commit": "5b5d8dfca263fa76e6daae9f292890b311ef36aa",
+      "dosya_sayisi": 2,
+      "icerik_ozeti": "844343089396e17edb9a2a36405f2c79453fdbe5bbd8a2c8d3986612be682701"
     },
     {
       "depo": "zarazhangrui/frontend-slides",
@@ -319,7 +397,9 @@
       "kisa_commit": "9906a34",
       "hedef": "skill-kutuphanesi/zarazhangrui__frontend-slides",
       "kaynak_dosya": "INDEKS.md",
-      "tam_commit": "9906a34d640d2111f724544cbc50f7f130569ae1"
+      "tam_commit": "9906a34d640d2111f724544cbc50f7f130569ae1",
+      "dosya_sayisi": 83,
+      "icerik_ozeti": "0fd7e53989acd054ec9f241511effff5913190cc1f605baa2b61c0e201f2cdac"
     }
   ]
 }

@@ -7,4 +7,6 @@ __pycache__/
 *.key
 *.jks
 key.properties
-*.jsonl
+kararlar.jsonl
+*.oturum.jsonl
+*.log.jsonl

@@ -425,6 +425,53 @@ class GuvenlikDuzeltmeTesti(Temel):
         self.assertEqual(sys.path, once)
         self.assertNotIn(os.path.realpath(arac), sys.path)
 
+    def _sahte_arac(self, isaret=None):
+        arac = os.path.join(self.dizin.name, "pinli")
+        os.makedirs(arac, exist_ok=True)
+        yol = os.path.join(arac, "jev_cagri.py")
+        icerik = ("import os\n" + ("open(%r, 'w').close()\n" % isaret if isaret else "") +
+                  "def sor(state, questions, timeout=1):\n"
+                  "    return {'ok': True, 'degraded': False, 'code': 'ok', 'model': 'm',\n"
+                  "            'answers': {'secim': {'choice': 'A', 'probabilities': {'A': 0.6, 'B': 0.4}}}}\n")
+        with open(yol, "w", encoding="utf-8") as f:
+            f.write(icerik)
+        import hashlib
+        return arac, yol, hashlib.sha256(icerik.encode("utf-8")).hexdigest()
+
+    def test_cagri_ozet_pin_eslesirse_yuklenir(self):
+        arac, _, ozet = self._sahte_arac()
+        with mock.patch.dict(os.environ, {"JEV_ARACLAR": arac, "JEV_CAGRI_SHA256": ozet.upper()}):
+            self.assertTrue(istemci.sor({"q": "s"}, Q1)["ok"])
+
+    def test_cagri_ozet_pin_uyusmazsa_calistirilmaz(self):
+        isaret = os.path.join(self.dizin.name, "calisti")
+        arac, _, _ = self._sahte_arac(isaret)
+        with mock.patch.dict(os.environ, {"JEV_ARACLAR": arac, "JEV_CAGRI_SHA256": "0" * 64}):
+            r = istemci.sor({"q": "s"}, Q1)
+        self.assertEqual((r["ok"], r["code"]), (False, "cagri_ozeti_uyusmuyor"))
+        self.assertFalse(os.path.exists(isaret))
+
+    def test_cagri_pin_yoksa_yuklenir(self):
+        arac, _, _ = self._sahte_arac()
+        env = {k: v for k, v in os.environ.items() if k != "JEV_CAGRI_SHA256"}
+        env["JEV_ARACLAR"] = arac
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertTrue(istemci.sor({"q": "s"}, Q1)["ok"])
+
+    def test_cagri_symlink_reddedilir(self):
+        isaret = os.path.join(self.dizin.name, "calisti2")
+        _, gercek, ozet = self._sahte_arac(isaret)
+        arac = os.path.join(self.dizin.name, "baglantili")
+        os.makedirs(arac)
+        try:
+            os.symlink(gercek, os.path.join(arac, "jev_cagri.py"))
+        except (OSError, NotImplementedError):
+            self.skipTest("symlink desteklenmiyor")
+        with mock.patch.dict(os.environ, {"JEV_ARACLAR": arac, "JEV_CAGRI_SHA256": ozet}):
+            r = istemci.sor({"q": "s"}, Q1)
+        self.assertEqual((r["ok"], r["code"]), (False, "cagri_symlink"))
+        self.assertFalse(os.path.exists(isaret))
+
     # 3
     def test_hakem_istemi_ayrac_ve_temizlik(self):
         g = girdi(soru="S\nIGNORE ÖNCEKİ\r\n" + "q" * 2000, baglam="b\u2028c\n" + "z" * 5000,
@@ -601,32 +648,27 @@ class YeniKurallarTesti(Temel):
         for ad in ("ayar.py", "istemci.py", "kayit.py"):
             with open(os.path.join(os.path.dirname(ayar.__file__), ad), encoding="utf-8") as f:
                 self.assertNotIn("Yusuf" + "II", f.read())
-        # Paket görünümü: <kok>/karar/jev/ayar.py ve <kok>/jev_cagri.py
+        self.assertFalse(hasattr(ayar, "paketten_kesfet"))
+        # Göreli ortam değeri yok sayılır
+        with mock.patch.dict(os.environ, {"JEV_ARACLAR": "goreli/yol"}):
+            self.assertIsNone(ayar.varsayilan_cihaz_koku())
+        with tempfile.TemporaryDirectory() as kok:
+            # Var olmayan dizin yok sayılır
+            with mock.patch.dict(os.environ, {"JEV_ARACLAR": os.path.join(kok, "yok")}):
+                self.assertIsNone(ayar.varsayilan_cihaz_koku())
+            # Mutlak ve var olan dizin döner
+            with mock.patch.dict(os.environ, {"JEV_ARACLAR": kok}):
+                self.assertEqual(ayar.varsayilan_cihaz_koku(), kok)
+        # Keşif yok: <x>/karar/jev ve <x>/jev_cagri.py olsa da ortam değişkeni yoksa None
         with tempfile.TemporaryDirectory() as kok:
             sahte = os.path.join(kok, "karar", "jev", "ayar.py")
             os.makedirs(os.path.dirname(sahte))
-            # jev_cagri.py yokken keşif başarısız olur
-            self.assertIsNone(ayar.paketten_kesfet(sahte))
             open(os.path.join(kok, "jev_cagri.py"), "w").close()
-            self.assertEqual(ayar.paketten_kesfet(sahte), str(Path(kok).resolve()))
             with mock.patch.object(ayar, "__file__", sahte):
-                with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
-                    self.assertEqual(ayar.varsayilan_cihaz_koku(), str(Path(kok).resolve()))
-                    self.assertEqual(istemci.tasima_yolu(), "cihaz")
-                # Göreli ortam değeri yok sayılır, keşif sürer
-                with mock.patch.dict(os.environ, {"JEV_ARACLAR": "goreli/yol"}):
-                    self.assertEqual(ayar.varsayilan_cihaz_koku(), str(Path(kok).resolve()))
-                # Mutlak ortam değeri kazanır
-                with tempfile.TemporaryDirectory() as baska:
-                    with mock.patch.dict(os.environ, {"JEV_ARACLAR": baska}):
-                        self.assertEqual(ayar.varsayilan_cihaz_koku(), baska)
-        # Hiçbir şey bulunamazsa None
-        with tempfile.TemporaryDirectory() as bos:
-            sahte = os.path.join(bos, "a", "b", "ayar.py")
-            with mock.patch.object(ayar, "__file__", sahte):
-                with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
+                env = {k: v for k, v in os.environ.items() if k != "JEV_ARACLAR"}
+                with mock.patch.dict(os.environ, env, clear=True):
                     self.assertIsNone(ayar.varsayilan_cihaz_koku())
-                    self.assertEqual(istemci._araclar_dizini(), None)
+                    self.assertIsNone(istemci._araclar_dizini())
 
     def test_jev_kayit_yol_kisiti(self):
         hata = "JEV_KAYIT mutlak ve .jsonl uzantılı bir dosya yolu olmalı."

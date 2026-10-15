@@ -41,3 +41,5 @@ Bu dosyadaki ve `skill-kutuphanesi/INDEKS.md` içindeki kısa commit'lerin tam 4
 ```
 python3 scripts/skill-kaynak-kilidi.py
 ```
+
+Kopyalanan dosyaların bozulmadığını doğrulamak için `icerik-ozeti.sha256` dosyası, `skill-kutuphanesi/` altındaki (kök `INDEKS.md` ve `README.md` hariç) ve bu tabloda listelenen skill klasörlerindeki her izlenen dosyanın SHA-256 özetini standart `sha256sum` biçiminde tutar. Depo kökünden `sha256sum -c --quiet docs/skill-kaynaklari/icerik-ozeti.sha256` ile denetlenir. `kaynak-kilidi.json` içindeki `dosya_sayisi` ve `icerik_ozeti` alanları her kaynağın dosya sayısını ve ilgili manifest satırlarının birleşik özetini verir. Ağ olmadan yeniden üretmek için: `python3 scripts/skill-kaynak-kilidi.py --yalniz-ozet`.

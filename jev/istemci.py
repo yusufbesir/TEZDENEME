@@ -8,6 +8,8 @@ Sabit uç nokta/model ve yönlendirme reddi bu yüzden YALNIZ bulut yolu için g
 yolunda bu paket yalnız dönen yanıtı doğrular.
 """
 
+import hashlib
+import hmac
 import importlib.util
 import json
 import math
@@ -28,6 +30,7 @@ UC_NOKTA = "https://ai-gateway.vercel.sh/v1/systemone"  # SABİT (yalnız bulut 
 MODEL = "typesafe-ai/jev"
 ANAHTAR_ORTAM = "AI_GATEWAY_API_KEY"
 ARACLAR_ORTAM = "JEV_ARACLAR"
+OZET_ORTAM = "JEV_CAGRI_SHA256"  # isteğe bağlı pin (önerilir): jev_cagri.py dosyasının SHA-256 özeti
 MAKS_YANIT = 1024 * 1024
 MAKS_GOVDE = 24000
 
@@ -165,8 +168,8 @@ def _bulut_tasima(body, timeout):
 
 
 def _araclar_dizini():
-    """JEV_ARACLAR ya da ayar.varsayilan_cihaz_koku() (paketten keşif); yoksa None."""
-    return os.environ.get(ARACLAR_ORTAM) or ayar.varsayilan_cihaz_koku()
+    """Yalnız açıkça verilmiş mutlak JEV_ARACLAR dizini (ayar.varsayilan_cihaz_koku); yoksa None."""
+    return ayar.varsayilan_cihaz_koku()
 
 
 def tasima_yolu():
@@ -179,11 +182,33 @@ def tasima_yolu():
     return "yok"
 
 
+class CagriReddedildi(Exception):
+    """jev_cagri.py yüklenmeden reddedildi; `kod` sonuçtaki hata kodudur."""
+
+    def __init__(self, kod):
+        super().__init__(kod)
+        self.kod = kod
+
+
+def _cagri_kaynagi(dosya):
+    """jev_cagri.py baytlarını okur: sembolik bağ reddedilir; JEV_CAGRI_SHA256 varsa özet eşleşmeli.
+    Pin tanımsızsa yine yüklenir ama pin önerilir. Çalıştırılan bayt, özeti doğrulanan baytın ta kendisidir."""
+    if os.path.islink(dosya):
+        raise CagriReddedildi("cagri_symlink")
+    with open(dosya, "rb") as f:
+        veri = f.read()
+    pin = os.environ.get(OZET_ORTAM, "").strip().lower()
+    if pin and not hmac.compare_digest(hashlib.sha256(veri).hexdigest(), pin):
+        raise CagriReddedildi("cagri_ozeti_uyusmuyor")
+    return veri
+
+
 def _cihaz_cagri(state, questions, timeout):
     """Cihaz yolu: isteği Hafıza OS modülü (jev_cagri -> jev_client) yapar; uç noktayı onun ayar
     dosyası belirler ve onun uç nokta politikası geçerlidir. Bu paket yalnız yanıtı doğrular."""
     dizin = os.path.realpath(_araclar_dizini())
     dosya = os.path.join(dizin, "jev_cagri.py")
+    veri = _cagri_kaynagi(dosya)  # doğrulanmadan hiçbir şey yürütülmez
     eski_yol = list(sys.path)
     try:
         # Modül dizini yalnız yükleme/çağrı süresince ve sona eklenir (önceliği yok).
@@ -192,7 +217,7 @@ def _cihaz_cagri(state, questions, timeout):
         if spec is None or spec.loader is None:
             raise ImportError("jev_cagri yüklenemedi")
         modul = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(modul)
+        exec(compile(veri, dosya, "exec"), modul.__dict__)
         return modul.sor(state, questions, timeout=timeout)
     finally:
         sys.path[:] = eski_yol
@@ -240,6 +265,8 @@ def sor(state, questions, timeout=6.0, tasima=None):
             if yol == "cihaz":
                 try:
                     sonuc = _cihaz_cagri(state, questions, timeout)
+                except CagriReddedildi as e:
+                    return _sonuc(False, e.kod, t0=t0)
                 except Exception:
                     return _sonuc(False, "cihaz_hata", t0=t0)
                 if not isinstance(sonuc, dict):
