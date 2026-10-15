@@ -32,3 +32,9 @@
 | 2026-10-15 | Bağımsız hakem: canlı denemedeki ayrışma kararı (Claude C, Jev A) [İP:Jev'i projeye bağlama#TMGrRs] | verifier (hakem) / claude-sonnet-5-5 | 8.220 toplam | A seçti; 2/3 çoğunluk A, Claude'un bilerek zayıf seçimi düzeltildi. |
 | 2026-10-15 | Baş Denetmen PR #10 bulgularını düzelt [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 64.083 toplam | Başarılı. 6 madde, 55 test. Orkestratör JEV_KAYIT kısıtını üst dizin bağına izin verecek biçimde daralttı. |
 | 2026-10-15 | Denetmen düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. |
+| 2026-10-15 | Skill kaynakları için tam commit SHA kilidi, betik ve test [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 29.942 toplam | Tamam: 40/40 çözüldü, 61 test geçti |
+| 2026-10-15 | jev/ayar.py içindeki kişisel D:\ yolunu kaldır (JEV_ARACLAR ya da paketten bulma) [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 30.681 toplam | Tamam: 61 test geçti |
+| 2026-10-15 | Siber Güvenlik Denetmeni bulgularının düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | 36.653 toplam | Geçti |
+| 2026-10-15 | Jev cihaz kökünde otomatik keşfi kaldır, jev_cagri.py için SHA-256 pini ve sembolik bağ reddi [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 44.890 toplam | Tamam: 65 test geçti |
+| 2026-10-15 | Skill kilidine sha256 içerik özeti ve skill-etkinlestir.sh kilit doğrulaması [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 53.703 toplam | Tamam: 69 Python, 35 kabuk testi geçti |
+| 2026-10-15 | Denetmenlerin ikinci tur düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | 39.797 toplam | Geçti |

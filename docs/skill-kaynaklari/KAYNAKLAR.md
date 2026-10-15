@@ -33,3 +33,13 @@ Lisans metinleri `lisanslar/` klasöründe.
 - **planning-with-files** çağrıldığında kendi hook'larını (UserPromptSubmit, PreToolUse, PostToolUse, Stop, PreCompact) etkinleştirir ve skill klasöründeki yerel betikleri çalıştırır. Betiklerde ağ çağrısı yok.
 - **brainstorming** (superpowers) görsel beyin fırtınası için yerel bir web sunucusu başlatabilir.
 - Skill açıklamaları her oturumda Claude'un bağlamına yüklenir; 64 skill bağlamda birkaç bin token yer kaplar. Kullanılmayanları silmek bu maliyeti düşürür.
+
+## Kaynak kilidi
+
+Bu dosyadaki ve `skill-kutuphanesi/INDEKS.md` içindeki kısa commit'lerin tam 40 karakterlik SHA karşılıkları makine tarafından okunabilir biçimde `kaynak-kilidi.json` dosyasındadır. Yeniden üretmek için (ağ gerekir):
+
+```
+python3 scripts/skill-kaynak-kilidi.py
+```
+
+Kopyalanan dosyaların bozulmadığını doğrulamak için `icerik-ozeti.sha256` dosyası, `skill-kutuphanesi/` altındaki (kök `INDEKS.md` ve `README.md` hariç) ve bu tabloda listelenen skill klasörlerindeki her izlenen dosyanın SHA-256 özetini standart `sha256sum` biçiminde tutar. Depo kökünden `sha256sum -c --quiet docs/skill-kaynaklari/icerik-ozeti.sha256` ile denetlenir. `kaynak-kilidi.json` içindeki `dosya_sayisi` ve `icerik_ozeti` alanları her kaynağın dosya sayısını ve ilgili manifest satırlarının birleşik özetini verir. Ağ olmadan yeniden üretmek için: `python3 scripts/skill-kaynak-kilidi.py --yalniz-ozet`.
