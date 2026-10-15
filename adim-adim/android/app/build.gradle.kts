@@ -65,9 +65,26 @@ android {
     signingConfigs {
         if (yayinImzasiVar) {
             create("yayin") {
+                for (alan in listOf("keyAlias", "keyPassword", "storeFile", "storePassword")) {
+                    if ((anahtarOzellikleri[alan] as String?).isNullOrBlank()) {
+                        throw GradleException("key.properties içinde '$alan' eksik ya da boş")
+                    }
+                }
+                // storeFile MUTLAK yol olmalı; göreli değer android/app altında aranır ve
+                // anahtar deposunun depo ağacına düşmesine yol açar.
+                val depoYolu = java.io.File(anahtarOzellikleri["storeFile"] as String)
+                if (!depoYolu.isAbsolute) {
+                    throw GradleException(
+                        "key.properties storeFile mutlak yol olmalı (ör. C:/Users/<ad>/.anahtar/adim-adim-yayin.jks): " +
+                            depoYolu.path
+                    )
+                }
+                if (!depoYolu.isFile) {
+                    throw GradleException("Anahtar deposu bulunamadı: ${depoYolu.absolutePath}")
+                }
                 keyAlias = anahtarOzellikleri["keyAlias"] as String
                 keyPassword = anahtarOzellikleri["keyPassword"] as String
-                storeFile = file(anahtarOzellikleri["storeFile"] as String)
+                storeFile = depoYolu
                 storePassword = anahtarOzellikleri["storePassword"] as String
             }
         }

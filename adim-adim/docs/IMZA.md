@@ -4,7 +4,7 @@
 Release derlemesi hata ayıklama anahtarıyla değil, geliştiricinin cihazındaki ayrı bir yayın anahtar deposuyla imzalanır.
 
 ## Dosyalar
-- `key.properties` (düz metin şifre içerir): **`%USERPROFILE%\.anahtar\key.properties`**. Proje klasörüne KONMAZ; `D:\YusufII` ağacını diğer hesaplar da okuyabilir. Alanlar: `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
+- `key.properties` (düz metin şifre içerir): **`%USERPROFILE%\.anahtar\key.properties`**. Proje klasörüne KONMAZ; `D:\YusufII` ağacını diğer hesaplar da okuyabilir. Alanlar: `storePassword`, `keyPassword`, `keyAlias`, `storeFile`. `storeFile` MUTLAK yol olmalı; göreli ya da boş değerde derleme durur.
 - Anahtar deposu `adim-adim-yayin.jks`: aynı `.anahtar` klasöründe. Konum ve ACL aşağıda.
 - `android/app/build.gradle.kts` `key.properties` dosyasını YALNIZ `<kullanıcı profili>/.anahtar/key.properties` konumunda arar. Proje içinde (`android/key.properties`) geri dönüş yolu bilerek yoktur; `.gitignore` kuralları yalnız yanlışlıkla eklenmeye karşı durur. Log'a yalnız dosya yolu yazılır, şifre asla yazılmaz.
   Bulursa `yayin` imza yapılandırmasını kullanır. Bulamazsa:
@@ -60,6 +60,6 @@ Ek bayrak gerekmez; koruma varsayılan açıktır. `key.properties` bulunamazsa 
 Anahtar deposunun kaybı uygulamanın güncellenememesi demektir. `.jks` dosyasını ve şifreleri ayrı, güvenli bir yere (parola yöneticisi ya da şifreli harici disk) yedekleyin.
 
 ## Kurallar
-- `key.properties` ve `*.jks` hiçbir zaman commit edilmez ve proje klasörüne konmaz; yine de kök ve alt `.gitignore` dosyaları yanlışlıkla eklenmelerini engeller.
+- `key.properties`, `*.jks`, `*.keystore` ve `*.p12` hiçbir zaman commit edilmez ve proje klasörüne konmaz; yine de kök ve alt `.gitignore` dosyaları yanlışlıkla eklenmelerini engeller.
 - Şifreler kasa notlarına ve Mem0'a yazılmaz.
 - Yayın derlemesi `key.properties` olmadan dağıtılmaz; `dagitim=true` varsayılanı bunu zorlar, `-Pdagitim=false` yalnız yerel deneme içindir.

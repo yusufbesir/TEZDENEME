@@ -2,3 +2,4 @@
 *.jks
 *.keystore
 **/key.properties
+**/*.p12
