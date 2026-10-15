@@ -23,3 +23,5 @@
 | 2026-10-15 | Adım Adım: çeldirici "2" ekleri, "kap" yazımı, Dinle açıklamaları | implementer / claude-sonnet-5-5 | 38.735 toplam | Başarılı. 16 çeldirici, 14 açıklama; 14 içerik testi geçti. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
 | 2026-10-15 | Adım Adım: Baş Denetmen düzeltmelerinin doğrulanması (3. tur) | verifier / claude-sonnet-5-5 | 41.558 toplam | Geçti. 101 test; 1 orta (value/textContent çift doğru), 3 düşük içerik notu; orkestratör düzeltti. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
 | 2026-10-15T15:10Z | Eski egitim-uygulamasi klasörünü kaldır, PR #13 aç | Fable (kendisi, tek dosyalık iş) | - | Açıldı, Yusuf onayı bekleniyor |
+| 2026-10-15 | Adım Adım: eski sürüm temizleyici güncelleme mekanizması (Windows), guncelle.ps1, 19 test | implementer / claude-sonnet-5-5 | ~45.000 (30K girdi, 15K çıktı, tahmini) | Başarılı. 120 test geçti, analyze temiz. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
+| 2026-10-15 | Adım Adım: güncelleme mekanizmasının doğrulanması (5 kural) | verifier / claude-sonnet-5-5 | ~35.000 | Geçti. 2 düşük gözlem (ps1 Windows'ta çalıştırılmadı; sürücü harfli yol testi yalnız fromJson). [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
