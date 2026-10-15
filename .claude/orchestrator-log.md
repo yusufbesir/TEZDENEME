@@ -13,3 +13,4 @@
 | 2026-10-15 | Adım Adım: deneyim kalıpları, renk bilimi, tipografi araştırması | araştırma (general-purpose) / claude-sonnet-5-5 | 106.517 toplam | Başarılı. Petrol/teal OKLCH paleti, Nunito+Inter; docs/TASARIM.md. |
 | 2026-10-15 | Adım Adım: motor (seviye, seri, Leitner, cevap kontrolü) ve DosyaDepo | implementer / claude-sonnet-5-5 | 60.121 toplam | Başarılı. 74 test geçti, analyze temiz. |
 | 2026-10-15 | Adım Adım: 4 kursu Dart'a aktar, Dinle ve Kod alıştırmaları ekle | implementer / claude-sonnet-5-5 | 67.867 toplam | Başarılı. 31 ders, 12 test geçti. |
+| 2026-10-15 | Adım Adım: arayüz (5 ekran, 7 alıştırma bileşeni, tema, Riverpod, go_router, ses ve bildirim servisleri) | implementer / claude-sonnet-5-5 | 120.907 toplam | Başarılı. 91 test geçti (toplam), analyze temiz. |
