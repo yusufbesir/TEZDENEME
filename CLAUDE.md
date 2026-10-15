@@ -47,3 +47,10 @@ Jev, TypeSafe AI'ın karar modelidir. Metin ve kod üretmez; tipli sorulara seç
 - Kritik kategorilerde (mimari, güvenlik, veri bütünlüğü, geri alınamaz) Jev yalnız görüş verir; karar kullanıcı ve Opus'tadır.
 - Jev'e erişilemezse yanıtta "Jev'e erişilemedi" diye açıkça yaz. Jev denetim işlerinde kullanılmaz.
 - Jev'e yalnız Vercel AI Gateway üzerinden gidilir; anahtar yalnız `AI_GATEWAY_API_KEY` ortam değişkeninde ya da cihazdaki mevcut anahtar dosyasında durur. Ayrıntı: `docs/jev/karar-kurgusu.md`.
+
+## Token ve Araç Kaydı Kuralları
+
+- Her oturum, yazdığı kasa notlarına ve çıktı/rapor dosyalarına o iş için harcanan girdi (input) ve çıktı (output) token sayılarını ayrı ayrı yazar. Alt ajanların tokenları ayrıca belirtilir ve toplamı verilir. Kesin sayı alınamıyorsa bu açıkça "tahmini" ya da "veri yok" diye yazılır.
+- Her notta "Kullanılan yapay zeka araçları" bölümü olur: ana model, alt ajan modelleri, Jev, Codex/ChatGPT, Gemini gibi işte kullanılan her yapay zeka aracı listelenir.
+- Kesin sayı için oturumun kendi sayacı kullanılır (`get_session` çıktısındaki `usage`: girdi, çıktı, önbellek okuma/yazma). Sayaç oturum toplamıdır; alt ajan kırılımını vermez, o yüzden alt ajan tokenları `.claude/orchestrator-log.md` satırlarından alınır, orada yoksa "veri yok" yazılır.
+- Geçmiş oturumlar için kayıt ekleme yoluyla yapılır, mevcut içerik silinmez. Tablo: `token-kaydi/` (proje klasörü).
