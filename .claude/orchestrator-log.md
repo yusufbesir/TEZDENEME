@@ -43,3 +43,6 @@
 | 2026-10-15 | Güvenlik denetimi 4. tur + webdav unix_socket/use_emulator/storage_url/hostname düzeltmesi (kendim) | verifier (denetçi) / claude-opus-5-5 + Opus (ana) | - | Denetim Kaldı: 1 Orta (webdav unix_socket); düzeltildi, 338/338 |
 | 2026-10-15 | Doğrulama 5. tur | verifier / claude-sonnet-5-5 | - | Geçti: 338/338, gerçek rclone webdav unix_socket senaryosunda silme yok |
 | 2026-10-15 | Güvenlik denetimi 5. tur | verifier (denetçi) / claude-opus-5-5 | - | Geçti: Kritik/Yüksek/Orta yok; 4 Düşük (AWS_/OS_ ortamı + env_auth, azure sas_url/connection_string, docker kapsayıcı IP'si, belge ifadesi) |
+| 2026-10-15 | Baş Denetmen bulguları (xtrace, goster-ve-kaldir uyarısı, açık hedef onayı, özel ağ, atomik kayıt, --mount) | implementer / claude-sonnet-5-5 | girdi ~250k, çıktı ~35k (tahmini) | Tamamlandı: 354/354 |
+| 2026-10-15 | Doğrulama: Baş Denetmen düzeltmeleri | verifier / claude-sonnet-5-5 | - | Geçti: 354/354, bash -n temiz, sır yok |
+| 2026-10-15 | Güvenlik denetimi: Baş Denetmen düzeltmeleri | verifier (denetçi) / claude-opus-5-5 | girdi ~95k, çıktı ~9k (tahmini) | Geçti: Kritik/Yüksek/Orta yok; 4 Düşük (NAT64/IPv4-uyumlu IPv6, ':' içeren yerel yol izin kaçışı, Tailscale/VPC özel adresler onaylanamaz, güncelleme sonrası onay gelene kadar silme durur) |

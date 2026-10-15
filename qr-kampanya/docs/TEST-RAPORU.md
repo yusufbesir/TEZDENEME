@@ -4,7 +4,7 @@
 
 ## Özet
 
-- **Otomatik testler:** 338 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`; gerçek rclone gerektiren testler `QR_TEST_RCLONE` verilince çalışır). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15-yedek-riskleri.txt` (önceki 264 testlik koşu: `docs/kanit/test-ciktisi-2026-10-15.txt`).
+- **Otomatik testler:** 354 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`; gerçek rclone gerektiren testler `QR_TEST_RCLONE` verilince çalışır). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15-basdenetmen.txt`; önceki 338 testlik koşu `docs/kanit/test-ciktisi-2026-10-15-yedek-riskleri.txt` (önceki 264 testlik koşu: `docs/kanit/test-ciktisi-2026-10-15.txt`).
 - **Uçtan uca testler** bulut geliştirme ortamında, gerçek Docker Compose yığınıyla (PostgreSQL 17.6, Caddy 2.10.2, uygulama imajı; sıkılaştırılmış ayarlar ve MFA zorunlu) yapıldı. Alan adı ve VPS henüz olmadığı için HTTPS yerine `http://localhost:8080` kullanıldı.
 - **Yapılamayanlar (açıkça):** gerçek alan adında HTTPS sertifikası alma ve fiziksel baskıdan telefonla okuma. Bunlar VPS kurulumunda yapılmalı (bkz. sonda).
 - Bağımsız denetim: gereksinim doğrulaması **Geçti**; güvenlik denetimi iki tur yapıldı, bulunan Orta bulgular düzeltildi (bkz. “Güvenlik denetimi”).
@@ -71,6 +71,17 @@ Düzeltmelerden sonra iki tur iç güvenlik denetimi (Opus) yapıldı; ilk turda
 | — | `guncelle.sh` düşükleri | `up -d --no-deps app`; yeni Caddyfile ayrı kapta doğrulanır, geçersizse çalışan Caddy'ye dokunulmaz; RestartCount kontrolü | Geçersiz Caddyfile ile e2e: hata, eski Caddy aynı |
 
 Bu değişiklikler beş tur bağımsız doğrulama ve beş tur güvenlik denetiminden (Opus) geçti; her turdaki Orta bulgular düzeltildi, son turda Kritik/Yüksek/Orta bulgu kalmadı. Kalan Düşükler `GUVENLIK.md` → Bilinen sınırlamalar. Ham çıktılar: `docs/kanit/yedek-riskleri-*.txt`. Gerçek bir Hetzner Storage Box'a karşı denenmedi.
+
+## Baş Denetmen bulguları (0a9a2df, 15 Ekim gece)
+
+| # | Bulgu | Yapılan | Kanıt |
+|---|---|---|---|
+| 1 | `bash -x` altında anahtar stderr'e sızıyor | Anahtar işlenen bölümler `{ set +x +v; } 2>/dev/null` korumalı, önceki durum geri yüklenir | `bash -x`, `-xv`, `SHELLOPTS=xtrace`, `BASH_XTRACEFD` ile pty denemeleri: stdout/stderr/izleme dosyasında anahtar yok |
+| 2 | `--goster-ve-kaldir`'da shred garanti değil | Silmeden önce ve sonra açık uyarı; belge | Birim testleri |
+| 3 | NAT/kapsayıcı arkasındaki hedef "uzak" sayılabilir | Yerel yedek silme yalnızca `.env`'de `YEDEK_UZAK_ONAYLI_HEDEF=<ad>` açık onayıyla; bağlantı dizesi ve yerel yol onaylanamaz; özel ağ adresleri onayla bile yerel; `YEDEK_YEREL_HEDEF_IZIN` hedef adına eşit olmalı ve günlüğe yazılır | Gerçek rclone (`listremotes`/`config show`): onaysız b2 silmedi, onaylı sildi; 10.x ve 172.18.x onaylı bile silmedi |
+| — | Düşükler | Atomik anahtar kaydı (üzerine yazmaz), docker `--mount`, bağlantı dizesinde kimlik bilgisi uyarısı, B2/S3 özet sınırı belgelendi | Gerçek docker ile `,` ve `:` içeren yol; `dst` enjeksiyonu işlemedi |
+
+Bağımsız doğrulama Geçti, güvenlik denetimi (Opus) Geçti: Kritik/Yüksek/Orta yok. Kalan Düşükler `GUVENLIK.md`'de.
 
 ## VPS'te yapılması gereken testler
 

@@ -20,7 +20,12 @@
 #      "alias/crypt/..." uzak ad, host/endpoint/url'si localhost/127.0.0.0/8/::1/makine adı/makine IP'si olan ağ türü) VEYA
 #      hedef güvenle sunucu dışı olduğu belirlenemiyorsa (izin listesinde olmayan/bilinmeyen tür, "ad,seçenek=değer:yol" biçimi) kopyalanır ama sunucu
 #      dışı SAYILMAZ: yerel yedek silinmez, panel uyarısı sürer.
-#      (Yalnızca deneme için kaçış: YEDEK_YEREL_HEDEF_IZIN=1 — üretimde KULLANMAYIN.)
+#      Özel ağ adresleri (10/8, 172.16/12, 192.168/16, 100.64/10, 169.254/16, fc00::/7, fe80::/10; IP ya da çözülen ad) da
+#      belirsiz = yerel sayılır (NAT/kapsayıcı); bunlarda YEDEK_UZAK_ONAYLI_HEDEF olsa bile silme yapılmaz.
+#      (Yalnızca deneme için kaçış: YEDEK_YEREL_HEDEF_IZIN=<HEDEF_AD> — değer ":" öncesi adla BİREBİR aynı olmalı, "1" yetmez;
+#       her kullanım yedek-gunlugu.log'a yazılır; üretimde KULLANMAYIN.)
+#   0b) AÇIK ONAY: hedef sunucu dışı görünse bile yerel yedek ancak .env'de YEDEK_UZAK_ONAYLI_HEDEF=<HEDEF_AD> (":" öncesi ad,
+#      birebir) varsa silinir. Onay yoksa kopyalanır ve doğrulanır ama silinmez, "zaman" null kalır (panel uyarısı sürer).
 #   4) Silme: YEDEK_SAKLAMA_GUN'den eski VE aynı ZAMAN'a ait db+medya+sha256 üçlüsünün HEPSİ uzakta doğrulanmışsa
 #      yerel üçlü silinir. En yeni TAM yerel yedek (üçlüsü eksiksiz en yeni ZAMAN) asla silinmez. YEDEK_UZAK_HEDEF tanımlı değilse hiçbir şey silinmez.
 # Yedek dosyaları root'a ait ve 600 izinlidir: bu betiği root ile çalıştırın (sudo crontab -e). Cron örneği:
@@ -200,6 +205,39 @@ adres_yerel_mi() {
   fi
   return 1
 }
+# Özel/yerel ağ IP'si mi? 10/8, 172.16/12, 192.168/16, 100.64/10 (CGNAT), 169.254/16 (link-local), fc00::/7 (ULA), fe80::/10.
+# NAT arkasındaki, başka bir kapsayıcıdaki ya da aynı yerel ağdaki bir adres "başka makine" olduğunu KANITLAMAZ -> belirsiz = yerel.
+ip_ozel_mi() {
+  local a="${1,,}" o1 o2
+  a="${a%%\%*}"; a="${a#::ffff:}"
+  if [[ "$a" =~ ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$ ]]; then
+    o1=$((10#${BASH_REMATCH[1]})); o2=$((10#${BASH_REMATCH[2]}))
+    [ "$o1" -eq 10 ] && return 0
+    [ "$o1" -eq 172 ] && [ "$o2" -ge 16 ] && [ "$o2" -le 31 ] && return 0
+    [ "$o1" -eq 192 ] && [ "$o2" -eq 168 ] && return 0
+    [ "$o1" -eq 100 ] && [ "$o2" -ge 64 ] && [ "$o2" -le 127 ] && return 0
+    [ "$o1" -eq 169 ] && [ "$o2" -eq 254 ] && return 0
+    return 1
+  fi
+  [[ "$a" == *:* ]] || return 1
+  [[ "$a" =~ ^f[cd][0-9a-f]{0,2}: ]] && return 0
+  [[ "$a" =~ ^fe[89ab][0-9a-f]?: ]] && return 0
+  return 1
+}
+# Ad/IP özel ağda mı? (IP ise doğrudan; ad ise getent ile çözülen adreslerden biri özelse)
+adres_ozel_mi() {
+  local a="${1,,}" ip
+  a="${a%.}"
+  [ -n "$a" ] || return 1
+  ip_ozel_mi "$a" && return 0
+  if command -v getent >/dev/null 2>&1; then
+    while IFS= read -r ip; do
+      [ -n "$ip" ] || continue
+      ip_ozel_mi "$ip" && return 0
+    done < <(getent ahosts "$a" 2>/dev/null | awk '{ print tolower($1) }' | sort -u || true)
+  fi
+  return 1
+}
 # "http://kullanici@host:9000/yol", "host:2222", "[::1]:22" -> host
 host_cikar() {
   local v="$1"
@@ -231,6 +269,7 @@ adaylar_yerel_mi() {
     [ -n "$v" ] || continue
     v=$(host_cikar "$v")
     if adres_yerel_mi "$v"; then YEREL_NEDEN="$k alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)"; return 0; fi
+    if adres_ozel_mi "$v"; then YEREL_NEDEN="$k alanı özel/yerel ağ adresi (10/8, 172.16/12, 192.168/16, 100.64/10, 169.254/16, fc00::/7, fe80::/10): NAT arkasında ya da başka bir kapsayıcıda olabilir, gerçekten başka makine olduğu kanıtlanamaz (onay olsa bile silme yapılmaz)"; return 0; fi
   done
   return 1
 }
@@ -291,16 +330,47 @@ hedef_yerel_mi() {
       return 1 ;;
   esac
 }
-YEREL_HEDEF=0
+YEREL_HEDEF=0     # 1: hedef yerel/belirsiz -> kopyalanır, silme YOK (onay bunu aşamaz)
+ONAYSIZ=0         # 1: hedef sunucu dışı görünüyor ama .env'de açıkça onaylanmadı -> kopyalanır/doğrulanır, silme YOK
+ONAY_DEGERI="${YEDEK_UZAK_ONAYLI_HEDEF:-}"
+IZIN_DEGERI="${YEDEK_YEREL_HEDEF_IZIN:-}"
+# Onay yalnızca HEDEF_AD ile BİREBİR aynı değerle geçerlidir. "(yerel-yol)" ve bağlantı dizesi hedefleri ("(adsız)",
+# ":tür,...:yol") asla onaylanamaz: tek bir onay tüm adsız hedefleri kapsamasın ve kimlik bilgisi `ps`te görünen
+# bağlantı dizesi yolu teşvik edilmesin. Silme için `rclone config` ile adlandırılmış bir uzak gerekir.
+ad_onayli_mi() { case "$HEDEF_AD" in ''|'(yerel-yol)'|'(adsız)') return 1 ;; esac; [ "$1" = "$HEDEF_AD" ]; }
+
+# Bağlantı dizesinde (":tür,seçenek=değer:yol" / "ad,seçenek=değer:yol") kimlik bilgisi varsa `ps` ile herkes görür.
+case "$HEDEF" in
+  :*|*,*)
+    case "${HEDEF,,}" in
+      *pass=*|*password*|*key=*|*secret*|*token*|*account_key*|*sas_url*|*service_account_credentials*|*credential*)
+        echo "UYARI: YEDEK_UZAK_HEDEF bağlantı dizesi kimlik bilgisi içeriyor olabilir (pass/key/secret/token/sas_url/...)."
+        echo "       Komut satırındaki değerler 'ps' ile diğer kullanıcılara görünür. Kimlik bilgilerini 'rclone config' ayar dosyasına yazın, bağlantı dizesine değil."
+        ;;
+    esac ;;
+esac
+
 if hedef_yerel_mi "$HEDEF"; then
-  if [ "${YEDEK_YEREL_HEDEF_IZIN:-0}" = "1" ]; then
-    echo "UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın."
+  if ad_onayli_mi "$IZIN_DEGERI"; then
+    echo "################################################################################"
+    echo " UYARI: YEDEK_YEREL_HEDEF_IZIN=$HEDEF_AD KULLANILDI"
+    echo " Yerel/belirsiz bir hedef SUNUCU DIŞI gibi işlenecek; eski yerel yedekler SİLİNEBİLİR."
+    echo " Neden yerel sayıldığı: $YEREL_NEDEN"
+    echo " Bu YALNIZCA DENEME içindir; üretimde KULLANMAYIN. Hedef gerçekten başka makinede değilse yedek kaybedebilirsiniz."
+    echo "################################################################################"
+    mkdir -p "$DIZIN"
+    gunluge "YEREL HEDEF İZNİ KULLANILDI: $HEDEF_AD"
   else
     YEREL_HEDEF=1
     echo "UYARI: YEDEK_UZAK_HEDEF ($HEDEF_AD) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI."
     echo "       Neden: $YEREL_NEDEN"
     echo "       Dosyalar kopyalanır ama HİÇBİR yerel yedek silinmez ve panel uyarısı sürer. Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın."
+    [ -z "$IZIN_DEGERI" ] || echo "       (YEDEK_YEREL_HEDEF_IZIN değeri hedef adıyla ($HEDEF_AD) birebir aynı değil; '1' artık yetmez, kaçış uygulanmadı.)"
   fi
+elif ! ad_onayli_mi "$ONAY_DEGERI"; then
+  ONAYSIZ=1
+  echo "UYARI: hedef sunucu dışı olarak onaylanmadı ($HEDEF_AD); onaylamak için .env'e YEDEK_UZAK_ONAYLI_HEDEF=$HEDEF_AD ekleyin"
+  echo "       (yalnızca hedef gerçekten başka bir makinede/bulutta ise). Dosyalar kopyalanır ve doğrulanır ama HİÇBİR yerel yedek silinmez; panel uyarısı sürer."
 fi
 
 DESENLER=(--include 'db-*.dump.age' --include 'medya-*.tar.gz.age' --include 'sha256-*.txt')
@@ -450,6 +520,7 @@ en_yeni_dogrulandi_mi() {
     && printf '%s\n' ${DOGRULANAN[@]+"${DOGRULANAN[@]}"} | grep -qxF -- "sha256-$EN_YENI.txt"
 }
 if [ "$YEREL_HEDEF" = "1" ]; then ZAMAN_DEGERI="null"; DOGRULANAN=()   # yerel hedef sunucu dışı sayılmaz
+elif [ "$ONAYSIZ" = "1" ]; then ZAMAN_DEGERI="null"   # doğrulandı ama onaylanmadı: panel uyarısı sürsün (zaman boş); dosya listesi korunur
 elif en_yeni_dogrulandi_mi; then ZAMAN_DEGERI="\"$(json_kacis "$SIMDI")\""
 elif [ -n "$ONCEKI_ZAMAN" ]; then ZAMAN_DEGERI="\"$(json_kacis "$ONCEKI_ZAMAN")\""
 else ZAMAN_DEGERI="null"; fi
@@ -457,11 +528,17 @@ LISTE=""
 for ad in ${DOGRULANAN[@]+"${DOGRULANAN[@]}"}; do LISTE+="${LISTE:+, }\"$ad\""; done
 ( umask 077
   NOT=""; [ "$YEREL_HEDEF" = "1" ] && NOT="yerel hedef, sunucu dışı sayılmadı"
+  [ "$ONAYSIZ" = "1" ] && NOT="sunucu dışı kopya doğrulandı ama onaylanmadı (YEDEK_UZAK_ONAYLI_HEDEF)"
   printf '{\n  "zaman": %s,\n  "son_deneme": "%s",\n  "hedef": "%s",\n  "yontem": "%s",\n  "not": "%s",\n  "dogrulanan": [%s]\n}\n' \
     "$ZAMAN_DEGERI" "$(json_kacis "$SIMDI")" "$(json_kacis "$HEDEF_AD")" "$(json_kacis "$YONTEM")" "$(json_kacis "$NOT")" "$LISTE" > "$DOGRULAMA.tmp" && mv "$DOGRULAMA.tmp" "$DOGRULAMA" )
 if [ "$YEREL_HEDEF" = "1" ]; then
   gunluge "dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → $HEDEF_AD; yerel yedek SİLİNMEDİ"
   echo "Yerel hedef nedeniyle silme yapılmadı."
+  exit 0
+fi
+if [ "$ONAYSIZ" = "1" ]; then
+  gunluge "dışarı kopyalama: ${#DOGRULANAN[@]} dosya uzakta doğrulandı ($YONTEM) → $HEDEF_AD; hedef sunucu dışı olarak onaylanmadı; onaylamak için .env'e YEDEK_UZAK_ONAYLI_HEDEF=$HEDEF_AD ekleyin; yerel yedek SİLİNMEDİ"
+  echo "Onay olmadığı için silme yapılmadı."
   exit 0
 fi
 gunluge "dışarı kopyalama: ${#DOGRULANAN[@]} dosya uzakta doğrulandı ($YONTEM) → $HEDEF_AD"

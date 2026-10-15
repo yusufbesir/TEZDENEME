@@ -91,4 +91,6 @@ if [ "$(docker compose exec -T app python manage.py shell -c 'from django.contri
   echo "İlk yönetici hesabını oluşturun (parola en az 12 karakter):"
   docker compose exec app python manage.py yonetici_olustur
 fi
+echo "BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca"
+echo "       YEDEK_UZAK_ONAYLI_HEDEF=uzakadi (':' öncesi ad) ile hedefin gerçekten başka bir makine/bulut olduğunu onaylayın (docs/YEDEKLEME.md)."
 echo "Kurulum tamam. Panel: $(grep ^SITE_SEMA .env | cut -d= -f2)://$(grep ^SITE_ALAN_ADI .env | cut -d= -f2)/panel/"

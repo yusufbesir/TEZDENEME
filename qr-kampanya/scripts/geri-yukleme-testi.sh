@@ -60,9 +60,12 @@ calistir() {
   if [ -n "$ORTAK_GECICI" ]; then echo "Özel anahtar: gizli girişle alındı, bellekte tutuluyor, iş bitince silinecek (içeriği yazılmaz)"
   else echo "Özel anahtar dosyası: $ANAHTAR (içeriği yazılmaz)"; fi
   # Ağsız geçici veritabanı: parola gerekmez (dışarıdan erişim imkânsız), anahtar ve yedek salt okunur bağlanır.
+  # --mount: yol ":" / "," içerse de bozulmaz (-v "YOL:/x" bozulurdu).
+  M_ANAHTAR=$(ortak_mount "$ANAHTAR" /anahtar/yedek-anahtari.txt ro) || { echo "SONUÇ: BAŞARISIZ - anahtar yolu docker'a bağlanamıyor."; return 1; }
+  M_YEDEK=$(ortak_mount "$YEDEK_DIZIN" /yedekler ro) || { echo "SONUÇ: BAŞARISIZ - yedek dizin yolu docker'a bağlanamıyor."; return 1; }
   docker run -d --name "$GECICI" --network none --tmpfs /tmp:mode=1777,size=2g \
     -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_USER=test -e POSTGRES_DB=test \
-    -v "$ANAHTAR":/anahtar/yedek-anahtari.txt:ro -v "$YEDEK_DIZIN":/yedekler:ro \
+    --mount "$M_ANAHTAR" --mount "$M_YEDEK" \
     "$YEDEK_IMAJI" >/dev/null
   for i in $(seq 1 60); do docker exec "$GECICI" pg_isready -U test -d test >/dev/null 2>&1 && break; sleep 1; done
   sleep 2

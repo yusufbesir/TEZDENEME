@@ -135,6 +135,8 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
         (self.kok / ".env").write_text(f"YEDEK_DIZINI={self.yedekler}\nYEDEK_SAKLAMA_GUN={saklama}\n" + (f"YEDEK_UZAK_HEDEF={shlex.quote(hedef)}\n" if hedef else ""))
         env = {"PATH": os.environ["PATH"], "HOME": str(self.kok), "RCLONE_KOMUTU": f"sh {self.rclone}",
                "SAHTE_REMOTELAR": "b2 b2\nsf sftp"}   # bilinmeyen tür "yerel" sayılır: varsayılan uzaklar tanımlı
+        if hedef:   # açık onay modeli: varsayılan olarak hedef adı onaylanır (onay testleri bunu ortam ile geçersiz kılar)
+            env["YEDEK_UZAK_ONAYLI_HEDEF"] = hedef.split(":")[0].split(",")[0]
         env.update(ortam)
         return subprocess.run(["bash", str(self.kok / "scripts" / "disari-kopyala.sh")], capture_output=True, text=True, env=env, timeout=60)
 
@@ -222,15 +224,18 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
     def test_dogrulama_kaydinda_kimlik_bilgisi_yok(self):
         self.ucluyu_yaz(0)
         gizli = "GIZLI-ANAHTAR-123"
-        s = self.calistir(hedef=f":s3,access_key_id={gizli},secret_access_key={gizli}:kova")
+        # Bağlantı dizesi hedefinin adı "(adsız)"dır ve ASLA onaylanamaz ("(adsız)" yazılsa bile): silme olmaz, zaman null.
+        eski = self.ucluyu_yaz(30)
+        s = self.calistir(hedef=f":s3,access_key_id={gizli},secret_access_key={gizli}:kova", YEDEK_UZAK_ONAYLI_HEDEF="(adsız)")
         self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
         kayit_metni = (self.yedekler / "uzak-dogrulama.json").read_text()
         kayit = json.loads(kayit_metni)
         self.assertNotIn(gizli, kayit_metni)
         self.assertNotIn(gizli, s.stdout + s.stderr + (self.yedekler / "yedek-gunlugu.log").read_text())
         self.assertEqual(kayit["hedef"], "(adsız)")
-        self.assertTrue(kayit["zaman"])
-        self.assertEqual(len(kayit["dogrulanan"]), 3)
+        self.assertIsNone(kayit["zaman"])
+        self.assertTrue(all(self.var(eski, t) for t in ("db", "medya", "sha")), "adsız hedef onaylanamaz; silme olmamalı")
+        self.assertIn("onaylanmadı", s.stdout)
         # Düz hedef adı: yalnızca ":" öncesi yazılır.
         s = self.calistir(hedef="b2:gizli-klasor")
         self.assertEqual(json.loads((self.yedekler / "uzak-dogrulama.json").read_text())["hedef"], "b2")
@@ -323,10 +328,87 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
     def test_yerel_hedef_izni_yalniz_deneme_icin_silmeye_izin_verir(self):
         eski = self.ucluyu_yaz(30)
         self.ucluyu_yaz(0)
-        s = self.calistir(hedef="yerel:kova", SAHTE_REMOTELAR="yerel local", YEDEK_YEREL_HEDEF_IZIN="1")
+        s = self.calistir(hedef="yerel:kova", SAHTE_REMOTELAR="yerel local", YEDEK_YEREL_HEDEF_IZIN="yerel")
         self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
         self.assertIn("YALNIZCA DENEME", s.stdout)
         self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")))
+
+    # --- ORTA-3: açık onay modeli, özel ağ adresleri, izin kaçışı ---------------------------------------------------
+    def test_onay_yoksa_kopyalanir_dogrulanir_ama_silinmez_ve_uyari_surer(self):
+        eski = self.ucluyu_yaz(30)
+        en_yeni = self.ucluyu_yaz(0)
+        s = self.calistir(hedef="b2:kova", YEDEK_UZAK_ONAYLI_HEDEF="")
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        self.assertTrue(all(self.var(eski, t) for t in ("db", "medya", "sha")), "onaysız hedefte silme olmamalı")
+        self.assertTrue(all(self.var(en_yeni, t) for t in ("db", "medya", "sha")))
+        self.assertIn("sunucu dışı olarak onaylanmadı", s.stdout)
+        self.assertIn("YEDEK_UZAK_ONAYLI_HEDEF=b2", s.stdout)
+        kayit = json.loads((self.yedekler / "uzak-dogrulama.json").read_text())
+        self.assertIsNone(kayit["zaman"], "panel uyarısı sürmeli (zaman null)")
+        self.assertEqual(len(kayit["dogrulanan"]), 6, "kopya doğrulanmış olmalı ve kaydedilmeli")
+        self.assertIn("doğrulandı ama onaylanmadı", kayit["not"])
+        gunluk = (self.yedekler / "yedek-gunlugu.log").read_text()
+        self.assertIn("YEDEK_UZAK_ONAYLI_HEDEF=b2", gunluk)
+        self.assertNotIn("SİLİNDİ", gunluk)
+        self.assertTrue((self.kok / "kova" / f"db-{eski}.dump.age").exists(), "uzağa kopyalanmış olmalı")
+
+    def test_eslesmeyen_onay_silmez_eslesen_onay_siler(self):
+        eski = self.ucluyu_yaz(30)
+        self.ucluyu_yaz(0)
+        for onay in ("baska", "b2:kova", "B2", "b2 "):
+            with self.subTest(onay=onay):
+                s = self.calistir(hedef="b2:kova", YEDEK_UZAK_ONAYLI_HEDEF=onay)
+                self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+                self.assertTrue(all(self.var(eski, t) for t in ("db", "medya", "sha")))
+                self.assertIn("onaylanmadı", s.stdout)
+        s = self.calistir(hedef="b2:kova", YEDEK_UZAK_ONAYLI_HEDEF="b2")
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")), "birebir onayla eski üçlü silinmeli")
+        self.assertIsNotNone(json.loads((self.yedekler / "uzak-dogrulama.json").read_text())["zaman"])
+
+    def test_ozel_ag_adresleri_onay_olsa_bile_yerel_sayilir(self):
+        for adres in ("10.1.2.3", "http://172.18.0.5:9000", "192.168.1.20", "100.64.3.4", "169.254.169.254", "fd00::1", "[fe80::1]:22", "::ffff:10.0.0.1"):
+            with self.subTest(adres=adres):
+                self.temizle_yedekler()
+                s = self.yerel_hedef_dogrula("uz:kova", SAHTE_REMOTELAR="uz s3", SAHTE_ALANLAR=f"uz endpoint={adres}", YEDEK_UZAK_ONAYLI_HEDEF="uz")
+                self.assertIn("özel/yerel ağ adresi", s.stdout)
+                self.assertIn("onay olsa bile silme yapılmaz", s.stdout)
+
+    def test_ozel_ag_araligi_disindaki_adresler_sunucu_disi_sayilir(self):
+        for adres in ("172.32.0.1", "172.15.0.1", "100.128.0.1", "11.0.0.1", "203.0.113.9", "https://203.0.113.9"):
+            with self.subTest(adres=adres):
+                self.temizle_yedekler()
+                eski = self.ucluyu_yaz(30)
+                self.ucluyu_yaz(0)
+                s = self.calistir(hedef="uz:kova", SAHTE_REMOTELAR="uz s3", SAHTE_ALANLAR=f"uz endpoint={adres}")
+                self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+                self.assertNotIn("özel/yerel ağ", s.stdout)
+                self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")), adres)
+
+    def test_yerel_hedef_izni_1_artik_yetmez_ad_birebir_olmali_ve_kullanim_gunluge_yazilir(self):
+        self.yerel_hedef_dogrula("yerel:kova", SAHTE_REMOTELAR="yerel local", YEDEK_YEREL_HEDEF_IZIN="1")
+        self.temizle_yedekler()
+        self.yerel_hedef_dogrula("yerel:kova", SAHTE_REMOTELAR="yerel local", YEDEK_YEREL_HEDEF_IZIN="baska")
+        self.temizle_yedekler()
+        self.yerel_hedef_dogrula("./yerel-kopya", YEDEK_YEREL_HEDEF_IZIN="(yerel-yol)")   # yer tutucu ad hiçbir şeyi onaylamaz
+        self.temizle_yedekler()
+        eski = self.ucluyu_yaz(30)
+        self.ucluyu_yaz(0)
+        s = self.calistir(hedef="yerel:kova", SAHTE_REMOTELAR="yerel local", YEDEK_YEREL_HEDEF_IZIN="yerel")
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        self.assertIn("KULLANILDI", s.stdout)
+        self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")))
+        gunluk = (self.yedekler / "yedek-gunlugu.log").read_text()
+        self.assertRegex(gunluk, r"\d{4}-\d\d-\d\dT[^ ]+ YEREL HEDEF İZNİ KULLANILDI: yerel")
+
+    def test_baglanti_dizesinde_kimlik_bilgisi_varsa_uyarir_degeri_yazmaz(self):
+        self.ucluyu_yaz(0)
+        s = self.calistir(hedef=":sftp,host=203.0.113.9,user=u,pass=GIZLIPAROLA123:yol", SAHTE_REMOTELAR="")
+        self.assertIn("kimlik bilgisi", s.stdout)
+        self.assertIn("rclone config", s.stdout)
+        self.assertNotIn("GIZLIPAROLA123", s.stdout + s.stderr)
+        s = self.calistir(hedef="b2:kova")
+        self.assertNotIn("kimlik bilgisi", s.stdout)
 
     def test_rclone_config_show_ciktisi_gizli_deger_olarak_yazilmaz(self):
         # config show gizli değer içerebilir; betik onu ayrıştırır ama asla yazmaz.
@@ -399,7 +481,7 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
     @unittest.skipUnless(os.environ.get("QR_TEST_RCLONE") or shutil.which("rclone"), "gerçek rclone yok")
     def test_gercek_rclone_crypt_hedefi_ozetsiz_yolu_download_ile_dogrular(self):
         """Gerçek rclone: crypt uzak ortak özet sunmaz -> uyarı + otomatik --download. (crypt yerel klasöre yazar,
-        bu yüzden yalnızca bu deneme için YEDEK_YEREL_HEDEF_IZIN=1 verilir.)"""
+        bu yüzden yalnızca bu deneme için YEDEK_YEREL_HEDEF_IZIN=sifreli verilir; değer hedef adıyla birebir aynı olmalıdır.)"""
         rclone = os.environ.get("QR_TEST_RCLONE") or shutil.which("rclone")
         gizli = subprocess.run([rclone, "obscure", "deneme-parolasi"], capture_output=True, text=True).stdout.strip()
         self.ucluyu_yaz(0)
@@ -407,7 +489,7 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
         uzak = self.kok / "crypt-hedef"
         uzak.mkdir()
         yapilandirma.write_text(f"[sifreli]\ntype = crypt\nremote = {uzak}\npassword = {gizli}\n")   # ayar dosyası tek kaynak
-        ortam = {"RCLONE_KOMUTU": rclone, "RCLONE_CONFIG": str(yapilandirma), "YEDEK_YEREL_HEDEF_IZIN": "1"}
+        ortam = {"RCLONE_KOMUTU": rclone, "RCLONE_CONFIG": str(yapilandirma), "YEDEK_YEREL_HEDEF_IZIN": "sifreli"}
         s = self.calistir(hedef="sifreli:", **ortam)
         self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
         self.assertIn("özet yok sayıldı", s.stdout)   # features sorgusu: crypt ortak özet sunmaz
@@ -706,7 +788,7 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
         self.assertFalse(any("--download" in c for c in cagri.read_text().splitlines()), "yerel hedefte ağır indirme yapılmamalı")
         cagri.write_text("")
         # 2) deneme izniyle: özetsiz sftp, günlük bastırılmış olsa da silme YALNIZ --download ile
-        s = self.calistir(hedef="sfn:", YEDEK_YEREL_HEDEF_IZIN="1", **ortam)
+        s = self.calistir(hedef="sfn:", YEDEK_YEREL_HEDEF_IZIN="sfn", **ortam)
         self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
         checks = [c for c in cagri.read_text().splitlines() if c.startswith("check ")]
         self.assertTrue(checks and all("--download" in c for c in checks), checks)
@@ -1021,8 +1103,8 @@ case "$*" in
     mnt=""; mod=""
     for a in "$@"; do
       case "$a" in
-        *:/cikti) mnt="${a%:/cikti}"; mod=uret ;;
-        *:/anahtar/yedek-anahtari.txt:ro) mnt="${a%:/anahtar/yedek-anahtari.txt:ro}"; mod=turet ;;
+        type=bind,*,dst=/cikti) m="${a#type=bind,}"; m="${m%,dst=*}"; m="${m#\"}"; m="${m%\"}"; mnt="${m#src=}"; mod=uret ;;
+        type=bind,*,dst=/anahtar/yedek-anahtari.txt,readonly) m="${a#type=bind,}"; m="${m%,dst=*}"; m="${m#\"}"; m="${m%\"}"; mnt="${m#src=}"; mod=turet ;;
       esac
     done
     if [ "$mod" = uret ]; then
@@ -1040,8 +1122,8 @@ case "$*" in
 esac
 for a in "$@"; do
   case "$a" in
-    *:/anahtar/yedek-anahtari.txt:ro)
-      k="${a%%:/anahtar/yedek-anahtari.txt:ro}"
+    type=bind,*,dst=/anahtar/yedek-anahtari.txt,readonly)
+      k="${a#type=bind,}"; k="${k%,dst=*}"; k="${k#\"}"; k="${k%\"}"; k="${k#src=}"
       printf '%s %s %s\n' "$k" "$(stat -c %a "$k")" "$(grep -c '^AGE-SECRET-KEY-1' "$k")" >> "${SAHTE_PROBE:-/dev/null}" ;;
   esac
 done
@@ -1290,7 +1372,7 @@ class AnahtarUretimiVeSilmeTesti(AnahtarTestTabani):
             self.assertIn("--network none", c)
         uretim = [c for c in keygen if " -o /cikti/anahtar.txt" in c]
         self.assertEqual(len(uretim), 1, keygen)
-        self.assertRegex(uretim[0], r"-v (/dev/shm|/run/user/\d+)/qr-yedek-uretim\.[A-Za-z0-9]+:/cikti ")   # tmpfs bind-mount
+        self.assertRegex(uretim[0], r"--mount type=bind,src=(/dev/shm|/run/user/\d+)/qr-yedek-uretim\.[A-Za-z0-9]+,dst=/cikti ")   # tmpfs bind-mount
         self.assertTrue(any(" -y " in c for c in keygen))
         self.assertNotIn("AGE-SECRET-KEY", "\n".join(self.docker_cagrilari()))
         self.assertEqual(self.tmpfs_artigi(), [], "tmpfs üretim dizini temizlenmeli")
@@ -1639,3 +1721,151 @@ class PanelYedekUyarisiTesti(TemelTest):
             d = yedek_durumu()
         self.assertIsNone(d["yerel_sayi"])
         self.assertTrue(d["uzak_uyari"])
+
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Baş Denetmen ORTA-1/ORTA-2 + DÜŞÜK: xtrace sızıntısı, diskte silme uyarısı, atomik kayıt, --mount
+# ---------------------------------------------------------------------------------------------------------------
+class AnahtarXtraceSizintisiTesti(AnahtarTestTabani):
+    """`bash -x` / `-xv` / BASH_XTRACEFD altında anahtar değeri stderr'e, stdout'a ve izleme dosyasına sızmamalı."""
+
+    def x_ile(self, betik, bayraklar, yanitlar, *argumanlar, xtrace_dosyasi=None):
+        env = self.ortam()
+        yol = str(self.kok / "scripts" / betik)
+        if xtrace_dosyasi:
+            komut = ["bash", "-c", 'exec 5>"$0"; BASH_XTRACEFD=5 bash "$@"', str(xtrace_dosyasi), *bayraklar, yol, *argumanlar]
+        else:
+            komut = ["bash", *bayraklar, yol, *argumanlar]
+        return pty_ile_calistir(komut, env, self.kok, list(yanitlar))
+
+    def test_yedek_anahtari_hazirla_evet_ve_geri_yapistirma_bash_x_altinda_sizdirmaz(self):
+        for bayraklar in (["-x"], ["-xv"]):
+            with self.subTest(bayraklar=bayraklar):
+                (self.kok / ".env").unlink(missing_ok=True)
+                self.env_yaz(alici=False)
+                kod, cikti, hata, terminal = self.x_ile("yedek-anahtari-hazirla.sh", bayraklar,
+                                                        [("(EVET): ", "EVET\n"), ("(görünmez): ", SAHTE_ANAHTAR + "\n")])
+                self.assertEqual(kod, 0, hata + cikti)
+                self.assertIn("+ ", hata, "xtrace gerçekten açıktı (test anlamlılığı)")
+                self.assertNotIn(SAHTE_ANAHTAR, cikti)
+                self.assertNotIn(SAHTE_ANAHTAR, hata)
+                self.assertNotIn("AGE-SECRET-KEY-1" + "Q" * 10, hata + cikti)
+                self.assertFalse(self.anahtar.exists())
+
+    def test_uyusmayan_yapistirma_ve_basic_xtracefd_sizdirmaz(self):
+        self.env_yaz(alici=False)
+        xt = self.kok / "xtrace.log"
+        yanlis = "AGE-SECRET-KEY-1" + "Z" * 58
+        kod, cikti, hata, terminal = self.x_ile("yedek-anahtari-hazirla.sh", ["-x"],
+                                                [("(EVET): ", "EVET\n"), ("(görünmez): ", yanlis + "\n")], xtrace_dosyasi=xt)
+        self.assertEqual(kod, 0, hata + cikti)
+        izleme = xt.read_text()
+        self.assertGreater(len(izleme), 200, "BASH_XTRACEFD dosyasına izleme yazılmış olmalı")
+        for gizli in (SAHTE_ANAHTAR, yanlis):
+            for metin in (cikti, hata, izleme):
+                self.assertNotIn(gizli, metin)
+        # Çıkış tuzağı anahtarı gizli/ altına kaydeder; yarım kalan geçici dosya bırakmaz.
+        self.assertTrue(self.anahtar.exists())
+        self.assertEqual(oct(self.anahtar.stat().st_mode & 0o777), "0o600")
+        self.assertEqual(list(self.anahtar.parent.glob(".yedek-anahtari.*")), [])
+
+    def test_geri_yukleme_testi_gizli_giris_bash_x_altinda_sizdirmaz(self):
+        self.env_yaz(alici=True)
+        zaman = "20261015-031500"
+        db, sha = f"db-{zaman}.dump.age", f"sha256-{zaman}.txt"
+        (self.yedekler / db).write_bytes(b"age-encryption.org/v1\nsahte")
+        (self.yedekler / sha).write_text(subprocess.run(["sha256sum", db], cwd=self.yedekler, capture_output=True, text=True).stdout)
+        for bayraklar in (["-x"], ["-xv"]):
+            with self.subTest(bayraklar=bayraklar):
+                xt = self.kok / "xtrace2.log"
+                kod, cikti, hata, terminal = self.x_ile("geri-yukleme-testi.sh", bayraklar, [("Anahtar: ", SAHTE_ANAHTAR + "\n")], xtrace_dosyasi=xt)
+                self.assertEqual(kod, 0, hata + cikti)
+                self.assertIn("SONUÇ: GEÇTİ", cikti)
+                self.assertGreater(len(xt.read_text()), 200)
+                for metin in (cikti, hata, xt.read_text(), *(p.read_text() for p in self.yedekler.glob("geri-yukleme-testi-*.log"))):
+                    self.assertNotIn(SAHTE_ANAHTAR, metin)
+
+    def test_xtrace_durumu_geri_yuklenir_ve_kapaliyken_acilmaz(self):
+        ortak = str(self.kok / "scripts" / "yedek-ortak.sh")
+        acik = subprocess.run(["bash", "-c", f'. "{ortak}"; set -x; ortak_gizli_basla; case $- in *x*) echo ICERDE_ACIK;; esac; ortak_gizli_bitir; case $- in *x*) echo DISARDA_ACIK;; esac'],
+                              capture_output=True, text=True)
+        self.assertNotIn("ICERDE_ACIK", acik.stdout)
+        self.assertIn("DISARDA_ACIK", acik.stdout)
+        kapali = subprocess.run(["bash", "-c", f'. "{ortak}"; ortak_gizli_basla; ortak_gizli_bitir; case $- in *x*) echo ACIK;; esac'], capture_output=True, text=True)
+        self.assertNotIn("ACIK", kapali.stdout)
+
+
+class AnahtarKayitVeMountTesti(AnahtarTestTabani):
+    def fonksiyon_calistir(self, kod):
+        betik = (self.kok / "scripts" / "yedek-anahtari-hazirla.sh").read_text()
+        import re as _re
+        fn = _re.search(r"^anahtari_kalici_kaydet\(\) \{.*?^\}\n", betik, _re.S | _re.M).group(0)
+        (self.kok / "gizli").mkdir(exist_ok=True)
+        tmp = self.kok / "tmpfs-kopya.txt"
+        tmp.write_text(SAHTE_ANAHTAR + "\n")
+        r = subprocess.run(["bash", "-c", f'cd "{self.kok}"; ANAHTAR=gizli/yedek-anahtari.txt; TMP_ANAHTAR="{tmp}"; KALICI_YOL=""\n{fn}\n{kod}'],
+                           capture_output=True, text=True)
+        return r, tmp
+
+    def test_kayit_atomik_600_ve_gecici_dosya_birakmaz(self):
+        r, tmp = self.fonksiyon_calistir('anahtari_kalici_kaydet; echo "kod=$? yol=$KALICI_YOL"')
+        self.assertIn("kod=0 yol=gizli/yedek-anahtari.txt", r.stdout, r.stderr)
+        hedef = self.kok / "gizli" / "yedek-anahtari.txt"
+        self.assertEqual(hedef.read_text(), SAHTE_ANAHTAR + "\n")
+        self.assertEqual(oct(hedef.stat().st_mode & 0o777), "0o600")
+        self.assertEqual([p.name for p in (self.kok / "gizli").iterdir()], ["yedek-anahtari.txt"], "geçici dosya kalmamalı")
+        self.assertTrue(tmp.exists())
+
+    def test_yaris_hedef_aradan_olusursa_ezilmez_hata_verir_tmpfs_kopyasi_kalir(self):
+        # ln'yi taklit ederek "kontrolden sonra başkası hedefi oluşturdu" yarışını yaratır.
+        r, tmp = self.fonksiyon_calistir('ln() { printf BASKASI > "${@: -1}"; return 1; }\nanahtari_kalici_kaydet; echo "kod=$?"')
+        self.assertIn("kod=1", r.stdout, r.stderr)
+        self.assertEqual((self.kok / "gizli" / "yedek-anahtari.txt").read_text(), "BASKASI", "var olan dosya ezilmemeli")
+        self.assertTrue(tmp.exists(), "tmpfs kopyası silinmemeli")
+        self.assertEqual([p.name for p in (self.kok / "gizli").iterdir()], ["yedek-anahtari.txt"], "geçici dosya kalmamalı")
+
+    def test_ortak_mount_iki_nokta_ve_virgul_icin_dogru_dize_uretir_tirnagi_reddeder(self):
+        ortak = str(self.kok / "scripts" / "yedek-ortak.sh")
+        r = subprocess.run(["bash", "-c", f'. "{ortak}"; ortak_mount "/a:b" /x ro; echo; ortak_mount "/a,b" /y; echo; ortak_mount \'/a"b\' /z; echo "kod=$?"'],
+                           capture_output=True, text=True)
+        satirlar = r.stdout.splitlines()
+        self.assertEqual(satirlar[0], "type=bind,src=/a:b,dst=/x,readonly")
+        self.assertEqual(satirlar[1], 'type=bind,"src=/a,b",dst=/y')
+        self.assertIn("kod=1", r.stdout)
+
+    def test_docker_cagrilarinda_v_degil_mount_kullanilir_iki_nokta_iceren_yol_calisir(self):
+        yol = self.kok / "yol:iki,nokta"
+        yol.mkdir()
+        (yol / "anahtar.txt").write_text(SAHTE_ANAHTAR + "\n")
+        self.env_yaz(alici=True)
+        shutil.copy(self.kok / "scripts" / "yedek-ortak.sh", yol / "x.sh")
+        r = subprocess.run(["bash", "-c", f'. "{self.kok}/scripts/yedek-ortak.sh"; cd "{self.kok}"; ORTAK_YEDEK=1; ortak_imaj_var_mi || true; '
+                            f'ortak_coz "{yol}/anahtar.txt" "{yol}" db-20260101-010101.dump.age'],
+                           capture_output=True, text=True, env=self.ortam())
+        cagri = "\n".join(self.docker_cagrilari())
+        self.assertIn("--mount", cagri)
+        self.assertNotRegex(cagri, r"(^| )-v ")
+        self.assertIn('"src=' + str(yol / "anahtar.txt") + '"', cagri)
+
+
+class DiskteSilmeUyarisiTesti(AnahtarTestTabani):
+    def test_goster_ve_kaldir_silmeden_once_ve_sonra_diskte_kurtarilabilir_uyarisi_basar(self):
+        self.anahtar.parent.mkdir()
+        self.anahtar.write_text(f"# public key: {SAHTE_ACIK}\n{SAHTE_ANAHTAR}\n")
+        self.env_yaz(alici=True)
+        kod, cikti, hata, terminal = self.tty_li("yedek-anahtari-hazirla.sh", "--goster-ve-kaldir",
+                                                 yanitlar=[("(EVET): ", "EVET\n"), ("(görünmez): ", SAHTE_ANAHTAR + "\n")])
+        self.assertEqual(kod, 0, hata + cikti)
+        self.assertFalse(self.anahtar.exists())
+        self.assertEqual(cikti.count("ANAHTAR ZATEN KALICI DİSKE YAZILMIŞTIR"), 2, "silmeden ÖNCE ve SONRA uyarı")
+        self.assertLess(cikti.index("ZATEN KALICI DİSKE"), cikti.index("SİLİNDİ"))
+        for parca in ("SSD", "btrfs/ZFS", "LVM", "kurtarılabilir", "EVET ile anahtarı hiç diske yazmamaktır", "yeniden şifrelemek"):
+            self.assertIn(parca, cikti)
+        self.assertNotIn(SAHTE_ANAHTAR, cikti + hata)
+
+    def test_ana_akis_tmpfs_uyari_basmaz(self):
+        self.env_yaz(alici=False)
+        kod, cikti, hata, terminal = self.tty_li("yedek-anahtari-hazirla.sh", yanitlar=[("(EVET): ", "EVET\n"), ("(görünmez): ", SAHTE_ANAHTAR + "\n")])
+        self.assertEqual(kod, 0, hata + cikti)
+        self.assertNotIn("ZATEN KALICI DİSKE", cikti)

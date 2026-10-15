@@ -36,6 +36,22 @@ grep -qE "^[[:space:]]*(export[[:space:]]+)?YEDEK_ALICI=[\"']?age1" .env 2>/dev/
 
 mkdir -p gizli && chmod 700 gizli
 
+# --goster-ve-kaldir modunda anahtar ZATEN diskte olduğundan silme güvenceli değildir (yalnızca uyarı; otomatik işlem yok).
+diskte_silme_uyarisi() {
+  cat <<'UYARI'
+
+------------------------------------------------------------------------------------
+ DİKKAT: BU MODDA ANAHTAR ZATEN KALICI DİSKE YAZILMIŞTIR.
+ `shred`/`rm`; SSD (aşınma dengeleme), ext4 günlüğü, btrfs/ZFS (yazarken kopyala, anlık görüntü),
+ LVM anlık görüntüsü, RAID, yedeklenen disk/VM görüntüsü gibi katmanlarda eski kopyanın silindiğini
+ GARANTİ ETMEZ; diskteki eski kopya kurtarılabilir olabilir.
+ En güvenlisi: kurulumda EVET ile anahtarı hiç diske yazmamaktır (bu yol tmpfs kullanır).
+ Seçenekler (bu betik bunları KENDİLİĞİNDEN YAPMAZ): disk/birim şifrelemesi kullanmak; ya da yeni anahtar çifti üretip
+ eski yedekleri yeni anahtarla yeniden şifrelemek ve eski anahtarı güvenli kabul etmemek.
+------------------------------------------------------------------------------------
+UYARI
+}
+
 sunucuda_uyari() {
   cat <<'UYARI'
 
@@ -83,6 +99,7 @@ anahtari_goster_ve_sor() {
   # Tek bir EVET ile geri dönüşsüz kayıp olmasın: silmeden önce kopyalanan anahtarın geri yapıştırılması
   # ve dosyadakiyle birebir aynı olması istenir (gizli giriş, ekrana yansımaz, hiçbir yere yazılmaz).
   local yapistirilan="" beklenen=""
+  ortak_gizli_basla   # anahtar değeri değişkenlerde: xtrace/verbose kapalı (bash -x altında sızmasın)
   if [ "$onay" = "EVET" ]; then
     beklenen=$(grep -m1 -E '^AGE-SECRET-KEY-1[A-Z0-9]+$' "$dosya" || true)
     stty -echo <&7 2>/dev/null || true   # yankı, istem basılmadan ÖNCE kapatılır; INT/TERM'de ortak_yankiyi_ac geri açar
@@ -96,6 +113,7 @@ anahtari_goster_ve_sor() {
     fi
   fi
   yapistirilan=""; beklenen=""
+  ortak_gizli_bitir
   exec 7>&- 7<&-
   case "$onay" in
     EVET)     KARAR="onay" ;;
@@ -109,10 +127,11 @@ anahtari_goster_ve_sor() {
 # Dosyadaki özel anahtardan açık anahtarı türetir ($1 = göreli/mutlak dosya yolu); yalnızca açık anahtar yazdırır.
 # --log-driver none: özel anahtar bir şekilde konteyner çıktısına düşse bile günlük sürücüsüne gitmez.
 acik_anahtar_turet() {
-  local yol="$1"
+  local yol="$1" m
   case "$yol" in /*) ;; *) yol="$(pwd)/$yol" ;; esac
+  m=$(ortak_mount "$yol" /anahtar/yedek-anahtari.txt ro) || return 1
   docker run --rm --log-driver none --network none --cap-drop ALL --user "$(id -u):$(id -g)" --entrypoint age-keygen \
-    -v "$yol":/anahtar/yedek-anahtari.txt:ro "$YEDEK_IMAJI" -y /anahtar/yedek-anahtari.txt
+    --mount "$m" "$YEDEK_IMAJI" -y /anahtar/yedek-anahtari.txt
 }
 
 # Özel anahtarı (tmpfs) kalıcı olarak gizli/yedek-anahtari.txt'ye taşır (700 dizin, 600 dosya). Var olan dosyanın üzerine
@@ -124,14 +143,28 @@ TMPD=""; TMP_ANAHTAR=""; ANAHTAR_KULLANICIDA=0; KALICI_YOL=""
 ANAHTAR_GOSTERILDI=0
 anahtari_kalici_kaydet() {
   [ -n "$TMP_ANAHTAR" ] && [ -f "$TMP_ANAHTAR" ] || return 0
-  local hedef="$ANAHTAR"
+  local hedef="$ANAHTAR" gecici
   ( umask 077; mkdir -p gizli ) && chmod 700 gizli || return 1
-  if [ -e "$hedef" ]; then
+  if [ -e "$hedef" ] || [ -L "$hedef" ]; then
     cmp -s "$TMP_ANAHTAR" "$hedef" && { KALICI_YOL="$hedef"; return 0; }
     hedef="gizli/yedek-anahtari-$(date +%Y%m%d-%H%M%S).txt"
   fi
-  ( umask 077; cp -- "$TMP_ANAHTAR" "$hedef.tmp" ) && chmod 600 "$hedef.tmp" && cmp -s "$TMP_ANAHTAR" "$hedef.tmp" \
-    && mv -- "$hedef.tmp" "$hedef" || { rm -f -- "$hedef.tmp"; return 1; }
+  # ATOMİK ve ÜZERİNE YAZMAYAN kayıt: aynı dizinde 600 izinli geçici dosya (mktemp), içerik doğrulanır, sonra `ln` ile hedefe
+  # bağlanır (hedef varsa ln BAŞARISIZ olur; yarış durumunda başkasının dosyası ezilmez). Hedef zaten varsa hata verilir ve
+  # tmpfs kopyası SİLİNMEZ (çağıran silmez). Bağlantı desteklenmeyen dosya sisteminde `mv -n` yedek yoludur.
+  gecici=$(umask 077; mktemp "gizli/.yedek-anahtari.XXXXXX") || return 1
+  if ! { chmod 600 "$gecici" && cat -- "$TMP_ANAHTAR" > "$gecici" && cmp -s "$TMP_ANAHTAR" "$gecici"; }; then rm -f -- "$gecici"; return 1; fi
+  if [ -e "$hedef" ] || [ -L "$hedef" ]; then rm -f -- "$gecici"; echo "HATA: $hedef zaten var; üzerine YAZILMADI." >&2; return 1; fi
+  if ln -- "$gecici" "$hedef" 2>/dev/null; then
+    rm -f -- "$gecici"
+  elif [ ! -e "$hedef" ] && [ ! -L "$hedef" ]; then
+    mv -n -- "$gecici" "$hedef" 2>/dev/null || true
+    [ ! -e "$gecici" ] || { rm -f -- "$gecici"; return 1; }
+  else
+    rm -f -- "$gecici"; echo "HATA: $hedef aynı anda oluşturulmuş; üzerine YAZILMADI." >&2; return 1
+  fi
+  cmp -s "$TMP_ANAHTAR" "$hedef" || return 1
+  chmod 600 "$hedef"
   KALICI_YOL="$hedef"
 }
 # Her çıkışta (hata, Ctrl-C, TERM, normal): tmpfs dosyası temizlenir AMA anahtar kaybolmaz: kullanıcı onay verip
@@ -183,6 +216,7 @@ if [ "$MOD" = "goster" ]; then
   anahtari_goster_ve_sor "$ANAHTAR"
   case "$KARAR" in
     onay)
+      diskte_silme_uyarisi
       shred -n 1 -u -- "$ANAHTAR" 2>/dev/null || true
       rm -f -- "$ANAHTAR"
       if [ -e "$ANAHTAR" ]; then
@@ -191,6 +225,8 @@ if [ "$MOD" = "goster" ]; then
       else
         echo "Özel anahtar dosyası sunucudan SİLİNDİ (kullanıcı onayıyla). Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi."
         echo "Geri yükleme testi ve geri yükleme sırasında anahtar sizden istenecek (parola yöneticisinden yapıştırırsınız)."
+        echo "UYARI: dosya silindi ama diskteki eski kopya (SSD/günlük/anlık görüntü) kurtarılabilir olabilir; sunucu ele geçirilirse bunu varsayın."
+        diskte_silme_uyarisi
       fi ;;
     uyusmadi)
       echo "Anahtarı yeniden kopyalayıp şu komutla tekrar deneyin: bash scripts/yedek-anahtari-hazirla.sh --goster-ve-kaldir"
@@ -232,8 +268,10 @@ TMPFS=$(ortak_tmpfs_dizini) || { echo "HATA: bellek dosya sistemi (tmpfs) buluna
 TMPD=$(umask 077; mktemp -d "$TMPFS/qr-yedek-uretim.XXXXXX")   # EXIT/INT/TERM/HUP tuzağı bunu hemen kapsar (aşağıda)
 # Anahtar stdout'a YAZDIRILMAZ (docker günlük sürücüsü/journald'e düşerdi): konteyner onu bind-mount edilmiş tmpfs
 # dizinine -o ile yazar; --log-driver none ile konteyner çıktısı hiçbir sürücüye gitmez.
+# Bind-mount yolu ":" / "," içerse de bozulmaması için --mount kullanılır; yol güvenle ifade edilemezse anahtar ÜRETİLMEDEN durulur.
+M_CIKTI=$(ortak_mount "$TMPD" /cikti) || { echo "HATA: tmpfs dizin yolu docker'a bağlanamıyor; anahtar üretilmedi (henüz bir şey kaybolmadı)."; exit 1; }
 if ! URETIM_HATA=$(docker run --rm --log-driver none --network none --cap-drop ALL --security-opt no-new-privileges:true \
-      --user "$(id -u):$(id -g)" --entrypoint age-keygen -v "$TMPD":/cikti "$YEDEK_IMAJI" -o /cikti/anahtar.txt 2>&1 >/dev/null); then
+      --user "$(id -u):$(id -g)" --entrypoint age-keygen --mount "$M_CIKTI" "$YEDEK_IMAJI" -o /cikti/anahtar.txt 2>&1 >/dev/null); then
   echo "HATA: anahtar üretilemedi: ${URETIM_HATA:-bilinmeyen hata}"; exit 1
 fi
 TMP_ANAHTAR="$TMPD/anahtar.txt"

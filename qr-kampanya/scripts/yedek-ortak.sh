@@ -19,6 +19,16 @@ ortak_zaman() {
   return 0
 }
 
+# docker bind-mount argümanı. "-v YOL:/x" YOL içinde ":" varsa bozulur; bu yüzden --mount type=bind kullanılır (değer CSV'dir:
+# "," içeren kaynak yolu çift tırnaklı alan olarak verilir). Yolda çift tırnak/yeni satır varsa güvenle ifade edilemez -> 1 döner.
+# Kullanım: m=$(ortak_mount KAYNAK HEDEF [ro]) || { hata; return 1; }   çağrı: docker run --mount "$m" ...
+ortak_mount() {
+  local src="$1" dst="$2" ro="${3:-}" alan
+  case "$src$dst" in *'"'*|*$'\n'*) echo "HATA: yolda çift tırnak veya yeni satır var; güvenle bağlanamaz: $src" >&2; return 1 ;; esac
+  case "$src" in *,*) alan="\"src=$src\"" ;; *) alan="src=$src" ;; esac
+  printf 'type=bind,%s,dst=%s%s' "$alan" "$dst" "${ro:+,readonly}"
+}
+
 # Yedek imajı yoksa anlaşılır hata verir.
 ortak_imaj_var_mi() {
   docker image inspect "$YEDEK_IMAJI" >/dev/null 2>&1 \
@@ -62,8 +72,11 @@ ortak_sha256_dogrula() {
 # $1 = anahtar (mutlak yol), $2 = yedek dizini (mutlak yol), $3 = dosya adı
 ortak_coz() {
   ortak_ad_gecerli_mi "$3" || { echo "HATA: geçersiz yedek dosya adı reddedildi." >&2; return 1; }
+  local m1 m2
+  m1=$(ortak_mount "$1" /anahtar/yedek-anahtari.txt ro) || return 1
+  m2=$(ortak_mount "$2" /yedekler ro) || return 1
   docker run --rm --log-driver none --network none --cap-drop ALL --security-opt no-new-privileges:true \
-    -v "$1":/anahtar/yedek-anahtari.txt:ro -v "$2":/yedekler:ro \
+    --mount "$m1" --mount "$m2" \
     --entrypoint age "$YEDEK_IMAJI" -d -i /anahtar/yedek-anahtari.txt "/yedekler/$3"
 }
 
@@ -71,6 +84,33 @@ ortak_coz() {
 # Özel anahtar yönetimi (anahtar sunucudan kaldırılmış olabilir).
 # Özel anahtarın içeriği ekrana, günlüğe, komut satırına veya ortam değişkenine yazılmaz.
 # ---------------------------------------------------------------------------------------------------------
+
+# xtrace/verbose koruması: anahtar değerinin değişkende/komutta göründüğü bölümler ortak_gizli_basla ... ortak_gizli_bitir
+# arasına alınır. `bash -x`, `set -x`, `set -v`, SHELLOPTS=xtrace ve BASH_XTRACEFD altında anahtar izlenmez. `set +x` satırının
+# kendisi de izlenmesin diye { set +x; } 2>/dev/null kullanılır. Önceki durum geri yüklenir. İç içe çağrıda ilk durum korunur.
+ORTAK_XT=0; ORTAK_V=0; ORTAK_GIZLI_DERIN=0
+ortak_gizli_basla() {
+  { 
+    if [ "$ORTAK_GIZLI_DERIN" = "0" ]; then
+      case $- in *x*) ORTAK_XT=1 ;; *) ORTAK_XT=0 ;; esac
+      case $- in *v*) ORTAK_V=1 ;; *) ORTAK_V=0 ;; esac
+    fi
+    ORTAK_GIZLI_DERIN=$((ORTAK_GIZLI_DERIN + 1))
+    set +x +v
+  } 2>/dev/null
+  return 0
+}
+ortak_gizli_bitir() {
+  { 
+    ORTAK_GIZLI_DERIN=$((ORTAK_GIZLI_DERIN - 1))
+    if [ "$ORTAK_GIZLI_DERIN" -le 0 ]; then
+      ORTAK_GIZLI_DERIN=0
+      [ "$ORTAK_V" = "1" ] && set -v
+      [ "$ORTAK_XT" = "1" ] && set -x
+    fi
+  } 2>/dev/null
+  return 0
+}
 
 # Etkileşimli bir terminal (/dev/tty) var mı? (cron, ssh -T, boru hattı vb. durumlarda yoktur)
 ortak_tty_var_mi() { ( : </dev/tty ) 2>/dev/null && ( : >/dev/tty ) 2>/dev/null; }
@@ -129,6 +169,7 @@ ortak_anahtar_iste() {
   ortak_sinyal_tuzagi
   chmod 600 "$ORTAK_GECICI"
   local satir bulundu=0 n=0
+  ortak_gizli_basla   # anahtar değeri satir değişkeninde: xtrace/verbose kapalı
   exec 8<>/dev/tty
   ortak_stty_kaydet
   stty -echo <&8 2>/dev/null || true   # yankı, istem basılmadan ÖNCE kapatılır (hızlı yapıştırma yankılanmasın)
@@ -144,6 +185,7 @@ ortak_anahtar_iste() {
   printf '\n' >&8
   exec 8>&- 8<&-
   satir=""
+  ortak_gizli_bitir
   [ "$bulundu" = "1" ] || { ortak_gecici_temizle; echo "HATA: geçerli bir özel anahtar girilmedi." >&2; return 1; }
   ANAHTAR="$ORTAK_GECICI"
 }

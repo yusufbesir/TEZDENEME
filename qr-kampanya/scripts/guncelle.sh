@@ -130,4 +130,10 @@ if [ "$TAMAM" = "1" ]; then sleep 4; caddy_saglam_mi || TAMAM=0; fi
 [ "$TAMAM" = "1" ] || { echo "HATA: Caddy güncel Caddyfile ile kararlı çalışır durumda doğrulanamadı (durum/RestartCount/Caddyfile özeti)."; exit 1; }
 echo "Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0)."
 trap - EXIT
+# Mevcut kurulumlarda .env OTOMATİK DEĞİŞTİRİLMEZ (onay kullanıcıya aittir): yalnızca bilgi verilir.
+if grep -qE '^[[:space:]]*(export[[:space:]]+)?YEDEK_UZAK_HEDEF=' .env 2>/dev/null \
+   && ! grep -qE '^[[:space:]]*(export[[:space:]]+)?YEDEK_UZAK_ONAYLI_HEDEF=.' .env 2>/dev/null; then
+  echo "BİLGİ: .env içinde YEDEK_UZAK_HEDEF var ama YEDEK_UZAK_ONAYLI_HEDEF yok: sunucu dışı kopya doğrulansa bile eski yerel yedekler SİLİNMEZ."
+  echo "       Hedef gerçekten başka bir makinede/bulutta ise onaylamak için .env'e elle ekleyin: YEDEK_UZAK_ONAYLI_HEDEF=<YEDEK_UZAK_HEDEF'in ':' öncesi adı> (bu betik eklemez)."
+fi
 echo "Güncelleme tamamlandı."
