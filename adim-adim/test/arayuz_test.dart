@@ -24,10 +24,11 @@ class SahteBildirim implements BildirimServisi {
   final cagrilar = <String>[];
   bool izin = true;
   @override
-  Future<bool> gunlukHatirlatma(String saat) async {
+  Future<bool> gunlukHatirlatma(String saat, {bool izinIste = true}) async {
     cagrilar.add('kur:$saat');
     return izin;
   }
+
   @override
   Future<void> iptal() async => cagrilar.add('iptal');
 }
@@ -43,18 +44,22 @@ Future<ProviderContainer> uygulamayiAc(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  await tester.pumpWidget(ProviderScope(
-    overrides: [
-      depoProvider.overrideWithValue(depo),
-      kurslarProvider.overrideWithValue([sahteKurs]),
-      bugunProvider.overrideWithValue('2026-10-15'),
-      sesProvider.overrideWithValue(ses ?? SahteSes()),
-      bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
-    ],
-    child: const AdimAdimUygulama(),
-  ));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        depoProvider.overrideWithValue(depo),
+        kurslarProvider.overrideWithValue([sahteKurs]),
+        bugunProvider.overrideWithValue('2026-10-15'),
+        sesProvider.overrideWithValue(ses ?? SahteSes()),
+        bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
+      ],
+      child: const AdimAdimUygulama(),
+    ),
+  );
   await tester.pumpAndSettle();
-  return ProviderScope.containerOf(tester.element(find.byType(AdimAdimUygulama)));
+  return ProviderScope.containerOf(
+    tester.element(find.byType(AdimAdimUygulama)),
+  );
 }
 
 Future<void> dokun(WidgetTester tester, Finder f) async {
@@ -70,7 +75,9 @@ Future<void> kontrolEtDogru(WidgetTester tester, {bool son = false}) async {
 }
 
 void main() {
-  testWidgets('ders akışı: doğru cevaplar -> geri bildirim -> özet', (tester) async {
+  testWidgets('ders akışı: doğru cevaplar -> geri bildirim -> özet', (
+    tester,
+  ) async {
     final depo = BellekDepo();
     final ses = SahteSes();
     final kap = await uygulamayiAc(tester, depo, ses: ses);
@@ -126,7 +133,9 @@ void main() {
     expect(find.textContaining('Tamamlandı'), findsOneWidget);
   });
 
-  testWidgets('yanlış cevap: hata bandı, doğru cevap ve açıklama gösterilir', (tester) async {
+  testWidgets('yanlış cevap: hata bandı, doğru cevap ve açıklama gösterilir', (
+    tester,
+  ) async {
     final depo = BellekDepo();
     await uygulamayiAc(tester, depo);
     await dokun(tester, find.textContaining('Ders Bir'));
@@ -137,15 +146,20 @@ void main() {
     expect(find.byIcon(Icons.cancel), findsWidgets);
   });
 
-  testWidgets('ayar değişikliği kalıcı olur ve sıfırlama onay ister', (tester) async {
+  testWidgets('ayar değişikliği kalıcı olur ve sıfırlama onay ister', (
+    tester,
+  ) async {
     final depo = BellekDepo();
     final bildirim = SahteBildirim();
     await uygulamayiAc(tester, depo, bildirim: bildirim);
 
     await dokun(
-        tester,
-        find.descendant(
-            of: find.byType(NavigationBar), matching: find.text('Ayarlar')));
+      tester,
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Ayarlar'),
+      ),
+    );
     await dokun(tester, find.text('Koyu'));
     expect((await depo.yukle()).koyuTema, true);
 
@@ -169,9 +183,10 @@ void main() {
     expect(sifir.sesAcik, true);
   });
 
-  testWidgets('geniş ekranda iki sütun: yol + profil kartı, yan ray', (tester) async {
-    await uygulamayiAc(tester, BellekDepo(),
-        boyut: const Size(1200, 900));
+  testWidgets('geniş ekranda iki sütun: yol + profil kartı, yan ray', (
+    tester,
+  ) async {
+    await uygulamayiAc(tester, BellekDepo(), boyut: const Size(1200, 900));
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.byType(ProfilKarti), findsOneWidget);
@@ -187,26 +202,32 @@ void main() {
 
   testWidgets('seri kopmuşsa ekranda 0 görünür', (tester) async {
     final depo = BellekDepo(
-        const OgrenciDurumu(xp: 50, seri: 5, enSeri: 5, sonGun: '2026-10-01'));
+      const OgrenciDurumu(xp: 50, seri: 5, enSeri: 5, sonGun: '2026-10-01'),
+    );
     await uygulamayiAc(tester, depo, boyut: const Size(1200, 900));
     expect(find.text('0 gün seri'), findsWidgets);
     expect(find.text('5 gün seri'), findsNothing);
   });
 
-  testWidgets('bildirim izni reddedilince anahtar kapanır ve uyarı çıkar',
-      (tester) async {
+  testWidgets('bildirim izni reddedilince anahtar kapanır ve uyarı çıkar', (
+    tester,
+  ) async {
     final depo = BellekDepo();
     final bildirim = SahteBildirim()..izin = false;
     await uygulamayiAc(tester, depo, bildirim: bildirim);
     await dokun(
-        tester,
-        find.descendant(
-            of: find.byType(NavigationBar), matching: find.text('Ayarlar')));
+      tester,
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Ayarlar'),
+      ),
+    );
     await dokun(tester, find.byType(SwitchListTile).last);
     expect(find.text('Bildirim izni verilmedi'), findsOneWidget);
     expect((await depo.yukle()).hatirlatmaSaati, isNull);
     expect(
-        tester.widget<SwitchListTile>(find.byType(SwitchListTile).last).value,
-        false);
+      tester.widget<SwitchListTile>(find.byType(SwitchListTile).last).value,
+      false,
+    );
   });
 }

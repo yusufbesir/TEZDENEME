@@ -19,6 +19,8 @@ flutter build apk           # Android
 ```
 Testler: `flutter analyze && flutter test`
 
+Yayın öncesi: Android release derlemesi şimdilik debug anahtarıyla imzalıdır (`android/app/build.gradle.kts`). Mağazaya ya da dağıtıma çıkmadan önce kendi imza anahtarınızı (`key.properties`) tanımlayın.
+
 ## Klasörler
 - `lib/model` içerik ve öğrenci durumu modelleri
 - `lib/motor` saf öğrenme motoru (Flutter'a bağımlı değil)

@@ -10,11 +10,10 @@ class SayfaGovdesi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints:
-              BoxConstraints(maxWidth: genislik ?? Olcu.icerikGenislik),
-          child: child,
-        ),
-      );
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: genislik ?? Olcu.icerikGenislik),
+      child: child,
+    ),
+  );
 }

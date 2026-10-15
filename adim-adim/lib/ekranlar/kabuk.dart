@@ -17,16 +17,21 @@ class Kabuk extends ConsumerWidget {
   const Kabuk({super.key, required this.kabuk});
   final StatefulNavigationShell kabuk;
 
-  void _git(int i) => kabuk.goBranch(i, initialLocation: i == kabuk.currentIndex);
+  void _git(int i) =>
+      kabuk.goBranch(i, initialLocation: i == kabuk.currentIndex);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Kayıt hatası başlayınca bir kez uyarır; hata geçince temizlenir.
     ref.listen<String?>(kayitHatasiProvider, (onceki, simdi) {
       if (simdi != null && onceki == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('İlerleme kaydedilemedi. Depolama alanını kontrol et.'),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'İlerleme kaydedilemedi. Depolama alanını kontrol et.',
+            ),
+          ),
+        );
       }
     });
     final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;

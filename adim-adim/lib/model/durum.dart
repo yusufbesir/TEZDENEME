@@ -170,8 +170,8 @@ class OgrenciDurumu {
       tamamlanan: sayac(j['tamamlanan'], (k) => !k.contains('#')),
       gunlukXp: sayac(j['gunlukXp'], gunGecerli),
       gunlukHedef: tamsayi(j['gunlukHedef'], 30, min: 10, max: 500),
-      ad: (j['ad'] is String && (j['ad'] as String).length <= 40)
-          ? j['ad'] as String
+      ad: j['ad'] is String
+          ? String.fromCharCodes((j['ad'] as String).runes.take(40))
           : '',
       koyuTema: j['koyuTema'] is bool ? j['koyuTema'] as bool : null,
       sesAcik: j['sesAcik'] is bool ? j['sesAcik'] as bool : true,

@@ -53,14 +53,18 @@ class _YazDurumu extends State<YazGorunumu> {
             labelText: 'Cevabını yaz',
             counterText: '',
             suffixIcon: kontrol
-                ? Icon(widget.dogruMu ? Icons.check_circle : Icons.cancel,
-                    color: widget.dogruMu ? r.dogru : r.hata)
+                ? Icon(
+                    widget.dogruMu ? Icons.check_circle : Icons.cancel,
+                    color: widget.dogruMu ? r.dogru : r.hata,
+                  )
                 : null,
             enabledBorder: kontrol
                 ? OutlineInputBorder(
                     borderRadius: BorderRadius.circular(Olcu.kose),
                     borderSide: BorderSide(
-                        color: widget.dogruMu ? r.dogru : r.hata, width: 2),
+                      color: widget.dogruMu ? r.dogru : r.hata,
+                      width: 2,
+                    ),
                   )
                 : null,
           ),

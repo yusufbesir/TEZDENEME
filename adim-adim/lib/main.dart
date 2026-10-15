@@ -17,10 +17,12 @@ Future<void> main() async {
     debugPrint('Dosya deposu açılamadı, bellek deposu kullanılıyor: $e');
     depo = BellekDepo();
   }
-  runApp(ProviderScope(
-    overrides: [depoProvider.overrideWithValue(depo)],
-    child: const AdimAdimUygulama(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [depoProvider.overrideWithValue(depo)],
+      child: const AdimAdimUygulama(),
+    ),
+  );
 }
 
 /// Yazı tipi lisanslarını (SIL OFL) uygulama lisans sayfasına ekler.

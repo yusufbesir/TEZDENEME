@@ -29,8 +29,9 @@ class KayitHatasi extends Notifier<String?> {
   void ayarla(String? mesaj) => state = mesaj;
 }
 
-final kayitHatasiProvider =
-    NotifierProvider<KayitHatasi, String?>(KayitHatasi.new);
+final kayitHatasiProvider = NotifierProvider<KayitHatasi, String?>(
+  KayitHatasi.new,
+);
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
 
@@ -70,7 +71,13 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     }
     final saat = d.hatirlatmaSaati;
     if (saat != null) {
-      unawaited(ref.read(bildirimProvider).gunlukHatirlatma(saat).catchError((_) => false));
+      // Açılışta yalnızca yeniden zamanla; izin penceresi açma (izin ayarlarda istenir).
+      unawaited(
+        ref
+            .read(bildirimProvider)
+            .gunlukHatirlatma(saat, izinIste: false)
+            .catchError((_) => false),
+      );
     }
     return d;
   }

@@ -67,8 +67,9 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
     }
 
     final sonuc = _sonuc;
-    final List<({String kartId, Alistirma alistirma})> bekleyen =
-        sonuc == null ? _bekleyenler() : const [];
+    final List<({String kartId, Alistirma alistirma})> bekleyen = sonuc == null
+        ? _bekleyenler()
+        : const [];
     return SafeArea(
       child: SayfaGovdesi(
         child: Padding(
@@ -77,8 +78,9 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Semantics(
-                  header: true,
-                  child: Text('Tekrar', style: yazi.headlineMedium)),
+                header: true,
+                child: Text('Tekrar', style: yazi.headlineMedium),
+              ),
               const SizedBox(height: Olcu.b3),
               Expanded(
                 child: Center(
@@ -97,24 +99,24 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                             }),
                           )
                         : bekleyen.isEmpty
-                            ? const _Mesaj(
-                                simge: Icons.task_alt,
-                                baslik: 'Bugün tekrar yok',
-                                metin:
-                                    'Ders çözdükçe tekrar kartların burada birikir.',
-                              )
-                            : _Mesaj(
-                                simge: Icons.replay,
-                                renk: r.ana,
-                                baslik: '${bekleyen.length} kart bekliyor',
-                                metin:
-                                    'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
-                                dugme: 'Tekrara başla',
-                                onTap: () => setState(() {
-                                  _oturum = bekleyen;
-                                  _sonuc = null;
-                                }),
-                              ),
+                        ? const _Mesaj(
+                            simge: Icons.task_alt,
+                            baslik: 'Bugün tekrar yok',
+                            metin:
+                                'Ders çözdükçe tekrar kartların burada birikir.',
+                          )
+                        : _Mesaj(
+                            simge: Icons.replay,
+                            renk: r.ana,
+                            baslik: '${bekleyen.length} kart bekliyor',
+                            metin:
+                                'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
+                            dugme: 'Tekrara başla',
+                            onTap: () => setState(() {
+                              _oturum = bekleyen;
+                              _sonuc = null;
+                            }),
+                          ),
                   ),
                 ),
               ),
@@ -153,9 +155,11 @@ class _Mesaj extends StatelessWidget {
         const SizedBox(height: Olcu.b2),
         Text(baslik, style: yazi.titleLarge, textAlign: TextAlign.center),
         const SizedBox(height: Olcu.b1),
-        Text(metin,
-            style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
-            textAlign: TextAlign.center),
+        Text(
+          metin,
+          style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+          textAlign: TextAlign.center,
+        ),
         if (dugme != null) ...[
           const SizedBox(height: Olcu.b3),
           FilledButton(onPressed: onTap, child: Text(dugme!)),

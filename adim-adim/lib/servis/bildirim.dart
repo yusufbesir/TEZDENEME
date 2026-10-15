@@ -7,7 +7,8 @@ import 'package:timezone/timezone.dart' as tz;
 /// Bildirim servisinin arayüzü (testte sahtesi sağlanır).
 abstract class BildirimServisi {
   /// İzin verilmez ya da kurulamazsa false döner.
-  Future<bool> gunlukHatirlatma(String saat);
+  /// [izinIste] false ise izin penceresi açılmaz; izin yoksa false döner.
+  Future<bool> gunlukHatirlatma(String saat, {bool izinIste = true});
   Future<void> iptal();
 }
 
@@ -15,7 +16,8 @@ abstract class BildirimServisi {
 class GercekBildirim implements BildirimServisi {
   const GercekBildirim();
   @override
-  Future<bool> gunlukHatirlatma(String saat) => Bildirim.gunlukHatirlatma(saat);
+  Future<bool> gunlukHatirlatma(String saat, {bool izinIste = true}) =>
+      Bildirim.gunlukHatirlatma(saat, izinIste: izinIste);
   @override
   Future<void> iptal() => Bildirim.iptal();
 }
@@ -54,22 +56,24 @@ abstract final class Bildirim {
   /// cihaz saat dilimini veren bir paket gerektirir (eklenmedi).
   ///
   /// Önce bildirim izni istenir (Android 13+, iOS, macOS); verilmezse false.
-  static Future<bool> gunlukHatirlatma(String saat) async {
+  static Future<bool> gunlukHatirlatma(
+    String saat, {
+    bool izinIste = true,
+  }) async {
     try {
       final parcalar = saat.split(':');
       final s = int.parse(parcalar[0]);
       final d = int.parse(parcalar[1]);
       if (s < 0 || s > 23 || d < 0 || d > 59) return false;
       if (!await _baslat()) return false;
-      if (!await _izinIste()) return false;
+      if (izinIste && !await _izinIste()) return false;
       final simdi = DateTime.now();
       var hedef = DateTime(simdi.year, simdi.month, simdi.day, s, d);
       if (!hedef.isAfter(simdi)) {
         hedef = DateTime(simdi.year, simdi.month, simdi.day + 1, s, d);
       }
       final u = hedef.toUtc();
-      final zaman =
-          tz.TZDateTime.utc(u.year, u.month, u.day, u.hour, u.minute);
+      final zaman = tz.TZDateTime.utc(u.year, u.month, u.day, u.hour, u.minute);
       await _eklenti.zonedSchedule(
         id: _kimlik,
         title: 'Adım Adım',
@@ -95,23 +99,35 @@ abstract final class Bildirim {
   }
 
   static Future<bool> _izinIste() async {
-    final android = _eklenti.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _eklenti
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android != null) {
       return await android.requestNotificationsPermission() ?? false;
     }
-    final ios = _eklenti.resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>();
+    final ios = _eklenti
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
     if (ios != null) {
       return await ios.requestPermissions(
-              alert: true, badge: true, sound: true) ??
+            alert: true,
+            badge: true,
+            sound: true,
+          ) ??
           false;
     }
-    final mac = _eklenti.resolvePlatformSpecificImplementation<
-        MacOSFlutterLocalNotificationsPlugin>();
+    final mac = _eklenti
+        .resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin
+        >();
     if (mac != null) {
       return await mac.requestPermissions(
-              alert: true, badge: true, sound: true) ??
+            alert: true,
+            badge: true,
+            sound: true,
+          ) ??
           false;
     }
     return true;

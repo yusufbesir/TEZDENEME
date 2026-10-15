@@ -29,10 +29,13 @@ class ProfilKarti extends StatelessWidget {
                 Icon(Icons.account_circle_outlined, size: 40, color: r.ana),
                 const SizedBox(width: Olcu.b2),
                 Expanded(
-                    child: Text(ad,
-                        style: yazi.titleLarge,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis)),
+                  child: Text(
+                    ad,
+                    style: yazi.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: Olcu.b2),
@@ -47,14 +50,21 @@ class ProfilKarti extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('${sv.bu} / ${sv.sonraki} XP · toplam ${durum.xp} XP',
-                style: yazi.bodySmall?.copyWith(color: r.metinIkincil)),
+            Text(
+              '${sv.bu} / ${sv.sonraki} XP · toplam ${durum.xp} XP',
+              style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+            ),
             const SizedBox(height: Olcu.b2),
             Row(
               children: [
                 Icon(Icons.local_fire_department, color: r.vurgu),
                 const SizedBox(width: Olcu.b1),
-                Expanded(child: Text('${Motor.gosterilenSeri(durum, bugun)} gün seri', style: yazi.bodyLarge)),
+                Expanded(
+                  child: Text(
+                    '${Motor.gosterilenSeri(durum, bugun)} gün seri',
+                    style: yazi.bodyLarge,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: Olcu.b1),
@@ -63,8 +73,10 @@ class ProfilKarti extends StatelessWidget {
                 Icon(Icons.emoji_events_outlined, color: r.vurgu),
                 const SizedBox(width: Olcu.b1),
                 Expanded(
-                  child: Text('En uzun seri: ${durum.enSeri} gün',
-                      style: yazi.bodyLarge),
+                  child: Text(
+                    'En uzun seri: ${durum.enSeri} gün',
+                    style: yazi.bodyLarge,
+                  ),
                 ),
               ],
             ),

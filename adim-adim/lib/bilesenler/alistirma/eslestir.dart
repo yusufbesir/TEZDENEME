@@ -23,7 +23,8 @@ class EslestirGorunumu extends StatefulWidget {
 
 class _EslestirDurumu extends State<EslestirGorunumu> {
   late final List<int> _sagSira = _karistir();
-  final Map<int, int> _eslesen = {}; // sol indeks -> sag indeks (ciftler indeksi)
+  final Map<int, int> _eslesen =
+      {}; // sol indeks -> sag indeks (ciftler indeksi)
   int? _seciliSol;
 
   List<int> _karistir() {
@@ -63,8 +64,9 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
   void _sagSec(int sag) {
     if (widget.kontrolEdildi) return;
     setState(() {
-      final mevcut =
-          _eslesen.entries.where((e) => e.value == sag).map((e) => e.key);
+      final mevcut = _eslesen.entries
+          .where((e) => e.value == sag)
+          .map((e) => e.key);
       if (mevcut.isNotEmpty) {
         _eslesen.remove(mevcut.first);
       } else if (_seciliSol != null) {
@@ -103,8 +105,10 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SoruBasligi(widget.alistirma.soru,
-            ipucu: 'Önce soldan, sonra sağdan bir öğe seç.'),
+        SoruBasligi(
+          widget.alistirma.soru,
+          ipucu: 'Önce soldan, sonra sağdan bir öğe seç.',
+        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -117,7 +121,8 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
                       numara: _numara(i),
                       secili: _seciliSol == i,
                       dogru: widget.kontrolEdildi && _eslesen[i] == i,
-                      yanlis: widget.kontrolEdildi &&
+                      yanlis:
+                          widget.kontrolEdildi &&
                           _eslesen.containsKey(i) &&
                           _eslesen[i] != i,
                       onTap: () => _solSec(i),
@@ -135,7 +140,8 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
                       numara: _sagNumara(s),
                       secili: false,
                       dogru: widget.kontrolEdildi && _sagNumara(s) == s + 1,
-                      yanlis: widget.kontrolEdildi &&
+                      yanlis:
+                          widget.kontrolEdildi &&
                           _sagNumara(s) != null &&
                           _sagNumara(s) != s + 1,
                       onTap: () => _sagSec(s),
@@ -161,19 +167,19 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
     final kenar = dogru
         ? r.dogru
         : yanlis
-            ? r.hata
-            : (secili || numara != null)
-                ? r.ana
-                : r.kenar;
+        ? r.hata
+        : (secili || numara != null)
+        ? r.ana
+        : r.kenar;
     final durum = dogru
         ? 'doğru eşleşme'
         : yanlis
-            ? 'yanlış eşleşme'
-            : numara != null
-                ? 'eşleşti, numara $numara'
-                : secili
-                    ? 'seçili'
-                    : '';
+        ? 'yanlış eşleşme'
+        : numara != null
+        ? 'eşleşti, numara $numara'
+        : secili
+        ? 'seçili'
+        : '';
     return Padding(
       padding: const EdgeInsets.only(bottom: Olcu.b1),
       child: Semantics(
@@ -187,7 +193,9 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(Olcu.kose),
             side: BorderSide(
-                color: kenar, width: (secili || numara != null) ? 2 : 1),
+              color: kenar,
+              width: (secili || numara != null) ? 2 : 1,
+            ),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(Olcu.kose),
@@ -196,7 +204,9 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
               constraints: const BoxConstraints(minHeight: 56),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: Olcu.b2, vertical: Olcu.b1),
+                  horizontal: Olcu.b2,
+                  vertical: Olcu.b1,
+                ),
                 child: Row(
                   children: [
                     if (numara != null) ...[
@@ -204,22 +214,25 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
                         dogru
                             ? Icons.check_circle
                             : yanlis
-                                ? Icons.cancel
-                                : Icons.link,
+                            ? Icons.cancel
+                            : Icons.link,
                         color: kenar,
                         size: 20,
                       ),
                       const SizedBox(width: 4),
-                      Text('$numara',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge
-                              ?.copyWith(color: kenar)),
+                      Text(
+                        '$numara',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(color: kenar),
+                      ),
                       const SizedBox(width: Olcu.b1),
                     ],
                     Expanded(
-                      child: Text(metin,
-                          style: Theme.of(context).textTheme.bodyLarge),
+                      child: Text(
+                        metin,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
                   ],
                 ),

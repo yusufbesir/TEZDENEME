@@ -41,12 +41,14 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
         content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: const Text('Devam et')),
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Devam et'),
+          ),
           FilledButton(
-              style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
-              onPressed: () => Navigator.pop(c, true),
-              child: const Text('Çık')),
+            style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Çık'),
+          ),
         ],
       ),
     );
@@ -60,12 +62,14 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
         .read(durumProvider.notifier)
         .dersBitir(ders.id, dogru, toplam);
     if (!mounted) return;
-    setState(() => _ozet = (
-          dogru: dogru,
-          toplam: toplam,
-          xp: Motor.dersXp(dogru, toplam),
-          seri: yeni.seri,
-        ));
+    setState(
+      () => _ozet = (
+        dogru: dogru,
+        toplam: toplam,
+        xp: Motor.dersXp(dogru, toplam),
+        seri: yeni.seri,
+      ),
+    );
   }
 
   @override
@@ -76,15 +80,15 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
         child: ders == null || ders.alistirmalar.isEmpty
             ? _Bulunamadi(onGeri: _cik)
             : _ozet != null
-                ? _Ozet(ozet: _ozet!, onDon: _cik, dersAdi: ders.ad)
-                : AlistirmaOturumu(
-                    alistirmalar: ders.alistirmalar,
-                    onSonuc: (i, dogru) => ref
-                        .read(durumProvider.notifier)
-                        .kartIsle(ders.kartKimligi(i), dogru),
-                    onBitti: (d, t) => _bitir(ders, d, t),
-                    onKapat: _kapatOnayi,
-                  ),
+            ? _Ozet(ozet: _ozet!, onDon: _cik, dersAdi: ders.ad)
+            : AlistirmaOturumu(
+                alistirmalar: ders.alistirmalar,
+                onSonuc: (i, dogru) => ref
+                    .read(durumProvider.notifier)
+                    .kartIsle(ders.kartKimligi(i), dogru),
+                onBitti: (d, t) => _bitir(ders, d, t),
+                onKapat: _kapatOnayi,
+              ),
       ),
     );
   }
@@ -105,8 +109,10 @@ class _Bulunamadi extends StatelessWidget {
           children: [
             Icon(Icons.error_outline, size: 48, color: r.hata),
             const SizedBox(height: Olcu.b2),
-            Text('Bu ders bulunamadı.',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Bu ders bulunamadı.',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: Olcu.b2),
             FilledButton(onPressed: onGeri, child: const Text('Yola dön')),
           ],
@@ -150,26 +156,42 @@ class _Ozet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Spacer(),
-            Icon(tam ? Icons.emoji_events : Icons.check_circle,
-                size: 64, color: tam ? r.vurgu : r.dogru),
+            Icon(
+              tam ? Icons.emoji_events : Icons.check_circle,
+              size: 64,
+              color: tam ? r.vurgu : r.dogru,
+            ),
             const SizedBox(height: Olcu.b2),
-            Text('Ders tamamlandı',
-                textAlign: TextAlign.center, style: yazi.headlineMedium),
+            Text(
+              'Ders tamamlandı',
+              textAlign: TextAlign.center,
+              style: yazi.headlineMedium,
+            ),
             const SizedBox(height: Olcu.b1),
-            Text(dersAdi,
-                textAlign: TextAlign.center,
-                style: yazi.bodyLarge?.copyWith(color: r.metinIkincil)),
+            Text(
+              dersAdi,
+              textAlign: TextAlign.center,
+              style: yazi.bodyLarge?.copyWith(color: r.metinIkincil),
+            ),
             const SizedBox(height: Olcu.b3),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(Olcu.b2),
                 child: Column(
                   children: [
-                    satir(Icons.check_circle_outline, r.dogru, 'Doğru',
-                        '${ozet.dogru}/${ozet.toplam}'),
+                    satir(
+                      Icons.check_circle_outline,
+                      r.dogru,
+                      'Doğru',
+                      '${ozet.dogru}/${ozet.toplam}',
+                    ),
                     satir(Icons.bolt, r.vurgu, 'Kazanılan XP', '+${ozet.xp}'),
-                    satir(Icons.local_fire_department, r.vurgu, 'Seri',
-                        '${ozet.seri} gün'),
+                    satir(
+                      Icons.local_fire_department,
+                      r.vurgu,
+                      'Seri',
+                      '${ozet.seri} gün',
+                    ),
                   ],
                 ),
               ),

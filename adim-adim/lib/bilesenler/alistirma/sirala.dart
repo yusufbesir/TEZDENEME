@@ -24,15 +24,17 @@ class SiralaGorunumu extends StatefulWidget {
 }
 
 class _SiralaDurumu extends State<SiralaGorunumu> {
-  late final List<int> _havuz =
-      List.generate(widget.alistirma.kelimeler.length, (i) => i);
+  late final List<int> _havuz = List.generate(
+    widget.alistirma.kelimeler.length,
+    (i) => i,
+  );
   final List<int> _secilen = [];
 
   List<String> get _kelimeler => widget.alistirma.kelimeler;
 
-  void _bildir() => widget.onCevap(_havuz.isEmpty
-      ? [for (final i in _secilen) _kelimeler[i]]
-      : null);
+  void _bildir() => widget.onCevap(
+    _havuz.isEmpty ? [for (final i in _secilen) _kelimeler[i]] : null,
+  );
 
   void _ekle(int i) {
     if (widget.kontrolEdildi) return;
@@ -62,8 +64,10 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SoruBasligi(widget.alistirma.soru,
-            ipucu: 'Parçalara dokunarak doğru sıraya diz.'),
+        SoruBasligi(
+          widget.alistirma.soru,
+          ipucu: 'Parçalara dokunarak doğru sıraya diz.',
+        ),
         Semantics(
           label: _secilen.isEmpty
               ? 'Cevap alanı boş'
@@ -84,14 +88,17 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 if (kontrol)
-                  Icon(widget.dogruMu ? Icons.check_circle : Icons.cancel,
-                      color: renk),
+                  Icon(
+                    widget.dogruMu ? Icons.check_circle : Icons.cancel,
+                    color: renk,
+                  ),
                 if (_secilen.isEmpty && !kontrol)
                   Padding(
                     padding: const EdgeInsets.all(Olcu.b1),
-                    child: Text('Cevabın burada görünecek',
-                        style: yazi.bodyMedium
-                            ?.copyWith(color: r.metinIkincil)),
+                    child: Text(
+                      'Cevabın burada görünecek',
+                      style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+                    ),
                   ),
                 for (final i in _secilen) _parca(i, () => _cikar(i), true),
               ],
@@ -113,11 +120,16 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
     return Semantics(
       button: true,
       label: _kelimeler[i],
-      hint: secildi ? 'Havuza geri koymak için dokun' : 'Cevaba eklemek için dokun',
+      hint: secildi
+          ? 'Havuza geri koymak için dokun'
+          : 'Cevaba eklemek için dokun',
       excludeSemantics: true,
       onTap: widget.kontrolEdildi ? null : onTap,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: Olcu.hedef, minWidth: Olcu.hedef),
+        constraints: const BoxConstraints(
+          minHeight: Olcu.hedef,
+          minWidth: Olcu.hedef,
+        ),
         child: Material(
           color: secildi ? r.ana : r.zemin,
           shape: RoundedRectangleBorder(
@@ -129,11 +141,14 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
             onTap: widget.kontrolEdildi ? null : onTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: Olcu.b2, vertical: Olcu.b1 + 4),
+                horizontal: Olcu.b2,
+                vertical: Olcu.b1 + 4,
+              ),
               child: Text(
                 _kelimeler[i],
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: secildi ? r.anaUstu : r.metin),
+                  color: secildi ? r.anaUstu : r.metin,
+                ),
               ),
             ),
           ),

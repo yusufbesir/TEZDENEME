@@ -87,7 +87,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'name' 'neym' diye okunur ve 'ad' demektir; 'game' (oyun) ile karıştırma, 'my name is' kendini tanıtma kalıbıdır.",
             ),
           ],
         ),
@@ -177,7 +177,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 2,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'Spain' 'speyn' gibi okunur; 'from' sözcüğü 'nereden' anlamına gelir ve 'she is from' kalıbı kökeni söyler.",
             ),
           ],
         ),
@@ -259,7 +259,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 0,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'seven' 'sevın' gibi okunur; 'I have' 'sahibim' demektir ve 'cats' sonundaki s sesiyle çoğul olur.",
             ),
           ],
         ),
@@ -338,7 +338,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'blue' 'blu:' diye okunur, 'car' ise 'ka:r' gibi; cümle arabanın mavi olduğunu söyler.",
             ),
           ],
         ),
@@ -425,7 +425,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'brother' 'bradhır' gibi okunur (th sesi dil uçtadır); 'tall' boyu uzun anlamına gelir.",
             ),
           ],
         ),
@@ -504,7 +504,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 2,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'kitchen' 'kiçın' gibi okunur; 'small' 'smol' diye okunur ve 'küçük' demektir.",
             ),
           ],
         ),
@@ -595,7 +595,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 0,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'drink' içmek, 'tea' 'ti:' diye okunur ve 'çay' demektir; 'every morning' her sabah anlamına gelir.",
             ),
           ],
         ),
@@ -687,7 +687,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'table for two' iki kişilik masa demektir; 'two' 'tu:' diye okunur ve restoranda kullanılan kalıptır.",
             ),
           ],
         ),
@@ -785,7 +785,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 0,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'wakes up' uyanmak demektir ve 'wakes' sonunda 'ks' sesi duyulur; 'seven' yedi saatini belirtir.",
             ),
           ],
         ),
@@ -865,7 +865,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 2,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'half past six' altıyı yarım geçe, yani 6:30 demektir; 'half' içindeki l okunmaz ('ha:f').",
             ),
           ],
         ),
@@ -943,7 +943,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 2,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'Friday' 'fraydey' gibi okunur; 'see you on' ile bir sonraki buluşma günü söylenir.",
             ),
           ],
         ),
@@ -1031,7 +1031,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'cloudy' 'klaudi' (bulutlu), 'windy' 'vindi' (rüzgarlı) diye okunur; ikisi de hava durumu sıfatıdır.",
             ),
           ],
         ),
@@ -1113,7 +1113,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 2,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'right' 'rayt' diye okunur ve 'sağ' demektir; 'turn right' sağa dön, 'walk' yürü anlamına gelir.",
             ),
           ],
         ),
@@ -1194,7 +1194,7 @@ const Kurs ingilizceA1 = Kurs(
               ],
               dogru: 1,
               aciklama:
-                  'Cümleyi bir kez daha dinle; benzer yazımlardaki küçük farklara dikkat et.',
+                  "'try this on' bir kıyafeti denemek demektir; 'Can I' 'kenay' gibi bitişik okunur ve izin ister.",
             ),
           ],
         ),

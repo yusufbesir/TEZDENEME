@@ -26,10 +26,17 @@ class AnaSayfa extends ConsumerWidget {
       return const Center(child: Text('Henüz kurs yok.'));
     }
     final secilenId = ref.watch(secilenKursProvider);
-    final kurs =
-        kurslar.firstWhere((k) => k.id == secilenId, orElse: () => kurslar.first);
+    final kurs = kurslar.firstWhere(
+      (k) => k.id == secilenId,
+      orElse: () => kurslar.first,
+    );
 
-    final yol = _YolListesi(kurs: kurs, durum: durum, bugun: bugun, kurslar: kurslar);
+    final yol = _YolListesi(
+      kurs: kurs,
+      durum: durum,
+      bugun: bugun,
+      kurslar: kurslar,
+    );
 
     return SafeArea(
       child: genis
@@ -41,7 +48,11 @@ class AnaSayfa extends ConsumerWidget {
                   flex: 2,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(
-                        0, Olcu.b3, Olcu.b3, Olcu.b3),
+                      0,
+                      Olcu.b3,
+                      Olcu.b3,
+                      Olcu.b3,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -72,11 +83,15 @@ class _GunlukKart extends StatelessWidget {
         child: Row(
           children: [
             HedefHalkasi(
-                xp: durum.gunlukXp[bugun] ?? 0, hedef: durum.gunlukHedef),
+              xp: durum.gunlukXp[bugun] ?? 0,
+              hedef: durum.gunlukHedef,
+            ),
             const SizedBox(width: Olcu.b3),
             Expanded(
-              child: Text('Bugünkü hedefin ${durum.gunlukHedef} XP',
-                  style: Theme.of(context).textTheme.titleMedium),
+              child: Text(
+                'Bugünkü hedefin ${durum.gunlukHedef} XP',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
           ],
         ),
@@ -178,36 +193,45 @@ class _YolListesi extends ConsumerWidget {
         ],
       ),
       const SizedBox(height: Olcu.b1),
-      Text(kurs.aciklama,
-          style: yazi.bodyMedium?.copyWith(color: r.metinIkincil)),
+      Text(
+        kurs.aciklama,
+        style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+      ),
       const SizedBox(height: Olcu.b3),
     ];
 
     var dersNo = 0;
     for (final unite in kurs.uniteler) {
-      final biten =
-          unite.dersler.where((d) => (durum.tamamlanan[d.id] ?? 0) > 0).length;
-      ogeler.add(Semantics(
-        header: true,
-        label: '${unite.ad}. $biten / ${unite.dersler.length} ders tamam.',
-        excludeSemantics: true,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: Olcu.b2, vertical: Olcu.b1),
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: r.ana, width: 3)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.flag, color: r.ana),
-              const SizedBox(width: Olcu.b1),
-              Expanded(child: Text(unite.ad, style: yazi.titleMedium)),
-              Text('$biten/${unite.dersler.length}',
-                  style: yazi.labelLarge?.copyWith(color: r.metinIkincil)),
-            ],
+      final biten = unite.dersler
+          .where((d) => (durum.tamamlanan[d.id] ?? 0) > 0)
+          .length;
+      ogeler.add(
+        Semantics(
+          header: true,
+          label: '${unite.ad}. $biten / ${unite.dersler.length} ders tamam.',
+          excludeSemantics: true,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Olcu.b2,
+              vertical: Olcu.b1,
+            ),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: r.ana, width: 3)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.flag, color: r.ana),
+                const SizedBox(width: Olcu.b1),
+                Expanded(child: Text(unite.ad, style: yazi.titleMedium)),
+                Text(
+                  '$biten/${unite.dersler.length}',
+                  style: yazi.labelLarge?.copyWith(color: r.metinIkincil),
+                ),
+              ],
+            ),
           ),
         ),
-      ));
+      );
       ogeler.add(const SizedBox(height: Olcu.b2));
       for (var i = 0; i < unite.dersler.length; i++) {
         final ders = unite.dersler[i];
@@ -216,43 +240,57 @@ class _YolListesi extends ConsumerWidget {
         final BasamakDurumu bd = kez > 0
             ? BasamakDurumu.tamam
             : (ders.id == siradakiId
-                ? BasamakDurumu.siradaki
-                : BasamakDurumu.kilitli);
-        ogeler.add(Padding(
-          padding: EdgeInsets.only(
-              left: (i % 3) * Olcu.b2, bottom: Olcu.b2),
-          child: Basamak(
-            no: dersNo,
-            ad: ders.ad,
-            durum: bd,
-            alistirmaSayisi: ders.alistirmalar.length,
-            tekrarSayisi: kez,
-            onTap: bd == BasamakDurumu.kilitli
-                ? () => ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(const SnackBar(
-                    content: Row(children: [
-                      Icon(Icons.lock_outline),
-                      SizedBox(width: Olcu.b1),
-                      Expanded(child: Text('Bu dersi açmak için önce önceki dersi bitir.')),
-                    ]),
-                  ))
-                : () => context.push('/ders/${Uri.encodeComponent(ders.id)}'),
+                  ? BasamakDurumu.siradaki
+                  : BasamakDurumu.kilitli);
+        ogeler.add(
+          Padding(
+            padding: EdgeInsets.only(left: (i % 3) * Olcu.b2, bottom: Olcu.b2),
+            child: Basamak(
+              no: dersNo,
+              ad: ders.ad,
+              durum: bd,
+              alistirmaSayisi: ders.alistirmalar.length,
+              tekrarSayisi: kez,
+              onTap: bd == BasamakDurumu.kilitli
+                  ? () => ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.lock_outline),
+                              SizedBox(width: Olcu.b1),
+                              Expanded(
+                                child: Text(
+                                  'Bu dersi açmak için önce önceki dersi bitir.',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                  : () => context.push('/ders/${Uri.encodeComponent(ders.id)}'),
+            ),
           ),
-        ));
+        );
       }
       ogeler.add(const SizedBox(height: Olcu.b2));
     }
     if (siradakiId == null) {
-      ogeler.add(Row(
-        children: [
-          Icon(Icons.emoji_events, color: r.vurgu),
-          const SizedBox(width: Olcu.b1),
-          Expanded(
-              child: Text('Bu kursun tüm derslerini bitirdin. Tebrikler!',
-                  style: yazi.titleMedium)),
-        ],
-      ));
+      ogeler.add(
+        Row(
+          children: [
+            Icon(Icons.emoji_events, color: r.vurgu),
+            const SizedBox(width: Olcu.b1),
+            Expanded(
+              child: Text(
+                'Bu kursun tüm derslerini bitirdin. Tebrikler!',
+                style: yazi.titleMedium,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return Align(
@@ -269,8 +307,12 @@ class _YolListesi extends ConsumerWidget {
 }
 
 class _Rozet extends StatelessWidget {
-  const _Rozet(
-      {required this.simge, required this.metin, required this.renk, this.onTap});
+  const _Rozet({
+    required this.simge,
+    required this.metin,
+    required this.renk,
+    this.onTap,
+  });
   final IconData simge;
   final String metin;
   final Color renk;
@@ -303,8 +345,11 @@ class _Rozet extends StatelessWidget {
                   Icon(simge, color: renk),
                   const SizedBox(width: Olcu.b1),
                   Flexible(
-                      child: Text(metin,
-                          style: Theme.of(context).textTheme.labelLarge)),
+                    child: Text(
+                      metin,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                  ),
                 ],
               ),
             ),

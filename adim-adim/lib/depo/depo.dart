@@ -119,14 +119,23 @@ class DosyaDepo implements Depo {
     }
   }
 
+  /// Kullanıcının "verileri sıfırla" kararı: ana dosya, geçici dosya ve
+  /// `.bozuk-*` yedekleri birlikte silinir; eski ilerleme diskte kalmaz.
   @override
   Future<void> sifirla() async {
-    for (final f in [_dosya, _gecici]) {
-      try {
+    try {
+      for (final f in [_dosya, _gecici]) {
         if (await f.exists()) await f.delete();
-      } catch (_) {
-        // Silinemeyen dosya sessizce yok sayılır.
       }
+      final klasorYolu = _dosya.parent;
+      if (await klasorYolu.exists()) {
+        final onek = '${_dosya.path}.bozuk-';
+        await for (final e in klasorYolu.list()) {
+          if (e is File && e.path.startsWith(onek)) await e.delete();
+        }
+      }
+    } catch (_) {
+      // Silinemeyen dosya bir sonraki kayıtta ezilir.
     }
   }
 }

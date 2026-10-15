@@ -29,26 +29,43 @@ class AlistirmaKarti extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => switch (alistirma) {
-        final Secim a => SecimGorunumu(
-            alistirma: a, kontrolEdildi: kontrolEdildi, onCevap: onCevap),
-        final Bosluk a => BoslukGorunumu(
-            alistirma: a, kontrolEdildi: kontrolEdildi, onCevap: onCevap),
-        final Yaz a => YazGorunumu(
-            alistirma: a,
-            kontrolEdildi: kontrolEdildi,
-            dogruMu: dogruMu,
-            onCevap: onCevap,
-            onGonder: onGonder),
-        final Sirala a => SiralaGorunumu(
-            alistirma: a,
-            kontrolEdildi: kontrolEdildi,
-            dogruMu: dogruMu,
-            onCevap: onCevap),
-        final Eslestir a => EslestirGorunumu(
-            alistirma: a, kontrolEdildi: kontrolEdildi, onCevap: onCevap),
-        final Dinle a => DinleGorunumu(
-            alistirma: a, kontrolEdildi: kontrolEdildi, onCevap: onCevap),
-        final Kod a => KodGorunumu(
-            alistirma: a, kontrolEdildi: kontrolEdildi, onCevap: onCevap),
-      };
+    final Secim a => SecimGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Bosluk a => BoslukGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Yaz a => YazGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+      onGonder: onGonder,
+    ),
+    final Sirala a => SiralaGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+    ),
+    final Eslestir a => EslestirGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Dinle a => DinleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Kod a => KodGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+  };
 }

@@ -177,6 +177,9 @@ abstract final class Motor {
   /// Serbest yazı karşılaştırması için normalleştirir.
   static String _normalle(String s) {
     var r = s
+        // Kıvrık kesme ve tırnak işaretleri (iOS/Android klavyeleri) düz hale getirilir.
+        .replaceAll(RegExp('[\u2018\u2019\u02BC\u00B4`]'), "'")
+        .replaceAll(RegExp('[\u201C\u201D]'), '"')
         .replaceAll('İ', 'i')
         .replaceAll('I', 'i')
         .replaceAll('ı', 'i')

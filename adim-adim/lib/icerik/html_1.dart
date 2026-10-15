@@ -184,7 +184,7 @@ const Kurs html1 = Kurs(
           alistirmalar: [
             Secim(
               soru: 'Bilgi toplamak için tüm alanları saran etiket hangisidir?',
-              secenekler: ['<box>', '<form>', '<input>', '<fieldset2>'],
+              secenekler: ['<box>', '<form>', '<input>', '<section>'],
               dogru: 1,
               aciklama: 'Alanlar <form> etiketinin içine konur.',
             ),
@@ -213,7 +213,7 @@ const Kurs html1 = Kurs(
             ),
             Bosluk(
               soru: '<input type="___" name="parola">',
-              secenekler: ['hidden2', 'star', 'password', 'secret'],
+              secenekler: ['hidden', 'star', 'password', 'secret'],
               dogru: 2,
               aciklama: 'Yazılanı noktalarla gizleyen tür password türüdür.',
             ),
@@ -308,14 +308,14 @@ const Kurs html1 = Kurs(
             Bosluk(
               soru:
                   '<tr><___>Ürün</td><td>Fiyat</td></tr> satırında eksik etiket nedir?',
-              secenekler: ['td', 'tr', 'th2', 'table'],
+              secenekler: ['td', 'tr', 'thead', 'table'],
               dogru: 0,
               aciklama: 'Veri hücreleri <td> ile açılır, </td> ile kapanır.',
             ),
             Bosluk(
               soru:
                   'Bir hücreyi iki sütun genişliğinde yapmak için <td ___="2">.',
-              secenekler: ['rowspan', 'width2', 'span', 'colspan'],
+              secenekler: ['rowspan', 'width', 'span', 'colspan'],
               dogru: 3,
               aciklama: 'colspan yatayda birleştirir, rowspan dikeyde.',
             ),

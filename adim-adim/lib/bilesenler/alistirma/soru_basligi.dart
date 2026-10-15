@@ -17,12 +17,17 @@ class SoruBasligi extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Semantics(
-              header: true, child: Text(metin, style: yazi.headlineSmall)),
+            header: true,
+            child: Text(metin, style: yazi.headlineSmall),
+          ),
           if (ipucu != null) ...[
             const SizedBox(height: Olcu.b1),
-            Text(ipucu!,
-                style: yazi.bodyMedium
-                    ?.copyWith(color: context.renkler.metinIkincil)),
+            Text(
+              ipucu!,
+              style: yazi.bodyMedium?.copyWith(
+                color: context.renkler.metinIkincil,
+              ),
+            ),
           ],
         ],
       ),

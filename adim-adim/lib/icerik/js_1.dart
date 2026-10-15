@@ -182,7 +182,7 @@ const Kurs js1 = Kurs(
           alistirmalar: [
             Secim(
               soru: 'Belirli sayıda tekrar için en yaygın döngü hangisidir?',
-              secenekler: ['if', 'for', 'else', 'switch2'],
+              secenekler: ['if', 'for', 'else', 'switch'],
               dogru: 1,
               aciklama: 'for sayacı olan tekrarlar için uygundur.',
             ),
@@ -382,7 +382,7 @@ const Kurs js1 = Kurs(
             Bosluk(
               soru:
                   'let el = document.getElementById("kod"); el.___ = "ABC-123"; yazıyı değiştirir.',
-              secenekler: ['text2', 'write', 'textContent', 'say'],
+              secenekler: ['value', 'write', 'textContent', 'say'],
               dogru: 2,
               aciklama: 'textContent bir öğenin metnini güvenle değiştirir.',
             ),
@@ -472,7 +472,7 @@ const Kurs js1 = Kurs(
             ),
             Secim(
               soru: 'Tuşa basma olayının adı nedir?',
-              secenekler: ['press2', 'keydown', 'typed', 'keyclick'],
+              secenekler: ['keyup', 'keydown', 'typed', 'keyclick'],
               dogru: 1,
               aciklama: 'keydown, tuşa basıldığı an tetiklenir.',
             ),
@@ -485,7 +485,12 @@ const Kurs js1 = Kurs(
             Bosluk(
               soru:
                   'document.addEventListener("___", baslat); sayfa DOM\'u hazır olunca çalışır.',
-              secenekler: ['ready', 'start', 'load2', 'DOMContentLoaded'],
+              secenekler: [
+                'ready',
+                'start',
+                'beforeunload',
+                'DOMContentLoaded',
+              ],
               dogru: 3,
               aciklama: 'DOMContentLoaded HTML ayrıştırıldığında tetiklenir.',
             ),

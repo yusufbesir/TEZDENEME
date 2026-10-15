@@ -19,18 +19,29 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, kabuk) => Kabuk(kabuk: kabuk),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/yol', builder: (c, s) => const AnaSayfa()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/tekrar', builder: (c, s) => const TekrarEkrani()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/profil', builder: (c, s) => const ProfilEkrani()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/yol', builder: (c, s) => const AnaSayfa()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/tekrar', builder: (c, s) => const TekrarEkrani()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/profil', builder: (c, s) => const ProfilEkrani()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/ayarlar',
+                builder: (c, s) => const AyarlarEkrani(),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(

@@ -57,10 +57,10 @@ ThemeData _tema(Brightness parlaklik, AdimRenkleri r) {
   );
 
   final taban = ThemeData(brightness: parlaklik).textTheme.apply(
-        fontFamily: yaziGovde,
-        bodyColor: r.metin,
-        displayColor: r.metin,
-      );
+    fontFamily: yaziGovde,
+    bodyColor: r.metin,
+    displayColor: r.metin,
+  );
   TextStyle? baslik(TextStyle? s) =>
       s?.copyWith(fontFamily: yaziBaslik, fontWeight: FontWeight.w700);
   final yazi = taban.copyWith(
@@ -75,7 +75,8 @@ ThemeData _tema(Brightness parlaklik, AdimRenkleri r) {
   );
 
   final sekil = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(Olcu.kose));
+    borderRadius: BorderRadius.circular(Olcu.kose),
+  );
   const minBoyut = Size(Olcu.hedef, Olcu.hedef);
 
   return ThemeData(
@@ -148,32 +149,37 @@ ThemeData _tema(Brightness parlaklik, AdimRenkleri r) {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: r.yuzey,
       indicatorColor: r.ana,
-      iconTheme: WidgetStateProperty.resolveWith((durumlar) => IconThemeData(
+      iconTheme: WidgetStateProperty.resolveWith(
+        (durumlar) => IconThemeData(
           color: durumlar.contains(WidgetState.selected)
               ? r.anaUstu
-              : r.metinIkincil)),
-      labelTextStyle: WidgetStateProperty.resolveWith((durumlar) =>
-          yazi.labelMedium!.copyWith(
-              color: durumlar.contains(WidgetState.selected)
-                  ? r.metin
-                  : r.metinIkincil,
-              fontWeight: FontWeight.w600)),
+              : r.metinIkincil,
+        ),
+      ),
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        (durumlar) => yazi.labelMedium!.copyWith(
+          color: durumlar.contains(WidgetState.selected)
+              ? r.metin
+              : r.metinIkincil,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: r.yuzey,
       indicatorColor: r.ana,
       selectedIconTheme: IconThemeData(color: r.anaUstu),
       unselectedIconTheme: IconThemeData(color: r.metinIkincil),
-      selectedLabelTextStyle:
-          yazi.labelMedium!.copyWith(color: r.metin, fontWeight: FontWeight.w600),
-      unselectedLabelTextStyle:
-          yazi.labelMedium!.copyWith(color: r.metinIkincil),
+      selectedLabelTextStyle: yazi.labelMedium!.copyWith(
+        color: r.metin,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelTextStyle: yazi.labelMedium!.copyWith(
+        color: r.metinIkincil,
+      ),
     ),
     dividerTheme: DividerThemeData(color: r.kenar, space: 1),
-    dialogTheme: DialogThemeData(
-      backgroundColor: r.zemin,
-      shape: sekil,
-    ),
+    dialogTheme: DialogThemeData(backgroundColor: r.zemin, shape: sekil),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: r.ana,
       linearTrackColor: r.kenar,
@@ -184,12 +190,15 @@ ThemeData _tema(Brightness parlaklik, AdimRenkleri r) {
       thumbColor: r.ana,
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.resolveWith((d) =>
-          d.contains(WidgetState.selected) ? r.anaUstu : r.metinIkincil),
-      trackColor: WidgetStateProperty.resolveWith((d) =>
-          d.contains(WidgetState.selected) ? r.ana : r.yuzey),
-      trackOutlineColor: WidgetStateProperty.resolveWith((d) =>
-          d.contains(WidgetState.selected) ? r.ana : r.metinIkincil),
+      thumbColor: WidgetStateProperty.resolveWith(
+        (d) => d.contains(WidgetState.selected) ? r.anaUstu : r.metinIkincil,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (d) => d.contains(WidgetState.selected) ? r.ana : r.yuzey,
+      ),
+      trackOutlineColor: WidgetStateProperty.resolveWith(
+        (d) => d.contains(WidgetState.selected) ? r.ana : r.metinIkincil,
+      ),
     ),
   );
 }

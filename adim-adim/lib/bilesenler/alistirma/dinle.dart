@@ -69,12 +69,16 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
                   ),
                 ),
                 const SizedBox(height: Olcu.b1),
-                Text(sesAcik ? 'Dinlemek için dokun' : 'Ses kapalı',
-                    style: yazi.bodyMedium?.copyWith(color: r.metinIkincil)),
+                Text(
+                  sesAcik ? 'Dinlemek için dokun' : 'Ses kapalı',
+                  style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+                ),
                 if (_sesHatasi && sesAcik) ...[
                   const SizedBox(height: Olcu.b1),
-                  Text('Ses kullanılamıyor; cümle yazılı gösterildi',
-                      style: yazi.bodyMedium?.copyWith(color: r.hata)),
+                  Text(
+                    'Ses kullanılamıyor; cümle yazılı gösterildi',
+                    style: yazi.bodyMedium?.copyWith(color: r.hata),
+                  ),
                 ],
                 if (!sesAcik || _sesHatasi) ...[
                   const SizedBox(height: Olcu.b1),
@@ -84,8 +88,10 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
                       Icon(Icons.volume_off, color: r.vurgu, size: 20),
                       const SizedBox(width: Olcu.b1),
                       Flexible(
-                        child: Text('Okunacak cümle: ${a.okunacak}',
-                            style: yazi.bodyLarge),
+                        child: Text(
+                          'Okunacak cümle: ${a.okunacak}',
+                          style: yazi.bodyLarge,
+                        ),
                       ),
                     ],
                   ),

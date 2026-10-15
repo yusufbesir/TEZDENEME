@@ -56,10 +56,9 @@ class HedefHalkasi extends StatelessWidget {
                   ),
                   Text(
                     'XP',
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelSmall
-                        ?.copyWith(color: r.metinIkincil),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(color: r.metinIkincil),
                   ),
                 ],
               ),
@@ -72,8 +71,7 @@ class HedefHalkasi extends StatelessWidget {
 }
 
 class _HalkaBoyaci extends CustomPainter {
-  _HalkaBoyaci(
-      {required this.oran, required this.iz, required this.ilerleme});
+  _HalkaBoyaci({required this.oran, required this.iz, required this.ilerleme});
   final double oran;
   final Color iz;
   final Color ilerleme;
@@ -90,7 +88,12 @@ class _HalkaBoyaci extends CustomPainter {
     canvas.drawArc(daire, 0, math.pi * 2, false, boya..color = iz);
     if (oran > 0) {
       canvas.drawArc(
-          daire, -math.pi / 2, math.pi * 2 * oran, false, boya..color = ilerleme);
+        daire,
+        -math.pi / 2,
+        math.pi * 2 * oran,
+        false,
+        boya..color = ilerleme,
+      );
     }
   }
 

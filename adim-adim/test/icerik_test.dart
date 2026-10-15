@@ -156,4 +156,37 @@ void main() {
       }
     }
   });
+
+  test('hiçbir seçenek metni yapay "2" ekiyle bitmez', () {
+    // Haklı istisnalar: grid span sayı seçenekleri ve gerçek h2 başlık etiketi.
+    const istisna = {'2', 'x2', '*2', 'h2', '/h2'};
+    final sonuc = RegExp(r'2$');
+    for (final a in _alistirmalar()) {
+      final secenekler = switch (a) {
+        Secim() => a.secenekler,
+        Bosluk() => a.secenekler,
+        Dinle() => a.secenekler,
+        Kod() => a.secenekler,
+        _ => const <String>[],
+      };
+      for (final s in secenekler) {
+        if (istisna.contains(s)) continue;
+        expect(
+          sonuc.hasMatch(s.trimRight()),
+          isFalse,
+          reason: '$s / ${a.soru}',
+        );
+      }
+    }
+  });
+
+  test('Dinle açıklamaları benzersiz ve dolu', () {
+    final acik = [
+      for (final a in _alistirmalar())
+        if (a is Dinle) a.aciklama ?? '',
+    ];
+    expect(acik, isNotEmpty);
+    expect(acik.every((e) => e.isNotEmpty), isTrue);
+    expect(acik.toSet().length, acik.length);
+  });
 }

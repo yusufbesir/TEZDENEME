@@ -3,7 +3,7 @@
 İz etiketi: [İP:Adım Adım öğrenme uygulaması#Dwv81f] · Tarih: 2026-10-15
 
 ## Özet
-- Bağımsız güvenlik denetçisi (claude-sonnet-5-5) 14 bulgu verdi: 1 yüksek, 6 orta, 6 düşük, 1 bilgi. Yüksek ve orta bulguların hepsi bu sürümde ele alındı; biri (zaman dilimi) belgelenmiş sınırlama olarak kaldı.
+- Bağımsız güvenlik denetçisi (claude-sonnet-5-5) 14 bulgu verdi: 1 yüksek, 6 orta, 6 düşük, 1 bilgi. Aşağıdaki tabloda 12 düzeltme satırı var; ReDoS ve platform bilgi maddeleri eylem gerektirmediği için tabloya alınmadı. Yüksek ve orta bulguların hepsi ele alındı; biri (zaman dilimi) belgelenmiş sınırlama olarak kaldı.
 - Uygulama ağ isteği yapmaz; yayın (release) manifestinde İnternet izni yok. Kullanıcı girdisi hiçbir yerde kod, HTML ya da düzenli ifade olarak yorumlanmaz.
 
 ## Bulgular ve yapılanlar
@@ -21,6 +21,13 @@
 | Düşük | Sembolik bağ ve okuma sırasında büyüyen dosya denetimi yoktu | Bağ reddedilir; okunan bayt sayısı da sınırlanır |
 | Düşük | Ses hatası sessizce yutuluyordu | Dinleme alıştırmasında bir kez uyarı gösterilir ve cümle yazılı verilir |
 | Düşük | Kullanılmayan paketler (drift, sqlite3_flutter_libs, shared_preferences) | Kaldırıldı |
+
+## Baş Denetmen turu (2026-10-15, PR #11)
+- Kıvrık kesme işareti (’) yazma cevaplarında düz kesmeye çevrilir.
+- Sıfırlama `.bozuk-*` yedeklerini de siler (kullanıcının açık kararı).
+- Açılışta hatırlatma yeniden kurulurken izin penceresi açılmaz; izin yalnızca ayarlardan istenir.
+- Kullanıcı adı 40 karaktere kırpılır (atılmaz).
+- Android yayın derlemesi debug anahtarıyla imzalı; yayın öncesi kendi anahtarı gerekir (README).
 
 ## Doğrulanamayanlar
 - Paket sürümleri için güncel güvenlik duyuruları bu ortamda pub.dev'e erişilemediği için denetlenemedi. İnternetli bir ortamda `dart pub outdated` ve bağımlılık duyuruları ayrıca kontrol edilmeli.

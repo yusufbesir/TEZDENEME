@@ -42,15 +42,19 @@ class GeriBildirimBandi extends StatelessWidget {
         duration: Olcu.sure(context),
         builder: (context, t, child) => Opacity(
           opacity: t,
-          child: Transform.translate(offset: Offset(0, (1 - t) * 24), child: child),
+          child: Transform.translate(
+            offset: Offset(0, (1 - t) * 24),
+            child: child,
+          ),
         ),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(Olcu.b2),
           decoration: BoxDecoration(
             color: zemin,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(Olcu.kose)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(Olcu.kose),
+            ),
           ),
           child: SafeArea(
             top: false,
@@ -60,17 +64,24 @@ class GeriBildirimBandi extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(dogruMu ? Icons.check_circle : Icons.cancel,
-                        color: r.anaUstu, size: 28),
+                    Icon(
+                      dogruMu ? Icons.check_circle : Icons.cancel,
+                      color: r.anaUstu,
+                      size: 28,
+                    ),
                     const SizedBox(width: Olcu.b1),
-                    Text(baslik,
-                        style: yazi.titleLarge?.copyWith(color: r.anaUstu)),
+                    Text(
+                      baslik,
+                      style: yazi.titleLarge?.copyWith(color: r.anaUstu),
+                    ),
                   ],
                 ),
                 if (ayrinti.isNotEmpty) ...[
                   const SizedBox(height: Olcu.b1),
-                  Text(ayrinti,
-                      style: yazi.bodyMedium?.copyWith(color: r.anaUstu)),
+                  Text(
+                    ayrinti,
+                    style: yazi.bodyMedium?.copyWith(color: r.anaUstu),
+                  ),
                 ],
                 const SizedBox(height: Olcu.b2),
                 SizedBox(

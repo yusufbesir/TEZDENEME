@@ -74,7 +74,11 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(
-              Olcu.b1, Olcu.b1, Olcu.b2, Olcu.b1),
+            Olcu.b1,
+            Olcu.b1,
+            Olcu.b2,
+            Olcu.b1,
+          ),
           child: Row(
             children: [
               IconButton(
@@ -97,11 +101,12 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
                 ),
               ),
               const SizedBox(width: Olcu.b1),
-              Text('${_indeks + 1}/$toplam',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelLarge
-                      ?.copyWith(color: r.metinIkincil)),
+              Text(
+                '${_indeks + 1}/$toplam',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: r.metinIkincil),
+              ),
             ],
           ),
         ),
@@ -111,7 +116,9 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: Olcu.icerikGenislik),
+                constraints: const BoxConstraints(
+                  maxWidth: Olcu.icerikGenislik,
+                ),
                 child: AlistirmaKarti(
                   key: ValueKey(_indeks),
                   alistirma: _simdiki,
@@ -140,8 +147,9 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
               child: Align(
                 heightFactor: 1,
                 child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(maxWidth: Olcu.icerikGenislik),
+                  constraints: const BoxConstraints(
+                    maxWidth: Olcu.icerikGenislik,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     child: FilledButton(

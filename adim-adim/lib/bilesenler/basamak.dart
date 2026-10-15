@@ -26,12 +26,11 @@ class Basamak extends StatelessWidget {
   final VoidCallback? onTap;
 
   String get _durumMetni => switch (durum) {
-        BasamakDurumu.tamam => tekrarSayisi > 1
-            ? 'Tamamlandı · $tekrarSayisi kez'
-            : 'Tamamlandı',
-        BasamakDurumu.siradaki => 'Sıradaki ders',
-        BasamakDurumu.kilitli => 'Kilitli · önceki dersi bitir',
-      };
+    BasamakDurumu.tamam =>
+      tekrarSayisi > 1 ? 'Tamamlandı · $tekrarSayisi kez' : 'Tamamlandı',
+    BasamakDurumu.siradaki => 'Sıradaki ders',
+    BasamakDurumu.kilitli => 'Kilitli · önceki dersi bitir',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +68,11 @@ class Basamak extends StatelessWidget {
                 SizedBox(
                   width: Olcu.hedef,
                   height: Olcu.hedef,
-                  child: Icon(simge, size: sira ? 40 : 32, color: sira ? r.ana : onRenk),
+                  child: Icon(
+                    simge,
+                    size: sira ? 40 : 32,
+                    color: sira ? r.ana : onRenk,
+                  ),
                 ),
                 const SizedBox(width: Olcu.b2),
                 Expanded(
@@ -92,13 +95,17 @@ class Basamak extends StatelessWidget {
                   const SizedBox(width: Olcu.b1),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: Olcu.b2, vertical: Olcu.b1),
+                      horizontal: Olcu.b2,
+                      vertical: Olcu.b1,
+                    ),
                     decoration: BoxDecoration(
                       color: r.ana,
                       borderRadius: BorderRadius.circular(Olcu.kose),
                     ),
-                    child: Text('Başla',
-                        style: yazi.labelLarge?.copyWith(color: r.anaUstu)),
+                    child: Text(
+                      'Başla',
+                      style: yazi.labelLarge?.copyWith(color: r.anaUstu),
+                    ),
                   ),
                 ],
               ],

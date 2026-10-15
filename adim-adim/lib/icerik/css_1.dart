@@ -296,7 +296,7 @@ const Kurs css1 = Kurs(
             Secim(
               soru: 'Çapraz eksende hizalama hangi özellikle yapılır?',
               secenekler: [
-                'justify-items2',
+                'justify-self',
                 'align-items',
                 'text-align',
                 'flex-wrap',
@@ -307,14 +307,14 @@ const Kurs css1 = Kurs(
             ),
             Bosluk(
               soru: '.sira { display: flex; flex-___: column; }',
-              secenekler: ['direction', 'side', 'way', 'flow2'],
+              secenekler: ['direction', 'side', 'way', 'grow'],
               dogru: 0,
               aciklama: 'flex-direction yönü belirler: row veya column.',
             ),
             Bosluk(
               soru:
                   '.sira { display: flex; ___: 10px; } öğeler arasına boşluk koyar.',
-              secenekler: ['space', 'margin2', 'pad', 'gap'],
+              secenekler: ['space', 'inset', 'pad', 'gap'],
               dogru: 3,
               aciklama: 'gap flex ve grid öğeleri arasında boşluk bırakır.',
             ),
@@ -325,7 +325,7 @@ const Kurs css1 = Kurs(
               aciklama: 'flex-wrap: wrap öğeleri yeni satıra taşır.',
             ),
             Sirala(
-              soru: 'Flex kapı kuralını sırala.',
+              soru: 'Flex kap kuralını sırala.',
               kelimeler: ['}', 'display: flex;', '.kap {'],
               dogru: ['.kap {', 'display: flex;', '}'],
               aciklama: 'Seçici, bildirim, kapanış sırası.',
@@ -379,7 +379,7 @@ const Kurs css1 = Kurs(
                 'grid: on;',
                 'display: grid;',
                 'layout: grid;',
-                'display: table2;',
+                'display: table;',
               ],
               dogru: 1,
               aciklama: 'Kapta display: grid yazılır.',
@@ -397,13 +397,13 @@ const Kurs css1 = Kurs(
             ),
             Secim(
               soru: 'Izgarada hücreler arası boşluk hangi özellikle verilir?',
-              secenekler: ['spacing2', 'cell-margin', 'between', 'gap'],
+              secenekler: ['border-spacing', 'cell-margin', 'between', 'gap'],
               dogru: 3,
               aciklama: 'gap satır ve sütun arası boşluktur.',
             ),
             Bosluk(
               soru: '.izgara { display: grid; grid-template-___: 1fr 2fr; }',
-              secenekler: ['cells', 'boxes', 'columns', 'cols2'],
+              secenekler: ['cells', 'boxes', 'columns', 'areas'],
               dogru: 2,
               aciklama: 'Sütunlar grid-template-columns ile tanımlanır.',
             ),
@@ -483,7 +483,7 @@ const Kurs css1 = Kurs(
             Secim(
               soru:
                   'Ekran genişliğine göre kural uygulayan CSS yapısı hangisidir?',
-              secenekler: ['@screen2', '@phone', '@media', '@width'],
+              secenekler: ['@supports', '@phone', '@media', '@width'],
               dogru: 2,
               aciklama: '@media sorgusu ekran koşuluna göre kural çalıştırır.',
             ),
@@ -508,7 +508,7 @@ const Kurs css1 = Kurs(
             Bosluk(
               soru:
                   'Mobil öncelikli yaklaşımda genelde ___-width sorgusu kullanılır.',
-              secenekler: ['max2', 'top', 'low', 'min'],
+              secenekler: ['max', 'top', 'low', 'min'],
               dogru: 3,
               aciklama:
                   'min-width ile küçük ekran temel alınır, büyüdükçe kural eklenir.',

@@ -24,19 +24,19 @@ class _SecimDurumu extends State<SecimGorunumu> {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SoruBasligi(widget.alistirma.soru),
-          SecenekListesi(
-            secenekler: widget.alistirma.secenekler,
-            secili: _secili,
-            dogru: widget.alistirma.dogru,
-            kontrolEdildi: widget.kontrolEdildi,
-            onSec: (i) {
-              setState(() => _secili = i);
-              widget.onCevap(i);
-            },
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SoruBasligi(widget.alistirma.soru),
+      SecenekListesi(
+        secenekler: widget.alistirma.secenekler,
+        secili: _secili,
+        dogru: widget.alistirma.dogru,
+        kontrolEdildi: widget.kontrolEdildi,
+        onSec: (i) {
+          setState(() => _secili = i);
+          widget.onCevap(i);
+        },
+      ),
+    ],
+  );
 }

@@ -515,4 +515,12 @@ void main() {
       expect(d.gunlukXp, {'2026-10-14': 20});
     });
   });
+
+  group('kıvrık kesme işareti', () {
+    test("o’clock ile o'clock aynı sayılır", () {
+      const a = Yaz(soru: 'Saat', cevaplar: ["It's five o'clock"]);
+      expect(Motor.cevapDogruMu(a, 'It’s five o’clock'), isTrue);
+      expect(Motor.cevapDogruMu(a, 'Its five oclock'), isFalse);
+    });
+  });
 }

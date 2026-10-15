@@ -27,46 +27,56 @@ sealed class Alistirma {
     switch (tur) {
       case 'secim':
         return Secim(
-            soru: soru,
-            secenekler: metinler('secenekler'),
-            dogru: j['dogru'] as int,
-            aciklama: aciklama);
+          soru: soru,
+          secenekler: metinler('secenekler'),
+          dogru: j['dogru'] as int,
+          aciklama: aciklama,
+        );
       case 'bosluk':
         return Bosluk(
-            soru: soru,
-            secenekler: metinler('secenekler'),
-            dogru: j['dogru'] as int,
-            aciklama: aciklama);
+          soru: soru,
+          secenekler: metinler('secenekler'),
+          dogru: j['dogru'] as int,
+          aciklama: aciklama,
+        );
       case 'yaz':
-        return Yaz(soru: soru, cevaplar: metinler('cevaplar'), aciklama: aciklama);
+        return Yaz(
+          soru: soru,
+          cevaplar: metinler('cevaplar'),
+          aciklama: aciklama,
+        );
       case 'sirala':
         return Sirala(
-            soru: soru,
-            kelimeler: metinler('kelimeler'),
-            dogru: metinler('dogru'),
-            aciklama: aciklama);
+          soru: soru,
+          kelimeler: metinler('kelimeler'),
+          dogru: metinler('dogru'),
+          aciklama: aciklama,
+        );
       case 'eslestir':
         return Eslestir(
-            soru: soru,
-            ciftler: (j['ciftler'] as List)
-                .map((c) => (sol: (c as List)[0] as String, sag: c[1] as String))
-                .toList(),
-            aciklama: aciklama);
+          soru: soru,
+          ciftler: (j['ciftler'] as List)
+              .map((c) => (sol: (c as List)[0] as String, sag: c[1] as String))
+              .toList(),
+          aciklama: aciklama,
+        );
       case 'dinle':
         return Dinle(
-            soru: soru,
-            okunacak: j['okunacak'] as String,
-            secenekler: metinler('secenekler'),
-            dogru: j['dogru'] as int,
-            aciklama: aciklama);
+          soru: soru,
+          okunacak: j['okunacak'] as String,
+          secenekler: metinler('secenekler'),
+          dogru: j['dogru'] as int,
+          aciklama: aciklama,
+        );
       case 'kod':
         return Kod(
-            soru: soru,
-            kod: j['kod'] as String,
-            secenekler: metinler('secenekler'),
-            dogru: j['dogru'] as int,
-            dil: j['dil'] as String? ?? 'html',
-            aciklama: aciklama);
+          soru: soru,
+          kod: j['kod'] as String,
+          secenekler: metinler('secenekler'),
+          dogru: j['dogru'] as int,
+          dil: j['dil'] as String? ?? 'html',
+          aciklama: aciklama,
+        );
       default:
         throw FormatException('Bilinmeyen alıştırma türü: $tur');
     }
@@ -75,44 +85,46 @@ sealed class Alistirma {
 
 /// Çoktan seçmeli.
 class Secim extends Alistirma {
-  const Secim(
-      {required super.soru,
-      required this.secenekler,
-      required this.dogru,
-      super.aciklama});
+  const Secim({
+    required super.soru,
+    required this.secenekler,
+    required this.dogru,
+    super.aciklama,
+  });
   final List<String> secenekler;
   final int dogru;
   @override
   String get tur => 'secim';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'secenekler': secenekler,
-        'dogru': dogru,
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'secenekler': secenekler,
+    'dogru': dogru,
+    'aciklama': aciklama,
+  };
 }
 
 /// Boşluk doldurma: soru içinde `___`, seçeneklerden biri doğru.
 class Bosluk extends Alistirma {
-  const Bosluk(
-      {required super.soru,
-      required this.secenekler,
-      required this.dogru,
-      super.aciklama});
+  const Bosluk({
+    required super.soru,
+    required this.secenekler,
+    required this.dogru,
+    super.aciklama,
+  });
   final List<String> secenekler;
   final int dogru;
   @override
   String get tur => 'bosluk';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'secenekler': secenekler,
-        'dogru': dogru,
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'secenekler': secenekler,
+    'dogru': dogru,
+    'aciklama': aciklama,
+  };
 }
 
 /// Serbest yazma: kabul edilen cevap listesi.
@@ -122,29 +134,34 @@ class Yaz extends Alistirma {
   @override
   String get tur => 'yaz';
   @override
-  Map<String, Object?> toJson() =>
-      {'tur': tur, 'soru': soru, 'cevaplar': cevaplar, 'aciklama': aciklama};
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'cevaplar': cevaplar,
+    'aciklama': aciklama,
+  };
 }
 
 /// Parçaları sıraya dizme.
 class Sirala extends Alistirma {
-  const Sirala(
-      {required super.soru,
-      required this.kelimeler,
-      required this.dogru,
-      super.aciklama});
+  const Sirala({
+    required super.soru,
+    required this.kelimeler,
+    required this.dogru,
+    super.aciklama,
+  });
   final List<String> kelimeler; // karışık
   final List<String> dogru; // doğru sıra
   @override
   String get tur => 'sirala';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'kelimeler': kelimeler,
-        'dogru': dogru,
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'kelimeler': kelimeler,
+    'dogru': dogru,
+    'aciklama': aciklama,
+  };
 }
 
 /// Eşleştirme: 3-5 çift.
@@ -155,21 +172,22 @@ class Eslestir extends Alistirma {
   String get tur => 'eslestir';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'ciftler': ciftler.map((c) => [c.sol, c.sag]).toList(),
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'ciftler': ciftler.map((c) => [c.sol, c.sag]).toList(),
+    'aciklama': aciklama,
+  };
 }
 
 /// Dinleme: `okunacak` metni sesli okunur, kullanıcı duyduğunu seçer.
 class Dinle extends Alistirma {
-  const Dinle(
-      {required super.soru,
-      required this.okunacak,
-      required this.secenekler,
-      required this.dogru,
-      super.aciklama});
+  const Dinle({
+    required super.soru,
+    required this.okunacak,
+    required this.secenekler,
+    required this.dogru,
+    super.aciklama,
+  });
   final String okunacak;
   final List<String> secenekler;
   final int dogru;
@@ -177,24 +195,25 @@ class Dinle extends Alistirma {
   String get tur => 'dinle';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'okunacak': okunacak,
-        'secenekler': secenekler,
-        'dogru': dogru,
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'okunacak': okunacak,
+    'secenekler': secenekler,
+    'dogru': dogru,
+    'aciklama': aciklama,
+  };
 }
 
 /// Kod boşluğu: `kod` içinde `___` yer tutucu, tek satırlık seçenekler.
 class Kod extends Alistirma {
-  const Kod(
-      {required super.soru,
-      required this.kod,
-      required this.secenekler,
-      required this.dogru,
-      this.dil = 'html',
-      super.aciklama});
+  const Kod({
+    required super.soru,
+    required this.kod,
+    required this.secenekler,
+    required this.dogru,
+    this.dil = 'html',
+    super.aciklama,
+  });
   final String kod;
   final List<String> secenekler;
   final int dogru;
@@ -203,14 +222,14 @@ class Kod extends Alistirma {
   String get tur => 'kod';
   @override
   Map<String, Object?> toJson() => {
-        'tur': tur,
-        'soru': soru,
-        'kod': kod,
-        'secenekler': secenekler,
-        'dogru': dogru,
-        'dil': dil,
-        'aciklama': aciklama
-      };
+    'tur': tur,
+    'soru': soru,
+    'kod': kod,
+    'secenekler': secenekler,
+    'dogru': dogru,
+    'dil': dil,
+    'aciklama': aciklama,
+  };
 }
 
 class Ders {

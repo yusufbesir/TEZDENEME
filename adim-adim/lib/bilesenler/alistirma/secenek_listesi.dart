@@ -37,19 +37,20 @@ class SecenekListesi extends StatelessWidget {
     );
   }
 
-  Widget _satir(
-      BuildContext context, AdimRenkleri r, TextTheme yazi, int i) {
+  Widget _satir(BuildContext context, AdimRenkleri r, TextTheme yazi, int i) {
     final seciliMi = secili == i;
     final dogruSecenek = kontrolEdildi && i == dogru;
     final yanlisSecili = kontrolEdildi && seciliMi && i != dogru;
     final kenar = dogruSecenek
         ? r.dogru
         : yanlisSecili
-            ? r.hata
-            : seciliMi
-                ? r.ana
-                : r.kenar;
-    IconData simge = seciliMi ? Icons.radio_button_checked : Icons.radio_button_unchecked;
+        ? r.hata
+        : seciliMi
+        ? r.ana
+        : r.kenar;
+    IconData simge = seciliMi
+        ? Icons.radio_button_checked
+        : Icons.radio_button_unchecked;
     Color simgeRenk = seciliMi ? r.ana : r.metinIkincil;
     String durumMetni = seciliMi ? 'seçili' : '';
     if (dogruSecenek) {
@@ -73,7 +74,10 @@ class SecenekListesi extends StatelessWidget {
         decoration: BoxDecoration(
           color: seciliMi ? r.yuzey : r.zemin,
           borderRadius: BorderRadius.circular(Olcu.kose),
-          border: Border.all(color: kenar, width: seciliMi || dogruSecenek ? 2 : 1),
+          border: Border.all(
+            color: kenar,
+            width: seciliMi || dogruSecenek ? 2 : 1,
+          ),
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(Olcu.kose),
@@ -82,7 +86,9 @@ class SecenekListesi extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: 56),
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: Olcu.b2, vertical: Olcu.b1),
+                horizontal: Olcu.b2,
+                vertical: Olcu.b1,
+              ),
               child: Row(
                 children: [
                   Icon(simge, color: simgeRenk),

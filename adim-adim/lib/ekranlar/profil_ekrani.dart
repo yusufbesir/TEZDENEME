@@ -42,40 +42,49 @@ class ProfilEkrani extends ConsumerWidget {
           padding: const EdgeInsets.all(Olcu.b3),
           children: [
             Semantics(
-                header: true,
-                child: Text('Profil', style: yazi.headlineMedium)),
+              header: true,
+              child: Text('Profil', style: yazi.headlineMedium),
+            ),
             const SizedBox(height: Olcu.b3),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),
             Row(
               children: [
                 Expanded(
-                    child: _Istatistik(
-                        simge: Icons.bolt,
-                        etiket: 'Toplam XP',
-                        deger: '${durum.xp}')),
+                  child: _Istatistik(
+                    simge: Icons.bolt,
+                    etiket: 'Toplam XP',
+                    deger: '${durum.xp}',
+                  ),
+                ),
                 const SizedBox(width: Olcu.b2),
                 Expanded(
-                    child: _Istatistik(
-                        simge: Icons.task_alt,
-                        etiket: 'Biten ders',
-                        deger: '$bitenDers')),
+                  child: _Istatistik(
+                    simge: Icons.task_alt,
+                    etiket: 'Biten ders',
+                    deger: '$bitenDers',
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: Olcu.b2),
             Row(
               children: [
                 Expanded(
-                    child: _Istatistik(
-                        simge: Icons.local_fire_department,
-                        etiket: 'Seri',
-                        deger: '${Motor.gosterilenSeri(durum, bugun)} gün')),
+                  child: _Istatistik(
+                    simge: Icons.local_fire_department,
+                    etiket: 'Seri',
+                    deger: '${Motor.gosterilenSeri(durum, bugun)} gün',
+                  ),
+                ),
                 const SizedBox(width: Olcu.b2),
                 Expanded(
-                    child: _Istatistik(
-                        simge: Icons.emoji_events_outlined,
-                        etiket: 'En uzun seri',
-                        deger: '${durum.enSeri} gün')),
+                  child: _Istatistik(
+                    simge: Icons.emoji_events_outlined,
+                    etiket: 'En uzun seri',
+                    deger: '${durum.enSeri} gün',
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: Olcu.b3),
@@ -112,8 +121,11 @@ class ProfilEkrani extends ConsumerWidget {
 }
 
 class _Istatistik extends StatelessWidget {
-  const _Istatistik(
-      {required this.simge, required this.etiket, required this.deger});
+  const _Istatistik({
+    required this.simge,
+    required this.etiket,
+    required this.deger,
+  });
   final IconData simge;
   final String etiket;
   final String deger;
@@ -134,8 +146,10 @@ class _Istatistik extends StatelessWidget {
               Icon(simge, color: r.vurgu),
               const SizedBox(height: Olcu.b1),
               Text(deger, style: yazi.titleLarge),
-              Text(etiket,
-                  style: yazi.bodySmall?.copyWith(color: r.metinIkincil)),
+              Text(
+                etiket,
+                style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+              ),
             ],
           ),
         ),
@@ -185,11 +199,14 @@ class _Cubuk extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(ad,
-              style: yazi.labelSmall?.copyWith(
-                  color: bugunMu ? r.metin : r.metinIkincil,
-                  fontWeight: bugunMu ? FontWeight.w800 : FontWeight.w400,
-                  decoration: bugunMu ? TextDecoration.underline : null)),
+          Text(
+            ad,
+            style: yazi.labelSmall?.copyWith(
+              color: bugunMu ? r.metin : r.metinIkincil,
+              fontWeight: bugunMu ? FontWeight.w800 : FontWeight.w400,
+              decoration: bugunMu ? TextDecoration.underline : null,
+            ),
+          ),
         ],
       ),
     );

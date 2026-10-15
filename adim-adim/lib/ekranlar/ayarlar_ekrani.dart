@@ -38,8 +38,11 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
   static String adTemizle(String ham) {
     final temiz = ham
         .replaceAll(
-            RegExp(r'[\u0000-\u001F\u007F-\u009F\u200E\u200F\u202A-\u202E\u2066-\u2069]'),
-            '')
+          RegExp(
+            r'[\u0000-\u001F\u007F-\u009F\u200E\u200F\u202A-\u202E\u2066-\u2069]',
+          ),
+          '',
+        )
         .trim();
     final r = temiz.runes.toList();
     return r.length > 40 ? String.fromCharCodes(r.take(40)).trim() : temiz;
@@ -70,7 +73,9 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 items: [
                   for (var h = 0; h < 24; h++)
                     DropdownMenuItem(
-                        value: h, child: Text(h.toString().padLeft(2, '0')))
+                      value: h,
+                      child: Text(h.toString().padLeft(2, '0')),
+                    ),
                 ],
                 onChanged: (v) => setS(() => saat = v ?? saat),
               ),
@@ -83,7 +88,9 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 items: [
                   for (var m = 0; m < 60; m += 5)
                     DropdownMenuItem(
-                        value: m, child: Text(m.toString().padLeft(2, '0')))
+                      value: m,
+                      child: Text(m.toString().padLeft(2, '0')),
+                    ),
                 ],
                 onChanged: (v) => setS(() => dakika = v ?? dakika),
               ),
@@ -91,12 +98,15 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(c),
-                child: const Text('Vazgeç')),
+              onPressed: () => Navigator.pop(c),
+              child: const Text('Vazgeç'),
+            ),
             FilledButton(
               style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
-              onPressed: () => Navigator.pop(c,
-                  '${saat.toString().padLeft(2, '0')}:${(dakika - dakika % 5).toString().padLeft(2, '0')}'),
+              onPressed: () => Navigator.pop(
+                c,
+                '${saat.toString().padLeft(2, '0')}:${(dakika - dakika % 5).toString().padLeft(2, '0')}',
+              ),
               child: const Text('Kaydet'),
             ),
           ],
@@ -114,13 +124,17 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
         .read(durumProvider.notifier)
         .ayarGuncelle(hatirlatmaSaati: saat);
     if (!tamam && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Row(children: [
-          Icon(Icons.notifications_off_outlined),
-          SizedBox(width: Olcu.b1),
-          Expanded(child: Text('Bildirim izni verilmedi')),
-        ]),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.notifications_off_outlined),
+              SizedBox(width: Olcu.b1),
+              Expanded(child: Text('Bildirim izni verilmedi')),
+            ],
+          ),
+        ),
+      );
     }
   }
 
@@ -131,11 +145,13 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
         icon: Icon(Icons.warning_amber_rounded, color: c.renkler.hata),
         title: const Text('Tüm veriler silinsin mi?'),
         content: const Text(
-            'XP, seri, tekrar kartları ve ayarların silinir. Bu işlem geri alınamaz.'),
+          'XP, seri, tekrar kartları ve ayarların silinir. Bu işlem geri alınamaz.',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: const Text('Vazgeç')),
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Vazgeç'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(
               minimumSize: const Size(48, 48),
@@ -152,13 +168,17 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
       await ref.read(durumProvider.notifier).sifirla();
       _ad.clear();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Row(children: [
-            Icon(Icons.check_circle_outline),
-            SizedBox(width: Olcu.b1),
-            Expanded(child: Text('Veriler sıfırlandı.')),
-          ]),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle_outline),
+                SizedBox(width: Olcu.b1),
+                Expanded(child: Text('Veriler sıfırlandı.')),
+              ],
+            ),
+          ),
+        );
       }
     }
   }
@@ -175,10 +195,12 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
     final notifier = ref.read(durumProvider.notifier);
 
     Widget bolum(String baslik) => Padding(
-          padding: const EdgeInsets.only(top: Olcu.b3, bottom: Olcu.b1),
-          child: Semantics(
-              header: true, child: Text(baslik, style: yazi.titleMedium)),
-        );
+      padding: const EdgeInsets.only(top: Olcu.b3, bottom: Olcu.b1),
+      child: Semantics(
+        header: true,
+        child: Text(baslik, style: yazi.titleMedium),
+      ),
+    );
 
     return SafeArea(
       child: SayfaGovdesi(
@@ -186,8 +208,9 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
           padding: const EdgeInsets.all(Olcu.b3),
           children: [
             Semantics(
-                header: true,
-                child: Text('Ayarlar', style: yazi.headlineMedium)),
+              header: true,
+              child: Text('Ayarlar', style: yazi.headlineMedium),
+            ),
             bolum('Profil'),
             TextField(
               controller: _ad,
@@ -207,17 +230,20 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 showSelectedIcon: true,
                 segments: const [
                   ButtonSegment(
-                      value: null,
-                      icon: Icon(Icons.brightness_auto),
-                      label: Text('Sistem')),
+                    value: null,
+                    icon: Icon(Icons.brightness_auto),
+                    label: Text('Sistem'),
+                  ),
                   ButtonSegment(
-                      value: false,
-                      icon: Icon(Icons.light_mode_outlined),
-                      label: Text('Açık')),
+                    value: false,
+                    icon: Icon(Icons.light_mode_outlined),
+                    label: Text('Açık'),
+                  ),
                   ButtonSegment(
-                      value: true,
-                      icon: Icon(Icons.dark_mode_outlined),
-                      label: Text('Koyu')),
+                    value: true,
+                    icon: Icon(Icons.dark_mode_outlined),
+                    label: Text('Koyu'),
+                  ),
                 ],
                 selected: {durum.koyuTema},
                 onSelectionChanged: (s) {
@@ -234,12 +260,15 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(
-                  durum.sesAcik ? Icons.volume_up : Icons.volume_off,
-                  color: r.ana),
+                durum.sesAcik ? Icons.volume_up : Icons.volume_off,
+                color: r.ana,
+              ),
               title: const Text('Ses'),
-              subtitle: Text(durum.sesAcik
-                  ? 'Dinleme alıştırmaları sesli okunur'
-                  : 'Kapalı: dinleme cümlesi yazıyla gösterilir'),
+              subtitle: Text(
+                durum.sesAcik
+                    ? 'Dinleme alıştırmaları sesli okunur'
+                    : 'Kapalı: dinleme cümlesi yazıyla gösterilir',
+              ),
               value: durum.sesAcik,
               onChanged: (v) => notifier.ayarGuncelle(sesAcik: v),
             ),
@@ -261,8 +290,11 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   ),
                   SizedBox(
                     width: 72,
-                    child: Text('${durum.gunlukHedef} XP',
-                        textAlign: TextAlign.end, style: yazi.titleMedium),
+                    child: Text(
+                      '${durum.gunlukHedef} XP',
+                      textAlign: TextAlign.end,
+                      style: yazi.titleMedium,
+                    ),
                   ),
                 ],
               ),
@@ -271,14 +303,17 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(
-                  durum.hatirlatmaSaati == null
-                      ? Icons.notifications_off_outlined
-                      : Icons.notifications_active_outlined,
-                  color: r.ana),
+                durum.hatirlatmaSaati == null
+                    ? Icons.notifications_off_outlined
+                    : Icons.notifications_active_outlined,
+                color: r.ana,
+              ),
               title: const Text('Günlük hatırlatma'),
-              subtitle: Text(durum.hatirlatmaSaati == null
-                  ? 'Kapalı'
-                  : 'Her gün ${durum.hatirlatmaSaati}'),
+              subtitle: Text(
+                durum.hatirlatmaSaati == null
+                    ? 'Kapalı'
+                    : 'Her gün ${durum.hatirlatmaSaati}',
+              ),
               value: durum.hatirlatmaSaati != null,
               onChanged: (v) => v
                   ? _hatirlatmaAyarla('20:00')
@@ -317,7 +352,9 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
               leading: Icon(Icons.description_outlined, color: r.ana),
               title: const Text('Lisanslar'),
               onTap: () => showLicensePage(
-                  context: context, applicationName: 'Adım Adım'),
+                context: context,
+                applicationName: 'Adım Adım',
+              ),
             ),
           ],
         ),
