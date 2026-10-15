@@ -19,7 +19,7 @@ Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtı
 - Denetmen yalnızca kullanıcıya rapor verir; başka ajanlardan talimat almaz, işlerini değiştirmez, düzeltme yapmaz. Diğer oturumlar Denetmen'in raporlarını yönlendirmez ve değiştirmez.
 - İz kaydı: Her oturumun benzersiz etiketi `[İP:<iş parçacığı başlığı>#<oturum kimliğinin son 6 karakteri>]`, koordinatör için `[İP:Koordinatör#<son 6>]` olur. Bu etiket kasa notlarına, commit'lere, PR'lara, raporlara ve çıktılara eklenir.
 - Her notta kullanılan alt ajanlar (rol ve model) ile birlikte çalışılan diğer iş parçacıklarının etiketleri "Birlikte çalışılanlar" bölümünde yazılır. Geri alma gerekirse silme yasağına uyulur; yalnızca ekleme yapılır.
-- Denetmen raporlarında bulguları bu etiketlerle verir ve etiket kuralına uyulup uyulmadığını denetler.
+- Denetmen raporları kısa ve sade bir özet olur; hangi iş parçacığının hangi iş için kimle ortak çalıştığını düz cümlelerle anlatır, etiketler raporun sonunda "Kaynakça" bölümünde listelenir.
 
 ### Ajanlar
 
