@@ -33,8 +33,20 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
     super.dispose();
   }
 
+  /// Kontrol karakterlerini ve çift yönlü Unicode karakterlerini ayıklar,
+  /// 40 karakterle (rune) sınırlar.
+  static String adTemizle(String ham) {
+    final temiz = ham
+        .replaceAll(
+            RegExp(r'[\u0000-\u001F\u007F-\u009F\u200E\u200F\u202A-\u202E\u2066-\u2069]'),
+            '')
+        .trim();
+    final r = temiz.runes.toList();
+    return r.length > 40 ? String.fromCharCodes(r.take(40)).trim() : temiz;
+  }
+
   void _adKaydet() {
-    final yeni = _ad.text.trim();
+    final yeni = adTemizle(_ad.text);
     final mevcut = ref.read(durumProvider).value?.ad ?? '';
     if (yeni != mevcut) {
       ref.read(durumProvider.notifier).ayarGuncelle(ad: yeni);
@@ -92,7 +104,23 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
       ),
     );
     if (sec != null) {
-      await ref.read(durumProvider.notifier).ayarGuncelle(hatirlatmaSaati: sec);
+      await _hatirlatmaAyarla(sec);
+    }
+  }
+
+  /// Hatırlatmayı kurar; bildirim izni verilmezse anahtar kapanır ve uyarılır.
+  Future<void> _hatirlatmaAyarla(String saat) async {
+    final tamam = await ref
+        .read(durumProvider.notifier)
+        .ayarGuncelle(hatirlatmaSaati: saat);
+    if (!tamam && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Row(children: [
+          Icon(Icons.notifications_off_outlined),
+          SizedBox(width: Olcu.b1),
+          Expanded(child: Text('Bildirim izni verilmedi')),
+        ]),
+      ));
     }
   }
 
@@ -253,7 +281,7 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   : 'Her gün ${durum.hatirlatmaSaati}'),
               value: durum.hatirlatmaSaati != null,
               onChanged: (v) => v
-                  ? notifier.ayarGuncelle(hatirlatmaSaati: '20:00')
+                  ? _hatirlatmaAyarla('20:00')
                   : notifier.ayarGuncelle(hatirlatmaSil: true),
             ),
             if (durum.hatirlatmaSaati != null)
@@ -282,6 +310,14 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 label: const Text('Verileri sıfırla'),
                 onPressed: _sifirlaOnayi,
               ),
+            ),
+            bolum('Hakkında'),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.description_outlined, color: r.ana),
+              title: const Text('Lisanslar'),
+              onTap: () => showLicensePage(
+                  context: context, applicationName: 'Adım Adım'),
             ),
           ],
         ),

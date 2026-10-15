@@ -6,8 +6,11 @@ import '../tema/tema.dart';
 
 /// Özet kart: ad, seviye, XP çubuğu, seri. Geniş ekranda yol yanında gösterilir.
 class ProfilKarti extends StatelessWidget {
-  const ProfilKarti({super.key, required this.durum});
+  const ProfilKarti({super.key, required this.durum, this.bugun});
   final OgrenciDurumu durum;
+
+  /// 'YYYY-MM-DD'; seri kopma kontrolü için (yoksa sistem saati).
+  final String? bugun;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,7 @@ class ProfilKarti extends StatelessWidget {
               children: [
                 Icon(Icons.local_fire_department, color: r.vurgu),
                 const SizedBox(width: Olcu.b1),
-                Expanded(child: Text('${durum.seri} gün seri', style: yazi.bodyLarge)),
+                Expanded(child: Text('${Motor.gosterilenSeri(durum, bugun)} gün seri', style: yazi.bodyLarge)),
               ],
             ),
             const SizedBox(height: Olcu.b1),

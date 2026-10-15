@@ -8,15 +8,18 @@ class Ses {
 
   FlutterTts? _tts;
 
-  Future<void> oku(String metin, {String dil = 'en-US'}) async {
+  /// Başarıyla konuşma başlatıldıysa true; hata olursa false.
+  Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     try {
       final tts = _tts ??= FlutterTts();
       await tts.setLanguage(dil);
       await tts.setSpeechRate(0.45);
       await tts.stop();
       await tts.speak(metin);
+      return true;
     } catch (e) {
       debugPrint('Ses okunamadı: $e');
+      return false;
     }
   }
 }

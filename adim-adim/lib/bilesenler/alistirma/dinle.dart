@@ -26,8 +26,12 @@ class DinleGorunumu extends ConsumerStatefulWidget {
 
 class _DinleDurumu extends ConsumerState<DinleGorunumu> {
   int? _secili;
+  bool _sesHatasi = false;
 
-  void _oku() => ref.read(sesProvider).oku(widget.alistirma.okunacak);
+  Future<void> _oku() async {
+    final tamam = await ref.read(sesProvider).oku(widget.alistirma.okunacak);
+    if (!tamam && mounted && !_sesHatasi) setState(() => _sesHatasi = true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +71,12 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
                 const SizedBox(height: Olcu.b1),
                 Text(sesAcik ? 'Dinlemek için dokun' : 'Ses kapalı',
                     style: yazi.bodyMedium?.copyWith(color: r.metinIkincil)),
-                if (!sesAcik) ...[
+                if (_sesHatasi && sesAcik) ...[
+                  const SizedBox(height: Olcu.b1),
+                  Text('Ses kullanılamıyor; cümle yazılı gösterildi',
+                      style: yazi.bodyMedium?.copyWith(color: r.hata)),
+                ],
+                if (!sesAcik || _sesHatasi) ...[
                   const SizedBox(height: Olcu.b1),
                   Row(
                     mainAxisSize: MainAxisSize.min,

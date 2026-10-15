@@ -6,7 +6,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 /// Bildirim servisinin arayüzü (testte sahtesi sağlanır).
 abstract class BildirimServisi {
-  Future<void> gunlukHatirlatma(String saat);
+  /// İzin verilmez ya da kurulamazsa false döner.
+  Future<bool> gunlukHatirlatma(String saat);
   Future<void> iptal();
 }
 
@@ -14,7 +15,7 @@ abstract class BildirimServisi {
 class GercekBildirim implements BildirimServisi {
   const GercekBildirim();
   @override
-  Future<void> gunlukHatirlatma(String saat) => Bildirim.gunlukHatirlatma(saat);
+  Future<bool> gunlukHatirlatma(String saat) => Bildirim.gunlukHatirlatma(saat);
   @override
   Future<void> iptal() => Bildirim.iptal();
 }
@@ -46,13 +47,21 @@ abstract final class Bildirim {
 
   /// 'HH:MM' biçimindeki saatte her gün tekrarlanan hatırlatma kurar.
   /// Saat, cihazın yerel saatinden UTC'ye çevrilerek zamanlanır.
-  static Future<void> gunlukHatirlatma(String saat) async {
+  ///
+  /// SINIRLAMA: Yerel saat tz paketi kullanılmadan (tz.local ayarlanmadan)
+  /// UTC'ye çevrildiği için günlük tekrar UTC saatinde sabit kalır; yaz/kış
+  /// saati geçişinde hatırlatma yerel saate göre 1 saat kayar. Kalıcı çözüm
+  /// cihaz saat dilimini veren bir paket gerektirir (eklenmedi).
+  ///
+  /// Önce bildirim izni istenir (Android 13+, iOS, macOS); verilmezse false.
+  static Future<bool> gunlukHatirlatma(String saat) async {
     try {
       final parcalar = saat.split(':');
       final s = int.parse(parcalar[0]);
       final d = int.parse(parcalar[1]);
-      if (s < 0 || s > 23 || d < 0 || d > 59) return;
-      if (!await _baslat()) return;
+      if (s < 0 || s > 23 || d < 0 || d > 59) return false;
+      if (!await _baslat()) return false;
+      if (!await _izinIste()) return false;
       final simdi = DateTime.now();
       var hedef = DateTime(simdi.year, simdi.month, simdi.day, s, d);
       if (!hedef.isAfter(simdi)) {
@@ -78,9 +87,34 @@ abstract final class Bildirim {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
+      return true;
     } catch (e) {
       debugPrint('Hatırlatma kurulamadı: $e');
+      return false;
     }
+  }
+
+  static Future<bool> _izinIste() async {
+    final android = _eklenti.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.requestNotificationsPermission() ?? false;
+    }
+    final ios = _eklenti.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      return await ios.requestPermissions(
+              alert: true, badge: true, sound: true) ??
+          false;
+    }
+    final mac = _eklenti.resolvePlatformSpecificImplementation<
+        MacOSFlutterLocalNotificationsPlugin>();
+    if (mac != null) {
+      return await mac.requestPermissions(
+              alert: true, badge: true, sound: true) ??
+          false;
+    }
+    return true;
   }
 
   static Future<void> iptal() async {

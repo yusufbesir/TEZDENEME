@@ -1,6 +1,7 @@
 import 'package:adim_adim/bilesenler/profil_karti.dart';
 import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
+import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/servis/bildirim.dart';
 import 'package:adim_adim/servis/ses.dart';
 import 'package:adim_adim/uygulama.dart';
@@ -13,14 +14,20 @@ import 'sahte_icerik.dart';
 class SahteSes extends Ses {
   final okunanlar = <String>[];
   @override
-  Future<void> oku(String metin, {String dil = 'en-US'}) async =>
-      okunanlar.add(metin);
+  Future<bool> oku(String metin, {String dil = 'en-US'}) async {
+    okunanlar.add(metin);
+    return true;
+  }
 }
 
 class SahteBildirim implements BildirimServisi {
   final cagrilar = <String>[];
+  bool izin = true;
   @override
-  Future<void> gunlukHatirlatma(String saat) async => cagrilar.add('kur:$saat');
+  Future<bool> gunlukHatirlatma(String saat) async {
+    cagrilar.add('kur:$saat');
+    return izin;
+  }
   @override
   Future<void> iptal() async => cagrilar.add('iptal');
 }
@@ -176,5 +183,30 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
     expect(find.byType(ProfilKarti), findsNothing);
+  });
+
+  testWidgets('seri kopmuşsa ekranda 0 görünür', (tester) async {
+    final depo = BellekDepo(
+        const OgrenciDurumu(xp: 50, seri: 5, enSeri: 5, sonGun: '2026-10-01'));
+    await uygulamayiAc(tester, depo, boyut: const Size(1200, 900));
+    expect(find.text('0 gün seri'), findsWidgets);
+    expect(find.text('5 gün seri'), findsNothing);
+  });
+
+  testWidgets('bildirim izni reddedilince anahtar kapanır ve uyarı çıkar',
+      (tester) async {
+    final depo = BellekDepo();
+    final bildirim = SahteBildirim()..izin = false;
+    await uygulamayiAc(tester, depo, bildirim: bildirim);
+    await dokun(
+        tester,
+        find.descendant(
+            of: find.byType(NavigationBar), matching: find.text('Ayarlar')));
+    await dokun(tester, find.byType(SwitchListTile).last);
+    expect(find.text('Bildirim izni verilmedi'), findsOneWidget);
+    expect((await depo.yukle()).hatirlatmaSaati, isNull);
+    expect(
+        tester.widget<SwitchListTile>(find.byType(SwitchListTile).last).value,
+        false);
   });
 }

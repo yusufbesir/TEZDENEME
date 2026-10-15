@@ -45,7 +45,7 @@ class AnaSayfa extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ProfilKarti(durum: durum),
+                        ProfilKarti(durum: durum, bugun: bugun),
                         const SizedBox(height: Olcu.b2),
                         _GunlukKart(durum: durum, bugun: bugun),
                       ],
@@ -126,7 +126,7 @@ class _YolListesi extends ConsumerWidget {
                 children: [
                   _Rozet(
                     simge: Icons.local_fire_department,
-                    metin: '${durum.seri} gün seri',
+                    metin: '${Motor.gosterilenSeri(durum, bugun)} gün seri',
                     renk: r.vurgu,
                   ),
                   const SizedBox(height: Olcu.b1),
@@ -148,7 +148,7 @@ class _YolListesi extends ConsumerWidget {
           children: [
             _Rozet(
               simge: Icons.local_fire_department,
-              metin: '${durum.seri} gün seri',
+              metin: '${Motor.gosterilenSeri(durum, bugun)} gün seri',
               renk: r.vurgu,
             ),
             _Rozet(

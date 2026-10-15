@@ -18,13 +18,34 @@ final depoProvider = Provider<Depo>(
 
 final sesProvider = Provider<Ses>((ref) => Ses());
 
-final bildirimProvider =
-    Provider<BildirimServisi>((ref) => const GercekBildirim());
+final bildirimProvider = Provider<BildirimServisi>(
+  (ref) => const GercekBildirim(),
+);
+
+/// Son kayıt hatasının mesajı (null: sorun yok). Arayüz bunu dinleyip uyarır.
+class KayitHatasi extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void ayarla(String? mesaj) => state = mesaj;
+}
+
+final kayitHatasiProvider =
+    NotifierProvider<KayitHatasi, String?>(KayitHatasi.new);
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
 
 /// Bugünün günü 'YYYY-MM-DD'. Testte sabitlenebilir.
-final bugunProvider = Provider<String>((ref) => Motor.bugun());
+final bugunProvider = Provider<String>((ref) {
+  final simdi = DateTime.now();
+  // Gece yarısı geçince kendini yeniler; uygulama açık kalsa da gün değişir.
+  final yarin = DateTime(simdi.year, simdi.month, simdi.day + 1);
+  final sayac = Timer(
+    yarin.difference(simdi) + const Duration(seconds: 1),
+    ref.invalidateSelf,
+  );
+  ref.onDispose(sayac.cancel);
+  return Motor.bugun(simdi);
+});
 
 /// Ana sayfada seçili kurs kimliği (null: ilk kurs).
 class SecilenKurs extends Notifier<String?> {
@@ -33,8 +54,9 @@ class SecilenKurs extends Notifier<String?> {
   void sec(String id) => state = id;
 }
 
-final secilenKursProvider =
-    NotifierProvider<SecilenKurs, String?>(SecilenKurs.new);
+final secilenKursProvider = NotifierProvider<SecilenKurs, String?>(
+  SecilenKurs.new,
+);
 
 class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   @override
@@ -48,7 +70,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     }
     final saat = d.hatirlatmaSaati;
     if (saat != null) {
-      unawaited(ref.read(bildirimProvider).gunlukHatirlatma(saat));
+      unawaited(ref.read(bildirimProvider).gunlukHatirlatma(saat).catchError((_) => false));
     }
     return d;
   }
@@ -56,13 +78,18 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   OgrenciDurumu get _simdiki => state.value ?? const OgrenciDurumu();
 
   Future<OgrenciDurumu> _uygula(
-      OgrenciDurumu Function(OgrenciDurumu) donustur) async {
+    OgrenciDurumu Function(OgrenciDurumu) donustur,
+  ) async {
     final yeni = donustur(_simdiki);
     state = AsyncData(yeni);
     try {
       await ref.read(depoProvider).kaydet(yeni);
+      if (ref.read(kayitHatasiProvider) != null) {
+        ref.read(kayitHatasiProvider.notifier).ayarla(null);
+      }
     } catch (e) {
       debugPrint('Durum kaydedilemedi: $e');
+      ref.read(kayitHatasiProvider.notifier).ayarla('$e');
     }
     return yeni;
   }
@@ -78,8 +105,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   }
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
-  /// `hatirlatmaSil`: hatırlatmayı kapat.
-  Future<void> ayarGuncelle({
+  /// `hatirlatmaSil`: hatırlatmayı kapat. Hatırlatma açılırken bildirim izni
+  /// verilmezse hatırlatma geri kapatılır ve false döner.
+  Future<bool> ayarGuncelle({
     String? ad,
     bool? koyuTema,
     bool koyuTemaSil = false,
@@ -88,25 +116,32 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
   }) async {
-    await _uygula((d) => d.copyWith(
-          ad: ad,
-          koyuTema: koyuTema,
-          koyuTemaSil: koyuTemaSil,
-          sesAcik: sesAcik,
-          gunlukHedef: gunlukHedef,
-          hatirlatmaSaati: hatirlatmaSaati,
-          hatirlatmaSil: hatirlatmaSil,
-        ));
+    await _uygula(
+      (d) => d.copyWith(
+        ad: ad,
+        koyuTema: koyuTema,
+        koyuTemaSil: koyuTemaSil,
+        sesAcik: sesAcik,
+        gunlukHedef: gunlukHedef,
+        hatirlatmaSaati: hatirlatmaSaati,
+        hatirlatmaSil: hatirlatmaSil,
+      ),
+    );
     final bildirim = ref.read(bildirimProvider);
     try {
       if (hatirlatmaSil) {
         await bildirim.iptal();
       } else if (hatirlatmaSaati != null) {
-        await bildirim.gunlukHatirlatma(hatirlatmaSaati);
+        final izinli = await bildirim.gunlukHatirlatma(hatirlatmaSaati);
+        if (!izinli) {
+          await _uygula((d) => d.copyWith(hatirlatmaSil: true));
+          return false;
+        }
       }
     } catch (e) {
       debugPrint('Bildirim ayarı uygulanamadı: $e');
     }
+    return true;
   }
 
   Future<void> sifirla() async {
@@ -122,5 +157,6 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   }
 }
 
-final durumProvider =
-    AsyncNotifierProvider<DurumNotifier, OgrenciDurumu>(DurumNotifier.new);
+final durumProvider = AsyncNotifierProvider<DurumNotifier, OgrenciDurumu>(
+  DurumNotifier.new,
+);

@@ -5,6 +5,7 @@ import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 const _gunAdlari = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
@@ -44,7 +45,7 @@ class ProfilEkrani extends ConsumerWidget {
                 header: true,
                 child: Text('Profil', style: yazi.headlineMedium)),
             const SizedBox(height: Olcu.b3),
-            ProfilKarti(durum: durum),
+            ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),
             Row(
               children: [
@@ -68,7 +69,7 @@ class ProfilEkrani extends ConsumerWidget {
                     child: _Istatistik(
                         simge: Icons.local_fire_department,
                         etiket: 'Seri',
-                        deger: '${durum.seri} gün')),
+                        deger: '${Motor.gosterilenSeri(durum, bugun)} gün')),
                 const SizedBox(width: Olcu.b2),
                 Expanded(
                     child: _Istatistik(
