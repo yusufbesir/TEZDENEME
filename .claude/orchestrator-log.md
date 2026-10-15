@@ -14,3 +14,4 @@
 | 2026-10-15 | Jev paketi güvenlik incelemesi [İP:Jev'i projeye bağlama#TMGrRs] | verifier (güvenlik) / claude-sonnet-5-5 | 45.294 toplam | Geçti; 3 orta, 5 düşük bulgu. Düzeltme implementer'a verildi. |
 | 2026-10-15 | Jev paketi güvenlik bulgularını düzelt [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 58.478 toplam | Başarılı. 8 madde, 43 test. Orkestratör cihaz dönüş biçimi (code=None, üst düzey güven) uyumunu ekledi, 44 test. |
 | 2026-10-15 | Güvenlik düzeltmelerini yeniden doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Kaldı yalnız belgede (hash cümlesi); orkestratör tek satırı düzeltti, kod kontrolleri geçti (44 test, cihaz biçimi uçtan uca). |
+| 2026-10-15 | criteria sözlük düzeltmesini doğrula (cihazda HTTP 400 teşhisi sonrası) [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. 45 test. |

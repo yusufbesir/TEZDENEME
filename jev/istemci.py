@@ -107,9 +107,10 @@ def yanit_dogrula(raw, questions):
         if not isinstance(a, dict):
             return None
         if isinstance(q, dict) and q.get("type") == "choice":
-            # Gerçek API (cihazdaki jev_client ile aynı şema): seçenekler criteria metinleridir.
-            secenekler = q.get("criteria")
-            if not isinstance(secenekler, list) or not secenekler:
+            # Gerçek API: criteria {seçenek_id: açıklama} sözlüğüdür; choice ve olasılık anahtarları id'lerdir.
+            kriter = q.get("criteria")
+            secenekler = list(kriter) if isinstance(kriter, dict) else None
+            if not secenekler:
                 return None
             if a.get("choice") not in secenekler:
                 return None

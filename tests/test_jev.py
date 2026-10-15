@@ -38,8 +38,9 @@ def sahte(sirayla):
         govdeler.append(body)
         choice, probs, conf = sirayla[min(sayac["n"], len(sirayla) - 1)]
         sayac["n"] += 1
-        # Gerçek API gibi: seçim ve olasılık anahtarları criteria metinleridir.
-        metin = {c.split(":", 1)[0]: c for c in body["questions"]["secim"]["criteria"]}
+        # Gerçek API gibi: criteria sözlük olmalı; seçim ve olasılık anahtarları seçenek id'leridir.
+        assert isinstance(body["questions"]["secim"]["criteria"], dict), "criteria sözlük olmalı (liste HTTP 400)"
+        metin = {}
         a = {"choice": metin.get(choice, choice), "probabilities": {metin.get(k, k): v for k, v in probs.items()}}
         if conf is not None:
             a["confidence"] = conf
@@ -153,9 +154,9 @@ class ProtokolTesti(Temel):
             s = json.dumps(b, ensure_ascii=False)
             self.assertNotIn("ÖZEL_GEREKCE_XYZ", s)
             self.assertNotIn("claude", s.lower())
-        self.assertEqual([c[0] for c in t.govdeler[0]["questions"]["secim"]["criteria"]], ["A", "B", "C"])
+        self.assertEqual(list(t.govdeler[0]["questions"]["secim"]["criteria"]), ["A", "B", "C"])
         self.assertNotIn("options", t.govdeler[0]["questions"]["secim"])
-        self.assertEqual([c[0] for c in t.govdeler[1]["questions"]["secim"]["criteria"]], ["C", "B", "A"])
+        self.assertEqual(list(t.govdeler[1]["questions"]["secim"]["criteria"]), ["C", "B", "A"])
 
     def test_gizli_girdi_gonderilmez_ve_yazilmaz(self):
         t = sahte([YUKSEK])
@@ -269,7 +270,7 @@ class BulutTasimaTesti(Temel):
         p.start()
         self.addCleanup(p.stop)
 
-    Q = {"secim": {"type": "choice", "criteria": ["A: x", "B: y"], "instructions": "i"}}
+    Q = {"secim": {"type": "choice", "criteria": {"A": "x", "B": "y"}, "instructions": "i"}}
 
     def test_host_sabit_ve_yonlendirme_reddi(self):
         gorulen = {}
@@ -278,7 +279,7 @@ class BulutTasimaTesti(Temel):
             def __enter__(s): return s
             def __exit__(s, *a): return False
             def read(s, n=-1):
-                return json.dumps({"answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.7, "B: y": 0.3},
+                return json.dumps({"answers": {"secim": {"choice": "A", "probabilities": {"A": 0.7, "B": 0.3},
                                                          "confidence": 0.8}}, "model": "m"}).encode()
 
         class Acici:
@@ -318,14 +319,14 @@ class BulutTasimaTesti(Temel):
             self.assertTrue(istemci.UC_NOKTA.startswith("https://ai-gateway.vercel.sh/"))
 
     def test_yanit_dogrulama(self):
-        iyi = {"answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.5, "B: y": 0.5}}}}
+        iyi = {"answers": {"secim": {"choice": "A", "probabilities": {"A": 0.5, "B": 0.5}}}}
         kotuler = [
             {"answers": []},
             {"answers": {"baska": iyi["answers"]["secim"]}},
-            {"answers": {"secim": {"choice": "Z", "probabilities": {"A: x": 0.5, "B: y": 0.5}}}},
-            {"answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.5, "C": 0.5}}}},
-            {"answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.9, "B: y": 0.5}}}},
-            {"answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 1.5, "B: y": -0.5}}}},
+            {"answers": {"secim": {"choice": "Z", "probabilities": {"A": 0.5, "B": 0.5}}}},
+            {"answers": {"secim": {"choice": "A", "probabilities": {"A": 0.5, "C": 0.5}}}},
+            {"answers": {"secim": {"choice": "A", "probabilities": {"A": 0.9, "B": 0.5}}}},
+            {"answers": {"secim": {"choice": "A", "probabilities": {"A": 1.5, "B": -0.5}}}},
         ]
         self.assertTrue(istemci.sor({"q": "s"}, self.Q, tasima=lambda b, t: iyi)["ok"])
         for k in kotuler:
@@ -358,9 +359,9 @@ class CliTesti(Temel):
             self.assertEqual(kayit.varsayilan_yol(), "/tmp/x/y.jsonl")
 
 
-Q1 = {"secim": {"type": "choice", "criteria": ["A: x", "B: y"], "instructions": "i"}}
+Q1 = {"secim": {"type": "choice", "criteria": {"A": "x", "B": "y"}, "instructions": "i"}}
 IYI_CIHAZ = {"ok": True, "degraded": False, "code": "ok", "model": "jev-1.13.0",
-             "answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.7, "B: y": 0.3},
+             "answers": {"secim": {"choice": "A", "probabilities": {"A": 0.7, "B": 0.3},
                                    "confidence": 0.8}},
              "confidence": {"secim": 0.99}, "ekstra": "<script>"}
 
@@ -380,8 +381,8 @@ class GuvenlikDuzeltmeTesti(Temel):
         self.assertEqual(r["model"], "jev-1.13.0")
 
     def test_cihaz_kotu_answers(self):
-        for kotu in ({"secim": {"choice": "Z", "probabilities": {"A: x": 0.5, "B: y": 0.5}}},
-                     {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.9, "B: y": 0.5}}},
+        for kotu in ({"secim": {"choice": "Z", "probabilities": {"A": 0.5, "B": 0.5}}},
+                     {"secim": {"choice": "A", "probabilities": {"A": 0.9, "B": 0.5}}},
                      {"baska": {}}, []):
             ham = dict(IYI_CIHAZ, answers=kotu)
             r = self._cihaz(ham)
@@ -411,7 +412,7 @@ class GuvenlikDuzeltmeTesti(Temel):
             f.write("import sys\nGORULEN = list(sys.path)\n"
                     "def sor(state, questions, timeout=1):\n"
                     "    return {'ok': True, 'degraded': False, 'code': 'ok', 'model': 'm',\n"
-                    "            'answers': {'secim': {'choice': 'A: x', 'probabilities': {'A: x': 0.6, 'B: y': 0.4}}},\n"
+                    "            'answers': {'secim': {'choice': 'A', 'probabilities': {'A': 0.6, 'B': 0.4}}},\n"
                     "            'yol_sonu': sys.path[-1]}\n")
         once = list(sys.path)
         with mock.patch.dict(os.environ, {"JEV_ARACLAR": arac}):
@@ -514,13 +515,20 @@ if __name__ == "__main__":
 
 
 class CihazGercekBicimTesti(unittest.TestCase):
-    """jev_cagri.sor'un gerçek dönüş biçimi: code=None, üst düzey confidence, choice=criteria metni."""
+    """jev_cagri.sor'un gerçek dönüş biçimi: code=None, üst düzey confidence, choice=seçenek id."""
 
     def test_basari_code_none_ve_ust_guven(self):
-        q = {"secim": {"type": "choice", "criteria": ["A: x", "B: y"], "instructions": "i"}}
+        q = {"secim": {"type": "choice", "criteria": {"A": "x", "B": "y"}, "instructions": "i"}}
         ham = {"ok": True, "degraded": False, "code": None, "model": "typesafe-ai/jev",
-               "answers": {"secim": {"choice": "A: x", "probabilities": {"A: x": 0.7, "B: y": 0.3}}},
+               "answers": {"secim": {"choice": "A", "probabilities": {"A": 0.7, "B": 0.3}}},
                "confidence": {"secim": 0.85}, "latency_ms": 5, "usage": {}}
         r = istemci._cihaz_sonuc(ham, q, 0)
         self.assertTrue(r["ok"], r)
         self.assertEqual(r["confidence"], {"secim": 0.85})
+
+
+class CriteriaBicimTesti(unittest.TestCase):
+    def test_liste_criteria_reddedilir(self):
+        q = {"secim": {"type": "choice", "criteria": ["A", "B"], "instructions": "i"}}
+        r = istemci.sor({"q": "s"}, q, tasima=lambda b, t: {"answers": {"secim": {"choice": "A", "probabilities": {"A": 1.0, "B": 0.0}}}})
+        self.assertEqual(r["code"], "yanit_gecersiz")

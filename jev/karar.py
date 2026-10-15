@@ -52,7 +52,9 @@ def _jev_sor(girdi, sirali, tasima):
     soru = {
         "secim": {
             "type": "choice",
-            "criteria": ["%s: %s" % (s["id"], s["aciklama"][:300]) for s in sirali],
+            # Sunucu choice için {seçenek_id: açıklama} sözlüğü (record) bekler; liste HTTP 400 verir.
+            # Sözlük sırası korunur, bu yüzden ters sıralama denetimi de çalışır.
+            "criteria": {s["id"]: s["aciklama"][:300] for s in sirali},
             "instructions": TALIMAT,
         }
     }
