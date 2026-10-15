@@ -25,3 +25,5 @@
 2026-10-15 | Temizlik özelliği bağımsız doğrulama | verifier / claude-sonnet-5-5 | 38,013 alt-ajan token | Geçti
 2026-10-15 | 1.1.1 hardlink (nlink) düzeltmesi + exe derleme | orkestratör (kendisi, tek dosya) | ana oturum | Tamamlandı (31 + 112 test)
 2026-10-15 | 1.1.1 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti
+2026-10-15 | 1.1.2 kullanıcı başına kurulum (allowElevation:false, installer.nsh), derleme | orkestratör (küçük yapılandırma işi) | ana oturum | Tamamlandı (32 + 112 test)
+2026-10-15 | 1.1.2 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti (makro etkisi derlenmiş pakette doğrulanamadı, şablon kodundan dolaylı kanıt)
