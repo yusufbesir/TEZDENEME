@@ -4,9 +4,10 @@
 Release derlemesi hata ayıklama anahtarıyla değil, geliştiricinin cihazındaki ayrı bir yayın anahtar deposuyla imzalanır.
 
 ## Dosyalar
-- `android/key.properties` (depoya girmez; hem kök hem `adim-adim/` hem `android/` `.gitignore` engeller): `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
-- Anahtar deposu `adim-adim-yayin.jks` (depoya girmez). Konum aşağıda.
-- `android/app/build.gradle.kts`: `key.properties` varsa `yayin` imza yapılandırmasını kullanır. Yoksa:
+- `key.properties` (düz metin şifre içerir): **`%USERPROFILE%\.anahtar\key.properties`**. Proje klasörüne KONMAZ; `D:\YusufII` ağacını diğer hesaplar da okuyabilir. Alanlar: `storePassword`, `keyPassword`, `keyAlias`, `storeFile`.
+- Anahtar deposu `adim-adim-yayin.jks`: aynı `.anahtar` klasöründe. Konum ve ACL aşağıda.
+- `android/app/build.gradle.kts` `key.properties` dosyasını YALNIZ `<kullanıcı profili>/.anahtar/key.properties` konumunda arar. Proje içinde (`android/key.properties`) geri dönüş yolu bilerek yoktur; `.gitignore` kuralları yalnız yanlışlıkla eklenmeye karşı durur. Log'a yalnız dosya yolu yazılır, şifre asla yazılmaz.
+  Bulursa `yayin` imza yapılandırmasını kullanır. Bulamazsa:
   - **her release görevinde (assembleRelease, bundleRelease, `flutter build apk --release`) derlemeyi durdurur**; `android/gradle.properties` içinde `dagitim=true` varsayılandır, bayrak unutulamaz,
   - yalnız `-Pdagitim=false` açıkça verilirse uyarı basar ve hata ayıklama anahtarına düşer (yerel deneme).
 
@@ -35,7 +36,7 @@ mkdir %USERPROFILE%\.anahtar
 keytool -genkeypair -v -keystore %USERPROFILE%\.anahtar\adim-adim-yayin.jks -storetype PKCS12 -alias adimadim -keyalg RSA -keysize 4096 -validity 10950
 ```
 
-Ardından `adim-adim/android/key.properties` dosyasını doldurun (`storeFile` tam yol, ters bölüler `\\` ya da `/` ile):
+Ardından aynı klasördeki `key.properties.sablon` dosyasını doldurup `%USERPROFILE%\.anahtar\key.properties` olarak kaydedin (`storeFile` tam yol, `/` ayırıcıyla). Dosyayı proje klasörüne kopyalamayın:
 
 ```
 storePassword=...
@@ -51,14 +52,14 @@ storeFile=C:/Users/<kullanici>/.anahtar/adim-adim-yayin.jks
 cd adim-adim
 flutter build apk --release      # ya da flutter build appbundle
 ```
-Ek bayrak gerekmez; koruma varsayılan açıktır. `key.properties` yoksa derleme şu hatayla durur:
-"Release derlemesi için android/key.properties gerekli". Yalnız yerel deneme için:
+Ek bayrak gerekmez; koruma varsayılan açıktır. `key.properties` bulunamazsa derleme şu hatayla durur:
+"Release derlemesi için key.properties gerekli (%USERPROFILE%\.anahtar\key.properties)". Yalnız yerel deneme için:
 `cd android && gradlew -Pdagitim=false assembleRelease` (debug anahtarı, dağıtılmaz).
 
 ## Yedek
 Anahtar deposunun kaybı uygulamanın güncellenememesi demektir. `.jks` dosyasını ve şifreleri ayrı, güvenli bir yere (parola yöneticisi ya da şifreli harici disk) yedekleyin.
 
 ## Kurallar
-- `key.properties` ve `*.jks` hiçbir zaman commit edilmez; kök ve alt `.gitignore` dosyaları bunu engeller.
+- `key.properties` ve `*.jks` hiçbir zaman commit edilmez ve proje klasörüne konmaz; yine de kök ve alt `.gitignore` dosyaları yanlışlıkla eklenmelerini engeller.
 - Şifreler kasa notlarına ve Mem0'a yazılmaz.
 - Yayın derlemesi `key.properties` olmadan dağıtılmaz; `dagitim=true` varsayılanı bunu zorlar, `-Pdagitim=false` yalnız yerel deneme içindir.

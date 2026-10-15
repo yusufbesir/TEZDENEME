@@ -8,13 +8,17 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Yayın imzası: android/key.properties dosyası depoya girmez (.gitignore).
-// Anahtar deposu (*.jks) ve şifreler yalnızca geliştiricinin cihazında durur.
+// Yayın imzası: key.properties düz metin şifre içerir, bu yüzden YALNIZ kullanıcının
+// erişebildiği <kullanıcı profili>/.anahtar/key.properties dosyasından okunur.
+// Proje içinde (android/key.properties) geri dönüş yolu bilerek YOKTUR: proje ağacını
+// başka hesaplar okuyabilir. Anahtar deposu (*.jks) da aynı .anahtar klasöründedir.
+// Şifreler hiçbir log satırına yazılmaz; yalnız dosyanın yolu kaydedilir.
 val anahtarOzellikleri = Properties()
-val anahtarDosyasi = rootProject.file("key.properties")
-val yayinImzasiVar = anahtarDosyasi.exists()
+val anahtarDosyasi = file(System.getProperty("user.home")).resolve(".anahtar").resolve("key.properties")
+val yayinImzasiVar = anahtarDosyasi.isFile
 if (yayinImzasiVar) {
     FileInputStream(anahtarDosyasi).use { anahtarOzellikleri.load(it) }
+    logger.lifecycle("Yayın imzası: ${anahtarDosyasi.absolutePath} kullanılıyor")
 }
 
 // Dağıtım koruması: android/gradle.properties içinde `dagitim=true` VARSAYILANDIR.
@@ -27,8 +31,8 @@ gradle.taskGraph.whenReady {
     val releaseGorevi = allTasks.any { it.project == project && it.name.contains("Release") }
     if (releaseGorevi && dagitimKorumasi && !yayinImzasiVar) {
         throw GradleException(
-            "Release derlemesi için android/key.properties gerekli; hata ayıklama anahtarıyla " +
-                "dağıtım yapılmaz. Yalnız yerel deneme için -Pdagitim=false verin. Bkz. docs/IMZA.md"
+            "Release derlemesi için key.properties gerekli (%USERPROFILE%\\.anahtar\\key.properties); " +
+                "hata ayıklama anahtarıyla dağıtım yapılmaz. Yalnız yerel deneme için -Pdagitim=false verin. Bkz. docs/IMZA.md"
         )
     }
 }
@@ -76,7 +80,7 @@ android {
             } else {
                 // key.properties yoksa yalnız -Pdagitim=false ile (yerel deneme) buraya düşülür;
                 // aksi halde yukarıdaki taskGraph denetimi release görevini durdurur.
-                logger.warn("UYARI: android/key.properties yok; release derlemesi hata ayıklama anahtarıyla imzalanır. Dağıtma!")
+                logger.warn("UYARI: key.properties bulunamadı; release derlemesi hata ayıklama anahtarıyla imzalanır. Dağıtma!")
                 signingConfig = signingConfigs.getByName("debug")
             }
         }

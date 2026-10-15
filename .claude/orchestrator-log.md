@@ -29,3 +29,4 @@
 - 2026-10-15 | PR #16 denetim bulguları (ps1 yedek/geri alma/bağlantı/TOCTOU, yolHatasi ayrılmış adlar, -Pdagitim, IMZA.md, kök .gitignore) | ana oturum (Fable 5.1) kendisi uyguladı | - | tamam
 - 2026-10-15 | PR #16 düzeltmelerini doğrula | verifier (claude-sonnet-5-5) | ~34.2K token | Geçti (121 test, analyze temiz; sürücü kökü notu düzeltildi)
 - 2026-10-15 | Siber Güvenlik notu: release imza koruması varsayılan açık (gradle.properties dagitim=true, taskGraph denetimi) | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
+- 2026-10-15 | Siber Güvenlik: key.properties yalnız %USERPROFILE%\.anahtar'dan okunur, depo içi geri dönüş kaldırıldı | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
