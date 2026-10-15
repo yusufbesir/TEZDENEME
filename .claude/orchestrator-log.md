@@ -16,3 +16,5 @@
 | 2026-10-15 | Adım Adım: arayüz (5 ekran, 7 alıştırma bileşeni, tema, Riverpod, go_router, ses ve bildirim servisleri) | implementer / claude-sonnet-5-5 | 120.907 toplam | Başarılı. 91 test geçti (toplam), analyze temiz. |
 | 2026-10-15 | Adım Adım: bağımsız doğrulama (analyze, 91 test, sözleşme uyumu, kart kimliği, Türkçe tarama) | verifier / claude-sonnet-5-5 | 64.247 toplam | Geçti. 2 orta bulgu (seri gösterimi, gün sağlayıcısı), 3 düşük; orkestratör düzeltti. |
 | 2026-10-15 | Adım Adım: güvenlik incelemesi (ağ, yerel veri, girdi, izinler, lisanslar) | güvenlik denetçisi (general-purpose) / claude-sonnet-5-5 | 123.148 toplam | 1 yüksek, 6 orta, 6 düşük bulgu; docs/GUVENLIK.md. Düzeltmeler orkestratör + implementer. |
+| 2026-10-15 | Adım Adım: arayüz tarafı düzeltmeleri (bildirim izni, kayıt uyarısı, seri gösterimi, lisans sayfası) | implementer / claude-sonnet-5-5 | 61.335 toplam | Başarılı. 98 test geçti. |
+| 2026-10-15 | Adım Adım: düzeltmelerin yeniden doğrulanması | verifier / claude-sonnet-5-5 | ~60.000 toplam | Geçti. GUVENLIK.md kararlarının hepsi kodda; 3 düşük not. |
