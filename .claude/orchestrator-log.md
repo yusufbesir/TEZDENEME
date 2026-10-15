@@ -39,3 +39,7 @@
 | 2026-10-15 | Dosya dönüştürücü güvenlik düzeltmeleri [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 8 madde, 76 test geçti. |
 | 2026-10-15 | Dosya dönüştürücü düzeltmelerini doğrula [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 76 test, tüm video/ses biçimleri beyaz listeyle çalışıyor, LibreOffice ağ kesme etkili. Opak görsel→ICO hatasını orkestratör tek satırla düzeltti. |
 | 2026-10-15 | LibreOffice makro/bağlantı sertleştirmesi (orkestratör, tek dosya) [İP:Dosya dönüştürücü#eSZiVv] | Opus (ana oturum) | — | 76 test geçti; ayarların LibreOffice profilinde kaldığı gerçek dönüşümle görüldü. |
+| 2026-10-15 | Güncelleme ve eski sürüm temizliği [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 88 test; NSIS makrosu Windows'ta denenmedi. |
+| 2026-10-15 | Güncelleme temizliği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Kaldı: 1 orta (boş manifest), 3 düşük, NSIS kaldırmada RMDir /r riski. implementer'a döndü. |
+| 2026-10-15 | Güvenlik turu 2 düzeltmeleri (güncelleme, NSIS, imza, parse5) [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 104 test; NSIS çalışma zamanı Windows'ta denenmedi. |
+| 2026-10-15 | İkinci tur doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 104 test, 52 HTML atlatma denemesi, NSIS derlemesi. Orkestratör kök-mutlak yerel yolları da uzak saydı (tek satır). |
