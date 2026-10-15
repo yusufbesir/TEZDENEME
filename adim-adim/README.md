@@ -19,7 +19,7 @@ flutter build apk           # Android (release: %USERPROFILE%\.anahtar\key.prope
 ```
 Testler: `flutter analyze && flutter test`
 
-Yayın imzası: Android release derlemesi `%USERPROFILE%\.anahtar\key.properties` (yalnız kullanıcının erişebildiği klasör) üzerinden ayrı yayın anahtar deposuyla imzalanır; dosya ve `*.jks` ne depoya ne proje klasörüne girer. Kurulum için bkz. `docs/IMZA.md`. `key.properties` yoksa release derlemesi varsayılan olarak DURUR (`dagitim=true`); yalnız yerel deneme için `cd android && gradlew -Pdagitim=false assembleRelease` ile debug anahtarına düşülür.
+Yayın imzası: Android release derlemesi `%USERPROFILE%\.anahtar\key.properties` (yalnız kullanıcının erişebildiği klasör) üzerinden ayrı yayın anahtar deposuyla imzalanır; dosya ve `*.jks` ne depoya ne proje klasörüne girer. Kurulum için bkz. `docs/IMZA.md`. `key.properties` yoksa release derlemesi varsayılan olarak DURUR (`dagitim=true`); yalnız yerel deneme için `cd android && gradlew -Pdagitim=false assembleRelease` ile debug anahtarına düşülür. `key.properties` var ama hatalıysa (boş alan, göreli `storeFile`, eksik `.jks`) debug derlemesi de durur; bu bilerek güvenli tarafta kalan davranıştır, dosyayı düzeltin.
 
 ## Klasörler
 - `lib/model` içerik ve öğrenci durumu modelleri
