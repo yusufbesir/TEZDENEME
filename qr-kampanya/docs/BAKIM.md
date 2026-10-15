@@ -19,7 +19,7 @@ cd /opt/qr-kampanya
 bash scripts/guncelle.sh
 ```
 
-Betik sırasıyla: imajları derler; veritabanını başlatıp rolleri günceller; şifreli bir güncelleme öncesi yedeği alır; migrasyonları ayrı çalıştırır (başarısız olursa eski uygulamaya dokunmaz ve yedeğin adını, geri dönüş komutunu yazar); uygulamayı yeniler; Caddy'yi yeni yapılandırmayla yeniden oluşturup doğrular ve sağlık kontrolü yapar. Caddy yenilenirken birkaç saniyelik kesinti olur. Veriler Docker birimlerinde (`db-veri`, `medya`) tutulduğu için konteynerlerin yeniden oluşturulması veri kaybettirmez.
+Betik sırasıyla: imajları derler; veritabanını başlatıp rolleri günceller; şifreli bir güncelleme öncesi yedeği alır; migrasyonları ayrı çalıştırır (başarısız olursa eski uygulamaya dokunmaz ve yedeğin adını, geri dönüş komutunu yazar); uygulamayı yeniler; Caddy'yi yeni yapılandırmayla yeniden oluşturup doğrular ve sağlık kontrolü yapar. Caddy yenilenirken birkaç saniyelik kesinti olur. Caddy sağlık denetimindeki `RestartCount` yalnızca `docker inspect` anındaki sayacı okur ve yaklaşık 4 saniye sonra bir kez daha bakar; daha sonraki çökmeleri yakalamaz (gerekirse `docker compose ps` ile tekrar bakın). Veriler Docker birimlerinde (`db-veri`, `medya`) tutulduğu için konteynerlerin yeniden oluşturulması veri kaybettirmez.
 
 **Asla çalıştırmayın:** `docker compose down -v` (`-v` bütün veritabanını ve görselleri siler).
 

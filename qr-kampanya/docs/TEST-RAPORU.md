@@ -4,7 +4,7 @@
 
 ## Özet
 
-- **Otomatik testler:** 264 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15.txt`.
+- **Otomatik testler:** 338 test, hepsi geçti (`bash scripts/test.sh` veya `python manage.py test qr`; gerçek rclone gerektiren testler `QR_TEST_RCLONE` verilince çalışır). Ham çıktı: `docs/kanit/test-ciktisi-2026-10-15-yedek-riskleri.txt` (önceki 264 testlik koşu: `docs/kanit/test-ciktisi-2026-10-15.txt`).
 - **Uçtan uca testler** bulut geliştirme ortamında, gerçek Docker Compose yığınıyla (PostgreSQL 17.6, Caddy 2.10.2, uygulama imajı; sıkılaştırılmış ayarlar ve MFA zorunlu) yapıldı. Alan adı ve VPS henüz olmadığı için HTTPS yerine `http://localhost:8080` kullanıldı.
 - **Yapılamayanlar (açıkça):** gerçek alan adında HTTPS sertifikası alma ve fiziksel baskıdan telefonla okuma. Bunlar VPS kurulumunda yapılmalı (bkz. sonda).
 - Bağımsız denetim: gereksinim doğrulaması **Geçti**; güvenlik denetimi iki tur yapıldı, bulunan Orta bulgular düzeltildi (bkz. “Güvenlik denetimi”).
@@ -60,6 +60,17 @@
 | 7 | Düşük bulgular | IPv6 /64 yönlendirme hız sınırında; geri yüklemede sha256 doğrulaması; tek işlemli geri yükleme; dosya adı doğrulaması. `db`/`yedek` konteyner sıkılaştırması sınırlama olarak kaldı | Birim testleri |
 
 Düzeltmelerden sonra iki tur iç güvenlik denetimi (Opus) yapıldı; ilk turdaki Orta bulgu (eski kurulumu güncellerken yedeğin rol oluşmadan alınması) düzeltildi ve eski sürümden yükseltme uçtan uca denendi.
+
+## Denetmenin son üç küçük riski (15 Ekim, akşam)
+
+| # | Risk | Yapılan | Kanıt |
+|---|---|---|---|
+| 1 | Özel yedek anahtarı sunucuda kalıyor | Anahtar bellekte (tmpfs) ve Docker günlüğüne düşmeden üretilir, ekranda bir kez gösterilir; `EVET` + anahtarın geri yapıştırılıp birebir eşleşmesiyle diske hiç yazılmadan kaldırılır. Onay yoksa/kesilirse önce `gizli/` (700/600) altına kaydedilir, sonra `.env` yazılır; anahtar hiçbir yolda kaybolmaz. Geri yükleme ve aylık test anahtarı gizli girişle ister | pty ile birim testleri; gerçek Docker ile `docker logs` ve `/var/lib/docker/containers` taraması: 0 eşleşme |
+| 2 | Aynı makinedeki hedef “uzak” sayılıp yerel yedek silinebilir | Sunucu dışı tür izin listesi; yerel yol, `local`/`archive`/`memory`, bu makineyi gösteren host/endpoint/url (localhost, 127/8, ::1, makine adı ve IP'leri), `ssh=`, `unix_socket`, `use_emulator`, seçenekli ad ve bilinmeyen tür yerel sayılır, silme yapılmaz. Tüm rclone çağrıları `RCLONE_*` ortam değişkenleri olmadan çalışır | Gerçek rclone v1.75.0: sftp localhost, alias→yerel, archive, webdav unix soketi, ortam değişkeni yönlendirmeleri; hepsinde yerel dosyalar duruyor |
+| 3 | SFTP/Storage Box'ta yalnızca boyutla doğrulama | Ortak özet `rclone backend features` ile açıkça sorgulanır; sftp/ftp/smb/webdav ve belirsiz durumda otomatik `--download`, yalnızca silinmeye aday + en yeni yedekle sınırlı; o da başarısızsa silme yok | Gerçek `rclone serve sftp` (hash kapalı) ile `RCLONE_LOG_LEVEL=ERROR` altında bile indirerek doğrulama |
+| — | `guncelle.sh` düşükleri | `up -d --no-deps app`; yeni Caddyfile ayrı kapta doğrulanır, geçersizse çalışan Caddy'ye dokunulmaz; RestartCount kontrolü | Geçersiz Caddyfile ile e2e: hata, eski Caddy aynı |
+
+Bu değişiklikler beş tur bağımsız doğrulama ve beş tur güvenlik denetiminden (Opus) geçti; her turdaki Orta bulgular düzeltildi, son turda Kritik/Yüksek/Orta bulgu kalmadı. Kalan Düşükler `GUVENLIK.md` → Bilinen sınırlamalar. Ham çıktılar: `docs/kanit/yedek-riskleri-*.txt`. Gerçek bir Hetzner Storage Box'a karşı denenmedi.
 
 ## VPS'te yapılması gereken testler
 

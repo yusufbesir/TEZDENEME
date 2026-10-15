@@ -29,6 +29,10 @@ hata_yolu() {
       echo "HATA: hazırlık (veritabanı migrasyonu) BAŞARISIZ oldu. Eski uygulama (app) ve Caddy'ye dokunulmadı; çalışıyorsa çalışmaya devam eder."
       echo "Günlük: docker compose logs hazirlik --tail 100"
       ;;
+    caddy-dogrulama)
+      echo "HATA: yeni Caddyfile GEÇERSİZ. Eski Caddy'ye DOKUNULMADI; eski yapılandırmayla çalışmaya devam eder."
+      echo "Yeni uygulama (app) zaten başlatıldı. Caddyfile'ı düzeltip tekrar çalıştırın: bash scripts/guncelle.sh"
+      ;;
     app|caddy)
       echo "HATA: hazırlık tamamlandı ancak $ASAMA aşamasında hata oluştu; site yarım kalmış olabilir."
       echo "Günlükler: docker compose logs app caddy --tail 100"
@@ -68,7 +72,8 @@ docker compose exec -T db sh /docker-entrypoint-initdb.d/10-roller.sh
 
 echo "3/6 Güncelleme öncesi şifreli yedek alınıyor..."
 ASAMA="yedek"
-# Anahtar eksikse üretilir, mevcut anahtara dokunulmaz.
+# Anahtar dosyası da, .env'de YEDEK_ALICI de yoksa yeni anahtar üretilir (ekranda bir kez gösterilir, EVET ile sunucudan
+# kaldırılır). Mevcut anahtara dokunulmaz; YEDEK_ALICI varken anahtar dosyası yoksa (sunucudan kaldırılmış) YENİ ANAHTAR ÜRETİLMEZ.
 bash scripts/yedek-anahtari-hazirla.sh
 # YEDEK_ALICI .env'ye yeni eklenmiş olabilir; konteyner ortamı yeniden okusun.
 docker compose up -d --no-deps yedek
@@ -82,7 +87,8 @@ docker compose up --no-deps --force-recreate --exit-code-from hazirlik hazirlik
 
 echo "5/6 Yeni uygulama başlatılıyor..."
 ASAMA="app"
-docker compose up -d app
+# --no-deps: bağımlılıklar (db, hazirlik) yeniden oluşturulmaz; hazırlık yukarıda ayrıca çalıştırılıp doğrulandı.
+docker compose up -d --no-deps app
 HAZIR=0
 for i in $(seq 1 60); do
   if docker compose ps app --format '{{.Health}}' | grep -q healthy; then HAZIR=1; break; fi
@@ -91,21 +97,37 @@ done
 [ "$HAZIR" = "1" ] || { echo "HATA: uygulama 2 dakikada sağlıklı duruma geçmedi."; exit 1; }
 echo "Uygulama sağlıklı."
 
-echo "6/6 Caddy yeniden oluşturuluyor (güncel Caddyfile'ın yüklendiği doğrulanır)..."
+echo "6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)..."
+ASAMA="caddy-dogrulama"
+# Önce YENİ Caddyfile, kullanıcı konteynerine dokunmadan (tek seferlik, --no-deps, port yayınlamaz) doğrulanır;
+# geçersizse eski Caddy olduğu gibi çalışmaya devam eder. Compose ortam değişkenleri (SITE_ADRESI, ACME_EPOSTA) bu kapta da tanımlıdır.
+if ! docker compose run --rm -T --no-deps --entrypoint caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile; then
+  exit 1
+fi
 ASAMA="caddy"
 # Compose, yalnızca bağlanan Caddyfile değiştiyse konteyneri yeniden oluşturmaz ve Caddy dosyayı izlemez;
 # bu yüzden her güncellemede zorla yeniden oluşturulur (kısa bir kesinti: birkaç saniye).
 docker compose up -d --force-recreate --no-deps caddy
 BEKLENEN=$(sha256sum caddy/Caddyfile | cut -d' ' -f1)
+caddy_saglam_mi() {
+  # Çalışan Caddyfile güncel + geçerli + konteyner çalışıyor + hiç yeniden başlamamış (çöküp döngüye girmemiş).
+  local cid calisan
+  cid=$(docker compose ps -q caddy 2>/dev/null | head -1)
+  [ -n "$cid" ] || return 1
+  calisan=$(docker compose exec -T caddy sha256sum /etc/caddy/Caddyfile 2>/dev/null | cut -d' ' -f1 || true)
+  [ -n "$calisan" ] && [ "$calisan" = "$BEKLENEN" ] \
+    && docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile >/dev/null 2>&1 \
+    && [ "$(docker compose ps caddy --format '{{.State}}')" = "running" ] \
+    && [ "$(docker inspect -f '{{.RestartCount}}' "$cid" 2>/dev/null)" = "0" ]
+}
 TAMAM=0
 for i in $(seq 1 30); do
-  CALISAN=$(docker compose exec -T caddy sha256sum /etc/caddy/Caddyfile 2>/dev/null | cut -d' ' -f1 || true)
-  if [ -n "$CALISAN" ] && [ "$CALISAN" = "$BEKLENEN" ] \
-     && docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile >/dev/null 2>&1 \
-     && [ "$(docker compose ps caddy --format '{{.State}}')" = "running" ]; then TAMAM=1; break; fi
+  if caddy_saglam_mi; then TAMAM=1; break; fi
   sleep 2
 done
-[ "$TAMAM" = "1" ] || { echo "HATA: Caddy güncel Caddyfile ile çalışır durumda doğrulanamadı."; exit 1; }
-echo "Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti)."
+# Kısa bir bekleme sonrası yeniden denetlenir: çöküp yeniden başlayan konteyner (RestartCount > 0) hemen yakalanır.
+if [ "$TAMAM" = "1" ]; then sleep 4; caddy_saglam_mi || TAMAM=0; fi
+[ "$TAMAM" = "1" ] || { echo "HATA: Caddy güncel Caddyfile ile kararlı çalışır durumda doğrulanamadı (durum/RestartCount/Caddyfile özeti)."; exit 1; }
+echo "Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0)."
 trap - EXIT
 echo "Güncelleme tamamlandı."

@@ -7,7 +7,8 @@
 #
 #   --medya          veritabanına ek olarak aynı ZAMAN'daki görsel arşivini (medya-ZAMAN.tar.gz.age) de geri yükler
 #                    (mevcut görsellerin üzerine yazar; yedekte olmayan görsellere dokunmaz)
-#   --anahtar DOSYA  özel anahtar dosyası (veya YEDEK_ANAHTAR_DOSYASI; varsayılan ./gizli/yedek-anahtari.txt)
+#   --anahtar DOSYA  özel anahtar dosyası (veya YEDEK_ANAHTAR_DOSYASI; varsayılan ./gizli/yedek-anahtari.txt).
+#                    Dosya yoksa anahtar terminalden gizli girişle istenir, yalnızca bellekte tutulur ve iş bitince silinir.
 #
 # Önce sha256 doğrulanır (uyuşmazsa durur), şifre çözme geçici bir ağsız konteynerde yapılır ve düz döküm
 # diske yazılmadan doğrudan pg_restore'a akıtılır. Eski sürümden kalan şifresiz .dump dosyaları da kabul edilir.
@@ -49,8 +50,10 @@ DOSYALAR=("$YEDEK_AD"); [ "$MEDYA" = "1" ] && DOSYALAR+=("$MEDYA_AD")
 ortak_sha256_dogrula "$YEDEK_DIZIN" "${DOSYALAR[@]}" || { echo "Geri yükleme DURDURULDU; hiçbir şey değiştirilmedi."; exit 1; }
 
 if [ "$SIFRELI" = "1" ]; then
-  ANAHTAR=$(ortak_anahtar_yolu "${ANAHTAR_ARG:-${YEDEK_ANAHTAR_DOSYASI:-./gizli/yedek-anahtari.txt}}")
   ortak_imaj_var_mi
+  # Anahtar dosyası yoksa (sunucudan kaldırılmıştır) gizli girişle istenir; yalnızca bellekte (tmpfs) tutulur, çıkışta silinir.
+  trap ortak_gecici_temizle EXIT
+  ortak_anahtar_al "${ANAHTAR_ARG:-${YEDEK_ANAHTAR_DOSYASI:-}}" || { echo "Özel anahtar alınamadı. Hiçbir şey değiştirilmedi."; exit 1; }
   echo "== Şifre çözme denemesi (anahtar doğru mu, dosya bozuk mu?)"
   ortak_coz "$ANAHTAR" "$YEDEK_DIZIN" "$YEDEK_AD" > /dev/null \
     || { echo "Şifre çözülemedi; anahtar yanlış veya dosya bozuk. Hiçbir şey değiştirilmedi."; exit 1; }
@@ -75,6 +78,7 @@ ASAMA="durdurma"
 hata_yolu() {
   local kod=$?
   trap - EXIT
+  ortak_gecici_temizle
   [ "$kod" -ne 0 ] || return 0
   echo
   case "$ASAMA" in
@@ -127,4 +131,5 @@ if [ "$MEDYA" = "1" ]; then
   ortak_coz "$ANAHTAR" "$YEDEK_DIZIN" "$MEDYA_AD" | docker compose exec -T app tar -xzf - -C /veri
 fi
 trap - EXIT
+ortak_gecici_temizle
 echo "Geri yükleme tamamlandı."

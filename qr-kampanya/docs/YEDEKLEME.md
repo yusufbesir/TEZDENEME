@@ -6,7 +6,7 @@
 
 - `yedek` servisi **her gün 03:15'te** (İstanbul saati, `.env` → `YEDEK_SAATI`) veritabanı ve görsel yedeği alır.
 - Yedekler **şifrelidir** (age). Düz, şifresiz yedek diske yazılmaz.
-- Şifreyi açan **özel anahtar sunucuda durmaz**: parola yöneticinizde olmalıdır. Kaybolursa yedekler açılamaz.
+- Şifreyi açan **özel anahtar sunucuda durmaz**: kurulumda ekranda bir kez gösterilir, siz parola yöneticinize kopyalayıp `EVET` yazınca sunucudan silinir. Kaybolursa yedekler açılamaz.
 - Yedekler sunucuda `./yedekler/` klasöründedir (web'den erişilemez, izinler 700, yalnızca root okur).
 - Eski yerel yedekler **yalnızca sunucu dışına kopyalanıp doğrulandıktan sonra** silinir. Sunucu dışı kopya yoksa hiçbir şey silinmez (disk dolabilir).
 - Panel ana ekranı son yedeği, yedek sayısını ve sunucu dışı kopyanın son doğrulama zamanını gösterir.
@@ -18,11 +18,16 @@ Yedekler [age](https://github.com/FiloSottile/age) ile **açık/özel anahtar ç
 | Parça | Nerede | Ne işe yarar |
 |---|---|---|
 | Açık anahtar (`YEDEK_ALICI=age1...`) | `.env` ve yedek servisi | Yalnızca **şifreler**; gizli değildir |
-| Özel anahtar | `gizli/yedek-anahtari.txt` (izin 600) | **Açar**; yedek servisine verilmez |
+| Özel anahtar | Parola yöneticinizde. Kurulumda geçici olarak `gizli/yedek-anahtari.txt` (izin 600) | **Açar**; yedek servisine verilmez |
 
 - Anahtarı `scripts/kurulum.sh` (veya eskiden kurulduysa `scripts/guncelle.sh`) üretir. Var olan anahtarın üzerine asla yazmaz.
-- **Yapmanız gereken:** `gizli/yedek-anahtari.txt` içeriğini parola yöneticinize kopyalayın ve bir de sunucu dışında ikinci bir yerde saklayın. Bu dosya kaybolursa yedekler **asla** açılamaz.
-- Anahtarı kaydettikten sonra dosyayı sunucudan silmeniz önerilir. Böylece sunucu ele geçirilse bile eski yedekler ve sunucu dışı kopyalar okunamaz. Geri yüklerken dosyayı geçici olarak geri koyarsınız.
+- **Yapmanız gereken:** kurulum sırasında ekranda görünen anahtar satırlarını (`AGE-SECRET-KEY-1...` ile başlayan satır dahil) parola yöneticinize kopyalayın ve bir de sunucu dışında ikinci bir yerde saklayın. Anahtar kaybolursa yedekler **asla** açılamaz.
+- **Kopyaladıktan sonra** ekrandaki soruya büyük harfle `EVET` yazın; ardından doğrulama için `AGE-SECRET-KEY-1...` satırını parola yöneticinizden **geri yapıştırın** (görünmez). Yapıştırılan anahtar sunucudakiyle birebir aynıysa özel anahtar dosyası **silinir**; uyuşmazsa dosya kalır ve `--goster-ve-kaldir` ile tekrar deneyebilirsiniz. Böylece sunucu ele geçirilse bile eski yedekler ve sunucu dışı kopyalar okunamaz. Yedekleme etkilenmez (şifrelemek için yalnızca açık anahtar gerekir; o `.env` içinde `YEDEK_ALICI` olarak kalır).
+- `EVET` yazmazsanız (veya terminal etkileşimli değilse) dosya sunucuda **kalır** ve **"ÖZEL ANAHTAR HÂLÂ SUNUCUDA"** uyarısı çıkar: sunucu ele geçirilirse yedekler açılabilir. Anahtarı kaydettikten sonra istediğiniz zaman şunu çalıştırın; anahtarı bir kez daha gösterir ve aynı soruyu sorar: `bash scripts/yedek-anahtari-hazirla.sh --goster-ve-kaldir`.
+- **Anahtar nerede üretilir?** Yeni anahtar kalıcı diske yazılmadan önce yalnızca **bellek dosya sisteminde** (`/dev/shm`, yoksa 700 izinli `XDG_RUNTIME_DIR`) üretilir; Docker'a `--log-driver none` verilir ve anahtar konteynerin standart çıktısına yazdırılmaz (aksi hâlde Docker günlük sürücüsüne/journald'e düşerdi). `EVET` + geri yapıştırma doğrulaması geçilirse anahtar **hiç kalıcı diske yazılmadan** bellekten silinir (`gizli/` altında dosya oluşmaz). Anahtar üretilirken (kullanıcıya gösterilmeden, `.env` yazılmadan) Ctrl-C/TERM/HUP ya da hata gelirse bellek dizini anahtarla birlikte silinir (hiçbir yedek bu anahtarla şifrelenmediği için güvenlidir); temizlik sürerken ikinci bir sinyal kaydı yarıda kesmez. Anahtar gösterildikten sonra onay yoksa, terminal yoksa, yapıştırma uyuşmazsa ya da işlem Ctrl-C/hata ile kesilirse anahtar `gizli/yedek-anahtari.txt` (dizin 700, dosya 600) dosyasına taşınır, bellekteki kopya silinir ve büyük harfli uyarı çıkar. `.env` içindeki `YEDEK_ALICI` her zaman anahtar güvence altına alındıktan **sonra** yazılır; böylece yarıda kalan bir kurulum, şifreli yedek alıp anahtarı kaybetmez.
+- **Sınırlar (dürüst not).** `shred` SSD'de, ext4 gibi günlüklü ve btrfs/ZFS gibi copy-on-write dosya sistemlerinde silinen verinin fiziksel olarak üzerine yazıldığını **garanti etmez**; bu yüzden anahtarın diske hiç yazılmaması (yukarıdaki tmpfs düzeni) asıl önlemdir, `shred` yalnızca ek bir çabadır. Ekrandaki anahtar terminal **kaydırma geçmişinde** de kalır: kopyaladıktan sonra `clear` yazın; `tmux`/`screen` kullanıyorsanız oturumun kendi geçmişini de temizleyin (tmux: `Ctrl-b` sonra `:clear-history`; screen: `Ctrl-a` `Ctrl-\` ile oturumu kapatın) ve terminal kaydı (`script`, oturum kaydı) açıksa kapatın.
+- `--goster-ve-kaldir` silmeden önce dosyadaki özel anahtardan türetilen açık anahtarın `.env` içindeki `YEDEK_ALICI` ile aynı olduğunu denetler; farklıysa (veya `YEDEK_ALICI` yoksa) anahtarı **silmez ve göstermez**, açık bir uyarı verir.
+- Anahtar sunucudan kaldırıldıktan sonra `kurulum.sh` veya `guncelle.sh` tekrar çalışsa bile **yeni anahtar üretilmez** (üretilseydi eski yedekler yeni anahtarla uyuşmazdı). Betik "Yeni anahtar ÜRETİLMEDİ" yazar.
 - Anahtarı kimseyle paylaşmayın, e-postayla göndermeyin, Git'e eklemeyin (`gizli/` zaten Git dışındadır).
 - age sürümü `yedek/Dockerfile` içinde sabittir (v1.3.2) ve sabit sha256 ile doğrulanır; doğrulama tutmazsa imaj derlenmez. Derleme makinesi internete çıkamıyorsa `yedek/paketler/` klasörüne `age-v1.3.2-linux-amd64.tar.gz` (veya `-arm64`) koyun; aynı doğrulama o dosyaya da uygulanır.
 
@@ -66,30 +71,34 @@ Sunucu dışına kopya, hem felaket (disk/sunucu kaybı) hem de disk dolması i�
 `disari-kopyala.sh` sırasıyla şunları yapar:
 
 1. Şifreli dosyaları uzağa kopyalar (uzaktaki eski dosyaları silmez).
-2. Her yerel dosyanın uzakta var olduğunu ve boyut/özet olarak aynı olduğunu `rclone check --one-way` ile doğrular. Sağlayıcı özet (hash) desteklemiyorsa `rclone check` **yalnızca boyutu** karşılaştırır; bu durumda `.env` içine `YEDEK_UZAK_INDIREREK=1` yazın, veri indirilip birebir karşılaştırılır (daha yavaş ve trafik harcar).
-3. Sonucu `yedekler/uzak-dogrulama.json` dosyasına yazar (zaman, doğrulanan dosya adları, hedefin yalnızca `:` öncesi adı; parola/anahtar yazılmaz).
+2. Her yerel dosyanın uzakta var olduğunu ve aynı olduğunu `rclone check --one-way` ile doğrular. Bazı sağlayıcılar (SFTP, Hetzner Storage Box gibi) ortak bir özet (hash) sunmaz; bu durumda `rclone check` **yalnızca boyutu** karşılaştırır, bu da silme için yeterli değildir. Bu yüzden karar rclone günlük metnine değil **açık bir sorguya** dayanır: betik `rclone backend features` ile yerel ve uzak tarafın ortak bir özeti olup olmadığına bakar. Sorgu başarısız, boş ya da belirsizse; hedef `sftp`, `ftp`, `smb`, `webdav` veya `http` gibi bir ağ dosya sistemiyse (bu türlerde özet desteği sunucu kabuğuna bağlıdır ve `features` bilgisi yanıltabilir) ya da `YEDEK_UZAK_INDIREREK=1` ise doğrudan **verinin tamamını indirip birebir karşılaştırır** (`--download`). Özet destekleniyorsa özetle denenir; rclone çıktısındaki "No common hash found" metni yalnızca yedek tetiktir (`RCLONE_LOG_LEVEL`, `RCLONE_QUIET`, `RCLONE_LOG_FILE` bu çağrı için temizlenir ve `--log-level NOTICE` verilir). **Ağ maliyeti:** `--download` yalnızca silinmeye aday eski üçlüler ile bu çalıştırmadaki en yeni tam üçlü için yapılır (`--files-from`); kapsam dışı dosyalar "doğrulandı" sayılmaz ve **doğrulanmamış hiçbir üçlü silinmez** (`YEDEK_UZAK_INDIREREK=1` ise tüm dosyalar indirilir). İndirerek doğrulama başarısız olursa o gün **hiçbir yerel yedek silinmez**. Özet destekleyen sağlayıcılarda (B2, S3 vb.) indirme yapılmaz.
+3. Sonucu `yedekler/uzak-dogrulama.json` dosyasına yazar (zaman, doğrulanan dosya adları, doğrulama yöntemi, hedefin yalnızca `:` öncesi adı; parola/anahtar yazılmaz). **`zaman` = en yeni TAM (db+medya+sha256) yerel üçlünün uzakta doğrulandığı son andır.** Kapsamlı `--download` yalnızca silme adaylarını ve en yeni tam üçlüyü indirdiği için `zaman`, tüm yerel dosyaların değil, en yeni tam üçlünün doğrulanmasına bağlıdır; en yeni tam üçlü doğrulanamazsa (ya da tam üçlü yoksa) `zaman` güncellenmez ve panel eski/eksik doğrulamayı uyarır.
 4. **Silme kuralı.** Yerel bir üçlü ancak şu hepsi doğruysa silinir:
    - `YEDEK_SAKLAMA_GUN` (varsayılan 14) günden eskidir,
    - `db`, `medya` ve `sha256` dosyalarının üçü de yerelde vardır,
    - üçü de **uzakta doğrulanmıştır** (bu çalıştırmada),
    - eksiksiz (veritabanı + görsel + sha256) en yeni yerel yedek **değildir** (bu yedek hiçbir koşulda silinmez).
 
-   `YEDEK_UZAK_HEDEF` tanımlı değilse hiçbir şey silinmez. Silinen her dosya `yedek-gunlugu.log` ve ekran çıktısına yazılır.
+   `YEDEK_UZAK_HEDEF` tanımlı değilse hiçbir şey silinmez.
+
+   **Hedef aynı sunucudaki bir klasör olursa** (ör. `/yedek-kopya`, `./kopya`, `~/kopya`, rclone `local` türü bir uzak, ya da yerel bir klasöre işaret eden `alias`/`crypt` uzak) bu **sunucu dışı sayılmaz**: dosyalar kopyalanır ama **hiçbir yerel yedek silinmez**, `uzak-dogrulama.json` içine "yerel hedef, sunucu dışı sayılmadı" yazılır ve panel uyarısı sürer (disk ve sunucu kaybına karşı koruma sağlamadığı için). Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın. **rclone ayarlarını ortam değişkeniyle değil `rclone config` ile (ayar dosyasında) yapın:** betik, tüm rclone çağrılarında `RCLONE_` ile başlayan ortam değişkenlerini (`RCLONE_SFTP_HOST`, `RCLONE_S3_ENDPOINT`, `RCLONE_ALIAS_REMOTE`, `RCLONE_CONFIG_AD_*`, `RCLONE_SIZE_ONLY`, `RCLONE_LOG_LEVEL` vb.) kaldırır; yalnızca ayar dosyası yolu `RCLONE_CONFIG` ve ayar şifresi `RCLONE_CONFIG_PASS` korunur. Böylece "yerel mi?" tespiti ile rclone'un gerçekten kullandığı ayar aynı kaynaktan (ayar dosyası) gelir; `RCLONE_*` ortam değişkenleriyle rclone'u yerel adrese yönlendirip silmeyi tetiklemek ya da doğrulamayı zayıflatmak mümkün olmaz. (Not: bulut SDK'larının kendi değişkenleri — `AWS_ENDPOINT_URL`, `~/.aws/config`, `OS_*` — `env_auth = true` ayarlı s3/swift uzaklarında hedefi değiştirebilir; `env_auth` kullanmayın, anahtarları `rclone config` içine yazın.) Kaldırılan değişken olursa ekrana yalnızca **adı** (değeri değil) uyarı olarak yazılır. (Bash'in ortam adı olarak göremediği tireli `RCLONE_CONFIG_<AD-İLE-TİRE>_*` adları kaldırılamaz; ancak rclone bunları `config show` çıktısına da yansıttığı için tespit yine rclone'un kullandığı ayarla tutarlı kalır.) Belirsizlikte de **yerel sayılır** (silme yok): uzak türü sunucu dışı tür **izin listesinde** değilse (`b2`, `s3`, `sftp`, `ftp`, `smb`, `webdav`, `swift`, `azureblob`, `azurefiles`, `gcs`, `oos`, `qingstor`, `storj`, `drive`, `onedrive`, `dropbox`, `box`, `pcloud`, `mega`, `koofr`, `jottacloud`, `hidrive`, `yandex`, `seafile`; ör. `archive`, `memory`, `hdfs`, `http` yerel sayılır), rclone uzak türü belirlenemezse (ad `rclone listremotes`'ta yok), adlandırılmış uzağa bağlantı dizesi seçeneği eklenmişse (`ad,anahtar=değer:yol`; seçenekler ayarı geçersiz kılar), ya da `sftp` türünde `ssh` alanı dolu ise (ayarda ya da bağlantı dizesinde `ssh=...`; dış bir ssh komutu gerçek hedefi gizleyebilir, bu yüzden hedef belirsiz sayılır; gerekçe ekrana yazılır), ya da `webdav` `unix_socket` alanı doluysa veya Azure `use_emulator` açıksa (ikisi de tanımı gereği bu makinedir), ya da `sftp`/`ftp`/`smb`/`webdav`/`s3`/`swift`/`pcloud` gibi bir ağ türünün `host`/`endpoint`/`url`/`storage_url`/`hostname` alanı bu makineyi gösteriyorsa (`localhost`, `127.0.0.0/8`, `::1`, `0.0.0.0`, makinenin adı veya IP'leri; ad ayrıca çözülüp karşılaştırılır). Betik ekrana nedenini yazar (parola/ayar içeriği yazılmaz). Yalnızca **deneme için** `.env` içine `YEDEK_YEREL_HEDEF_IZIN=1` yazılırsa bu engel kalkar; üretimde kullanmayın. Silinen her dosya `yedek-gunlugu.log` ve ekran çıktısına yazılır.
 
 Sunucu dışı kopya hiç doğrulanmamışsa veya son doğrulama 7 günden eskiyse panel ana ekranında **sarı uyarı** çıkar: "Sunucu dışı kopya doğrulanmadı; eski yedekler silinmiyor, disk dolabilir". Bu durumda diski izleyin ve kopyalamayı düzeltin. Panel bu bilgiyi her yedek alındığında (günde bir) yeniler.
 
 ## Geri yükleme testi (güvenli, düzenli yapın)
 
-Önce özel anahtarı geçici olarak geri koyun (parola yöneticinizden `gizli/yedek-anahtari.txt` olarak, izin 600), sonra:
+Anahtar sunucudan kaldırıldıysa (önerilen durum) bir şey koymanız gerekmez: betik anahtarı sorar. Parola yöneticinizden **anahtar satırını** (`AGE-SECRET-KEY-1...` ile başlayan) kopyalayıp istemde yapıştırın ve Enter'a basın. Yazdığınız ekranda **görünmez**, diske yazılmaz (yalnızca bellekte geçici tutulur) ve iş bitince silinir. Terminal gerekir (SSH ile bağlanıp elle çalıştırın; cron'da çalışmaz). Aylık testte anahtarı bu şekilde yapıştırmanız gerekir.
 
 ```bash
 bash scripts/geri-yukleme-testi.sh
-# Anahtar başka yerdeyse:  bash scripts/geri-yukleme-testi.sh /yol/yedek-anahtari.txt
+# Anahtarı dosya olarak vermek isterseniz:  bash scripts/geri-yukleme-testi.sh /yol/yedek-anahtari.txt
 # veya:                    YEDEK_ANAHTAR_DOSYASI=/yol/yedek-anahtari.txt bash scripts/geri-yukleme-testi.sh
 # Belirli bir yedek için:  bash scripts/geri-yukleme-testi.sh yedekler/db-20261015-031500.dump.age
 ```
 
-Betik: (1) `sha256` dosyasıyla bütünlüğü doğrular, uyuşmazsa **durur**; (2) internetsiz geçici bir konteynerde şifreyi çözüp geçici veritabanına yükler (anahtar ve yedek salt okunur bağlanır); (3) tablo sayılarını canlı sistemle karşılaştırır; (4) görsel arşivini çözüp listeleyebildiğini doğrular; (5) geçici konteyneri kaldırır. Çıktı ekrana ve `yedekler/geri-yukleme-testi-ZAMAN.log` dosyasına yazılır. Sonunda `SONUÇ: GEÇTİ` görmelisiniz. Canlı sisteme dokunmaz. **Önerilen sıklık: ayda bir** ve her büyük güncellemeden önce. Testten sonra anahtar dosyasını sunucudan tekrar silebilirsiniz.
+Betik: (1) `sha256` dosyasıyla bütünlüğü doğrular, uyuşmazsa **durur**; (2) internetsiz geçici bir konteynerde şifreyi çözüp geçici veritabanına yükler (anahtar ve yedek salt okunur bağlanır); (3) tablo sayılarını canlı sistemle karşılaştırır; (4) görsel arşivini çözüp listeleyebildiğini doğrular; (5) geçici konteyneri kaldırır. Çıktı ekrana ve `yedekler/geri-yukleme-testi-ZAMAN.log` dosyasına yazılır. Sonunda `SONUÇ: GEÇTİ` görmelisiniz. Canlı sisteme dokunmaz. **Önerilen sıklık: ayda bir** ve her büyük güncellemeden önce. Anahtar dosyası verdiyseniz testten sonra sunucudan tekrar silin.
+
+Şifre çözen `docker run` çağrıları `--log-driver none` ile çalışır: çözülmüş düz döküm/medya konteynerin standart çıktısından akar ve Docker günlük sürücüsüne (json-file/journald) yazılmaz. (`docker exec`/`docker compose exec` çıktısı istemciye gider, günlük sürücüsüne gitmez.)
 
 ## Gerçek geri yükleme (yıkıcı)
 
@@ -99,6 +108,7 @@ bash scripts/geri-yukle.sh yedekler/db-20261015-031500.dump.age
 # Veritabanı + görseller:
 bash scripts/geri-yukle.sh yedekler/db-20261015-031500.dump.age --medya
 # Anahtar farklı yerdeyse ekleyin:  --anahtar /yol/yedek-anahtari.txt
+# Anahtar dosyası yoksa betik anahtarı gizli girişle sorar (yapıştırın, görünmez; bellekte tutulur, iş bitince silinir).
 ```
 
 - Canlı veritabanını yedektekiyle değiştirir; yedekten sonraki değişiklikler kaybolur.

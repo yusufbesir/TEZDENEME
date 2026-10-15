@@ -1,0 +1,14 @@
+### ORTA-2 gercek docker kaniti (isaretci degeri yazilmadi)
+== ESKI-davranis-logdriver-varsayilan: stdout satir=3 driver=json-file jsonlog_var=evet isaretci_sayisi=3
+== YENI-davranis-log-driver-none: stdout satir=3 driver=none jsonlog_var=hayir isaretci_sayisi=0
+genel tarama: isaretci /var/lib/docker/containers altinda (konteynerler silindi): 0
+docker exec cikti isaretcisi json-log icinde: 0
+docker exec stdin (pg_restore benzeri) json-log icinde: 0
+### Testler: manage.py test qr -> Ran 335 tests OK (onceki 320; +15)
+### bash -n scripts/*.sh: ok
+### Mutasyon: RCLONE ortam temizligi kapali -> 4 yeni test FAIL; ANAHTAR_GOSTERILDI kapali -> 4 yeni test FAIL; eski kod geri konuldu
+### Gizli bilgi taramasi (AGE-SECRET-KEY-1 uzun deger / BEGIN PRIVATE / parola=):
+docs/kanit/yukseltme-testi-2026-10-15.txt:134:Public key: age19dzcyku7d084k32zh7zadtgjy7dhy87rr939lvln6n2ywuhg55cq57ffpu
+docs/kanit/yukseltme-testi-2026-10-15-kosu2.txt:166:Public key: age1lpzg66w9sx6xysrws2fs36v8fpg50lsz9xq3majs36cgkjef35zqme0msr
+<scratch>/tur2-bulgular-ham.txt:10:### Gizli bilgi taramasi (AGE-SECRET-KEY-1 uzun deger / BEGIN PRIVATE / parola=):
+tarama bitti

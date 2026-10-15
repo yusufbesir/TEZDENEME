@@ -72,7 +72,10 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - Süper kullanıcıya veritabanı konteynerinin içinden (yerel soket) parolasız erişilebilir; bu, sunucu yöneticisinin bakım yoludur. Sunucuya root erişimi olan herkes veritabanının tamamına erişebilir.
 - age (yedek şifreleme aracı) sürüm arşivinin sha256 değeri, kurulum sırasında indirilen dosyadan hesaplanıp sabitlendi; age'in yayımladığı imzalı bir değerle karşılaştırılamadı. pip-tools ve pip-audit araçlarının kendisi hash'siz kurulur (bunlar uygulama imajına girmez).
 - `db` ve `yedek` konteynerleri salt okunur dosya sistemiyle çalışmaz (PostgreSQL ve yedekleme yazma ister).
-- Sağlayıcı hash desteklemiyorsa `rclone check` yalnızca boyut karşılaştırır; tam doğrulama için `YEDEK_UZAK_INDIREREK=1` (veriyi indirir).
+- Sağlayıcı ortak hash desteklemiyorsa (ya da sftp/ftp/smb/webdav gibi hash'i sunucu kabuğuna bağlı türlerde) doğrulama otomatik olarak **indirerek** yapılır (`--download`); indirme yalnızca silinmeye aday eski yedekler ve en yeni yedekle sınırlıdır. Tüm dosyaları indirerek doğrulamak için `YEDEK_UZAK_INDIREREK=1`.
+- Özel yedek anahtarı kurulumda ekranda bir kez gösterilir; `EVET` ve anahtarın geri yapıştırılmasıyla sunucuya hiç kalıcı yazılmadan kaldırılır. Ekranda göründüğü için terminal/tmux kaydırma geçmişinde kalabilir; onay verilmezse diske yazılan dosya `shred` ile silinse de SSD ve günlüklü dosya sistemlerinde adli kurtarmaya karşı garanti yoktur.
+- “Sunucu dışı kopya” tespiti (yerel yedek ancak uzak kopya doğrulanınca silinir) temkinlidir: yerel yol, `local`/`archive`/`memory` gibi izin listesinde olmayan türler, bu makineyi gösteren host/endpoint/url, `ssh=`/`unix_socket`/`use_emulator` ve belirsiz durumlar yerel sayılır, silme yapılmaz. Kapsanmayan dar durumlar (Düşük): aynı VPS'teki bir Docker kapsayıcısının özel IP'si (ör. `172.18.0.5` üzerindeki MinIO), Azure `sas_url`/`connection_string` ile yerel emülatör, `env_auth = true` + `AWS_ENDPOINT_URL` gibi bulut SDK ortam değişkenleri. Belgede önerilen B2/SFTP/S3 kurulumunda bunlar oluşmaz.
+- Geri yükleme testi şifresi çözülmüş veritabanını geçici bir PostgreSQL konteynerinin anonim birimine yazar ve test sonunda siler; test ani kesilirse (elektrik, `kill -9`) bu birim diskte kalabilir: `docker volume prune` ile temizleyin.
 
 
 ## Not: ziyaretçi özeti anonim değil, takma adlıdır

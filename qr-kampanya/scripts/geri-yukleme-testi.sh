@@ -6,10 +6,10 @@
 #   3) tablo sayılarını canlı veritabanıyla karşılaştırır
 #   4) görsel arşivini çözüp tar ile listeleyebildiğini doğrular
 #   5) geçici konteyneri kaldırır. Canlı veritabanına HİÇBİR değişiklik yapılmaz.
-# Özel anahtar sunucuda tutulmaz; anahtarı parola yöneticinizdeki kopyadan geçici olarak geri koyun.
+# Özel anahtar sunucuda tutulmaz: dosya yoksa anahtar terminalden gizli girişle istenir (bellekte tutulur, sonunda silinir).
 # Bütün çıktı ekrana ve yedekler/geri-yukleme-testi-ZAMAN.log dosyasına yazılır (anahtar içeriği asla yazılmaz).
 #   bash scripts/geri-yukleme-testi.sh [db-ZAMAN.dump.age] [anahtar-dosyası]
-#   (anahtar yolu: ikinci argüman veya YEDEK_ANAHTAR_DOSYASI; varsayılan ./gizli/yedek-anahtari.txt)
+#   (anahtar yolu: ikinci argüman veya YEDEK_ANAHTAR_DOSYASI; yoksa ./gizli/yedek-anahtari.txt; o da yoksa gizli giriş)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; . ./.env; set +a
@@ -39,12 +39,10 @@ calistir() {
   YEDEK_DIZIN=$(cd "$(dirname "$YEDEK")" && pwd)
   ZAMAN=$(ortak_zaman "$YEDEK_AD")
   MEDYA_AD="medya-$ZAMAN.tar.gz.age"
-  ANAHTAR=$(ortak_anahtar_yolu "${ANAHTAR_ARG:-${YEDEK_ANAHTAR_DOSYASI:-./gizli/yedek-anahtari.txt}}")
   ortak_imaj_var_mi
 
   echo "== Geri yükleme testi $(date -Iseconds) =="
   echo "Test edilen yedek: $YEDEK_DIZIN/$YEDEK_AD"
-  echo "Özel anahtar dosyası: $ANAHTAR (içeriği yazılmaz)"
 
   echo "-- 1/4 Bütünlük (sha256) doğrulaması"
   if [ -f "$YEDEK_DIZIN/$MEDYA_AD" ]; then
@@ -54,8 +52,13 @@ calistir() {
     echo "UYARI: $MEDYA_AD yok; görsel yedeği test edilemedi."
   fi
 
+  # Özel anahtar: dosya verilmediyse ve sunucuda yoksa gizli girişle istenir; yalnızca bellekte (tmpfs) tutulur.
+  # Terminal işlemleri doğrudan /dev/tty üzerinden yapılır, bu yüzden anahtar günlüğe (tee) düşmez.
   GECICI=qr-geri-yukleme-testi-$$
-  trap 'docker rm -fv "$GECICI" >/dev/null 2>&1 || true' EXIT
+  trap 'docker rm -fv "$GECICI" >/dev/null 2>&1 || true; ortak_gecici_temizle' EXIT
+  ortak_anahtar_al "${ANAHTAR_ARG:-${YEDEK_ANAHTAR_DOSYASI:-}}" || { echo "SONUÇ: BAŞARISIZ - özel anahtar alınamadı."; return 1; }
+  if [ -n "$ORTAK_GECICI" ]; then echo "Özel anahtar: gizli girişle alındı, bellekte tutuluyor, iş bitince silinecek (içeriği yazılmaz)"
+  else echo "Özel anahtar dosyası: $ANAHTAR (içeriği yazılmaz)"; fi
   # Ağsız geçici veritabanı: parola gerekmez (dışarıdan erişim imkânsız), anahtar ve yedek salt okunur bağlanır.
   docker run -d --name "$GECICI" --network none --tmpfs /tmp:mode=1777,size=2g \
     -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_USER=test -e POSTGRES_DB=test \
@@ -97,6 +100,12 @@ calistir() {
   fi
 }
 
+# calistir bir boru hattı alt kabuğunda çalışır (günlük için tee): Ctrl-C/TERM/HUP gizli giriş sırasında gelirse ana kabuk da
+# terminal yankısını açar (alt kabuğun kendi tuzağı geç kalabilir veya hiç tetiklenmeyebilir).
+trap 'ortak_yankiyi_ac' EXIT
+trap 'ortak_yankiyi_ac; exit 130' INT
+trap 'ortak_yankiyi_ac; exit 143' TERM
+trap 'ortak_yankiyi_ac; exit 129' HUP
 calistir 2>&1 | tee -a "$LOG"
 SONUC=${PIPESTATUS[0]}
 echo "Günlük: $LOG"
