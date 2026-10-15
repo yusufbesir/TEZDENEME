@@ -165,7 +165,7 @@ def _bulut_tasima(body, timeout):
 
 
 def _araclar_dizini():
-    """JEV_ARACLAR ya da (yalnız Windows'ta) ayar.CIHAZ_KOK; yoksa None."""
+    """JEV_ARACLAR ya da ayar.varsayilan_cihaz_koku() (paketten keşif); yoksa None."""
     return os.environ.get(ARACLAR_ORTAM) or ayar.varsayilan_cihaz_koku()
 
 

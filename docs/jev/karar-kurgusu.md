@@ -32,7 +32,7 @@ Etiket: [İP:Jev'i projeye bağlama#TMGrRs]
 ## Nerede çalışır
 | Ortam | Yol | Gereken |
 |---|---|---|
-| Cihaz (D:\YusufII) | Mevcut `HAFIZAM1\jev-araclar\jev_cagri.py` → `jev_client` isteği yapar (anahtarı ve uç noktayı kendi ayar dosyasından alır, kendi uç nokta politikasını uygular); bu paket yalnız yanıtı doğrular | Bir şey gerekmez |
+| Cihaz | Mevcut `<jev-araclar>\jev_cagri.py` → `jev_client` isteği yapar (anahtarı ve uç noktayı kendi ayar dosyasından alır, kendi uç nokta politikasını uygular); bu paket yalnız yanıtı doğrular | Bir şey gerekmez |
 | Bulut iş parçacıkları | Doğrudan Vercel AI Gateway (sabit uç nokta ve model, yönlendirme reddi bu pakette) | Bulut ortamında `AI_GATEWAY_API_KEY` ortam değişkeni ve `ai-gateway.vercel.sh` alan adı izni |
 
 Bulut ortamı kurulana kadar bulut oturumları `claude_karari` (Jev'e erişilemedi) durumunda çalışır ve bunu açıkça yazar.
@@ -45,7 +45,7 @@ Bulut ortamı kurulana kadar bulut oturumları `claude_karari` (Jev'e erişileme
 
 ## Defter
 - Bulutta: `/mnt/project-files/jev-kararlar/kararlar.jsonl` (bütün iş parçacıkları ortak kullanır).
-- Cihazda (Windows): `D:\YusufII\HAFIZAM1\jev-araclar\kayit\kararlar.jsonl` (yol `jev/ayar.py` içindedir).
+- Cihazda (Windows): `<jev-araclar>\kayit\kararlar.jsonl`. Kök `JEV_ARACLAR` ortam değişkeninden gelir ya da `jev_cagri.py` paketin iki üst dizininde duruyorsa paketin yanında kendiliğinden bulunur.
 - Yalnız ekleme yapılır, satır silinmez. `JEV_KAYIT` ile değiştirilebilir; yol mutlak, `.jsonl` uzantılı ve sembolik bağsız olmalıdır.
 
 ## Birlikte çalışılanlar

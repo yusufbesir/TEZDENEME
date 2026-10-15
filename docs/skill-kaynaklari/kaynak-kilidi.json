@@ -1,0 +1,325 @@
+{
+  "olusturma_tarihi": "2026-10-15",
+  "kaynaklar": [
+    {
+      "depo": "addyosmani/agent-skills",
+      "url": "https://github.com/addyosmani/agent-skills",
+      "kisa_commit": "1be8e34",
+      "hedef": "skill-kutuphanesi/addyosmani__agent-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "1be8e34187e34647bb83adc3a1323b26ae6f6abe"
+    },
+    {
+      "depo": "Agents365-ai/drawio-skill",
+      "url": "https://github.com/Agents365-ai/drawio-skill",
+      "kisa_commit": "88fd923",
+      "hedef": "skill-kutuphanesi/Agents365-ai__drawio-skill",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "88fd9236bc532aac4c25cb008a8bd59bc650b904"
+    },
+    {
+      "depo": "AgriciDaniel/claude-ads",
+      "url": "https://github.com/AgriciDaniel/claude-ads",
+      "kisa_commit": "ac21644",
+      "hedef": "skill-kutuphanesi/AgriciDaniel__claude-ads",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "ac21644933910419529bcf81efb95a9ca71edf81"
+    },
+    {
+      "depo": "AgriciDaniel/claude-obsidian",
+      "url": "https://github.com/AgriciDaniel/claude-obsidian",
+      "kisa_commit": "32ac5a0",
+      "hedef": "skill-kutuphanesi/AgriciDaniel__claude-obsidian",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "32ac5a02c4e082e4a5628ca810776375e134708e"
+    },
+    {
+      "depo": "alirezarezvani/claude-skills",
+      "url": "https://github.com/alirezarezvani/claude-skills",
+      "kisa_commit": "19392f7",
+      "hedef": "skill-kutuphanesi/alirezarezvani__claude-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "19392f7a08264ed00486a251f5b2098321771f94"
+    },
+    {
+      "depo": "anbeime/skill",
+      "url": "https://github.com/anbeime/skill",
+      "kisa_commit": "e92662c",
+      "hedef": "skill-kutuphanesi/anbeime__skill",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "e92662cd57d01dc312553c75187fa15f0e265ede"
+    },
+    {
+      "depo": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills",
+      "kisa_commit": "dbd4588",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44"
+    },
+    {
+      "depo": "blader/humanizer",
+      "url": "https://github.com/blader/humanizer",
+      "kisa_commit": "225a6f3",
+      "hedef": "skill-kutuphanesi/blader__humanizer",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8"
+    },
+    {
+      "depo": "cathrynlavery/diagram-design",
+      "url": "https://github.com/cathrynlavery/diagram-design",
+      "kisa_commit": "246d6d7",
+      "hedef": "skill-kutuphanesi/cathrynlavery__diagram-design",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "246d6d71d752245403d2bf28d27f124192584d18"
+    },
+    {
+      "depo": "coreyhaines31/marketingskills",
+      "url": "https://github.com/coreyhaines31/marketingskills",
+      "kisa_commit": "1efedbc",
+      "hedef": "skill-kutuphanesi/coreyhaines31__marketingskills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff"
+    },
+    {
+      "depo": "deanpeters/Product-Manager-Skills",
+      "url": "https://github.com/deanpeters/Product-Manager-Skills",
+      "kisa_commit": "1b5a524",
+      "hedef": "skill-kutuphanesi/deanpeters__Product-Manager-Skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "1b5a524ebb95e9497fa3f25002d8b8ec528d4444"
+    },
+    {
+      "depo": "DietrichGebert/ponytail",
+      "url": "https://github.com/DietrichGebert/ponytail",
+      "kisa_commit": "9b58c1f",
+      "hedef": "skill-kutuphanesi/DietrichGebert__ponytail",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "9b58c1ffb790c075ca32e70a89cf1d80588f4abf"
+    },
+    {
+      "depo": "google-labs-code/stitch-skills",
+      "url": "https://github.com/google-labs-code/stitch-skills",
+      "kisa_commit": "0337446",
+      "hedef": "skill-kutuphanesi/google-labs-code__stitch-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "0337446dadde6f8c94210444e2aa9d546126480f"
+    },
+    {
+      "depo": "huggingface/skills",
+      "url": "https://github.com/huggingface/skills",
+      "kisa_commit": "c3ff942",
+      "hedef": "skill-kutuphanesi/huggingface__skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "c3ff942be3e07116b475253f0a8fc4f54682c1a8"
+    },
+    {
+      "depo": "Jeffallan/claude-skills",
+      "url": "https://github.com/Jeffallan/claude-skills",
+      "kisa_commit": "1be15d8",
+      "hedef": "skill-kutuphanesi/Jeffallan__claude-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "1be15d8064f88fc25216442406d40add8fd23b53"
+    },
+    {
+      "depo": "JimLiu/baoyu-skills",
+      "url": "https://github.com/JimLiu/baoyu-skills",
+      "kisa_commit": "1567581",
+      "hedef": "skill-kutuphanesi/JimLiu__baoyu-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "1567581c26ec29f4216c6e6835415bf30343b0e3"
+    },
+    {
+      "depo": "jnMetaCode/superpowers-zh",
+      "url": "https://github.com/jnMetaCode/superpowers-zh",
+      "kisa_commit": "2daf57c",
+      "hedef": "skill-kutuphanesi/jnMetaCode__superpowers-zh",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "2daf57c0fb157521de24c62ac9c3254630eefbed"
+    },
+    {
+      "depo": "juliusbrussee/caveman",
+      "url": "https://github.com/juliusbrussee/caveman",
+      "kisa_commit": "2e08b91",
+      "hedef": "skill-kutuphanesi/juliusbrussee__caveman",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "2e08b9177c07bb7249a8a2d1a6758e5db281d002"
+    },
+    {
+      "depo": "K-Dense-AI/scientific-agent-skills",
+      "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+      "kisa_commit": "92ace75",
+      "hedef": "skill-kutuphanesi/K-Dense-AI__scientific-agent-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "92ace75ac21efe19a620434e0ca4e356081fe807"
+    },
+    {
+      "depo": "kepano/obsidian-skills",
+      "url": "https://github.com/kepano/obsidian-skills",
+      "kisa_commit": "3ccff53",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "3ccff5338ea700537839b21900aa5358a0402c98"
+    },
+    {
+      "depo": "KKKKhazix/khazix-skills",
+      "url": "https://github.com/KKKKhazix/khazix-skills",
+      "kisa_commit": "322346d",
+      "hedef": "skill-kutuphanesi/KKKKhazix__khazix-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "322346ded8129436b3f64707789a73e732ae24d9"
+    },
+    {
+      "depo": "Leonxlnx/taste-skill",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "kisa_commit": "717446e",
+      "hedef": "skill-kutuphanesi/Leonxlnx__taste-skill",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "717446e07a78d4e6d7918b1fde1a263378eebac9"
+    },
+    {
+      "depo": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills",
+      "kisa_commit": "49dd158",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "49dd158d1076134a641b33efb035946536778336"
+    },
+    {
+      "depo": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills",
+      "kisa_commit": "49dd158",
+      "hedef": "skill-kutuphanesi/mattpocock__skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "49dd158d1076134a641b33efb035946536778336"
+    },
+    {
+      "depo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "kisa_commit": "50d8a7d",
+      "hedef": "skill-kutuphanesi/nextlevelbuilder__ui-ux-pro-max-skill",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "50d8a7de0900119855614541f15a1a616691eb33"
+    },
+    {
+      "depo": "nidhinjs/prompt-master",
+      "url": "https://github.com/nidhinjs/prompt-master",
+      "kisa_commit": "2bd9251",
+      "hedef": "skill-kutuphanesi/nidhinjs__prompt-master",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "2bd92518e26bf659e21e3d9ab90573fcf3ddeccb"
+    },
+    {
+      "depo": "NVIDIA/SkillSpector",
+      "url": "https://github.com/NVIDIA/SkillSpector",
+      "kisa_commit": "5edc347",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "5edc347c320bd516f8ff38df200a63831bf92e80"
+    },
+    {
+      "depo": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "kisa_commit": "bb92a77",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+    },
+    {
+      "depo": "openai/skills",
+      "url": "https://github.com/openai/skills",
+      "kisa_commit": "49f948f",
+      "hedef": "skill-kutuphanesi/openai__skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "49f948faa9258a0c61caceaf225e179651397431"
+    },
+    {
+      "depo": "Orchestra-Research/AI-Research-SKILLs",
+      "url": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
+      "kisa_commit": "773a529",
+      "hedef": "skill-kutuphanesi/Orchestra-Research__AI-Research-SKILLs",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "773a52944ba4747a18bd4ae9ade53fff041adcbc"
+    },
+    {
+      "depo": "OthmanAdi/planning-with-files",
+      "url": "https://github.com/OthmanAdi/planning-with-files",
+      "kisa_commit": "7056ed2",
+      "hedef": ".claude/skills",
+      "kaynak_dosya": "KAYNAKLAR.md",
+      "tam_commit": "7056ed2f2b86a8a9e18840f625ac66a48fa07693"
+    },
+    {
+      "depo": "phuryn/pm-skills",
+      "url": "https://github.com/phuryn/pm-skills",
+      "kisa_commit": "c68487d",
+      "hedef": "skill-kutuphanesi/phuryn__pm-skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "c68487d721e419ec87af1ae6412a842978eab785"
+    },
+    {
+      "depo": "titanwings/distilly",
+      "url": "https://github.com/titanwings/distilly",
+      "kisa_commit": "b830d3d",
+      "hedef": "skill-kutuphanesi/titanwings__distilly",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "b830d3dcbde006370f141155795b89021e3a947b"
+    },
+    {
+      "depo": "tt-a1i/archify",
+      "url": "https://github.com/tt-a1i/archify",
+      "kisa_commit": "58ab0b9",
+      "hedef": "skill-kutuphanesi/tt-a1i__archify",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "58ab0b98d2d0def8e49dced705c7b566936723ec"
+    },
+    {
+      "depo": "vercel-labs/skills",
+      "url": "https://github.com/vercel-labs/skills",
+      "kisa_commit": "13e4063",
+      "hedef": "skill-kutuphanesi/vercel-labs__skills",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "13e4063a1cf913f5606d57d42ab83a86f5001e04"
+    },
+    {
+      "depo": "virgiliojr94/book-to-skill",
+      "url": "https://github.com/virgiliojr94/book-to-skill",
+      "kisa_commit": "e180fc4",
+      "hedef": "skill-kutuphanesi/virgiliojr94__book-to-skill",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "e180fc46365e8c1aab0120778cc8a40b9515324b"
+    },
+    {
+      "depo": "wanshuiyin/Auto-claude-code-research-in-sleep",
+      "url": "https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep",
+      "kisa_commit": "26b95cf",
+      "hedef": "skill-kutuphanesi/wanshuiyin__Auto-claude-code-research-in-sleep",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "26b95cfa0d8747078e9e43b42e20952709e561b8"
+    },
+    {
+      "depo": "wshobson/agents",
+      "url": "https://github.com/wshobson/agents",
+      "kisa_commit": "46891e7",
+      "hedef": "skill-kutuphanesi/wshobson__agents",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "46891e7e60da0e52baf1050b7b6391b64e84c6d9"
+    },
+    {
+      "depo": "yusufkaraaslan/Skill_Seekers",
+      "url": "https://github.com/yusufkaraaslan/Skill_Seekers",
+      "kisa_commit": "5b5d8df",
+      "hedef": "skill-kutuphanesi/yusufkaraaslan__Skill_Seekers",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "5b5d8dfca263fa76e6daae9f292890b311ef36aa"
+    },
+    {
+      "depo": "zarazhangrui/frontend-slides",
+      "url": "https://github.com/zarazhangrui/frontend-slides",
+      "kisa_commit": "9906a34",
+      "hedef": "skill-kutuphanesi/zarazhangrui__frontend-slides",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "9906a34d640d2111f724544cbc50f7f130569ae1"
+    }
+  ]
+}

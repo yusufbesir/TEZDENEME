@@ -1,1 +1,10 @@
 __pycache__/
+
+# Gizli bilgi ve yerel kayıtlar (Siber Güvenlik Denetmeni bulgusu) [İP:Jev'i projeye bağlama#TMGrRs]
+.env
+.env.*
+!.env.example
+*.key
+*.jks
+key.properties
+*.jsonl

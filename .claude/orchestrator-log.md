@@ -32,3 +32,6 @@
 | 2026-10-15 | Bağımsız hakem: canlı denemedeki ayrışma kararı (Claude C, Jev A) [İP:Jev'i projeye bağlama#TMGrRs] | verifier (hakem) / claude-sonnet-5-5 | 8.220 toplam | A seçti; 2/3 çoğunluk A, Claude'un bilerek zayıf seçimi düzeltildi. |
 | 2026-10-15 | Baş Denetmen PR #10 bulgularını düzelt [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 64.083 toplam | Başarılı. 6 madde, 55 test. Orkestratör JEV_KAYIT kısıtını üst dizin bağına izin verecek biçimde daralttı. |
 | 2026-10-15 | Denetmen düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. |
+| 2026-10-15 | Skill kaynakları için tam commit SHA kilidi, betik ve test [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 29.942 toplam | Tamam: 40/40 çözüldü, 61 test geçti |
+| 2026-10-15 | jev/ayar.py içindeki kişisel D:\ yolunu kaldır (JEV_ARACLAR ya da paketten bulma) [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 30.681 toplam | Tamam: 61 test geçti |
+| 2026-10-15 | Siber Güvenlik Denetmeni bulgularının düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | bilinmiyor | Geçti |

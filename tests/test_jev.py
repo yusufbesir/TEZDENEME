@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 import urllib.request
+from pathlib import Path
 from unittest import mock
 
 from jev import __main__ as cli
@@ -596,18 +597,36 @@ class YeniKurallarTesti(Temel):
 
     def test_cihaz_koku_ayar(self):
         from jev import ayar
-        self.assertEqual(ayar.CIHAZ_KOK, r"D:\YusufII\HAFIZAM1\jev-araclar")
-        for ad in ("istemci.py", "kayit.py"):
+        self.assertFalse(hasattr(ayar, "CIHAZ_KOK"))
+        for ad in ("ayar.py", "istemci.py", "kayit.py"):
             with open(os.path.join(os.path.dirname(ayar.__file__), ad), encoding="utf-8") as f:
-                self.assertNotIn("YusufII", f.read())
-        with mock.patch.object(ayar.os, "name", "posix"):
-            self.assertIsNone(ayar.varsayilan_cihaz_koku())
-            with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
-                self.assertEqual(istemci.tasima_yolu(), "yok")
-        with mock.patch.object(ayar.os, "name", "nt"):
-            self.assertEqual(ayar.varsayilan_cihaz_koku(), ayar.CIHAZ_KOK)
-            with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
-                self.assertEqual(istemci._araclar_dizini(), ayar.CIHAZ_KOK)
+                self.assertNotIn("Yusuf" + "II", f.read())
+        # Paket görünümü: <kok>/karar/jev/ayar.py ve <kok>/jev_cagri.py
+        with tempfile.TemporaryDirectory() as kok:
+            sahte = os.path.join(kok, "karar", "jev", "ayar.py")
+            os.makedirs(os.path.dirname(sahte))
+            # jev_cagri.py yokken keşif başarısız olur
+            self.assertIsNone(ayar.paketten_kesfet(sahte))
+            open(os.path.join(kok, "jev_cagri.py"), "w").close()
+            self.assertEqual(ayar.paketten_kesfet(sahte), str(Path(kok).resolve()))
+            with mock.patch.object(ayar, "__file__", sahte):
+                with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
+                    self.assertEqual(ayar.varsayilan_cihaz_koku(), str(Path(kok).resolve()))
+                    self.assertEqual(istemci.tasima_yolu(), "cihaz")
+                # Göreli ortam değeri yok sayılır, keşif sürer
+                with mock.patch.dict(os.environ, {"JEV_ARACLAR": "goreli/yol"}):
+                    self.assertEqual(ayar.varsayilan_cihaz_koku(), str(Path(kok).resolve()))
+                # Mutlak ortam değeri kazanır
+                with tempfile.TemporaryDirectory() as baska:
+                    with mock.patch.dict(os.environ, {"JEV_ARACLAR": baska}):
+                        self.assertEqual(ayar.varsayilan_cihaz_koku(), baska)
+        # Hiçbir şey bulunamazsa None
+        with tempfile.TemporaryDirectory() as bos:
+            sahte = os.path.join(bos, "a", "b", "ayar.py")
+            with mock.patch.object(ayar, "__file__", sahte):
+                with mock.patch.dict(os.environ, {"JEV_ARACLAR": ""}):
+                    self.assertIsNone(ayar.varsayilan_cihaz_koku())
+                    self.assertEqual(istemci._araclar_dizini(), None)
 
     def test_jev_kayit_yol_kisiti(self):
         hata = "JEV_KAYIT mutlak ve .jsonl uzantılı bir dosya yolu olmalı."
