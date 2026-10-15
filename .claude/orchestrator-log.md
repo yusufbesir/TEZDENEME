@@ -32,3 +32,9 @@
 | 2026-10-15 | Bağımsız hakem: canlı denemedeki ayrışma kararı (Claude C, Jev A) [İP:Jev'i projeye bağlama#TMGrRs] | verifier (hakem) / claude-sonnet-5-5 | 8.220 toplam | A seçti; 2/3 çoğunluk A, Claude'un bilerek zayıf seçimi düzeltildi. |
 | 2026-10-15 | Baş Denetmen PR #10 bulgularını düzelt [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 64.083 toplam | Başarılı. 6 madde, 55 test. Orkestratör JEV_KAYIT kısıtını üst dizin bağına izin verecek biçimde daralttı. |
 | 2026-10-15 | Denetmen düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | — | Geçti. |
+| 2026-10-15 | Dosya dönüştürücü arayüzü ve ana süreç [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 16 test geçti, xvfb ile açılış denendi; çekirdek henüz yokken yazıldı, uyum kontrolü gerekiyor. |
+| 2026-10-15 | Dosya dönüştürücü çekirdeği [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 63 test geçti; FFmpeg indirme SHA-256 doğrulandı. |
+| 2026-10-15 | Dosya dönüştürücü işlevsel doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 63 test, uçtan uca mp3→mpg/csv→json, paket içeriği tam. |
+| 2026-10-15 | Dosya dönüştürücü güvenlik denetimi [İP:Dosya dönüştürücü#eSZiVv] | verifier (güvenlik denetçisi) / claude-sonnet-5-5 | alınamadı | Geçti; 3 orta, 11 düşük bulgu. Düzeltme implementer'a verildi. |
+| 2026-10-15 | Dosya dönüştürücü güvenlik düzeltmeleri [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | alınamadı | Başarılı. 8 madde, 76 test geçti. |
+| 2026-10-15 | Dosya dönüştürücü düzeltmelerini doğrula [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | alınamadı | Geçti. 76 test, tüm video/ses biçimleri beyaz listeyle çalışıyor, LibreOffice ağ kesme etkili. Opak görsel→ICO hatasını orkestratör tek satırla düzeltti. |
