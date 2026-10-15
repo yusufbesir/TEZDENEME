@@ -1,0 +1,64 @@
+from django.urls import path
+
+from .panel import giris, ice_aktarma, icerik, mfa, pano, qrler, rapor, yonetim
+
+app_name = "panel"
+
+urlpatterns = [
+    path("", pano.ana, name="ana"),
+    path("giris", giris.giris, name="giris"),
+    path("cikis", giris.cikis, name="cikis"),
+    path("mfa/dogrula", mfa.dogrula, name="mfa_dogrula"),
+    path("mfa/kurulum", mfa.kurulum, name="mfa_kurulum"),
+    path("hesap/", mfa.hesap, name="hesap"),
+    path("hesap/mfa/kur", mfa.hesap_mfa_kur, name="hesap_mfa_kur"),
+    path("hesap/mfa/sifirla", mfa.hesap_mfa_sifirla, name="hesap_mfa_sifirla"),
+    path("hesap/parola", mfa.parola_degistir, name="parola_degistir"),
+
+    path("qr/", qrler.qr_liste, name="qr_liste"),
+    path("qr/yeni", qrler.qr_olustur, name="qr_olustur"),
+    path("qr/toplu", qrler.qr_toplu, name="qr_toplu"),
+    path("qr/disa-aktar", qrler.qr_disa_aktar, name="qr_disa_aktar"),
+    path("qr/ice-aktar/", ice_aktarma.ice_aktarma_liste, name="ice_aktarma_liste"),
+    path("qr/ice-aktar/yukle", ice_aktarma.ice_aktarma_yukle, name="ice_aktarma_yukle"),
+    path("qr/ice-aktar/ornek-ice-aktarma.csv", ice_aktarma.ornek_csv, name="ice_aktarma_ornek_csv"),
+    path("qr/ice-aktar/ornek-ice-aktarma.xlsx", ice_aktarma.ornek_xlsx, name="ice_aktarma_ornek_xlsx"),
+    path("qr/ice-aktar/<uuid:pk>/eslestir", ice_aktarma.ice_aktarma_eslestir, name="ice_aktarma_eslestir"),
+    path("qr/ice-aktar/<uuid:pk>/onizle", ice_aktarma.ice_aktarma_onizle, name="ice_aktarma_onizle"),
+    path("qr/ice-aktar/<uuid:pk>/hatalar.csv", ice_aktarma.ice_aktarma_hatalar_csv, name="ice_aktarma_hatalar"),
+    path("qr/ice-aktar/<uuid:pk>/uygula", ice_aktarma.ice_aktarma_uygula, name="ice_aktarma_uygula"),
+    path("qr/ice-aktar/<uuid:pk>/iptal", ice_aktarma.ice_aktarma_iptal, name="ice_aktarma_iptal"),
+    path("qr/ice-aktar/<uuid:pk>/sonuc", ice_aktarma.ice_aktarma_sonuc, name="ice_aktarma_sonuc"),
+    path("qr/ice-aktar/<uuid:pk>/rapor.csv", ice_aktarma.ice_aktarma_rapor_csv, name="ice_aktarma_rapor"),
+    path("qr/ice-aktar/<uuid:pk>/zip", ice_aktarma.ice_aktarma_zip, name="ice_aktarma_zip"),
+    path("qr/<int:pk>/", qrler.qr_detay, name="qr_detay"),
+    path("qr/<int:pk>/duzenle", qrler.qr_duzenle, name="qr_duzenle"),
+    path("qr/<int:pk>/png", qrler.qr_png_gorunumu, name="qr_png"),
+    path("qr/<int:pk>/svg", qrler.qr_svg_gorunumu, name="qr_svg"),
+
+    path("rapor/hatali", rapor.hatali_kayitlar, name="hatali"),
+    path("rapor/istatistik", rapor.istatistik_raporu, name="istatistik"),
+
+    path("kampanyalar/", icerik.kampanya_liste, name="kampanya_liste"),
+    path("kampanyalar/yeni", icerik.kampanya_olustur, name="kampanya_olustur"),
+    path("kampanyalar/<int:pk>/duzenle", icerik.kampanya_duzenle, name="kampanya_duzenle"),
+    path("urunler/", icerik.urun_liste, name="urun_liste"),
+    path("urunler/yeni", icerik.urun_olustur, name="urun_olustur"),
+    path("urunler/<int:pk>/duzenle", icerik.urun_duzenle, name="urun_duzenle"),
+    path("magazalar/", icerik.magaza_liste, name="magaza_liste"),
+    path("magazalar/yeni", icerik.magaza_olustur, name="magaza_olustur"),
+    path("magazalar/<int:pk>/duzenle", icerik.magaza_duzenle, name="magaza_duzenle"),
+
+    path("sayfalar/", icerik.sayfa_liste, name="sayfa_liste"),
+    path("sayfalar/yeni", icerik.sayfa_olustur, name="sayfa_olustur"),
+    path("sayfalar/<int:pk>/duzenle", icerik.sayfa_duzenle, name="sayfa_duzenle"),
+    path("sayfalar/<int:pk>/onizle", icerik.sayfa_onizle, name="sayfa_onizle"),
+    path("sayfalar/<int:pk>/gorsel/<int:gorsel_pk>/sil", icerik.sayfa_gorsel_sil, name="sayfa_gorsel_sil"),
+
+    path("ayarlar", yonetim.ayarlar, name="ayarlar"),
+    path("kullanicilar/", yonetim.kullanici_liste, name="kullanici_liste"),
+    path("kullanicilar/yeni", yonetim.kullanici_olustur, name="kullanici_olustur"),
+    path("kullanicilar/<int:pk>/duzenle", yonetim.kullanici_duzenle, name="kullanici_duzenle"),
+    path("kullanicilar/<int:pk>/mfa-sifirla", mfa.kullanici_mfa_sifirla, name="kullanici_mfa_sifirla"),
+    path("denetim/", yonetim.denetim_liste, name="denetim"),
+]

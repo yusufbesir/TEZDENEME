@@ -1,0 +1,41 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Mükerrer ve hatalı kayıtlar{% endblock %}
+{% block icerik %}
+<h1>Mükerrer ve hatalı kayıtlar</h1>
+
+<h2>Aynı hedef URL'yi paylaşan aktif kodlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Hedef URL</th><th>Kodlar</th></tr></thead>
+  <tbody>
+  {% for url, kodlar in mukerrer %}<tr><td>{{ url }}</td><td>{% for q in kodlar %}<a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td></tr>
+  {% empty %}<tr><td colspan="2">Sorun yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2>Hedef adresi geçersiz olan aktif kodlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kısa kod</th><th>Ad</th><th>Hedef</th></tr></thead>
+  <tbody>
+  {% for q in gecersiz_hedef %}<tr><td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td><td>{{ q.ad }}</td><td>{{ q.hedef_url }}</td></tr>
+  {% empty %}<tr><td colspan="3">Sorun yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2>Hedef sayfası yayında olmayan aktif kodlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kısa kod</th><th>Ad</th><th>Sayfa</th></tr></thead>
+  <tbody>
+  {% for q in yayinda_olmayan_sayfa %}<tr><td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td><td>{{ q.ad }}</td><td>{{ q.sayfa.baslik }} ({{ q.sayfa.get_durum_display }})</td></tr>
+  {% empty %}<tr><td colspan="3">Sorun yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2>Bitişi geçmiş ama hâlâ aktif olan kodlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kısa kod</th><th>Ad</th><th>Bitiş</th></tr></thead>
+  <tbody>
+  {% for q in suresi_gecmis %}<tr><td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td><td>{{ q.ad }}</td><td>{{ q.etkin_bitis|date:"d.m.Y H:i" }}</td></tr>
+  {% empty %}<tr><td colspan="3">Sorun yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}QR kod: {{ qr.kisa_kod }}{% endblock %}
+{% block icerik %}
+<h1>{{ qr.kisa_kod }}{% if qr.ad %} - {{ qr.ad }}{% endif %}</h1>
+<div class="ikili">
+  <div class="kart">
+    <img class="qr-onizleme" src="{% url 'panel:qr_png' qr.pk %}" alt="{{ qr.kisa_kod }} QR kodu" width="280" height="280">
+    <div class="eylemler">
+      <a class="dugme ikincil kucuk" href="{% url 'panel:qr_png' qr.pk %}?indir=1">PNG indir</a>
+      <a class="dugme ikincil kucuk" href="{% url 'panel:qr_svg' qr.pk %}?indir=1">SVG indir</a>
+    </div>
+    <p class="yardim">QR kodun içeriği her zaman kalıcı kısa adrestir; hedef değişse de basılı kod geçerli kalır.</p>
+  </div>
+  <div class="kart">
+    <p>Kısa URL: <span class="kisa-url">{{ qr.kisa_url }}</span></p>
+    <p>Durum: <span class="etiket-durum durum-{{ qr.durum }}">{{ qr.get_durum_display }}</span>
+       · Zaman durumu: <span class="etiket-durum durum-{{ zaman_durumu }}">{% if zaman_durumu == "gecerli" %}Geçerli{% elif zaman_durumu == "baslamadi" %}Başlamadı{% else %}Süresi doldu{% endif %}</span></p>
+    <p>Tür: {{ qr.get_tur_display }}
+      {% if qr.kampanya %} · Kampanya: {{ qr.kampanya.ad }}{% endif %}
+      {% if qr.urun %} · Ürün: {{ qr.urun.ad }}{% endif %}
+      {% if qr.magaza %} · Mağaza: {{ qr.magaza.ad }}{% endif %}</p>
+    <p>Hedef:
+      {% if qr.hedef_turu == "sayfa" %}sistem sayfası {% if qr.sayfa %}"{{ qr.sayfa.baslik }}" (/s/{{ qr.sayfa.slug }}, {{ qr.sayfa.get_durum_display }}){% endif %}
+      {% else %}<span class="kisa-url">{{ qr.hedef_url }}</span>{% endif %}</p>
+    {% if qr.baslangic or qr.bitis %}<p>Başlangıç: {{ qr.baslangic|date:"d.m.Y H:i"|default:"-" }} · Bitiş: {{ qr.bitis|date:"d.m.Y H:i"|default:"-" }}</p>{% endif %}
+    {% if qr.etiket_listesi %}<p>Etiketler: {{ qr.etiket_listesi|join:", " }}</p>{% endif %}
+    {% if qr.aciklama %}<p>{{ qr.aciklama|linebreaksbr }}</p>{% endif %}
+    <p>Son 30 gün tarama: <strong>{{ tarama.insan }}</strong> (bot hariç) · bot: {{ tarama.bot }}</p>
+    <div class="eylemler">
+      {% if test_url %}<a class="dugme ikincil" href="{{ test_url }}" target="_blank" rel="noopener noreferrer">Hedefi test et (yeni sekme)</a>{% endif %}
+      {% if perms.qr.change_qrkod %}<a class="dugme" href="{% url 'panel:qr_duzenle' qr.pk %}">Düzenle</a>{% endif %}
+    </div>
+    {% if perms.qr.change_qrkod %}
+    <form method="post" action="{% url 'panel:qr_toplu' %}" class="eylemler">
+      {% csrf_token %}
+      <input type="hidden" name="secili" value="{{ qr.pk }}">
+      <input type="hidden" name="donus" value="{{ qr.pk }}">
+      {% if qr.durum != "aktif" %}<button type="submit" name="islem" value="aktif" class="dugme ikincil kucuk">Aktif yap</button>{% endif %}
+      {% if qr.durum != "pasif" %}<button type="submit" name="islem" value="pasif" class="dugme ikincil kucuk">Pasif yap</button>{% endif %}
+      {% if qr.durum != "arsiv" %}<button type="submit" name="islem" value="arsivle" class="dugme ikincil kucuk">Arşivle</button>{% endif %}
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<h2>Hedef geçmişi</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Eski hedef</th><th>Yeni hedef</th><th>Not</th></tr></thead>
+  <tbody>
+  {% for g in gecmis %}
+  <tr>
+    <td>{{ g.zaman|date:"d.m.Y H:i" }}</td><td>{{ g.kullanici.get_username|default:"-" }}</td>
+    <td>{% if g.eski_hedef_turu == "sayfa" %}Sayfa: {{ g.eski_sayfa.slug }}{% else %}{{ g.eski_hedef_url|default:"-" }}{% endif %}</td>
+    <td>{% if g.yeni_hedef_turu == "sayfa" %}Sayfa: {{ g.yeni_sayfa.slug }}{% else %}{{ g.yeni_hedef_url|default:"-" }}{% endif %}</td>
+    <td>{{ g.not_metni }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="5">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

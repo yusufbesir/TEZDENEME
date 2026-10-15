@@ -1,0 +1,22 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}{{ baslik }}{% endblock %}
+{% block icerik %}
+<h1>{{ baslik }}</h1>
+<form method="get" class="filtre">
+  <div><label for="q">Ara</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
+  <div><button type="submit" class="dugme">Ara</button></div>
+</form>
+{% if ekleme_izni %}<div class="eylemler"><a class="dugme" href="{% url 'panel:'|add:anahtar|add:'_olustur' %}">Yeni {{ etiket|lower }}</a></div>{% endif %}
+<div class="tablo-kap">
+<table>
+  <thead><tr>{% for b in basliklar %}<th>{{ b }}</th>{% endfor %}<th></th></tr></thead>
+  <tbody>
+  {% for s in satirlar %}
+    <tr>{% for h in s.hucreler %}<td>{{ h }}</td>{% endfor %}
+    <td>{% if duzenleme_izni %}<a href="{% url 'panel:'|add:anahtar|add:'_duzenle' s.nesne.pk %}">Düzenle</a>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="{{ basliklar|length|add:1 }}">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Toplu içe aktarma{% endblock %}
+{% block icerik %}
+<h1>Toplu QR içe aktarma</h1>
+<form method="post" action="{% url 'panel:ice_aktarma_yukle' %}" enctype="multipart/form-data" class="kart">
+  {% csrf_token %}
+  <div class="alan">
+    <label for="dosya">CSV (.csv) veya Excel (.xlsx) dosyası</label>
+    <input type="file" id="dosya" name="dosya" accept=".csv,.xlsx" required>
+    <p class="yardim">En fazla {{ en_fazla_mb }} MB ve {{ en_fazla_satir }} veri satırı. İlk satır sütun başlıkları olmalıdır.
+      CSV için UTF-8 (BOM'lu olabilir) veya Windows-1254; ayraç <code>,</code> veya <code>;</code> otomatik algılanır.
+      Excel için ilk sayfa okunur.</p>
+  </div>
+  <div class="eylemler">
+    <button type="submit" class="dugme">Yükle ve devam et</button>
+    <a class="dugme ikincil" href="{% url 'panel:ice_aktarma_ornek_csv' %}">Örnek CSV indir</a>
+    <a class="dugme ikincil" href="{% url 'panel:ice_aktarma_ornek_xlsx' %}">Örnek Excel indir</a>
+    <a class="dugme ikincil" href="{% url 'panel:qr_liste' %}">QR kodlara dön</a>
+  </div>
+</form>
+
+<div class="kart">
+  <h2>Kullanılabilir alanlar</h2>
+  <p class="yardim">Sütun başlıkları bir sonraki adımda bu alanlarla eşleştirilir:
+    {% for kod, etiket in alanlar %}<code>{{ kod }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}.
+    Hedef için <code>hedef_url</code> veya <code>sayfa</code> zorunludur. Kod boşsa otomatik üretilir.
+    Tarihler <code>YYYY-AA-GG</code>, <code>GG.AA.YYYY</code> veya <code>YYYY-AA-GG SS:DD</code> biçiminde (Türkiye saati) olabilir;
+    yalnızca tarih verilen bitiş gününün sonuna kadar geçerlidir.</p>
+</div>
+
+<h2>Bekleyen içe aktarmalar</h2>
+{% if bekleyenler %}
+<div class="tablo-kap"><table>
+  <thead><tr><th>Dosya</th><th>Yüklenme</th><th></th></tr></thead>
+  <tbody>{% for b in bekleyenler %}
+    <tr><td>{{ b.dosya_adi }}</td><td>{{ b.olusturma|date:"d.m.Y H:i" }}</td>
+    <td><a class="dugme ikincil" href="{% url 'panel:ice_aktarma_onizle' b.pk %}">Devam et</a></td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% else %}<p class="sessiz">Bekleyen içe aktarma yok. Bekleyen kayıtlar 24 saat sonra listeden kalkar.</p>{% endif %}
+
+<h2>Son tamamlananlar</h2>
+{% if tamamlananlar %}
+<div class="tablo-kap"><table>
+  <thead><tr><th>Dosya</th><th>Tarih</th><th></th></tr></thead>
+  <tbody>{% for b in tamamlananlar %}
+    <tr><td>{{ b.dosya_adi }}</td><td>{{ b.olusturma|date:"d.m.Y H:i" }}</td>
+    <td><a class="dugme ikincil" href="{% url 'panel:ice_aktarma_sonuc' b.pk %}">Raporu aç</a></td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% else %}<p class="sessiz">Henüz tamamlanan içe aktarma yok.</p>{% endif %}
+{% endblock %}

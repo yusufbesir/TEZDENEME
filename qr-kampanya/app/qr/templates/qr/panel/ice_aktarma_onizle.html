@@ -1,0 +1,73 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}İçe aktarma onayı{% endblock %}
+{% block icerik %}
+<h1>İçe aktarma onayı</h1>
+<p><strong>{{ ia.dosya_adi }}</strong></p>
+<div class="kartlar">
+  <div class="sayi-kart"><strong>{{ yeni_sayisi }}</strong> oluşturulacak</div>
+  <div class="sayi-kart"><strong>{{ guncelleme_sayisi }}</strong> güncellenecek adayı</div>
+  <div class="sayi-kart"><strong>{{ degismedi_sayisi }}</strong> değişiklik yok</div>
+  <div class="sayi-kart"><strong>{{ hatali_sayisi }}</strong> hatalı satır</div>
+</div>
+
+{% if hatali_sayisi %}
+<h2>Hatalı satırlar (içe aktarılmaz)</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır no</th><th>Alan</th><th>Hata</th></tr></thead>
+  <tbody>{% for no, alan, mesaj in hatalar %}<tr><td>{{ no }}</td><td>{{ alan }}</td><td>{{ mesaj }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% if hata_toplam > hatalar|length %}<p class="sessiz">İlk {{ hatalar|length }} hata gösteriliyor; tamamı için CSV indirin.</p>{% endif %}
+<p><a class="dugme ikincil" href="{% url 'panel:ice_aktarma_hatalar' ia.pk %}">Hata listesini CSV indir</a></p>
+<p class="yardim">Hatalı satırlar atlanır; geçerli satırlar devam edebilir. Düzeltmek isterseniz dosyayı düzeltip yeniden yükleyin.</p>
+{% endif %}
+
+{% if iliskili_yeni %}
+<h2>Oluşturulacak ürün / kampanya / mağaza kayıtları</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Tür</th><th>Kod</th><th>Ad</th></tr></thead>
+  <tbody>{% for tip, kod, ad in iliskili_yeni %}<tr><td>{{ tip }}</td><td>{{ kod }}</td><td>{{ ad }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+
+{% if yeni_sayisi %}
+<h2>Oluşturulacak QR kodlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır</th><th>Kod</th><th>Ad</th><th>Hedef</th></tr></thead>
+  <tbody>{% for r in yeni %}<tr><td>{{ r.no }}</td><td>{{ r.kod }}{% if r.kod_otomatik %} <span class="sessiz">(otomatik)</span>{% endif %}</td><td>{{ r.qr.ad }}</td><td>{{ r.yeni_hedef }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% if yeni_sayisi > onizleme_siniri %}<p class="sessiz">İlk {{ onizleme_siniri }} satır gösteriliyor.</p>{% endif %}
+{% endif %}
+
+{% if guncelleme_sayisi %}
+<h2>Güncelleme adayları (sistemde zaten var)</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır</th><th>Kod</th><th>Eski hedef → yeni hedef</th><th>Değişen alanlar</th></tr></thead>
+  <tbody>{% for r in guncellenecek %}<tr><td>{{ r.no }}</td><td>{{ r.kod }}</td>
+    <td>{{ r.eski_hedef }}{% if r.eski_hedef != r.yeni_hedef %} → {{ r.yeni_hedef }}{% else %} (değişmiyor){% endif %}</td>
+    <td>{% for e, a, y in r.degisenler %}{{ e }}: {{ a|default:"-" }} → {{ y|default:"-" }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% if guncelleme_sayisi > onizleme_siniri %}<p class="sessiz">İlk {{ onizleme_siniri }} satır gösteriliyor.</p>{% endif %}
+{% endif %}
+
+<form method="post" action="{% url 'panel:ice_aktarma_uygula' ia.pk %}" class="kart">
+  {% csrf_token %}
+  {% if guncelleme_sayisi %}
+    {% if guncelleme_izni %}
+    <div class="alan onay">
+      <input type="checkbox" id="guncelle" name="guncelle" value="1">
+      <label for="guncelle">Mevcut {{ guncelleme_sayisi }} kaydı güncelle</label>
+      <p class="yardim">İşaretlenmezse mevcut kodlara hiç dokunulmaz ve “atlandı” sayılır. Güncellemede boş hücreler mevcut değeri korur; kısa kod değişmez; hedef değişirse geçmişe yazılır.</p>
+    </div>
+    {% else %}
+    <p class="yardim">Mevcut kayıtları güncelleme yetkiniz yok; bu satırlar atlanacak.</p>
+    {% endif %}
+  {% endif %}
+  <div class="eylemler">
+    {% if uygulanabilir %}<button type="submit" class="dugme">İçe aktar</button>{% else %}<span class="sessiz">İçe aktarılacak geçerli kayıt yok.</span>{% endif %}
+    <a class="dugme ikincil" href="{% url 'panel:ice_aktarma_eslestir' ia.pk %}">Eşleştirmeyi değiştir</a>
+  </div>
+</form>
+<form method="post" action="{% url 'panel:ice_aktarma_iptal' ia.pk %}" class="eylemler">
+  {% csrf_token %}<button type="submit" class="dugme ikincil">İptal et</button>
+</form>
+{% endblock %}

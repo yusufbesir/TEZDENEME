@@ -1,0 +1,47 @@
+# Caddy: HTTPS (Let's Encrypt sertifikası otomatik alınır ve yenilenir) ve ters vekil.
+# SITE_ADRESI .env içinde tanımlanır. Örnek: qr.ornekfirma.com
+# Yerel deneme için: SITE_ADRESI=http://localhost
+{
+	email {$ACME_EPOSTA}
+	# trusted_proxies BİLEREK tanımlı değil: Caddy'nin önünde başka bir vekil/CDN yok, istemciden gelen
+	# X-Forwarded-For güvenilmez ve Caddy tarafından ezilir. (Önüne vekil konursa o vekilin adresi eklenmeli.)
+}
+
+{$SITE_ADRESI} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		?Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Yüklenen görseller doğrudan Caddy tarafından sunulur (salt okunur).
+	handle_path /medya/* {
+		root * /srv/medya
+		header Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'none'; sandbox"
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
+
+	handle {
+		reverse_proxy app:8000 {
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Erişim günlüğünde istemci IP'si maskelenir (IPv4 /24, IPv6 /48); çerez ve XFF günlüğe yazılmaz.
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip ip_mask 24 48
+				request>client_ip ip_mask 24 48
+				request>headers>X-Forwarded-For delete
+				request>headers>Cookie delete
+			}
+		}
+	}
+}
