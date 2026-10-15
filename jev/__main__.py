@@ -38,7 +38,7 @@ def main(argv=None):
             if args.girdi == "-":
                 ham = sys.stdin.read()
             else:
-                with open(args.girdi, "r", encoding="utf-8") as f:
+                with open(args.girdi, "r", encoding="utf-8-sig") as f:
                     ham = f.read()
             try:
                 girdi = json.loads(ham)

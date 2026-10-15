@@ -532,3 +532,16 @@ class CriteriaBicimTesti(unittest.TestCase):
         q = {"secim": {"type": "choice", "criteria": ["A", "B"], "instructions": "i"}}
         r = istemci.sor({"q": "s"}, q, tasima=lambda b, t: {"answers": {"secim": {"choice": "A", "probabilities": {"A": 1.0, "B": 0.0}}}})
         self.assertEqual(r["code"], "yanit_gecersiz")
+
+
+class BomTesti(unittest.TestCase):
+    def test_bom_li_girdi_okunur(self):
+        import subprocess, sys, tempfile
+        with tempfile.TemporaryDirectory() as d:
+            yol = os.path.join(d, "g.json")
+            with open(yol, "w", encoding="utf-8-sig") as f:
+                f.write("{bozuk")
+            r = subprocess.run([sys.executable, "-m", "jev", "danis", "--girdi", yol], capture_output=True, text=True,
+                               env={**os.environ, "JEV_KAYIT": os.path.join(d, "k.jsonl"), "JEV_ARACLAR": "/yok"})
+            self.assertEqual(r.returncode, 2)
+            self.assertNotIn("BOM", r.stdout + r.stderr)
