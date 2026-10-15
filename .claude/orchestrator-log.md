@@ -14,3 +14,7 @@
 | 2026-10-15 | Barkod kuralları: TO önek, Code 128/39/93, uzunluk önerisi, 3 şifreleme yöntemi, araştırma raporu [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer x4 / claude-sonnet-5-5 (yöntemler 44k, barkod 58k, rapor 44k, arayüz 98k token) | ~244k | Tamamlandı |
 | 2026-10-15 | Bağımsız doğrulama + güvenlik incelemesi [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~82k | Geçti (70 test); orta/düşük bulgular giderildi veya raporlandı |
 | 2026-10-15 | Masaüstü paketi (Electron, Windows .exe) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer + verifier / claude-sonnet-5-5 | ~47k + ~30k | Geçti (Windows'ta denenmedi) |
+| 2026-10-15 | Biçim dönüştürücü (12 çıktı biçimi) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer / claude-sonnet-5-5 | ~46k | Tamamlandı (22 yeni test) |
+| 2026-10-15 | Dönüştürücü bağımsız doğrulama [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~32k | Geçti (92 test) |
+| 2026-10-15 | Modern arayüz + dönüştürücü bağlama [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer / claude-sonnet-5-5 | ~86k | Tamamlandı (99 test) |
+| 2026-10-15 | Arayüz bağımsız doğrulama (gerçek tarayıcı) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~57k | Geçti (12 biçim indirme, 4 genişlik ekran görüntüsü) |
