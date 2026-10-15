@@ -13,3 +13,4 @@
 | 2026-10-15 | Luhn kontrol rakamı + 20 haneli barkod | verifier / claude-sonnet-5-5 | ~25k | Geçti (17 test) |
 | 2026-10-15 | Barkod kuralları: TO önek, Code 128/39/93, uzunluk önerisi, 3 şifreleme yöntemi, araştırma raporu [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer x4 / claude-sonnet-5-5 (yöntemler 44k, barkod 58k, rapor 44k, arayüz 98k token) | ~244k | Tamamlandı |
 | 2026-10-15 | Bağımsız doğrulama + güvenlik incelemesi [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | verifier / claude-sonnet-5-5 | ~82k | Geçti (70 test); orta/düşük bulgular giderildi veya raporlandı |
+| 2026-10-15 | Masaüstü paketi (Electron, Windows .exe) [İP:Barkod sıra şifreleme uygulaması#ixQ4SM] | implementer + verifier / claude-sonnet-5-5 | ~47k + ~30k | Geçti (Windows'ta denenmedi) |
