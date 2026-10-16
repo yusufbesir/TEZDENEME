@@ -28,3 +28,4 @@
 2026-10-15 | 1.1.2 kullanıcı başına kurulum (allowElevation:false, installer.nsh), derleme | orkestratör (küçük yapılandırma işi) | ana oturum | Tamamlandı (32 + 112 test)
 2026-10-15 | 1.1.2 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti (makro etkisi derlenmiş pakette doğrulanamadı, şablon kodundan dolaylı kanıt)
 | 2026-10-16 | Barkod 1.1.3: Başlat menüsü Kaldır kısayolu + ayar silme sorusu (varsayılan Hayır) | implementer yerine orkestratör (tek dosya) + verifier/sonnet-5-5 | verifier ~39k token | Geçti (33+112 test, derleme doğrulandı) |
+| 2026-10-16 | Barkod 1.1.4: ön ek sonrası 1-9, gerçek .xlsx + 7 biçim, Çöz SVG, ≥4 örnek, isteğe bağlı sıra no | implementer x3 + verifier / sonnet-5-5 | ~50k+81k+58k impl, ~verifier | Geçti (117+33 test, tarayıcı + LibreOffice doğrulandı) |
