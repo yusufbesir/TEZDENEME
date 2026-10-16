@@ -1,5 +1,6 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
-/// ders" düğmesi ve alan kurslarının tek doğrusal basamak yolu.
+/// ders" düğmesi ve alan kurslarının tek doğrusal basamak yolu. Seri
+/// göstergesinin altında "Bu hafta 3/5 gün" haftalık hedef satırı bulunur.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -189,6 +190,18 @@ class _YolListesi extends StatelessWidget {
             HedefHalkasi(xp: bugunXp, hedef: durum.gunlukHedef, boyut: 56),
           ],
         ],
+      ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: Semantics(
+          label:
+              'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)} / ${durum.haftalikHedefGun} gün',
+          excludeSemantics: true,
+          child: Text(
+            'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)}/${durum.haftalikHedefGun} gün',
+            style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+          ),
+        ),
       ),
       const SizedBox(height: Olcu.b2),
       SizedBox(

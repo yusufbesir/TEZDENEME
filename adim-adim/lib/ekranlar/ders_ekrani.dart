@@ -1,4 +1,6 @@
-/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri).
+/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri). Ünitenin son
+/// dersinde özetin altında "Karışık tekrar (5 soru)" önerisi çıkar
+/// (önceki ünitelerden serpiştirilmiş 5 alıştırma; XP mikro ders gibi).
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -35,6 +37,10 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     }
     return null;
   }
+
+  /// Bu ders ünitesinin son dersiyse ve önceki ünite alıştırması varsa true.
+  bool _karisikVar(Ders ders) =>
+      Motor.serpistirmeSec(ref.read(kurslarProvider), ders.id).isNotEmpty;
 
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
 
@@ -94,6 +100,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                 xp: _ozet!.xp,
                 seri: _ozet!.seri,
                 onDon: _cik,
+                ekEtiket: _karisikVar(ders) ? 'Karışık tekrar (5 soru)' : null,
+                onEk: _karisikVar(ders)
+                    ? () => context.push(
+                        '/mikro?mod=karisik&ders=${Uri.encodeComponent(ders.id)}',
+                      )
+                    : null,
               )
             : AlistirmaOturumu(
                 alistirmalar: ders.alistirmalar,

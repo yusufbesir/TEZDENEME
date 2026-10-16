@@ -1,4 +1,6 @@
 /// Mikro ders ekranı: 2 dakikalık, 5 alıştırmalık kısa tekrar + yeni karışık ders.
+/// Üç kip: normal, `mod=zayif` (hata defterindeki zayıf noktalar önce) ve
+/// `mod=karisik` (ünite sonu serpiştirilmiş tekrar; `ders` parametresi).
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -18,7 +20,13 @@ import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class MikroDersEkrani extends ConsumerStatefulWidget {
-  const MikroDersEkrani({super.key});
+  const MikroDersEkrani({super.key, this.mod, this.dersId});
+
+  /// null: normal; 'zayif' | 'karisik'.
+  final String? mod;
+
+  /// 'karisik' kipinde biten ders kimliği.
+  final String? dersId;
 
   @override
   ConsumerState<MikroDersEkrani> createState() => _MikroDurumu();
@@ -34,15 +42,28 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
     super.initState();
     final durum = ref.read(durumProvider).value;
     final kurslar = ref.read(alanKurslariProvider);
-    _liste = durum == null
-        ? const []
-        : Motor.mikroSec(
-            durum,
-            kurslar,
-            ref.read(bugunProvider),
-            adet: 5,
-            tohum: DateTime.now().millisecondsSinceEpoch,
-          );
+    final tohum = DateTime.now().millisecondsSinceEpoch;
+    final bugun = ref.read(bugunProvider);
+    if (durum == null) {
+      _liste = const [];
+    } else if (widget.mod == 'karisik' && widget.dersId != null) {
+      _liste = Motor.serpistirmeSec(
+        ref.read(kurslarProvider),
+        widget.dersId!,
+        tohum: tohum,
+      );
+    } else {
+      _liste = Motor.mikroSec(
+        durum,
+        kurslar,
+        bugun,
+        adet: 5,
+        tohum: tohum,
+        oncelikliKartlar: widget.mod == 'zayif'
+            ? Motor.zayifKartlar(durum, bugun)
+            : const [],
+      );
+    }
   }
 
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
@@ -95,7 +116,11 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
             ? _Bos(onGeri: _cik)
             : _ozet != null
             ? DersOzeti(
-                baslik: 'Mikro ders tamamlandı',
+                baslik: switch (widget.mod) {
+                  'zayif' => 'Zayıf noktalar dersi tamamlandı',
+                  'karisik' => 'Karışık tekrar tamamlandı',
+                  _ => 'Mikro ders tamamlandı',
+                },
                 dogru: _ozet!.dogru,
                 toplam: _ozet!.toplam,
                 xp: _ozet!.xp,

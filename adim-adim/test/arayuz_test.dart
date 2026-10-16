@@ -1,3 +1,10 @@
+/// Arayüz (widget) testleri: ders akışı, ayarlar, gezinme, Tekrar sekmesi,
+/// hata defteri bölümü, haftalık hedef satırı ve ayarı, karışık tekrar önerisi.
+/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf
+/// kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
+import 'package:adim_adim/bilesenler/alistirma_oturumu.dart';
 import 'package:adim_adim/bilesenler/profil_karti.dart';
 import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
@@ -5,9 +12,12 @@ import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/model/icerik.dart';
 import 'package:adim_adim/servis/bildirim.dart';
 import 'package:adim_adim/servis/ses.dart';
+import 'package:adim_adim/tema/kategori_renkleri.dart';
 import 'package:adim_adim/uygulama.dart';
 import 'package:adim_adim/yarisma/depo.dart';
+import 'package:adim_adim/yarisma/model.dart';
 import 'package:adim_adim/yarisma/saglayicilar.dart';
+import 'package:adim_adim/yarisma/soru_bankasi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -372,5 +382,303 @@ void main() {
   testWidgets('bekleyen kart yoksa Tekrar rozeti görünmez', (tester) async {
     await uygulamayiAc(tester, null, boyut: const Size(400, 800));
     expect(find.byType(Badge), findsNothing);
+  });
+
+  // --- Öğrenme motoru: hata defteri, haftalık hedef, karışık tekrar ---
+
+  Future<void> tekrarSekmesineGec(WidgetTester tester) => dokun(
+    tester,
+    find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text('Tekrar'),
+    ),
+  );
+
+  testWidgets('Tekrar sekmesinde boş hata defteri açıklama gösterir', (
+    tester,
+  ) async {
+    await uygulamayiAc(tester, null);
+    await tekrarSekmesineGec(tester);
+    expect(find.text('Hata defteri'), findsOneWidget);
+    expect(find.text('Yanlış bildiklerin burada birikir.'), findsOneWidget);
+    final dugme = tester.widget<ButtonStyleButton>(
+      find.ancestor(
+        of: find.text('Zayıf noktalar dersi'),
+        matching: find.bySubtype<ButtonStyleButton>(),
+      ),
+    );
+    expect(dugme.onPressed, isNull);
+  });
+
+  testWidgets('hata defteri alıştırma kartı hatasını ve düğmeyi gösterir', (
+    tester,
+  ) async {
+    final depo = BellekDepo(
+      OgrenciDurumu(
+        alan: 'dil',
+        hatalar: [
+          const HataKaydi(
+            tur: HataKaydi.turKart,
+            id: '$sahteDers1#0',
+            seviye: 'sahte-1',
+            gun: '2026-10-14',
+          ),
+          // Kod alanının kaydı dil alanında görünmez.
+          const HataKaydi(
+            tur: HataKaydi.turKart,
+            id: '$sahteKodDers1#0',
+            seviye: 'sahte-kod-1',
+            gun: '2026-10-14',
+          ),
+        ],
+      ),
+    );
+    await uygulamayiAc(tester, depo, kurslar: [sahteKurs, sahteKodKurs]);
+    await tekrarSekmesineGec(tester);
+    expect(find.text('Hata defteri'), findsOneWidget);
+    expect(find.text('1 kayıt'), findsOneWidget);
+    expect(find.text('İki artı iki kaç eder?'), findsOneWidget);
+    expect(find.text('HTML neyin kısaltmasıdır?'), findsNothing);
+    expect(find.textContaining('Alıştırma · sahte-1'), findsOneWidget);
+    final dugme = tester.widget<ButtonStyleButton>(
+      find.ancestor(
+        of: find.text('Zayıf noktalar dersi'),
+        matching: find.bySubtype<ButtonStyleButton>(),
+      ),
+    );
+    expect(dugme.onPressed, isNotNull);
+  });
+
+  testWidgets('hata defteri yarışma sorusunu kategori adı, simgesi ve '
+      'rengiyle gösterir', (tester) async {
+    final q = tumSorular.firstWhere((s) => s.alan == 'dil');
+    final depo = BellekDepo(
+      OgrenciDurumu(
+        alan: 'dil',
+        hatalar: [
+          HataKaydi(
+            tur: HataKaydi.turYarisma,
+            id: q.id,
+            kategori: q.kategori.kimlik,
+            seviye: q.seviyeKursId,
+            gun: '2026-10-14',
+          ),
+          // Soru bankasında olmayan kayıt sessizce gizlenir.
+          const HataKaydi(
+            tur: HataKaydi.turYarisma,
+            id: 'yok.soru.1',
+            kategori: 'tarih',
+            seviye: 'x',
+            gun: '2026-10-14',
+          ),
+        ],
+      ),
+    );
+    await uygulamayiAc(tester, depo);
+    await tekrarSekmesineGec(tester);
+    expect(find.text('1 kayıt'), findsOneWidget);
+    expect(find.text(q.soru), findsOneWidget);
+    expect(find.textContaining(q.kategori.ad), findsOneWidget);
+    final parlaklik = Theme.of(
+      tester.element(find.byType(Scaffold).first),
+    ).brightness;
+    final simge = tester.widget<Icon>(
+      find.byIcon(KategoriRenkleri.simge(q.kategori)),
+    );
+    expect(simge.color, KategoriRenkleri.renk(q.kategori, parlaklik));
+    // Yarışma kaydı tek başına zayıf noktalar dersi açmaz (kartı yok).
+    final dugme = tester.widget<ButtonStyleButton>(
+      find.ancestor(
+        of: find.text('Zayıf noktalar dersi'),
+        matching: find.bySubtype<ButtonStyleButton>(),
+      ),
+    );
+    expect(dugme.onPressed, isNull);
+  });
+
+  testWidgets('Zayıf noktalar dersi hatalı kartı ilk soru olarak açar', (
+    tester,
+  ) async {
+    final depo = BellekDepo(
+      const OgrenciDurumu(
+        alan: 'dil',
+        hatalar: [
+          HataKaydi(
+            tur: HataKaydi.turKart,
+            id: '$sahteDers2#0',
+            seviye: 'sahte-1',
+            gun: '2026-10-14',
+          ),
+          // 7 günden eski hata zayıf nokta sayılmaz.
+          HataKaydi(
+            tur: HataKaydi.turKart,
+            id: '$sahteDers1#1',
+            seviye: 'sahte-1',
+            gun: '2026-10-01',
+          ),
+        ],
+      ),
+    );
+    await uygulamayiAc(tester, depo);
+    await tekrarSekmesineGec(tester);
+    await dokun(tester, find.text('Zayıf noktalar dersi'));
+    expect(find.byType(AlistirmaOturumu), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlistirmaOturumu),
+        matching: find.text('İki artı iki kaç eder?'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Yol sayfasında "Bu hafta 2/5 gün" satırı görünür', (
+    tester,
+  ) async {
+    // bugün 2026-10-15 (Perşembe); hafta Pazartesi 2026-10-12'de başlar.
+    final depo = BellekDepo(
+      const OgrenciDurumu(
+        alan: 'dil',
+        sonGun: '2026-10-15',
+        seri: 1,
+        gunlukXp: {
+          '2026-10-11': 30, // önceki hafta: sayılmaz
+          '2026-10-13': 20,
+          '2026-10-15': 25,
+        },
+      ),
+    );
+    await uygulamayiAc(tester, depo);
+    expect(find.text('Bu hafta 2/5 gün'), findsOneWidget);
+  });
+
+  testWidgets('haftalık satır seçilen hedefi gösterir (0/3)', (tester) async {
+    final depo = BellekDepo(
+      const OgrenciDurumu(alan: 'dil', haftalikHedefGun: 3),
+    );
+    await uygulamayiAc(tester, depo);
+    expect(find.text('Bu hafta 0/3 gün'), findsOneWidget);
+  });
+
+  testWidgets('Ayarlar: haftalık hedef değişir ve kalıcı olur', (tester) async {
+    final depo = BellekDepo(const OgrenciDurumu(alan: 'dil'));
+    await uygulamayiAc(tester, depo);
+    await ayarlariAc(tester);
+    expect(find.text('Haftalık hedef'), findsOneWidget);
+    expect(find.text('Haftada 5 gün'), findsOneWidget);
+    await tester.ensureVisible(find.text('Haftada 5 gün'));
+    final kaydirici = find.byType(Slider).at(1);
+    expect(tester.widget<Slider>(kaydirici).min, 3);
+    expect(tester.widget<Slider>(kaydirici).max, 7);
+    tester.widget<Slider>(kaydirici).onChanged!(6);
+    await tester.pumpAndSettle();
+    expect((await depo.yukle()).haftalikHedefGun, 6);
+    expect(find.text('Haftada 6 gün'), findsOneWidget);
+    // Sınır dışı değer 3..7 aralığına çekilir.
+    tester.widget<Slider>(kaydirici).onChanged!(1);
+    await tester.pumpAndSettle();
+    expect((await depo.yukle()).haftalikHedefGun, 3);
+  });
+
+  group('karışık tekrar önerisi', () {
+    final ikiUnite = Kurs(
+      id: 'iki-1',
+      ad: 'İki Ünite',
+      aciklama: '',
+      alan: KursAlani.dil,
+      uniteler: [
+        Unite(
+          id: 'iki-1.u1',
+          ad: 'Birinci',
+          dersler: [
+            Ders(
+              id: 'iki-1.u1.d1',
+              ad: 'Ders Alt',
+              alistirmalar: [
+                for (var i = 0; i < 6; i++)
+                  Secim(
+                    soru: 'Önceki soru $i',
+                    secenekler: const ['x', 'y'],
+                    dogru: 0,
+                  ),
+              ],
+            ),
+          ],
+        ),
+        Unite(
+          id: 'iki-1.u2',
+          ad: 'İkinci',
+          dersler: [
+            Ders(
+              id: 'iki-1.u2.d1',
+              ad: 'Ders Son',
+              alistirmalar: const [
+                Secim(
+                  soru: 'Son soru',
+                  secenekler: ['evet', 'hayır'],
+                  dogru: 0,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    testWidgets('ünitenin son dersi bitince öneri çıkar ve mikro ders açar', (
+      tester,
+    ) async {
+      final depo = BellekDepo(
+        const OgrenciDurumu(alan: 'dil', tamamlanan: {'iki-1.u1.d1': 1}),
+      );
+      await uygulamayiAc(tester, depo, kurslar: [ikiUnite]);
+      await dokun(tester, find.textContaining('Ders Son'));
+      await dokun(tester, find.text('evet'));
+      await kontrolEtDogru(tester, son: true);
+      expect(find.text('Ders tamamlandı'), findsOneWidget);
+      expect(find.text('Karışık tekrar (5 soru)'), findsOneWidget);
+
+      await dokun(tester, find.text('Karışık tekrar (5 soru)'));
+      expect(find.byType(AlistirmaOturumu), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlistirmaOturumu),
+          matching: find.textContaining('Önceki soru'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('ilk ünitenin son dersinde (önceki ünite yok) öneri çıkmaz', (
+      tester,
+    ) async {
+      final tek = Kurs(
+        id: 'tek-1',
+        ad: 'Tek',
+        aciklama: '',
+        alan: KursAlani.dil,
+        uniteler: [
+          Unite(
+            id: 'tek-1.u1',
+            ad: 'Tek Ünite',
+            dersler: [
+              Ders(
+                id: 'tek-1.u1.d1',
+                ad: 'Ders Tek',
+                alistirmalar: const [
+                  Secim(soru: 'Soru', secenekler: ['evet', 'hayır'], dogru: 0),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+      await uygulamayiAc(tester, null, kurslar: [tek]);
+      await dokun(tester, find.textContaining('Ders Tek'));
+      await dokun(tester, find.text('evet'));
+      await kontrolEtDogru(tester, son: true);
+      expect(find.text('Ders tamamlandı'), findsOneWidget);
+      expect(find.text('Karışık tekrar (5 soru)'), findsNothing);
+    });
   });
 }
