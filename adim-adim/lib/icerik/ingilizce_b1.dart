@@ -924,7 +924,7 @@ const Kurs ingilizceB1 = Kurs(
             ),
             Bosluk(
               soru: 'It was raining, ___ we stayed inside.',
-              secenekler: ['so', 'but', 'because'],
+              secenekler: ['so', 'or', 'because'],
               dogru: 0,
               aciklama:
                   'So sonuç bildirir: yağmur yağıyordu, bu yüzden içeride kaldık.',

@@ -64,3 +64,4 @@
 - 2026-10-16 | Esnek yerleşim düzeltme turu: siganMetin/kisaSayi, FittedBox kaldırıldı, 11 px alt sınır testleri | implementer (claude-sonnet-5-5) | ~35K token | tamam (237 test; birleştirme ve verifier bekliyor)
 - 2026-10-16 | İngilizce B1 kursu (12 ders, 120 alıştırma) + 36 B1 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (224 test; birleştirme ve verifier bekliyor)
 - 2026-10-16 | Motor dalı birleştirme çakışmaları (4 dosya) | implementer (claude-sonnet-5-5) | ~50K token | tamam (315 test, analyze temiz)
+- 2026-10-16 | Motor özellikleri + birleştirme + yerleşim turu + B1 doğrula | verifier (claude-sonnet-5-5) | ~75K token | Geçti (327 test; 1 isteğe bağlı şık notu, ana oturum uyguladı: but→or)
