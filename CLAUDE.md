@@ -11,7 +11,7 @@ Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtı
 - Mimari, güvenlik ve veri bütünlüğü kararları sende kalır.
 - Yalnızca `scout`, `implementer` ve `verifier` ajanlarını kullan.
 - `verifier` Geçti deyince commit'le.
-- Her ajan çalışmasından sonra `.claude/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
+- Her ajan çalışmasından sonra `docs/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
 - Bilmediğin şeyi tahmin etme, sor.
 - Mevcut bir dosyanın üzerine yazmadan önce sor.
 
@@ -37,3 +37,17 @@ Jev, TypeSafe AI'ın karar modelidir. Metin ve kod üretmez; tipli sorulara seç
 - Sayma, aritmetik ve tarih karşılaştırmasını Jev'e bırakma; kodla yap.
 - Gizli bilgiyi (API anahtarı, şifre) Jev'e gönderme. Üretimde sabit sürüm kullan (örn. `jev-1.13.0`), `jev-latest` kullanma.
 - Ayrıntılı kaynaklı araştırma: https://claude.ai/artifact/Dqpzh2DC5Yyni2BChJZCcA
+
+### Jev karar protokolü
+
+- Karar aşamalarında (yöntem, mimari, varsayılan seçimi, öneri) `jev-karar` skill'ini izle: `python3 -m jev danis --girdi karar.json`.
+- Kendi seçimini Jev'den önce kaydet (kör seçim). Claude'un seçimi ve gerekçesi Jev'e gönderilmez.
+- Jev iki sırada sorulur; sıra değişince seçimi değişirse Jev kararsız sayılır.
+- Claude ile Jev ayrışırsa ya da Jev kararsızsa farklı modelde bağımsız hakem (`verifier`) seçimleri görmeden karar verir; 2/3 çoğunluk yoksa kullanıcıya sorulur.
+- Kritik kategorilerde (mimari, güvenlik, veri bütünlüğü, geri alınamaz) Jev yalnız görüş verir; karar kullanıcı ve Opus'tadır.
+- Jev'e erişilemezse yanıtta "Jev'e erişilemedi" diye açıkça yaz. Jev denetim işlerinde kullanılmaz.
+- Jev'e yalnız Vercel AI Gateway üzerinden gidilir; anahtar yalnız `AI_GATEWAY_API_KEY` ortam değişkeninde ya da cihazdaki mevcut anahtar dosyasında durur. Ayrıntı: `docs/jev/karar-kurgusu.md`.
+
+## Proje Kuralları (ayrıntı)
+
+Kullanıcının kalıcı kuralları (hafıza, silme yasağı, güvenlik, dosya düzeni, etiket ve token kaydı vb.) `docs/kurallar/` altındadır. İlgili işte önce `docs/kurallar/README.md` dizinine ve ilgili dosyanın özetine bak; tamamını açma. Kural silinmez, değişiklik kullanıcıya önerilir.

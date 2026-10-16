@@ -5,6 +5,8 @@ set -euo pipefail
 KOK="$(cd "$(dirname "$0")/.." && pwd)"
 KUTUPHANE="$KOK/skill-kutuphanesi"
 HEDEF="$KOK/.claude/skills"
+KILIT="$KOK/docs/skill-kaynaklari/kaynak-kilidi.json"
+OZET="$KOK/docs/skill-kaynaklari/icerik-ozeti.sha256"
 YERLESIK=(code-review simplify init security-review loop run claude-api review help config doctor)
 
 kullanim() {
@@ -31,6 +33,44 @@ yerlesik_mi() {
   local y
   for y in "${YERLESIK[@]}"; do [[ "$y" == "$1" ]] && return 0; done
   return 1
+}
+
+# Kaynak kilidini doğrular: depo kilitte ve tam_commit dolu olmalı; skill klasöründeki
+# her dosya icerik-ozeti.sha256 içinde listeli ve özeti eşleşmeli; listelenmemiş dosya olmamalı.
+kilit_dogrula() {
+  local rel="$1" depo="${1%%/*}" onek="skill-kutuphanesi/$1/"
+  [[ -f "$KILIT" ]] || hata "Kaynak kilidi bulunamadı: $KILIT"
+  [[ -f "$OZET" ]] || hata "İçerik özeti bulunamadı: $OZET"
+
+  local tam
+  tam="$(awk -v h="\"hedef\": \"skill-kutuphanesi/$depo\"" '
+    index($0, h) { bulundu = 1; next }
+    bulundu && /"tam_commit"/ { print; exit }
+    bulundu && /^[ \t]*}/ { exit }' "$KILIT")"
+  [[ -n "$tam" ]] || hata "'$depo' kaynak kilidinde (kaynak-kilidi.json) kayıtlı değil; etkinleştirilmedi."
+  [[ "$tam" =~ \"tam_commit\":[[:space:]]*\"[0-9a-f]{40}\" ]] \
+    || hata "'$depo' için kilitte geçerli tam_commit yok (null); etkinleştirilmedi."
+
+  local liste gercek f
+  liste="$(tr -d '\r' < "$OZET" | awk -v p="$onek" 'substr($0, 67, length(p)) == p')"
+  gercek="$(cd "$KOK" && find "skill-kutuphanesi/$rel" \( -type f -o -type l \) | LC_ALL=C sort)"
+  [[ -n "$gercek" ]] || hata "'$rel' içinde dosya yok."
+  while IFS= read -r f; do
+    [[ -n "$f" ]] || continue
+    grep -q -F -x -- "$f" <<< "$(cut -c 67- <<< "$liste")" \
+      || hata "Dosya içerik özetinde listelenmemiş (fazladan/izinsiz dosya): $f"
+  done <<< "$gercek"
+  while IFS= read -r f; do
+    [[ -n "$f" ]] || continue
+    grep -q -F -x -- "$f" <<< "$gercek" \
+      || hata "Özette listeli dosya diskte yok: $f"
+  done <<< "$(cut -c 67- <<< "$liste")"
+
+  local sonuc
+  if ! sonuc="$(cd "$KOK" && sha256sum -c <<< "$liste" 2>&1)"; then
+    f="$(grep -v ': OK$' <<< "$sonuc" | head -n1)"
+    hata "İçerik özeti uyuşmuyor, dosya değiştirilmiş: ${f%%:*}"
+  fi
 }
 
 etkinlestir() {
@@ -71,6 +111,8 @@ etkinlestir() {
   if [[ -e "$HEDEF/$ad" || -L "$HEDEF/$ad" ]]; then
     hata "'$HEDEF/$ad' zaten var; üzerine yazılmadı."
   fi
+
+  kilit_dogrula "$rel"
 
   mkdir -p "$HEDEF"
   cp -R "$KUTUPHANE/$rel" "$HEDEF/$ad"
