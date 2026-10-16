@@ -1,0 +1,14 @@
+{
+  "appId": "com.piril.asistan",
+  "appName": "Pırıl",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": false,
+    "allowNavigation": []
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

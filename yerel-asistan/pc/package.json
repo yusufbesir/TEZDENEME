@@ -1,0 +1,95 @@
+{
+  "name": "piril-pc",
+  "productName": "Pırıl",
+  "version": "0.1.0",
+  "description": "Pırıl yerel asistan: Windows uygulaması",
+  "author": "Pırıl",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "test": "node --test ../test/pc/",
+    "kopyala": "node scripts/kopyala.js",
+    "ikon": "node scripts/ikon-uret.js",
+    "start": "npm run kopyala && electron .",
+    "dist": "npm run kopyala && electron-builder --win --x64 --publish never",
+    "dist:dir": "npm run kopyala && electron-builder --win --x64 --dir --publish never"
+  },
+  "dependencies": {
+    "ws": "8.22.0"
+  },
+  "devDependencies": {
+    "@electron/fuses": "2.1.3",
+    "electron": "43.7.6",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.piril.yerelasistan",
+    "productName": "Pırıl",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "temizlik.js",
+      "ag.js",
+      "guvenlik.js",
+      "depo.js",
+      "ikon.js",
+      "onay.js",
+      "eslestirme.js",
+      "cekirdek-kopru.js",
+      "karakter.html",
+      "karakter.css",
+      "karakter-pencere.js",
+      "platform/**/*",
+      "cekirdek/**/*",
+      "protokol/**/*",
+      "arayuz/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "asar": true,
+    "publish": null,
+    "icon": "build/icon.png",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pırıl",
+      "uninstallDisplayName": "Pırıl",
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": [
+        "tr_TR"
+      ],
+      "language": "1055",
+      "artifactName": "Piril-Kurulum-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "Piril-Tasinabilir-${version}.exe"
+    },
+    "afterPack": "scripts/after-pack.js"
+  }
+}

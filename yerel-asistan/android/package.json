@@ -1,0 +1,20 @@
+{
+  "name": "piril-android",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pırıl Android sarmalayıcısı (Capacitor). Ağ erişimi yalnızca yerel ağdaki bilgisayara şifreli ws bağlantısıdır.",
+  "scripts": {
+    "hazirla": "node scripts/hazirla.js",
+    "yamala": "node scripts/yamala.js",
+    "esitle": "node scripts/hazirla.js && npx cap sync android && node scripts/yamala.js"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor-community/speech-recognition": "7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}
