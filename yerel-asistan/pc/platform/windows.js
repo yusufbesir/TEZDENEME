@@ -71,10 +71,27 @@ const SABLON = Object.freeze({
   baslatAc: ORTAK_BASLIK +
     '$ad = $env:PIRIL_AD\n' +
     'if ([string]::IsNullOrEmpty($ad) -or $ad.Length -gt 40 -or $ad -notmatch \'^[\\p{L}\\p{N} ._\\-]+$\') { exit 2 }\n' +
-    '$kokler = @((Join-Path $env:ProgramData \'Microsoft\\Windows\\Start Menu\\Programs\'), (Join-Path $env:APPDATA \'Microsoft\\Windows\\Start Menu\\Programs\'))\n' +
-    '$bulunan = foreach ($k in $kokler) { if (Test-Path -LiteralPath $k) { Get-ChildItem -LiteralPath $k -Recurse -Filter *.lnk -ErrorAction SilentlyContinue | Where-Object { $_.BaseName -eq $ad } } }\n' +
-    '$ilk = $bulunan | Select-Object -First 1\n' +
+    // Kök sırası: önce makine geneli (standart kullanıcı yazamaz), sonra kullanıcı menüsü. Çift eşleşmede ilk kök kazanır.
+    "$kokler = @((Join-Path $env:ProgramData 'Microsoft\\Windows\\Start Menu\\Programs'), (Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs'))\n" +
+    '$ilk = $null\n' +
+    'foreach ($k in $kokler) {\n' +
+    '  if ($ilk -or -not (Test-Path -LiteralPath $k)) { continue }\n' +
+    '  $ilk = Get-ChildItem -LiteralPath $k -Recurse -Filter *.lnk -ErrorAction SilentlyContinue | Where-Object { $_.BaseName -eq $ad } | Sort-Object FullName | Select-Object -First 1\n' +
+    '}\n' +
     'if (-not $ilk) { exit 3 }\n' +
+    // Hedef doğrulama (baslatHedefIzinli ile aynı kural): .exe olmalı ve izinli köklerden birinin altında olmalı.
+    '$t = (New-Object -ComObject WScript.Shell).CreateShortcut($ilk.FullName).TargetPath\n' +
+    'if ([string]::IsNullOrEmpty($t)) { exit 4 }\n' +
+    'try { $t = [System.IO.Path]::GetFullPath($t) } catch { exit 4 }\n' +
+    "if ([System.IO.Path]::GetExtension($t) -ne '.exe') { exit 4 }\n" +
+    "$izinli = @($env:SystemRoot, $env:ProgramFiles, [Environment]::GetEnvironmentVariable('ProgramFiles(x86)'), (Join-Path $env:LOCALAPPDATA 'Programs'), (Join-Path $env:LOCALAPPDATA 'Microsoft\\WindowsApps'))\n" +
+    '$tamam = $false\n' +
+    'foreach ($r in $izinli) {\n' +
+    '  if ([string]::IsNullOrEmpty($r)) { continue }\n' +
+    "  $r = [System.IO.Path]::GetFullPath($r).TrimEnd('\\') + '\\'\n" +
+    '  if ($t.StartsWith($r, [System.StringComparison]::OrdinalIgnoreCase)) { $tamam = $true; break }\n' +
+    '}\n' +
+    'if (-not $tamam) { exit 4 }\n' +
     'Start-Process -FilePath $ilk.FullName\n',
   // env: PIRIL_ASAGI, PIRIL_YUKARI (0..50), PIRIL_SESSIZ (0/1). Ortam ses tuşları: 174 azalt, 175 artır, 173 sessiz.
   ses: ORTAK_BASLIK + EKLE_TIP +
@@ -152,6 +169,44 @@ function uygulamaCoz(kimlik) {
   }
   const u = UYGULAMALAR[kimlik];
   return u.exe ? { tur: 'exe', exe: u.exe } : { tur: 'baslat', ad: u.baslat };
+}
+
+// ---------- Başlat menüsü kısayolu (saf mantık; betikteki kuralın birebir aynısı) ----------
+// Aranacak kökler, ÖNCELİK sırasıyla: makine geneli (ProgramData; standart kullanıcı yazamaz) sonra kullanıcı menüsü.
+function baslatKokleri(ortam) {
+  const e = ortam || {};
+  const w = path.win32;
+  const alt = 'Microsoft\\Windows\\Start Menu\\Programs';
+  const k = [];
+  if (e.ProgramData) k.push(w.join(e.ProgramData, alt));
+  if (e.APPDATA) k.push(w.join(e.APPDATA, alt));
+  return k;
+}
+// adaylar: [{ kok, yol }] (kok = baslatKokleri girdisi). Birden fazla eşleşmede kök sırası önceliklidir; yoksa null.
+function baslatEslesmeSec(adaylar, kokler) {
+  const liste = Array.isArray(adaylar) ? adaylar : [];
+  for (const kok of kokler) {
+    const a = liste.filter((x) => x && x.kok === kok).map((x) => x.yol).sort();
+    if (a.length) return a[0];
+  }
+  return null;
+}
+// İzinli hedef kökleri: SystemRoot, ProgramFiles, ProgramFiles(x86), LOCALAPPDATA\Programs, LOCALAPPDATA\Microsoft\WindowsApps
+function baslatHedefKokleri(ortam) {
+  const e = ortam || {};
+  const w = path.win32;
+  const k = [e.SystemRoot, e.ProgramFiles, e['ProgramFiles(x86)']];
+  if (e.LOCALAPPDATA) { k.push(w.join(e.LOCALAPPDATA, 'Programs'), w.join(e.LOCALAPPDATA, 'Microsoft', 'WindowsApps')); }
+  return k.filter((x) => typeof x === 'string' && x).map((x) => w.normalize(x).replace(/\\+$/, '') + '\\');
+}
+// Kısayol hedefi .exe olmalı ve izinli köklerden birinin altında olmalı (büyük-küçük harf duyarsız; ".." çözülür).
+function baslatHedefIzinli(hedef, ortam) {
+  if (typeof hedef !== 'string' || !hedef || hedef.indexOf('\u0000') !== -1) return false;
+  const h = path.win32.normalize(hedef);
+  if (!path.win32.isAbsolute(h) || h.startsWith('\\\\')) return false;
+  if (path.win32.extname(h).toLowerCase() !== '.exe') return false;
+  const kucuk = h.toLowerCase();
+  return baslatHedefKokleri(ortam).some((k) => kucuk.startsWith(k.toLowerCase()));
 }
 
 // ---------- URL ----------
@@ -380,6 +435,7 @@ function olustur(dis) {
       if (c.tur === 'exe') { await ps('exeAc', { PIRIL_EXE: c.exe }); return; }
       try { await ps('baslatAc', { PIRIL_AD: c.ad }); } catch (e) {
         if (e.kod === 3) throw new Error('Uygulama bulunamadı');
+        if (e.kod === 4) throw new Error('Uygulama kısayolu güvenilir konumda değil');
         throw e;
       }
     },
@@ -450,6 +506,6 @@ function olustur(dis) {
 
 module.exports = {
   olustur, SINIR, SABLON, UYGULAMALAR, norm, semaforOlustur, hizSiniriOlustur, siraOlustur,
-  psKodla, psArgs, ortamHazirla, uygulamaCoz, urlDogrula, sesPlani,
+  psKodla, psArgs, ortamHazirla, uygulamaCoz, baslatKokleri, baslatEslesmeSec, baslatHedefKokleri, baslatHedefIzinli, urlDogrula, sesPlani,
   fareKomutu, tikKomutu, yazKomutu, yazMetniTemizle, tusKomutu, dosyaAraYurut, sorguTemizle, pilAyristir, ekranDosyaAdi
 };

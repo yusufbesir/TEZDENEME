@@ -25,7 +25,7 @@ const SEMA = {
   durum: (m) => (typeof m.uzakKontrol === 'boolean' ? null : 'durum{uzakKontrol} bekleniyor'),
 };
 
-const MERHABA_SINIR = 1024; // kimlik doğrulanana kadar ws çerçeve üst sınırı (bayt)
+const MERHABA_SINIR = 1024; // kimlik doğrulanana kadar kabul edilen ileti üst sınırı (bayt; message olayında denetlenir)
 const KIMLIKSIZ_TOPLAM = 4;
 const KIMLIKSIZ_IP = 2;
 const KUYRUK_SINIR = 32;
@@ -116,7 +116,8 @@ async function sunucuBaslat(secenek = {}) {
     hatalar.set(ip, k);
   }
 
-  const wss = new WebSocketServer({ host, port, maxPayload: MERHABA_SINIR });
+  const wss = new WebSocketServer({ host, port, maxPayload: DOGRULANMIS_SINIR });
+  // Bellek: ws iletiyi message olayından ÖNCE tamponlar; kimliksiz bağlantı tavanı (toplam 4) ile en kötü durum 4 x DOGRULANMIS_SINIR.
   await new Promise((coz, red) => {
     wss.once('listening', coz);
     wss.once('error', red);
@@ -207,6 +208,13 @@ async function sunucuBaslat(secenek = {}) {
     });
 
     ws.on('message', (veri, ikili) => {
+      // Kimlik doğrulanmadan önce ileti MERHABA_SINIR'ı aşarsa işlenmeden/ayrıştırılmadan bağlantı koparılır.
+      if (!o.dogrulandi && veri.byteLength > MERHABA_SINIR) {
+        hataKaydet(ip);
+        log('kimliksiz_buyuk', `kimliksiz büyük ileti: ${ip}`);
+        try { ws.terminate(); } catch (e) { /* kapalı */ }
+        return;
+      }
       if (ikili) return kapatHata(1003, 'ikili iletisim yok');
       const metin = veri.toString();
       if (o.durum === 'merhaba') return merhabaIsle(metin);
@@ -263,24 +271,16 @@ async function sunucuBaslat(secenek = {}) {
         o.mesgul = true;
         o.dogrulandi = true; // anahtarı bilen biri: saldırı sayılmaz, yalnızca meşgul
         hatalar.delete(ip);
-        // Kimlik kanıtlandı: ws çerçeve sınırı yükseltilir.
-        yukseltSinir();
         hataGonder('mesgul', 'Zaten bağlı bir telefon var.').then(() => {
           try { ws.close(1013, 'mesgul'); } catch (e) { /* kapalı */ }
         });
         return false;
       }
       o.dogrulandi = true;
-      yukseltSinir();
       aktif = o;
       hatalar.delete(ip);
       log('baglandi', `telefon bağlandı: ${ip}`);
       return true;
-    }
-
-    function yukseltSinir() {
-      // ws, çerçeve sınırını oluşturma anında alır; kimlik kanıtlanınca alıcıda yükseltilir.
-      if (ws._receiver) ws._receiver._maxPayload = DOGRULANMIS_SINIR;
     }
 
     // Doğrulanmış oturumdaki iletiler tek sıralı kuyrukta işlenir: biri bitmeden öbürü başlamaz.

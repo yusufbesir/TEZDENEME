@@ -378,29 +378,41 @@ test('oturumuKes ve baglananIp', async () => {
   } finally { await x.bitir(); }
 });
 
-test('payload tavanı: kimlik öncesi 1 KB, doğrulanmış oturumda 256 KB', async () => {
-  const x = await kur();
+test('payload tavanı: kimlik öncesi 1 KB (message olayında terminate), doğrulanmış oturumda 256 KB', async () => {
+  // ws maxPayload doğrulanmış sınıra sabit; kimliksiz bağlantıda >1 KB ileti işlenmeden koparılır ve hatalı deneme sayılır.
+  // Bellek üst sınırı: kimliksiz bağlantı tavanı (toplam 4) x maxPayload (DOGRULANMIS_SINIR ~ 350 KB) ~ 1.4 MB.
+  const x = await kur({ kilitEsik: 3 });
   try {
-    // el sıkışma öncesi: 2 KB merhaba kapanır (1009)
+    // el sıkışma öncesi: 2 KB ileti bağlantıyı koparır (terminate -> 1006), açılış + büyük ileti = 2 hatalı deneme
     const a = await hamBaglan(x.url, x.sir, { merhabaGonder: false });
     a.ws.send('x'.repeat(2000));
     assert.ok(await a.kapanmayiBekle());
-    assert.equal(a.kapanisKodu, 1009);
-    // el sıkışmış ama henüz doğrulanmamış: 2 KB kapanır
+    assert.notEqual(a.kapanisKodu, 1000);
+    assert.equal(x.s.kilitliMi('127.0.0.1'), false);
+    // el sıkışmış ama henüz doğrulanmamış: 2 KB kopar; bu 3. hatalı deneme (açılış sayılır) -> kilit
     const b = await hamBaglan(x.url, x.sir);
     await b.al();
     b.ws.send('x'.repeat(2000));
     assert.ok(await b.kapanmayiBekle());
-    assert.equal(b.kapanisKodu, 1009);
+    assert.ok(await kos(() => x.s.kilitliMi('127.0.0.1')));
+  } finally { await x.bitir(); }
+  const y = await kur();
+  try {
     // doğrulanınca ~200 KB'lık ileti ws katmanından geçer (şema yine reddeder)
-    const c = await hamBaglan(x.url, x.sir);
+    const c = await hamBaglan(y.url, y.sir);
     await c.al();
     await c.gonder({ t: 'durum', uzakKontrol: false });
     await bekle(100);
     await c.gonder({ t: 'yaz', metin: 'a'.repeat(200 * 1024) });
     assert.equal((await c.al()).kod, 'gecersiz');
     assert.equal(c.kapandi, false);
-  } finally { await x.bitir(); }
+  } finally { await y.bitir(); }
+});
+
+test('sunucu kaynağı ws dahili alanlarına (_receiver/_maxPayload) dokunmaz', () => {
+  const kaynak = require('node:fs').readFileSync(require('node:path').join(__dirname, '../../protokol/sunucu.js'), 'utf8');
+  assert.doesNotMatch(kaynak, /_receiver|_maxPayload/);
+  assert.match(kaynak, /new WebSocketServer\(\{[^}]*maxPayload: DOGRULANMIS_SINIR/);
 });
 
 test('kimliksiz eşzamanlı bağlantı tavanı: IP başına 2, toplam 4; aşılan hemen kapanır', async () => {

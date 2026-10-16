@@ -59,6 +59,45 @@ test('Başlat araması betiği tam ad eşleşmesi kullanır (alt dize/joker yok)
   assert.doesNotMatch(b, /-like|WildcardPattern|-match \$|\.Contains\(|\.IndexOf\(/);
 });
 
+test('Başlat betiği: ProgramData önce, hedef .exe ve izinli köklerle doğrulanır, kullanıcı girdisi eklenmez', () => {
+  const b = W.SABLON.baslatAc;
+  assert.ok(b.indexOf('$env:ProgramData') < b.indexOf('$env:APPDATA'), 'ProgramData önce aranır');
+  assert.match(b, /CreateShortcut\(\$ilk\.FullName\)\.TargetPath/);
+  assert.match(b, /-ne '\.exe'/);
+  ['SystemRoot', 'ProgramFiles', 'ProgramFiles\(x86\)', 'LOCALAPPDATA'].forEach((r) => assert.ok(b.includes(r), r));
+  assert.match(b, /Programs/);
+  assert.match(b, /WindowsApps/);
+  assert.doesNotMatch(b, /Visual Studio Code|Spotify/); // ad yalnız PIRIL_AD ortamından gelir
+});
+
+const WORT = {
+  ProgramData: 'C:\\ProgramData', APPDATA: 'C:\\Users\\u\\AppData\\Roaming', SystemRoot: 'C:\\Windows',
+  ProgramFiles: 'C:\\Program Files', 'ProgramFiles(x86)': 'C:\\Program Files (x86)', LOCALAPPDATA: 'C:\\Users\\u\\AppData\\Local'
+};
+
+test('baslatKokleri / baslatEslesmeSec: çift eşleşmede ProgramData önceliklidir', () => {
+  const [pd, kul] = W.baslatKokleri(WORT);
+  assert.strictEqual(pd, 'C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs');
+  assert.ok(kul.startsWith('C:\\Users\\u\\AppData\\Roaming'));
+  const kulYol = kul + '\\Spotify.lnk', pdYol = pd + '\\Spotify.lnk';
+  // kullanıcı olanı listede önce gelse bile ProgramData seçilir
+  assert.strictEqual(W.baslatEslesmeSec([{ kok: kul, yol: kulYol }, { kok: pd, yol: pdYol }], [pd, kul]), pdYol);
+  assert.strictEqual(W.baslatEslesmeSec([{ kok: kul, yol: kulYol }], [pd, kul]), kulYol);
+  assert.strictEqual(W.baslatEslesmeSec([], [pd, kul]), null);
+});
+
+test('baslatHedefIzinli: izinli köklerdeki .exe geçer; dışarıdaki, .exe olmayan ve kaçırma denemeleri reddedilir', () => {
+  const ok = ['C:\\Program Files\\VideoLAN\\VLC\\vlc.exe', 'c:\\program files (x86)\\A\\a.EXE', 'C:\\Windows\\System32\\notepad.exe',
+    'C:\\Users\\u\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe', 'C:\\Users\\u\\AppData\\Local\\Microsoft\\WindowsApps\\Spotify.exe'];
+  ok.forEach((h) => assert.strictEqual(W.baslatHedefIzinli(h, WORT), true, h));
+  const kotu = ['C:\\Users\\u\\Downloads\\x.exe', 'D:\\Program Files\\x.exe', 'C:\\Program Files\\x\\y.bat', 'C:\\Program Files\\x\\y.exe.lnk',
+    'C:\\Program Files\\x\\y.ps1', 'C:\\Windows\\System32\\cmd', 'C:\\Program Files Evil\\x.exe', 'C:\\Program Files\\..\\Users\\u\\x.exe',
+    'C:\\Users\\u\\AppData\\Local\\Temp\\x.exe', 'C:\\Users\\u\\AppData\\Local\\Microsoft\\Teams\\x.exe', '\\\\sunucu\\paylasim\\x.exe', 'x.exe', '', null, 5];
+  kotu.forEach((h) => assert.strictEqual(W.baslatHedefIzinli(h, WORT), false, String(h)));
+  // ortam değişkeni eksikse o kök izinli sayılmaz
+  assert.strictEqual(W.baslatHedefIzinli('C:\\Program Files\\x.exe', { SystemRoot: 'C:\\Windows' }), false);
+});
+
 test('urlDogrula: yalnız http/https', () => {
   assert.strictEqual(W.urlDogrula('https://example.com/a?b=1'), 'https://example.com/a?b=1');
   assert.strictEqual(W.urlDogrula('http://localhost:8080'), 'http://localhost:8080/');

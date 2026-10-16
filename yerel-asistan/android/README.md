@@ -20,7 +20,7 @@ PowerShell'de depo klasöründe:
 
 ```powershell
 cd yerel-asistan\android
-npm i
+npm ci
 node scripts\hazirla.js          # arayuz + cekirdek + protokol istemcisi -> www\
 npx cap add android              # Android projesini üretir (bir kez)
 ```

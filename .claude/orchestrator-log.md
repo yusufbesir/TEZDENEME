@@ -47,3 +47,6 @@
 | 2026-10-16 | Pırıl: protokol güvenlik düzeltmeleri (ECDH, DoS, sayaç) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 93.461 toplam | Tamam: 35 test geçti |
 | 2026-10-16 | Pırıl: PC, çekirdek, arayüz güvenlik düzeltmeleri [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 163.457 toplam | Tamam: 170 test geçti |
 | 2026-10-16 | Pırıl: düzeltme sonrası doğrulama [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | tahmini 60.000 toplam | Geçti: 170/170 |
+| 2026-10-16 | Pırıl: Denetmen bulguları PRL-4 (ws özel API) ve PRL-5 (Başlat menüsü kısayolu) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 66.859 toplam | Tamam: 174 test geçti |
+| 2026-10-16 | Pırıl: PRL-2 package-lock dosyaları (pc, android) ve npm ci [İP:Bluey projesi incelemesi#Tazzd6] | orchestrator (kendim) / claude-sonnet-5-5 | tahmini 5.000 toplam | Tamam |
+| 2026-10-16 | Pırıl: PRL-4/5 doğrulaması [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | tahmini 50.000 toplam | Geçti: 174/174 |
