@@ -1,0 +1,395 @@
+/// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
+/// ders" düğmesi ve alan kurslarının tek doğrusal basamak yolu.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../bilesenler/basamak.dart';
+import '../bilesenler/hedef_halkasi.dart';
+import '../bilesenler/profil_karti.dart';
+import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
+import '../model/icerik.dart';
+import '../motor/motor.dart';
+import '../tema/alan_renkleri.dart';
+import '../tema/tema.dart';
+
+/// Yol sekmesi: alan şeridi + tek doğrusal "basamak" yolu.
+class AnaSayfa extends ConsumerWidget {
+  const AnaSayfa({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final durum = ref.watch(durumProvider).value ?? const OgrenciDurumu();
+    final kurslar = ref.watch(alanKurslariProvider);
+    final bugun = ref.watch(bugunProvider);
+    final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;
+
+    if (durum.alan == null || kurslar.isEmpty) {
+      return _AlanYok(alanVar: durum.alan != null);
+    }
+
+    final yol = _YolListesi(kurslar: kurslar, durum: durum, bugun: bugun);
+
+    return SafeArea(
+      child: genis
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 3, child: yol),
+                Expanded(
+                  flex: 2,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(
+                      0,
+                      Olcu.b3,
+                      Olcu.b3,
+                      Olcu.b3,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ProfilKarti(durum: durum, bugun: bugun),
+                        const SizedBox(height: Olcu.b2),
+                        _GunlukKart(durum: durum, bugun: bugun),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : yol,
+    );
+  }
+}
+
+/// Alan seçilmemişse (yönlendirme gecikirse) basit boş durum.
+class _AlanYok extends StatelessWidget {
+  const _AlanYok({required this.alanVar});
+  final bool alanVar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(Olcu.b3),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              alanVar ? 'Bu alanda henüz kurs yok.' : 'Önce bir alan seç.',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: Olcu.b2),
+            FilledButton(
+              onPressed: () => context.go('/alan-sec'),
+              child: const Text('Alan seç'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GunlukKart extends StatelessWidget {
+  const _GunlukKart({required this.durum, required this.bugun});
+  final OgrenciDurumu durum;
+  final String bugun;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(Olcu.b3),
+        child: Row(
+          children: [
+            HedefHalkasi(
+              xp: durum.gunlukXp[bugun] ?? 0,
+              hedef: durum.gunlukHedef,
+            ),
+            const SizedBox(width: Olcu.b3),
+            Expanded(
+              child: Text(
+                'Bugünkü hedefin ${durum.gunlukHedef} XP',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _YolListesi extends StatelessWidget {
+  const _YolListesi({
+    required this.kurslar,
+    required this.durum,
+    required this.bugun,
+  });
+  final List<Kurs> kurslar;
+  final OgrenciDurumu durum;
+  final String bugun;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;
+    final parlaklik = Theme.of(context).brightness;
+    final alanRengi = AlanRenkleri.renk(durum.alan, parlaklik);
+    final bugunXp = durum.gunlukXp[bugun] ?? 0;
+    final seri = Motor.gosterilenSeri(durum, bugun);
+    final alistirmaVar = kurslar.any(
+      (k) => k.tumDersler.any((d) => d.alistirmalar.isNotEmpty),
+    );
+
+    // Sıradaki ders: alan kurslarında ilk tamamlanmamış ders.
+    String? siradakiId;
+    for (final k in kurslar) {
+      for (final d in k.tumDersler) {
+        if ((durum.tamamlanan[d.id] ?? 0) == 0) {
+          siradakiId = d.id;
+          break;
+        }
+      }
+      if (siradakiId != null) break;
+    }
+
+    final ogeler = <Widget>[
+      // Üst şerit: alan simgesi + adı, seri alevi, küçük hedef halkası.
+      Row(
+        children: [
+          Icon(AlanRenkleri.simge(durum.alan), color: alanRengi),
+          const SizedBox(width: Olcu.b1),
+          Expanded(
+            child: Semantics(
+              header: true,
+              child: Text(
+                AlanRenkleri.ad(durum.alan),
+                style: yazi.titleLarge?.copyWith(color: alanRengi),
+              ),
+            ),
+          ),
+          _SeriAlevi(
+            seri: seri,
+            nabiz: durum.sonGun == bugun && seri > 0,
+            renk: r.vurgu,
+          ),
+          if (!genis) ...[
+            const SizedBox(width: Olcu.b2),
+            HedefHalkasi(xp: bugunXp, hedef: durum.gunlukHedef, boyut: 56),
+          ],
+        ],
+      ),
+      const SizedBox(height: Olcu.b2),
+      SizedBox(
+        height: Olcu.hedef,
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.timer_outlined),
+          label: const Text('2 dakikalık ders'),
+          onPressed: alistirmaVar ? () => context.push('/mikro') : null,
+        ),
+      ),
+      const SizedBox(height: Olcu.b3),
+    ];
+
+    var dersNo = 0;
+    for (final kurs in kurslar) {
+      final tumu = kurs.tumDersler.toList();
+      final kursBiten = tumu
+          .where((d) => (durum.tamamlanan[d.id] ?? 0) > 0)
+          .length;
+      // Sahanlık bandı: kurs adı, alan renginde 3 px alt çizgi, biten/toplam.
+      ogeler.add(
+        Semantics(
+          header: true,
+          label: '${kurs.ad}. $kursBiten / ${tumu.length} ders tamam.',
+          excludeSemantics: true,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Olcu.b2,
+              vertical: Olcu.b1,
+            ),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: alanRengi, width: 3)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    kurs.ad,
+                    style: yazi.titleLarge?.copyWith(color: alanRengi),
+                  ),
+                ),
+                Text(
+                  '$kursBiten/${tumu.length}',
+                  style: yazi.labelLarge?.copyWith(color: r.metinIkincil),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      ogeler.add(const SizedBox(height: Olcu.b2));
+      for (final unite in kurs.uniteler) {
+        final biten = unite.dersler
+            .where((d) => (durum.tamamlanan[d.id] ?? 0) > 0)
+            .length;
+        ogeler.add(
+          Semantics(
+            header: true,
+            label: '${unite.ad}. $biten / ${unite.dersler.length} ders tamam.',
+            excludeSemantics: true,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Olcu.b2,
+                vertical: Olcu.b1,
+              ),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: r.ana, width: 3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.flag, color: r.ana),
+                  const SizedBox(width: Olcu.b1),
+                  Expanded(child: Text(unite.ad, style: yazi.titleMedium)),
+                  Text(
+                    '$biten/${unite.dersler.length}',
+                    style: yazi.labelLarge?.copyWith(color: r.metinIkincil),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        ogeler.add(const SizedBox(height: Olcu.b2));
+        for (var i = 0; i < unite.dersler.length; i++) {
+          final ders = unite.dersler[i];
+          dersNo++;
+          final kez = durum.tamamlanan[ders.id] ?? 0;
+          final BasamakDurumu bd = kez > 0
+              ? BasamakDurumu.tamam
+              : (ders.id == siradakiId
+                    ? BasamakDurumu.siradaki
+                    : BasamakDurumu.kilitli);
+          ogeler.add(
+            Padding(
+              padding: EdgeInsets.only(
+                left: (i % 3) * Olcu.b2,
+                bottom: Olcu.b2,
+              ),
+              child: Basamak(
+                no: dersNo,
+                ad: ders.ad,
+                durum: bd,
+                alistirmaSayisi: ders.alistirmalar.length,
+                tekrarSayisi: kez,
+                onTap: bd == BasamakDurumu.kilitli
+                    ? () => ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.lock_outline),
+                                SizedBox(width: Olcu.b1),
+                                Expanded(
+                                  child: Text(
+                                    'Bu dersi açmak için önce önceki dersi bitir.',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                    : () =>
+                          context.push('/ders/${Uri.encodeComponent(ders.id)}'),
+              ),
+            ),
+          );
+        }
+        ogeler.add(const SizedBox(height: Olcu.b2));
+      }
+    }
+    if (siradakiId == null) {
+      ogeler.add(
+        Row(
+          children: [
+            Icon(Icons.emoji_events, color: r.vurgu),
+            const SizedBox(width: Olcu.b1),
+            Expanded(
+              child: Text(
+                'Bu kursun tüm derslerini bitirdin. Tebrikler!',
+                style: yazi.titleMedium,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: Olcu.icerikGenislik),
+        child: ListView(
+          padding: const EdgeInsets.all(Olcu.b3),
+          children: ogeler,
+        ),
+      ),
+    );
+  }
+}
+
+/// Seri alevi: "12" + alev simgesi. Bugün ilk ders bitmişse bir kez nabız atar
+/// (1 → 1,15 → 1; en çok 250 ms, hareketi azalt açıksa 0).
+class _SeriAlevi extends StatelessWidget {
+  const _SeriAlevi({
+    required this.seri,
+    required this.nabiz,
+    required this.renk,
+  });
+  final int seri;
+  final bool nabiz;
+  final Color renk;
+
+  @override
+  Widget build(BuildContext context) {
+    final alev = Icon(Icons.local_fire_department, color: renk);
+    return Semantics(
+      label: '$seri gün seri',
+      excludeSemantics: true,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: Olcu.hedef),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('$seri', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(width: 4),
+            if (nabiz)
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: Olcu.sure(context, 250),
+                builder: (context, t, child) => Transform.scale(
+                  scale: 1 + 0.15 * math.sin(math.pi * t),
+                  child: child,
+                ),
+                child: alev,
+              )
+            else
+              alev,
+          ],
+        ),
+      ),
+    );
+  }
+}
