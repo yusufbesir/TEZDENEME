@@ -1,18 +1,58 @@
-/// Öğrenci durumu: XP, seri, aralıklı tekrar kartları, tamamlanan dersler.
+/// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
+/// haftalık hedef, tamamlanan dersler.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
+/// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
+/// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
+/// haftalık hedef 5).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
 class Kart {
-  const Kart({required this.kutu, required this.sonraki});
+  const Kart({
+    required this.kutu,
+    required this.sonraki,
+    this.yariOmurGun = 1.0,
+    this.sonCevap,
+  });
 
-  /// Leitner kutusu 1..5.
+  /// En kısa ve en uzun yarı ömür (gün).
+  static const double enAzYariOmur = 0.5;
+  static const double enCokYariOmur = 180;
+
+  /// Leitner kutusu 1..5; yarı ömürden türetilen gösterge (Tekrar rozetleri).
   final int kutu;
 
   /// Bir sonraki tekrar günü, 'YYYY-MM-DD'.
   final String sonraki;
 
-  Map<String, Object?> toJson() => {'kutu': kutu, 'sonraki': sonraki};
+  /// Kişisel unutma eğrisinin yarı ömrü, gün (0,5..180). Settles & Meeder 2016,
+  /// basitleştirilmiş: doğruda x2, yanlışta /2.
+  final double yariOmurGun;
+
+  /// Son cevap doğru muydu? null: bilinmiyor (eski kayıt ya da hiç cevaplanmadı).
+  final bool? sonCevap;
+
+  /// Yarı ömürden 1..5 gösterge kutusu: <2 gün 1, <4 gün 2, <8 gün 3,
+  /// <16 gün 4, daha fazlası 5.
+  static int kutuHesapla(double yariOmur) {
+    if (yariOmur < 2) return 1;
+    if (yariOmur < 4) return 2;
+    if (yariOmur < 8) return 3;
+    if (yariOmur < 16) return 4;
+    return 5;
+  }
+
+  /// Eski Leitner kutusunun gün aralığı (1,2,4,8,16); yarı ömür alanı olmayan
+  /// eski kayıtların başlangıç yarı ömrü.
+  static double kutudanYariOmur(int kutu) =>
+      (1 << (kutu < 1 ? 0 : (kutu > 5 ? 4 : kutu - 1))).toDouble();
+
+  Map<String, Object?> toJson() => {
+    'kutu': kutu,
+    'sonraki': sonraki,
+    'yariOmurGun': yariOmurGun,
+    'sonCevap': sonCevap,
+  };
 
   static Kart? fromJson(Object? j) {
     if (j is! Map) return null;
@@ -20,7 +60,79 @@ class Kart {
     final sonraki = j['sonraki'];
     if (kutu is! int || kutu < 1 || kutu > 5) return null;
     if (sonraki is! String || !OgrenciDurumu.gunGecerli(sonraki)) return null;
-    return Kart(kutu: kutu, sonraki: sonraki);
+    final ham = j['yariOmurGun'];
+    final yariOmur =
+        (ham is num &&
+            ham.isFinite &&
+            ham >= enAzYariOmur &&
+            ham <= enCokYariOmur)
+        ? ham.toDouble()
+        : kutudanYariOmur(kutu);
+    final son = j['sonCevap'];
+    return Kart(
+      kutu: kutu,
+      sonraki: sonraki,
+      yariOmurGun: yariOmur,
+      sonCevap: son is bool ? son : null,
+    );
+  }
+}
+
+/// Hata defteri kaydı: yanlış cevaplanan bir yarışma sorusu ya da alıştırma kartı.
+class HataKaydi {
+  const HataKaydi({
+    required this.tur,
+    required this.id,
+    required this.seviye,
+    required this.gun,
+    this.kategori,
+  });
+
+  static const String turKart = 'kart';
+  static const String turYarisma = 'yarisma';
+
+  /// En çok saklanan kayıt sayısı; en eskisi düşer.
+  static const int enCok = 200;
+
+  /// 'kart' (alıştırma kartı, id = dersId#indeks) | 'yarisma' (soru id).
+  final String tur;
+  final String id;
+
+  /// Yarışma kategorisinin kimliği ([YarismaKategori.kimlik]); kartta null.
+  final String? kategori;
+
+  /// Kurs/seviye kimliği, ör. 'ingilizce-1', 'html-1'.
+  final String seviye;
+
+  /// Yanlışın yapıldığı gün 'YYYY-MM-DD'.
+  final String gun;
+
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'id': id,
+    'kategori': kategori,
+    'seviye': seviye,
+    'gun': gun,
+  };
+
+  static HataKaydi? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final tur = j['tur'];
+    final id = j['id'];
+    final seviye = j['seviye'];
+    final gun = j['gun'];
+    final kategori = j['kategori'];
+    if (tur != turKart && tur != turYarisma) return null;
+    if (id is! String || id.isEmpty || id.length > 120) return null;
+    if (seviye is! String || seviye.length > 60) return null;
+    if (gun is! String || !OgrenciDurumu.gunGecerli(gun)) return null;
+    return HataKaydi(
+      tur: tur as String,
+      id: id,
+      seviye: seviye,
+      gun: gun,
+      kategori: (kategori is String && kategori.length <= 30) ? kategori : null,
+    );
   }
 }
 
@@ -39,7 +151,14 @@ class OgrenciDurumu {
     this.sesAcik = true,
     this.hatirlatmaSaati,
     this.alan,
+    this.hatalar = const [],
+    this.haftalikHedefGun = varsayilanHaftalikHedef,
   });
+
+  /// Haftalık hedef (haftada çalışılacak gün) sınırları ve varsayılanı.
+  static const int enAzHaftalikHedef = 3;
+  static const int enCokHaftalikHedef = 7;
+  static const int varsayilanHaftalikHedef = 5;
 
   final int xp;
   final int seri;
@@ -54,6 +173,13 @@ class OgrenciDurumu {
   final bool sesAcik;
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
   final String? alan; // 'dil' | 'kod'; null: henüz seçilmedi
+
+  /// Hata defteri, eskiden yeniye; en çok [HataKaydi.enCok] kayıt.
+  final List<HataKaydi> hatalar;
+
+  /// Haftada kaç gün çalışılacak (3..7, varsayılan 5). Haftalık ilerleme
+  /// ayrıca saklanmaz; `gunlukXp`ten hesaplanır (Motor.haftaGunSayisi).
+  final int haftalikHedefGun;
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
@@ -93,6 +219,8 @@ class OgrenciDurumu {
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
     String? alan,
+    List<HataKaydi>? hatalar,
+    int? haftalikHedefGun,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -110,6 +238,8 @@ class OgrenciDurumu {
           ? null
           : (hatirlatmaSaati ?? this.hatirlatmaSaati),
       alan: alan ?? this.alan,
+      hatalar: hatalar ?? this.hatalar,
+      haftalikHedefGun: haftalikHedefGun ?? this.haftalikHedefGun,
     );
   }
 
@@ -128,6 +258,8 @@ class OgrenciDurumu {
     'sesAcik': sesAcik,
     'hatirlatmaSaati': hatirlatmaSaati,
     'alan': alan,
+    'hatalar': [for (final h in hatalar) h.toJson()],
+    'haftalikHedefGun': haftalikHedefGun,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -168,6 +300,17 @@ class OgrenciDurumu {
     final sonGun = j['sonGun'];
     final saat = j['hatirlatmaSaati'];
     final alan = j['alan'];
+    final hamHata = j['hatalar'];
+    final hatalar = <HataKaydi>[];
+    if (hamHata is List) {
+      for (final e in hamHata) {
+        final h = HataKaydi.fromJson(e);
+        if (h != null) hatalar.add(h);
+      }
+    }
+    final sonHatalar = hatalar.length > HataKaydi.enCok
+        ? hatalar.sublist(hatalar.length - HataKaydi.enCok)
+        : hatalar;
     return OgrenciDurumu(
       xp: tamsayi(j['xp'], 0),
       seri: tamsayi(j['seri'], 0, max: 100000),
@@ -184,6 +327,13 @@ class OgrenciDurumu {
       sesAcik: j['sesAcik'] is bool ? j['sesAcik'] as bool : true,
       hatirlatmaSaati: (saat is String && saatGecerli(saat)) ? saat : null,
       alan: (alan == 'dil' || alan == 'kod') ? alan as String : null,
+      hatalar: List.unmodifiable(sonHatalar),
+      haftalikHedefGun: tamsayi(
+        j['haftalikHedefGun'],
+        varsayilanHaftalikHedef,
+        min: enAzHaftalikHedef,
+        max: enCokHaftalikHedef,
+      ),
     );
   }
 }

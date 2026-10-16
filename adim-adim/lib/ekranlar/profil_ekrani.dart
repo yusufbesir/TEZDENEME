@@ -1,5 +1,6 @@
 /// Profil sekmesi: alan satırı, istatistikler, son 7 gün XP grafiği; Ayarlar
 /// sağ üstteki dişliyle açılır.
+/// Grafik yüksekliği metin ölçeğiyle büyür; gün etiketleri tek satırdır.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -133,7 +134,10 @@ class ProfilEkrani extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(Olcu.b2),
                 child: SizedBox(
-                  height: 160,
+                  // Etiketler büyüyünce grafik de uzar (kesilmez).
+                  height:
+                      160 +
+                      60 * (MediaQuery.textScalerOf(context).scale(1) - 1),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -221,7 +225,24 @@ class _Cubuk extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text('$deger', style: yazi.labelMedium),
+          LayoutBuilder(
+            builder: (context, k) {
+              // Küçültme yok: labelMedium (12), sonra labelSmall (11), sonra "1,2k".
+              final sigan = siganMetin(
+                context,
+                adaylar: ['$deger', kisaSayi(deger)],
+                stiller: [yazi.labelMedium!, yazi.labelSmall!],
+                genislik: k.maxWidth,
+              );
+              return Text(
+                sigan.metin,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: sigan.stil,
+              );
+            },
+          ),
           const SizedBox(height: 4),
           Flexible(
             child: TweenAnimationBuilder<double>(
@@ -240,6 +261,9 @@ class _Cubuk extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             ad,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
             style: yazi.labelSmall?.copyWith(
               color: bugunMu ? r.metin : r.metinIkincil,
               fontWeight: bugunMu ? FontWeight.w800 : FontWeight.w400,

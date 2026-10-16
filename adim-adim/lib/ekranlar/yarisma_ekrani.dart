@@ -4,6 +4,8 @@
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Tek birincil eylem "Oyna"dır. Oyun tam ekran sayfa olarak kök Navigator'a
 /// itilir (rota kaydı sonra uygulama.dart'a eklenecek).
+/// Esnek yerleşim: kategori kartları en çok 240 px'lik hücrelerle akar, seviye
+/// seçici dar pencerede yatay kaydırılır, istatistikler dar hücrede sarılır.
 /// docs/SADE-ARAYUZ-VE-YARISMA.md bölüm 5 ve 7.
 library;
 
@@ -104,30 +106,37 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
                     if (liste.isEmpty)
                       Text('Önce bir alan seç.', style: yazi.bodyLarge)
                     else ...[
-                      SegmentedButton<String>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          minimumSize: const Size(Olcu.hedef, Olcu.hedef),
+                      // Dar pencerede segmentler yatay kaydırılır (kesilmez).
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SegmentedButton<String>(
+                          showSelectedIcon: false,
+                          style: SegmentedButton.styleFrom(
+                            minimumSize: const Size(Olcu.hedef, Olcu.hedef),
+                          ),
+                          segments: [
+                            for (final s in liste)
+                              ButtonSegment(
+                                value: s.kursId,
+                                label: Text(s.etiket),
+                              ),
+                          ],
+                          selected: {?secili},
+                          onSelectionChanged: (v) =>
+                              setState(() => _secilen = v.first),
                         ),
-                        segments: [
-                          for (final s in liste)
-                            ButtonSegment(
-                              value: s.kursId,
-                              label: Text(s.etiket),
-                            ),
-                        ],
-                        selected: {?secili},
-                        onSelectionChanged: (v) =>
-                            setState(() => _secilen = v.first),
                       ),
                       const SizedBox(height: Olcu.b3),
-                      GridView.count(
-                        crossAxisCount: 2,
+                      GridView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: Olcu.b2,
-                        crossAxisSpacing: Olcu.b2,
-                        childAspectRatio: 1.45,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 240,
+                          mainAxisSpacing: Olcu.b2,
+                          crossAxisSpacing: Olcu.b2,
+                          // Kart yüksekliği metin ölçeğiyle birlikte büyür.
+                          mainAxisExtent: _kartYuksekligi(context),
+                        ),
                         children: [
                           for (final k in YarismaKategori.values)
                             _KategoriKarti(
@@ -183,6 +192,14 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
       ),
     );
   }
+}
+
+/// Kategori kartı yüksekliği: üst şerit + dolgu + simge + iki satır ad + iki
+/// satır sayı (dar hücrede "doğru · yanlış" sarılır); metin ölçeğiyle büyür.
+double _kartYuksekligi(BuildContext context) {
+  final olcek = MediaQuery.textScalerOf(context);
+  final satir = olcek.scale(14) * 1.5 * 2 + olcek.scale(12) * 1.5 * 2;
+  return 4 + 2 * Olcu.b2 + 24 + 4 + satir + 4;
 }
 
 class _KategoriKarti extends StatelessWidget {
@@ -280,12 +297,32 @@ class _Istatistik extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (simge != null) Icon(simge, size: 20, color: simgeRengi),
-                  Text('$deger', style: yazi.titleLarge),
+                  Flexible(
+                    child: LayoutBuilder(
+                      builder: (context, k) {
+                        // Küçültme yok: önce titleMedium, sonra "1,2k".
+                        final sigan = siganMetin(
+                          context,
+                          adaylar: ['$deger', kisaSayi(deger)],
+                          stiller: [yazi.titleLarge!, yazi.titleMedium!],
+                          genislik: k.maxWidth,
+                        );
+                        return Text(
+                          sigan.metin,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          style: sigan.stil,
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
               Text(
                 baslik,
                 textAlign: TextAlign.center,
+                softWrap: true,
                 style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
               ),
             ],

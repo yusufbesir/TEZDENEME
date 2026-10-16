@@ -54,6 +54,19 @@
 - 2026-10-16 | Sade arayüzü doğrula | verifier (claude-sonnet-5-5) | ~33.8K token | Geçti (analyze temiz, 189 test; TekrarEkrani alan filtresi bulgu olarak not edildi)
 - 2026-10-16 | Yarışma ekranları: lobi, oyun, çark (1200 ms), süre çubuğu, şık/taç animasyonları, sonuç; 19 arayüz testi | implementer (claude-sonnet-5-5) | ~128K token | tamam (208 test)
 - 2026-10-16 | Yarışma ekranlarını doğrula | verifier (claude-sonnet-5-5) | ~35K token | Geçti (not: kayıt hatası sessiz)
+- 2026-10-16 | Yerleşim kodu keşfi (sabit boyutlar, Olcu eşiği, pencere alt sınırı) | scout (claude-haiku-5-5) | ~75K token | tamam (1280x720 kesilme nedeni kodla kanıtlanamadı; widget testi önerildi)
+- 2026-10-16 | İçerik yapısı, A2 ekleme noktaları, docs bölüm 8 | scout (claude-haiku-5-5) | ~79K token | tamam (ders id biçimi tutarsızlığı not edildi)
+- 2026-10-16 | Duolingo/Busuu/DuoCards/Trivia Crack güncel araştırma (web) | araştırma ajanı (claude-haiku-5-5, scout web erişimi olmadığı için genel ajan) | ~100K token | tamam (masaüstü yerleşimi doğrulanamadı; cihazda inceleme gerekir)
+- 2026-10-16 | İngilizce A2 kursu (12 ders, 120 alıştırma) + 36 A2 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (216 test, analyze temiz; verifier bekliyor)
+- 2026-10-16 | Esnek yerleşim: Olcu kırılma noktaları, LayoutBuilder, metin ölçeği 1.0–1.3, WM_GETMINMAXINFO 480x600, 25 yerleşim testi | implementer (claude-sonnet-5-5) | ~100K token | tamam (233 test, analyze temiz; win32 derlenmedi; verifier bekliyor)
+- 2026-10-16 | A2 kursu ve sorularını doğrula | verifier (claude-sonnet-5-5) | ~60K token | Kaldı → 1 tek-cevap sorunu (any/some) + 1 açıklama; ana oturum düzeltti, içerik testleri geçti
+- 2026-10-16 | Esnek yerleşimi doğrula | verifier (claude-sonnet-5-5) | ~56K token | Kaldı → FittedBox 11 px alt sınırını deliyor (hedef_halkasi, yarisma istatistik, profil çubuk); implementer'a geri verildi
+- 2026-10-16 | Esnek yerleşim düzeltme turu: siganMetin/kisaSayi, FittedBox kaldırıldı, 11 px alt sınır testleri | implementer (claude-sonnet-5-5) | ~35K token | tamam (237 test; birleştirme ve verifier bekliyor)
+- 2026-10-16 | İngilizce B1 kursu (12 ders, 120 alıştırma) + 36 B1 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (224 test; birleştirme ve verifier bekliyor)
+- 2026-10-16 | Motor dalı birleştirme çakışmaları (4 dosya) | implementer (claude-sonnet-5-5) | ~50K token | tamam (315 test, analyze temiz)
+- 2026-10-16 | Motor özellikleri + birleştirme + yerleşim turu + B1 doğrula | verifier (claude-sonnet-5-5) | ~75K token | Geçti (327 test; 1 isteğe bağlı şık notu, ana oturum uyguladı: but→or)
+- 2026-10-16 | İngilizce B2 kursu (12 ders, 120 alıştırma) + 36 B2 yarışma sorusu | implementer (claude-sonnet-5-5) | ~100K token | tamam (234 test kendi dalında; verifier bekliyor)
+- 2026-10-16 | İngilizce B2 doğrulama (commit dd440a0a; 337 test, 36 soru olgu ve tekrar kontrolü) | verifier (claude-sonnet-5-5) | ~61K token | Geçti (engel olmayan not: Yaz kabul kümeleri dar, kıvrık apostrof normalizasyonu kontrol edilmedi)
 | 2026-10-16 | Proje talimatları kutusunu docs/kurallar/ altına taşı, kısa kutu taslağı yaz [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 60.000 girdi / 12.000 çıktı | Başarılı. 3 kural dosyası, dizin ve 2.912 karakterlik taslak eklendi. |
 | 2026-10-16 | Yola bağlı kurallar, boyut testi, CHECKPOINT.md, yerleşim tablosu [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 50.000 girdi / 8.000 çıktı | Başarılı. 7 boyut testi geçti. |
 | 2026-10-16 | Rehber taraması önerilerini doğrula: ajan efor seviyeleri ve öneri dokümanı [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | verifier / claude-sonnet-5-5 | 21.132 toplam | Geçti: 69 Python, 35 kabuk testi |
