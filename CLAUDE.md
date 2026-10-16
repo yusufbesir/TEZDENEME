@@ -51,3 +51,5 @@ Jev, TypeSafe AI'ın karar modelidir. Metin ve kod üretmez; tipli sorulara seç
 ## Proje Kuralları (ayrıntı)
 
 Kullanıcının kalıcı kuralları (hafıza, silme yasağı, güvenlik, dosya düzeni, etiket ve token kaydı vb.) `docs/kurallar/` altındadır. İlgili işte önce `docs/kurallar/README.md` dizinine ve ilgili dosyanın özetine bak; tamamını açma. Kural silinmez, değişiklik kullanıcıya önerilir.
+
+Güncel durum (açık PR, bekleyen karar) `CHECKPOINT.md` dosyasındadır. Yola bağlı kurallar `.claude/rules/` altındadır.
