@@ -29,3 +29,8 @@
 2026-10-15 | 1.1.2 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti (makro etkisi derlenmiş pakette doğrulanamadı, şablon kodundan dolaylı kanıt)
 | 2026-10-16 | Barkod 1.1.3: Başlat menüsü Kaldır kısayolu + ayar silme sorusu (varsayılan Hayır) | implementer yerine orkestratör (tek dosya) + verifier/sonnet-5-5 | verifier ~39k token | Geçti (33+112 test, derleme doğrulandı) |
 | 2026-10-16 | Barkod 1.1.4: ön ek sonrası 1-9, gerçek .xlsx + 7 biçim, Çöz SVG, ≥4 örnek, isteğe bağlı sıra no | implementer x3 + verifier / sonnet-5-5 | ~50k+81k+58k impl, ~verifier | Geçti (117+33 test, tarayıcı + LibreOffice doğrulandı) |
+2026-10-16 | 12 biçim geri getirme | implementer/sonnet-5-5 | ~65k token | testler geçti
+2026-10-16 | Arayüz yeniden tasarım + Rehber | implementer/sonnet-5-5 | ~175k token | 124 test geçti
+2026-10-16 | 1.1.5 arayüz doğrulama | verifier/sonnet-5-5 | ~46k token | Geçti
+2026-10-16 | TAARKOD adı + logo entegrasyonu | implementer/sonnet-5-5 | ~72k token | 125+40 test geçti
+2026-10-16 | TAARKOD 1.1.5 doğrulama | verifier/sonnet-5-5 | ~46k token | Geçti; exe D:\YusufII\Projeler\Barkod-Siralama\Guncel\ teslim, SHA-256 cihazda eşleşti
