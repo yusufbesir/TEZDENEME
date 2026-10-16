@@ -4,11 +4,11 @@ Türkçe arayüzlü, çevrimdışı çalışan dil ve kodlama öğrenme uygulama
 İz etiketi: [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 
 ## Özet
-- Kurslar: İngilizce A1 (14 ders), İngilizce A2 (12 ders), HTML, CSS ve JavaScript (6'şar ders). İçerik özgün.
+- Kurslar: İngilizce A1 (14 ders), İngilizce A2 (12 ders), İngilizce B1 (12 ders), HTML, CSS ve JavaScript (6'şar ders). İçerik özgün.
 - Alıştırma türleri: çoktan seçmeli, boşluk doldurma, yazma, sıralama, eşleştirme, dinleme (sesli okuma) ve kod boşluğu.
 - Öğrenme motoru: kısa dersler, XP ve seviye, esnek seri ve haftalık hedef (haftada 3-7 gün; hedef tutulursa günlük ara seriyi bozmaz), günlük hedef, yarı ömür tabanlı aralıklı tekrar (kişisel unutma eğrisi; 1-5 kutu göstergesi korunur), hata defteri (yanlış kartlar ve yarışma soruları, "Zayıf noktalar dersi"), ünite sonu karışık tekrar (5 soru), 2 dakikalık mikro ders (önce zamanı gelen kartlar, sonra karışık türler).
 - Sade arayüz (2026-10-16): ilk açılışta alan seçimi (İngilizce / Programlama); uygulama yalnızca seçili alanın içeriğini gösterir. 4 sekme: Yol, Yarışma, Tekrar, Profil (ayarlar Profil'deki dişliden). Gerekçe ve araştırma kaynakları `docs/SADE-ARAYUZ-VE-YARISMA.md`.
-- Bilgi yarışması: ders motorundan bağımsız `lib/yarisma` paketi; çark, 6 kategori (genel kültür, tarih, sanat, matematik, fen, coğrafya), taç koşusu, 3 can, güçlendiriciler; sorular alan ve seviyeye göre (A1 ve A2 İngilizce, HTML/CSS/JS Türkçe), 144 soru. İstatistikler ayrı `yarisma.v1.json` dosyasında.
+- Bilgi yarışması: ders motorundan bağımsız `lib/yarisma` paketi; çark, 6 kategori (genel kültür, tarih, sanat, matematik, fen, coğrafya), taç koşusu, 3 can, güçlendiriciler; sorular alan ve seviyeye göre (A1, A2 ve B1 İngilizce, HTML/CSS/JS Türkçe), 180 soru. İstatistikler ayrı `yarisma.v1.json` dosyasında.
 - Tasarım: özgün "basamak" yolu; OKLCH ile seçilmiş, WCAG AA kontrastlı, renk körlüğü güvenli renkler; açık ve koyu tema. Gerekçeler `docs/TASARIM.md`, platform kararı `docs/KARAR-PLATFORM.md`.
 - Veri yalnızca cihazda, tek JSON dosyasında (atomik yazma). Ağ isteği yok.
 

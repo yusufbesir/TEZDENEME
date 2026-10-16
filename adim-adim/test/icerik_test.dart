@@ -11,10 +11,11 @@ Iterable<Alistirma> _alistirmalar() => _dersler().expand((d) => d.alistirmalar);
 List<String> _sirali(List<String> l) => [...l]..sort();
 
 void main() {
-  test('beş kurs ve kursBul', () {
+  test('altı kurs ve kursBul', () {
     expect(tumKurslar.map((k) => k.id), [
       'ingilizce-1',
       'ingilizce-2',
+      'ingilizce-3',
       'html-1',
       'css-1',
       'js-1',
@@ -23,6 +24,7 @@ void main() {
     expect(kursBul('yok'), isNull);
     expect(ingilizceA1.alan, KursAlani.dil);
     expect(ingilizceA2.alan, KursAlani.dil);
+    expect(ingilizceB1.alan, KursAlani.dil);
     for (final k in [html1, css1, js1]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -93,7 +95,11 @@ void main() {
   });
 
   test('her İngilizce derste Dinle, her kod dersinde Kod var', () {
-    for (final d in [...ingilizceA1.tumDersler, ...ingilizceA2.tumDersler]) {
+    for (final d in [
+      ...ingilizceA1.tumDersler,
+      ...ingilizceA2.tumDersler,
+      ...ingilizceB1.tumDersler,
+    ]) {
       final dinle = d.alistirmalar.whereType<Dinle>().toList();
       expect(dinle, isNotEmpty, reason: d.id);
       for (final a in dinle) {
