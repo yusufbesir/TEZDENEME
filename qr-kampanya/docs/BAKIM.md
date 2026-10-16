@@ -24,6 +24,17 @@ Betik sırasıyla: imajları derler; veritabanını başlatıp rolleri güncelle
 
 **Asla çalıştırmayın:** `docker compose down -v` (`-v` bütün veritabanını ve görselleri siler).
 
+## Migration geri alma (UYARI)
+
+Normal güncellemede geri alma gerekmez; veritabanını `migrate qr <önceki>` ile geri sarmadan önce **mutlaka yedek alın** (`bash scripts/yedek-al.sh`). İki migrasyon geri alınırken özel davranır:
+
+- **0010 (`migrate qr 0009`)**: Eski kod `cop` (çöp kutusu) durumunu tanımaz ve onu aktif sayıp yeniden yönlendirirdi. Bu yüzden geri alma, çöpteki **tüm** kodları önceki durumları ne olursa olsun **pasif** yapar (çöpe atılmış kod geri almada yeniden yönlendirmeye başlamaz). Eski hedef-tutarlılık kısıtıyla bağdaşmayacak bir satır varsa (örn. çöpteki kodun hedefi boş) **hiçbir satır değişmeden** hata ile durur; mesajdaki kodlara hedef girip tekrar deneyin. Çöpe atılma zamanı ve önceki durum alanları silinir; geri alma sonrası çöp kutusu kavramı kalmaz, ilgili kodları panelde elle düzenleyin.
+- **0012 (`migrate qr 0011`)**: Geri alma link ağacı tablolarını (ağaç, öğe, görüntüleme sayacı) siler. Bunlardan birinde bile satır varsa silme tetikleyicileri düşürülmeden önce, **hiçbir şey yapılmadan** hata ile durur. Ağaç verisini kaybetmek istemiyorsanız bu migrasyonu geri almayın; gerçekten gerekiyorsa önce yedek alın ve tabloları veritabanı yöneticisi olarak bilinçli biçimde boşaltın.
+
+**Adımlar ayrı ayrı uygulanır:** `migrate qr 0009` sırayla 0012, 0011, 0010'u ayrı işlemlerde geri alır. 0010 hata verip dururse 0012 ve 0011 zaten geri alınmış olabilir; bu yüzden **önce yedek alın**.
+
+Her migrasyon adımı kendi içinde tek işlemde (transaction) yapılır; hata veren adım değişmeden kalır. Her zaman yedekten dönmek de mümkündür ([YEDEKLEME.md](YEDEKLEME.md)).
+
 ## Bağımlılık güncellemesi (güvenlik)
 
 Kullanılan Python paketlerinin tam listesi ve “parmak izleri” (hash) `app/requirements.txt` dosyasında kilitlidir; bu dosya **elle düzenlenmez**. Sizin değiştireceğiniz tek dosya `app/requirements.in`'dir (yalnızca ana paketler ve sürümleri). Güncelleme adımları:

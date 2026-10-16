@@ -102,7 +102,10 @@ class QRKodForm(TemelForm):
             kod.disabled = True
             kod.help_text = "Basılmış kodlar bozulmasın diye kısa kod değiştirilemez."
         else:
-            kod.help_text = "Boş bırakırsanız tahmin edilmesi zor bir kod otomatik üretilir."
+            if GenelAyarlar.al().kod_uretim_bicimi == GenelAyarlar.KodBicimi.SIRALI:
+                kod.help_text = "Boş bırakırsanız sıradaki kod otomatik verilir (sıralı kod modu açık; kodlar tahmin edilebilir)."
+            else:
+                kod.help_text = "Boş bırakırsanız tahmin edilmesi zor bir kod otomatik üretilir."
         # "Yine de kaydet" onayı yalnızca yeni kayıtta ve aynı hedef uyarısı çıktığında forma eklenir.
         self.ayni_hedef_onay_alani = forms.BooleanField(
             label="Yine de kaydet", required=False,
@@ -116,6 +119,7 @@ class QRKodForm(TemelForm):
                 "(genel ayarlardan kapatılabilir)."
             )
         self._sirali_otomatik = False
+        self._cekilen_baslik = ""
 
     def clean_kisa_kod(self):
         if self.instance.pk:
@@ -161,7 +165,21 @@ class QRKodForm(TemelForm):
                     f"{self.fields[alan].label}: alan adı uluslararası karakter (IDN/punycode) içeriyor. "
                     "Benzer görünen karakterlerle taklit edilmiş bir alan adı olabilir; adresi dikkatle kontrol edin."
                 )
+        self._baslik_cek(veri)
         return veri
+
+    def _baslik_cek(self, veri):
+        """Başlık boşsa ve ayar açıksa hedef sayfanın başlığını çeker (ağ çağrısı). Doğrulama aşamasında, yani görünümlerin
+        `transaction.atomic` bloğundan ve sıralı kod `select_for_update` kilidinden ÖNCE yapılır; yavaş bir hedef veritabanı
+        kilidini tutmaz. Sonuç `save` içinde uygulanır. Yalnızca yeni kayıt, harici hedef ve hatasız form için çalışır."""
+        self._cekilen_baslik = ""
+        url = veri.get("hedef_url")
+        if (
+            self.instance.pk or self.errors or veri.get("hedef_turu") != QRKod.HedefTuru.HARICI or not url
+            or (veri.get("baslik") or "").strip() or not GenelAyarlar.al().baslik_otomatik_cek
+        ):
+            return
+        self._cekilen_baslik = baslik_cek.sayfa_basligi(url)
 
     def _ayni_hedef_kontrol(self, veri):
         """Yeni kayıtta aynı hedef URL'ye sahip arşivlenmemiş kod varsa, onay kutusu işaretlenmedikçe kaydı engeller."""
@@ -185,25 +203,21 @@ class QRKodForm(TemelForm):
                              "Yine de kaydetmek için “Yine de kaydet” kutusunu işaretleyip tekrar gönderin.")
 
     def save(self, commit=True):
-        """Yeni kayıtta: (1) sıralı kod biçiminde kod şimdi kalıcı olarak ayrılır (sayaç satır kilidiyle artırılır);
-        (2) başlık boşsa ve ayar açıksa hedef sayfanın başlığı güvenli biçimde çekilmeye çalışılır (başarısızlık sessizdir)."""
+        """Yeni kayıtta: (1) önceden (clean içinde, kilitlerden önce) çekilmiş başlık boş alana yazılır; (2) sıralı kod
+        biçiminde kod şimdi kalıcı olarak ayrılır (sayaç satır kilidiyle artırılır). Ağ çağrısı burada YAPILMAZ."""
         if not self.instance.pk:
+            self._baslik_doldur()
             if self._sirali_otomatik:
                 try:
                     self.instance.kisa_kod = sirali_kod_ayir()
                 except ValueError as hata:
                     raise ValidationError(str(hata)) from hata
-            self._baslik_doldur()
         return super().save(commit=commit)
 
     def _baslik_doldur(self):
         qr = self.instance
-        if (
-            (qr.baslik or "").strip() or qr.hedef_turu != QRKod.HedefTuru.HARICI or not qr.hedef_url
-            or not GenelAyarlar.al().baslik_otomatik_cek
-        ):
-            return
-        qr.baslik = baslik_cek.sayfa_basligi(qr.hedef_url)
+        if self._cekilen_baslik and not (qr.baslik or "").strip() and qr.hedef_turu == QRKod.HedefTuru.HARICI:
+            qr.baslik = self._cekilen_baslik
 
     def uyarilari_goster(self, request):
         """Kayıt başarılı olduktan sonra (yönlendirme sonrası görünür) uyarıları mesaj olarak ekler."""

@@ -380,17 +380,17 @@ class KodIstatistikTesti(Temel4):
 
     def test_acik_herkese_acik_sade_sayfa(self):
         self.ayar(herkese_acik_istatistik=True)
-        self.tarama_ekle(self.qr, 3, yonlendiren="a.example", ulke="TR")
+        self.tarama_ekle(self.qr, 10, yonlendiren="a.example", ulke="TR")  # tablolar için en az 10 insan taraması gerekir
         self.tarama_ekle(self.qr, 2, cihaz="bot", bot=True, yonlendiren="bot.example", ulke="US")
         yanit = self.client.get("/k/ABC123+")
         self.assertEqual(yanit.status_code, 200)
         self.assertContains(yanit, "ABC123")
-        self.assertEqual(yanit.context["toplam"], 3)  # bot hariç
+        self.assertEqual(yanit.context["toplam"], 10)  # bot hariç
         self.assertContains(yanit, "<svg")
         self.assertContains(yanit, "a.example")
         self.assertNotContains(yanit, "bot.example")
         self.assertContains(yanit, "TR")
-        self.assertEqual(yanit.context["son_30_gun"], 3)
+        self.assertEqual(yanit.context["son_30_gun"], 10)
 
     def test_noindex_ve_onbellek(self):
         self.ayar(herkese_acik_istatistik=True)

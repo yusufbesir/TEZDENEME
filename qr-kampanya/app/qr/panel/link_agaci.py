@@ -2,7 +2,9 @@
 
 Kalıcı silme YOKTUR: ağaç yalnızca çöp kutusuna taşınır (servisler.agac_cope_tasi). Her düğme bir QRKod (kısa link) üzerinden geçer;
 URL ile eklenen öğeler hızlı kısalt ile AYNI yoldan (HizliKisaltForm -> full_clean -> servisler.qr_kaydet) yeni `link` türünde
-kısa link olarak oluşturulur. Sunucu hedef URL'yi ASLA çağırmaz.
+kısa link olarak oluşturulur. Sunucu hedef URL'yi yönlendirmede ve görüntülemede çağırmaz; yalnızca "başlık otomatik çek" ayarı açıkken
+yeni kısa link oluşturulurken hedef sayfanın başlığı güvenli biçimde (baslik_cek: SSRF korumalı, 80/443, 3 sn) çekilir. Bu ağ çağrısı
+transaction.atomic bloğunun ve satır kilitlerinin dışında yapılır.
 """
 from collections import defaultdict
 from datetime import timedelta
@@ -227,17 +229,26 @@ def agac_geri_yukle(request, pk):
 
 # --- Öğeler ---
 
-def _url_ile_kisa_link(request, url, etiket, ayni_hedef_onay):
-    """Hızlı kısalt ile aynı yoldan yeni `link` türünde kısa link. Hata varsa (None, [mesajlar]) döner."""
+def _url_formu_hazirla(url, etiket, ayni_hedef_onay):
+    """Hızlı kısalt ile aynı form yolu: doğrulama + (ayar açıksa) başlık çekme ağ çağrısı + sıralı kod ayırma. `transaction.atomic`
+    bloğunun DIŞINDA, ağaç satır kilidinden önce çağrılmalıdır. Hata varsa (None, None, [mesajlar]) döner."""
     veri = {"hedef_url": url, "baslik": etiket}
     if ayni_hedef_onay:
         veri["ayni_hedef_onay"] = "on"
     hf = HizliKisaltForm(veri)
     if not hf.is_valid():
         mesajlar = [str(h) for liste in hf.errors.values() for h in liste]
-        return None, mesajlar or ["Adres geçersiz."]
-    qr = hf.save(commit=False)
+        return None, None, mesajlar or ["Adres geçersiz."]
+    try:
+        qr = hf.save(commit=False)
+    except ValidationError as hata:
+        return None, None, hata.messages
     hf.kaydet_hazirla()
+    return hf, qr, []
+
+
+def _kisa_linki_kaydet(request, hf, qr):
+    """Hazırlanmış kısa linki kaydeder (çağıranın atomic bloğu içinde). Hata varsa (None, [mesajlar]) döner."""
     try:
         qr.full_clean()
         qr_kaydet(qr, request, not_metni="Link ağacından oluşturuldu")
@@ -263,13 +274,22 @@ def agac_oge_ekle_gorunumu(request, pk):
                 messages.error(request, str(hata))
         return redirect("panel:agac_detay", pk=pk)
     qr, etiket = form.cleaned_data.get("qr"), form.cleaned_data.get("etiket", "")
+    hazir = None
+    if qr is None:
+        if not request.user.has_perm("qr.add_qrkod"):
+            messages.error(request, "Adresle yeni kısa link oluşturmak için QR ekleme yetkisi gerekir.")
+            return redirect("panel:agac_detay", pk=pk)
+        # Başlık çekme ağ çağrısı ve sıralı kod ayırma, atomic bloğun ve satır kilitlerinin DIŞINDA (ve kayıttan önce) yapılır.
+        hf, yeni_qr, hatalar = _url_formu_hazirla(form.cleaned_data["url"], etiket, form.cleaned_data.get("ayni_hedef_onay"))
+        if hf is None:
+            for h in hatalar:
+                messages.error(request, h)
+            return redirect("panel:agac_detay", pk=pk)
+        hazir = (hf, yeni_qr)
     try:
         with transaction.atomic():
-            if qr is None:
-                if not request.user.has_perm("qr.add_qrkod"):
-                    messages.error(request, "Adresle yeni kısa link oluşturmak için QR ekleme yetkisi gerekir.")
-                    return redirect("panel:agac_detay", pk=pk)
-                qr, hatalar = _url_ile_kisa_link(request, form.cleaned_data["url"], etiket, form.cleaned_data.get("ayni_hedef_onay"))
+            if hazir is not None:
+                qr, hatalar = _kisa_linki_kaydet(request, *hazir)
                 if qr is None:
                     for h in hatalar:
                         messages.error(request, h)

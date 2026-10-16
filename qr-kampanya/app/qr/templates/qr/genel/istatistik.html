@@ -18,8 +18,9 @@
     <div class="grafik">{{ grafik_svg }}</div>
   </div>
 
+  {% if tablolar_acik %}
   <div class="kart">
-    <h2>Yönlendiren siteler</h2>
+    <h2>Yönlendiren siteler (son 30 gün)</h2>
     {% if yonlendirenler %}
     <table class="ozet-tablo"><tbody>
       {% for s in yonlendirenler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>{% endfor %}
@@ -29,7 +30,7 @@
   </div>
 
   <div class="kart">
-    <h2>Ülkeler</h2>
+    <h2>Ülkeler (son 30 gün)</h2>
     {% if ulkeler %}
     <table class="ozet-tablo"><tbody>
       {% for s in ulkeler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>{% endfor %}
@@ -37,6 +38,9 @@
     {% else %}<p class="sessiz">Ülke bilgisi yok.</p>{% endif %}
     {% if ulke_bilinmeyen %}<p class="sessiz">Ülkesi bilinmeyen: {{ ulke_bilinmeyen }}</p>{% endif %}
   </div>
+  {% else %}
+  <p class="sessiz">Yönlendiren site ve ülke dökümü, son 30 günde yeterli sayıda tarama olmadığı için gösterilmiyor.</p>
+  {% endif %}
   {% if ayar.marka_adi %}<p class="alt">{{ ayar.marka_adi }}</p>{% endif %}
 </main>
 {% endblock %}

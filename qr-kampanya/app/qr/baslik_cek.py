@@ -1,7 +1,7 @@
 """Hedef sayfanın başlığını (<title>) güvenle çekme. Ayrıntı: docs/GUVENLIK.md ("Başlık çekme ve SSRF").
 
 Sunucunun kullanıcı girdisi olan bir adrese bağlandığı TEK yer burasıdır; bu yüzden SSRF'e karşı katmanlıdır:
-- Yalnızca http/https; adres önce `guvenli_url_dogrula` ile (yerel ad uzantıları, IP sabitleri, kimlik bilgisi) denetlenir.
+- Yalnızca http/https ve yalnızca 80/443 portları (yönlendirme adımlarında da); adres önce `guvenli_url_dogrula` ile (yerel ad uzantıları, IP sabitleri, kimlik bilgisi) denetlenir.
 - Ad DNS ile çözülür ve çözülen TÜM adresler genel (global) IP olmalıdır; özel, loopback, link-local, CGNAT, multicast,
   ayrılmış, belirtilmemiş ve IPv4 içeren IPv6 biçimleri (v4-mapped, 6to4, Teredo, NAT64) reddedilir.
 - Bağlantı, doğrulanan IP adresine kurulur (DNS rebinding'e karşı ikinci bir çözümleme yoktur); Host başlığı ve TLS SNI/sertifika
@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 TOPLAM_ZAMAN_ASIMI_SN = 3.0
 EN_FAZLA_YONLENDIRME = 3
+IZINLI_PORTLAR = (80, 443)
 EN_FAZLA_BAYT = 256 * 1024
 EN_FAZLA_BASLIK = 300
 OKUMA_PARCASI = 16 * 1024
@@ -251,7 +252,12 @@ def _tek_adim(url, kalan):
     """Tek istek: (durum, yanıt başlıkları, gövde baytları). Çözülen adresler denetlenir, ilk bağlanılabilen kullanılır."""
     parca = urlsplit(url)
     https = parca.scheme.lower() == "https"
-    port = parca.port or (443 if https else 80)
+    try:
+        port = parca.port if parca.port is not None else (443 if https else 80)
+    except ValueError as hata:  # geçersiz port
+        raise GuvensizAdres("geçersiz port") from hata
+    if port not in IZINLI_PORTLAR:
+        raise GuvensizAdres("izin verilmeyen port")
     try:
         host = (parca.hostname or "").encode("idna").decode("ascii")  # IDN: Host/SNI için punycode
     except UnicodeError as hata:

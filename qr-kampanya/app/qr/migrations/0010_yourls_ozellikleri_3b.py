@@ -2,6 +2,35 @@
 
 from django.conf import settings
 from django.db import migrations, models
+from django.db.migrations.exceptions import IrreversibleError
+
+
+def _hedef_tutarli_mi(qr):
+    """Eski `qr_hedef_tutarli` kısıtının (0009) arsiv dışı satırlar için koşulu."""
+    return (qr["hedef_turu"] == "harici" and qr["hedef_url"] != "") or (qr["hedef_turu"] == "sayfa" and qr["sayfa_id"] is not None)
+
+
+def cop_satirlarini_geri_don(apps, schema_editor):
+    """YALNIZ GERİ YÖN (`migrate qr 0009`): eski kod 'cop' durumunu tanımaz ve onu aktif sayıp yeniden yönlendirirdi.
+    Çöpe atılmış bir kodun geri almada yeniden yönlendirmeye başlaması istenmez; bu yüzden çöpteki HER satır, önceki durumu ne
+    olursa olsun `pasif` yapılır. Eski kısıt geri eklendiğinde bozulacak satır (hedefi tutarsız) varsa HİÇBİR ŞEY
+    DEĞİŞTİRİLMEDEN hata ile durulur. Bu adım, kısıt eklenmeden ve `onceki_durum` alanı kaldırılmadan ÖNCE çalışacak biçimde
+    operations içinde konumlandırılmıştır."""
+    QRKod = apps.get_model("qr", "QRKod")
+    db = schema_editor.connection.alias
+    cop = QRKod.objects.using(db).filter(durum="cop")
+    sorunlu = [
+        satir["kisa_kod"]
+        for satir in cop.values("kisa_kod", "hedef_turu", "hedef_url", "sayfa_id").iterator()
+        if not _hedef_tutarli_mi(satir)
+    ]
+    if sorunlu:
+        raise IrreversibleError(
+            "Geri alma durduruldu, hiçbir satır değiştirilmedi: çöp kutusundaki şu kodların hedefi eski kısıtla (qr_hedef_tutarli) "
+            f"uyumsuz: {', '.join(sorunlu[:20])}{' ...' if len(sorunlu) > 20 else ''}. Bu kodlara önce hedef girin ya da "
+            "durumlarını elle düzeltin, sonra geri almayı yeniden deneyin."
+        )
+    cop.update(durum="pasif")
 
 
 class Migration(migrations.Migration):
@@ -30,6 +59,9 @@ class Migration(migrations.Migration):
                 blank=True, max_length=10, verbose_name="çöpe atılmadan önceki durum"
             ),
         ),
+        # Yalnız geri yönde çalışır; ileri yön işlem yapmaz. Geri alırken operations ters sırada işlendiği için bu adım
+        # onceki_durum alanı kaldırılmadan ve eski kısıt eklenmeden önce yürür.
+        migrations.RunPython(migrations.RunPython.noop, cop_satirlarini_geri_don),
         migrations.AlterField(
             model_name="qrkod",
             name="durum",

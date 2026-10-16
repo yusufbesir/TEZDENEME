@@ -124,10 +124,10 @@ class BaslikCekmeGuvenlikTesti(SimpleTestCase):
         self.assertEqual(self.calistir("http://yok.example.com/")[0], "")
 
     def test_genel_adres_baglanti_cozulen_ipye_kurulur(self):
-        sonuc, cagrilar = self.calistir("https://ornek.example.com:8443/a?b=1", {"ornek.example.com": [GENEL]})
+        sonuc, cagrilar = self.calistir("https://ornek.example.com:443/a?b=1", {"ornek.example.com": [GENEL]})
         self.assertEqual(sonuc, "Gizli")
         # Bağlantı IP'ye, Host/SNI için özgün ad + port ile.
-        self.assertEqual(cagrilar, [(GENEL, "ornek.example.com", 8443, True)])
+        self.assertEqual(cagrilar, [(GENEL, "ornek.example.com", 443, True)])
 
     def test_genel_ipden_ozel_ipye_yonlendirme_reddedilir(self):
         yama, cagrilar = baglanti_yamasi(
@@ -336,7 +336,9 @@ class ToplamSureTesti(SimpleTestCase):
         try:
             import time
             port = sunucu.server_address[1]
-            with mock.patch.object(bc, "adresleri_coz", return_value=["127.0.0.1"]):
+            # Gerçek soket geçici bir portta dinler; 80/443 sınırı yalnızca bu testte bu porta genişletilir.
+            with mock.patch.object(bc, "adresleri_coz", return_value=["127.0.0.1"]), \
+                    mock.patch.object(bc, "IZINLI_PORTLAR", (80, 443, port)):
                 bas = time.monotonic()
                 sonuc = bc.sayfa_basligi(f"http://yavas.example.com:{port}/")
                 gecen = time.monotonic() - bas

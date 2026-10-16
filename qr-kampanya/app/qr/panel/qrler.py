@@ -2,7 +2,9 @@
 
 Kalıcı silme YOKTUR: "silme" yalnızca çöp kutusuna taşımadır (servisler.qr_cope_tasi). Kayıt her zaman servisler.qr_kaydet, durum değişikliği
 servisler.qr_durum_degistir ile yapılır (hedef geçmişi + denetim kaydı).
-Sunucu hedef URL'yi ASLA çağırmaz; "hedefi test et" tarayıcıda yeni sekmede açılan bağlantıdır.
+Sunucu hedef URL'yi yönlendirmede çağırmaz; "hedefi test et" tarayıcıda yeni sekmede açılan bağlantıdır. Tek istisna: genel ayarlardaki
+"başlık otomatik çek" açıkken, başlığı boş yeni kayıtta hedef sayfanın başlığı güvenli biçimde çekilir (baslik_cek; form doğrulamasında,
+veritabanı işlemi ve kilitler dışında).
 """
 import io
 import re

@@ -6,11 +6,19 @@
   GenelAyarlar.istatistikte_hedef_goster açıkken gösterilir. Bot taramaları her zaman hariçtir.
 - Arşivdeki ve çöp kutusundaki kodlar için her zaman 404. Bu istekler tarama SAYILMAZ.
 - `+all`: aynı hedefe (harici URL ya da aynı sistem sayfası) sahip, arşivde/çöpte olmayan tüm kodların toplamı.
+- Gizlilik: yönlendiren site ve ülke tabloları YALNIZ son 30 günün taramalarından üretilir ve bu penceredeki insan taraması
+  sayısı ESIK_TABLO (10) altındaysa hiç gösterilmez (az sayıda ziyaretçinin ayrıştırılmasını önler; yalnız toplam sayı görünür).
+- Hesaplanan istatistik 60 sn önbelleklenir (varsayılan DatabaseCache; anahtar kod + `+all` bilgisi). Bu yüzden sayfa en fazla
+  60 sn geriden gelir; ayarların (hedef göster, herkese açık) denetimi önbelleğe girmez, her istekte yapılır.
 - Hız sınırı yönlendirmeyle aynıdır (aynı IP kovası, YONLENDIRME_HIZ_SINIRI).
 """
+from datetime import timedelta
+
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_safe
 
 from . import grafik
@@ -21,6 +29,9 @@ from .panel.istatistik import alan_ozeti
 
 OZET_SATIR_SAYISI = 10
 GORUNMEZ_DURUMLAR = (QRKod.Durum.ARSIV, QRKod.Durum.COP)
+ESIK_TABLO = 10  # pencerede bundan az insan taraması varsa yönlendiren/ülke tabloları gösterilmez
+TABLO_GUN = 30
+ONBELLEK_SN = 60
 
 
 def _bulunamadi(request, ayar):
@@ -49,6 +60,39 @@ def _hedef_metni(qr):
     return qr.hedef_url
 
 
+def _istatistik_verisi(qr, tum):
+    """Sayfanın ayardan bağımsız verisi; 60 sn önbelleklenir."""
+    anahtar = f"kodist:{qr.pk}:{int(tum)}"
+    veri = cache.get(anahtar)
+    if veri is not None:
+        return veri
+    kod_sayisi = 1
+    if tum:
+        kodlar = _ayni_hedefli_kodlar(qr)
+        taramalar = Tarama.objects.filter(qr__in=kodlar)
+        kod_sayisi = kodlar.count()
+    else:
+        taramalar = Tarama.objects.filter(qr=qr)
+
+    insan = taramalar.filter(bot=False)
+    seri = grafik.seri(taramalar, "30g", bot_dahil=False)
+    son_30 = taramalar.filter(zaman__gte=timezone.now() - timedelta(days=TABLO_GUN))
+    tablolar_acik = son_30.filter(bot=False).count() >= ESIK_TABLO
+    veri = {
+        "kod_sayisi": kod_sayisi,
+        "toplam": insan.count(),
+        "son_30_gun": seri["toplam"],
+        "grafik_svg": grafik.svg_cubuk_grafik(seri, f"{qr.kisa_kod} (son 30 gün)", False),
+        "tablolar_acik": tablolar_acik,
+        "yonlendirenler": [], "yon_bilinmeyen": 0, "ulkeler": [], "ulke_bilinmeyen": 0,
+    }
+    if tablolar_acik:
+        veri["yonlendirenler"], veri["yon_bilinmeyen"] = alan_ozeti(son_30, "yonlendiren", False, OZET_SATIR_SAYISI)
+        veri["ulkeler"], veri["ulke_bilinmeyen"] = alan_ozeti(son_30, "ulke", False, OZET_SATIR_SAYISI)
+    cache.set(anahtar, veri, ONBELLEK_SN)
+    return veri
+
+
 @require_safe
 def kod_istatistik(request, kod, tum=None):
     if not hiz_sinirlayici.izin_ver(ip_anahtari(istemci_ip(request)), settings.YONLENDIRME_HIZ_SINIRI):
@@ -68,27 +112,12 @@ def kod_istatistik(request, kod, tum=None):
     if qr is None or qr.durum in GORUNMEZ_DURUMLAR:
         return _bulunamadi(request, ayar)
 
-    kod_sayisi = 1
-    if tum:
-        taramalar = Tarama.objects.filter(qr__in=_ayni_hedefli_kodlar(qr))
-        kod_sayisi = _ayni_hedefli_kodlar(qr).count()
-    else:
-        taramalar = Tarama.objects.filter(qr=qr)
-
-    insan = taramalar.filter(bot=False)
-    seri = grafik.seri(taramalar, "30g", bot_dahil=False)
-    yonlendirenler, yon_bilinmeyen = alan_ozeti(taramalar, "yonlendiren", False, OZET_SATIR_SAYISI)
-    ulkeler, ulke_bilinmeyen = alan_ozeti(taramalar, "ulke", False, OZET_SATIR_SAYISI)
+    veri = _istatistik_verisi(qr, bool(tum))
     yanit = render(request, "qr/genel/istatistik.html", {
         "ayar": ayar,
         "qr": qr,
         "tum": bool(tum),
-        "kod_sayisi": kod_sayisi,
-        "toplam": insan.count(),
-        "son_30_gun": seri["toplam"],
-        "grafik_svg": grafik.svg_cubuk_grafik(seri, f"{qr.kisa_kod} (son 30 gün)", False),
-        "yonlendirenler": yonlendirenler, "yon_bilinmeyen": yon_bilinmeyen,
-        "ulkeler": ulkeler, "ulke_bilinmeyen": ulke_bilinmeyen,
+        **veri,
         "hedef": _hedef_metni(qr) if ayar.istatistikte_hedef_goster else "",
         "hedef_goster": ayar.istatistikte_hedef_goster,
     })

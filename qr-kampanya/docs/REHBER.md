@@ -381,7 +381,7 @@ Taramayı getiren sayfanın **yalnızca alan adı** gösterilir (yol ve sorgu sa
 
 ### `kod+` herkese açık istatistik
 
-Kısa linkin sonuna `+` eklenirse (`https://qr.example.com/k/YAZ-2026+`) o kodun sade istatistik sayfası açılır; `+all` aynı hedefe giden tüm kodların toplamını gösterir. Bu özellik **varsayılan KAPALIDIR**: **Ayarlar**'daki **herkese açık istatistik sayfası** kutusu işaretlenirse çalışır. Kapalıyken girişli kullanıcıyı panel ayrıntısına yönlendirir, diğer herkes 404 görür. Açarsanız kısa kodu bilen herkes o kodun sayılarını görür; hedef adres ayrı ayarla gizlidir (bölüm 8).
+Kısa linkin sonuna `+` eklenirse (`https://qr.example.com/k/YAZ-2026+`) o kodun sade istatistik sayfası açılır; `+all` aynı hedefe giden tüm kodların toplamını gösterir. Bu özellik **varsayılan KAPALIDIR**: **Ayarlar**'daki **herkese açık istatistik sayfası** kutusu işaretlenirse çalışır. Kapalıyken girişli kullanıcıyı panel ayrıntısına yönlendirir, diğer herkes 404 görür. Yönlendiren site ve ülke tabloları yalnızca son 30 günü kapsar ve o dönemde en az 10 tarama yoksa gösterilmez; sayfa 60 sn önbelleklenir. Açarsanız kısa kodu bilen herkes o kodun sayılarını görür; hedef adres ayrı ayarla gizlidir (bölüm 8).
 
 ---
 

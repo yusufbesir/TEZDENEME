@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST
 
 from ..hiz import giris_hiz_siniri
@@ -202,6 +203,7 @@ def _bekleyen_zorunlu(request, kurulum):
 
 # --- Giriş sırasındaki ekranlar ---
 
+@sensitive_post_parameters("kod")
 @giris_hiz_siniri
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -250,6 +252,7 @@ def _kurulum_onayla(request, kullanici, gizli):
     return False, "kilit" if deneme.sinira_ulasti else "hata"
 
 
+@sensitive_post_parameters("kod")
 @giris_hiz_siniri
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -294,6 +297,7 @@ def hesap(request):
     return render(request, "qr/panel/hesap.html", {"mfa_acik": cihaz is not None, "mfa_zorunlu": settings.MFA_ZORUNLU})
 
 
+@sensitive_post_parameters("kod")
 @_oturum_zorunlu
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -329,6 +333,7 @@ def _sifirla(request, hedef, ozet, koru_oturum=None):
     return silinen
 
 
+@sensitive_post_parameters("kod")
 @_oturum_zorunlu
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -373,6 +378,7 @@ def kullanici_mfa_sifirla(request, pk):
     return render(request, "qr/panel/mfa_sifirla_onay.html", {"hedef": hedef})
 
 
+@sensitive_post_parameters("old_password", "new_password1", "new_password2")
 @_oturum_zorunlu
 @never_cache
 @require_http_methods(["GET", "POST"])

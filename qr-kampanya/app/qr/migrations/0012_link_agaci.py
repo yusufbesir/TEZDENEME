@@ -6,6 +6,7 @@ import qr.models
 import re
 from django.conf import settings
 from django.db import migrations, models
+from django.db.migrations.exceptions import IrreversibleError
 
 
 # Link ağaçları silinmez (0002 ile aynı tetikleyici işlevi; öğeler ağaçtan çıkarılabildiği için yalnızca ağaç tablosu korunur).
@@ -25,6 +26,23 @@ SILME_KORUMASI_GERI = """
 DROP TRIGGER IF EXISTS qr_linkagaci_silme_engeli ON qr_linkagaci;
 DROP TRIGGER IF EXISTS qr_linkagaci_bosaltma_engeli ON qr_linkagaci;
 """
+
+
+def geri_almadan_once_bos_mu(apps, schema_editor):
+    """YALNIZ GERİ YÖN: geri alma ağaç tablolarını siler. Ağaç ya da öğe tablosunda (ya da görüntüleme sayacında) satır varsa
+    hiçbir şey yapmadan hata ile durur. Silme tetikleyicileri düşürülmeden ÖNCE çalışır (RunSQL'den sonra listelenir)."""
+    db = schema_editor.connection.alias
+    sayilar = {
+        ad: apps.get_model("qr", ad).objects.using(db).count() for ad in ("LinkAgaci", "LinkAgaciOgesi", "LinkAgaciGoruntuleme")
+    }
+    dolu = {ad: n for ad, n in sayilar.items() if n}
+    if dolu:
+        ozet = ", ".join(f"{ad}: {n}" for ad, n in dolu.items())
+        raise IrreversibleError(
+            f"Geri alma durduruldu, hiçbir şey silinmedi: link ağacı tablolarında kayıt var ({ozet}). Bu migrasyon geri "
+            "alınırsa tablolar silinir. Önce veriyi yedekleyip (yedek/geri yükleme belgesine bakın) tabloları bilinçli olarak "
+            "boşaltmanız gerekir; ağaçlar uygulamadan silinemez."
+        )
 
 
 class Migration(migrations.Migration):
@@ -219,4 +237,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL(SILME_KORUMASI, SILME_KORUMASI_GERI),
+        # Geri yönde RunSQL'den (tetikleyicileri düşürür) ÖNCE, tablolar silinmeden önce çalışır.
+        migrations.RunPython(migrations.RunPython.noop, geri_almadan_once_bos_mu),
     ]

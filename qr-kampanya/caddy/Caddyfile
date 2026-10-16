@@ -58,6 +58,15 @@
 				request>headers>Cookie delete
 				request>headers>Authorization delete
 				request>headers>Referer delete
+				# Sorgu dizesindeki hassas parametreler (API parolası/TOTP/anahtar, hedef adres, başlık) günlüğe yazılmaz.
+				request>uri query {
+					delete password
+					delete totp
+					delete api_key
+					delete key
+					delete url
+					delete baslik
+				}
 			}
 		}
 	}

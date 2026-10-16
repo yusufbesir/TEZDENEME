@@ -29,7 +29,7 @@
 ## 3. Tek QR kod oluşturmak
 
 1. **QR kodlar → Yeni QR kod**.
-2. **Kısa kod**: QR'a yazılacak kalıcı kod (örn. `KMP-0001`). Boş bırakırsanız tahmin edilmesi zor, rastgele bir kod üretilir. **Bir kez kaydedildikten sonra değiştirilemez.**
+2. **Kısa kod**: QR'a yazılacak kalıcı kod (örn. `KMP-0001`). Boş bırakırsanız otomatik kod üretilir: varsayılan rastgele biçimde tahmin edilmesi zor, “sıralı” biçim seçiliyse sıradaki sayı (tahmin edilebilir). **Bir kez kaydedildikten sonra değiştirilemez.**
 3. **Yönlendirme türü**: “Harici web adresi” (başka bir siteye gider) veya “Sistemdeki sayfa” (kendi kampanya sayfanız).
 4. İsteğe bağlı alanlar: ad, tür, ürün, kampanya, mağaza, başlangıç/bitiş, bitiş sonrası adres, açıklama, etiketler.
 5. **Kaydet**. Detay sayfasında QR önizlemesini görür, **PNG** (dijital/ofis baskısı) veya **SVG** (matbaa, büyük baskı) olarak indirirsiniz.
@@ -48,7 +48,7 @@
 
 **Hızlı kısalt** (menüde en üstte): yalnızca uzun adresi yapıştırırsınız; isteğe bağlı kısa kod ve başlık da girebilirsiniz. **Kısalt**'a basınca “Kısa link” türünde bir kayıt oluşur. Doğrulama normal QR formuyla aynıdır: ayrılmış kelimeler, aynı hedef uyarısı (“Yine de kaydet” onayı), oluşturma hız sınırı. QR adı boşsa başlıktan, o da yoksa hedefin alan adından türetilir. Sonuç ekranında kısa link, **Kopyala** düğmesi, QR önizleme (PNG/SVG indirme), paylaşım kutusu ve **Bir tane daha** formu bulunur. Gereken yetki: QR ekleme (Editör, Yönetici).
 
-**Başlığı otomatik çekme:** Başlığı boş bırakırsanız ve hedef harici bir adresse, sunucu hedef sayfanın başlığını (`<title>`) çekmeye çalışır (hızlı kısalt, “Yeni QR kod” formu ve API `shorturl`). Yalnızca yeni kayıtta çalışır; başarısız olursa başlık boş kalır, kayıt engellenmez. Güvenlik önlemleri için [GUVENLIK.md](GUVENLIK.md). **Ayarlar → başlığı otomatik çek** kutusundan kapatılır.
+**Başlığı otomatik çekme:** Başlığı boş bırakırsanız ve hedef harici bir adresse, sunucu hedef sayfanın başlığını (`<title>`) çekmeye çalışır (hızlı kısalt, “Yeni QR kod” formu ve API `shorturl`). Yalnızca yeni kayıtta ve yalnızca 80/443 portlarında çalışır; başarısız olursa başlık boş kalır, kayıt engellenmez. Güvenlik önlemleri için [GUVENLIK.md](GUVENLIK.md). **Ayarlar → başlığı otomatik çek** kutusundan kapatılır.
 
 **Yer imi düğmesi:** Hızlı kısalt sayfasındaki “Yer imi düğmesi” bölümündeki düğmeyi tarayıcınızın yer imleri çubuğuna sürükleyin (sürükleyemiyorsanız kodu kopyalayıp yeni bir yer iminin adresine yapıştırın). Herhangi bir sayfadayken tıklarsanız, o sayfanın adresi ve başlığı Hızlı kısalt sayfasına yeni pencerede **önceden doldurulmuş** olarak açılır (`/panel/kisalt/?url=…&baslik=…`). **Hiçbir şey kendiliğinden kaydedilmez**: kayıt yalnızca sayfada “Kısalt”a basınca (POST + CSRF) olur. Giriş yapmamışsanız önce giriş sayfası açılır. Yer imi kodu panelin tam adresini içerir; panel adresi değişirse düğmeyi yeniden ekleyin. Sıkı içerik güvenlik politikası (CSP) kullanan bazı sitelerde tarayıcı yer imi betiğini çalıştırmayabilir; panel sayfasında düğmeye tıklamak ise bilerek bir şey yapmaz.
 
@@ -157,7 +157,7 @@ Dosya yoksa, okunamazsa ya da ayar boşsa ülke boş kalır; yönlendirme ve di�
 YOURLS uyumlu: kısa adresin sonuna `+` eklenirse (`https://alan.adiniz/k/ABC123+`; `%2B` de çalışır) istatistik sayfası açılır, `+all` ise **aynı hedef adrese** giden tüm kodların toplamını gösterir (arşivdeki ve çöp kutusundaki kodlar toplama girmez).
 
 - **Genel ayarlar → herkese açık istatistik sayfası** (varsayılan **KAPALI**). Kapalıyken: giriş yapmış ve `QR kod görüntüleme` yetkisi olan kullanıcı panelde ilgili QR ayrıntısına yönlendirilir (grafikler orada); diğer herkes, kod var olsa bile, “bulunamadı” (404) görür.
-- Açıkken sayfa kimlik doğrulaması gerektirmez ve şunları gösterir: kod, toplam tarama (bot hariç), son 30 gün grafiği, en çok yönlendiren siteler ve ülkeler. **Hedef adres gösterilmez**; göstermek için **herkese açık istatistikte hedef adresi göster** ayarını açın (hedef gizli olabilir).
+- Açıkken sayfa kimlik doğrulaması gerektirmez ve şunları gösterir: kod, toplam tarama (bot hariç), son 30 gün grafiği, (son 30 günde en az 10 insan taraması varsa) son 30 günün en çok yönlendiren siteleri ve ülkeleri; daha az taramada yalnız toplam görünür. Sonuç 60 sn önbelleklenir. **Hedef adres gösterilmez**; göstermek için **herkese açık istatistikte hedef adresi göster** ayarını açın (hedef gizli olabilir).
 - Arşivdeki ve çöp kutusundaki kodlar için 404 verilir. Sayfa arama motorlarına kapalıdır (`noindex`), önbelleğe alınmaz ve yönlendirmeyle aynı IP başına hız sınırına tabidir. Bu istekler **tarama olarak sayılmaz**.
 - Açmadan önce: kısa kodu bilen herkes o kodun tarama sayılarını görebilir. Kısa kodlar basılı olduğundan bunu bilinçli bir tercih olarak ele alın.
 
