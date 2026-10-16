@@ -38,3 +38,4 @@
 | 2026-10-15 | Jev cihaz kökünde otomatik keşfi kaldır, jev_cagri.py için SHA-256 pini ve sembolik bağ reddi [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 44.890 toplam | Tamam: 65 test geçti |
 | 2026-10-15 | Skill kilidine sha256 içerik özeti ve skill-etkinlestir.sh kilit doğrulaması [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 53.703 toplam | Tamam: 69 Python, 35 kabuk testi geçti |
 | 2026-10-15 | Denetmenlerin ikinci tur düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | 39.797 toplam | Geçti |
+| 2026-10-16 | Rehber taraması önerilerini doğrula: ajan efor seviyeleri ve öneri dokümanı [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | verifier / claude-sonnet-5-5 | 21.132 toplam | Geçti: 69 Python, 35 kabuk testi |
