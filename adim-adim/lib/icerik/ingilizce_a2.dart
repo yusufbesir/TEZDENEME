@@ -272,7 +272,7 @@ const Kurs ingilizceA2 = Kurs(
                 (sol: 'carry', sag: 'carried'),
               ],
               aciklama:
-                  'Sessizle biten + y, ied olur; kısa ünlü + sessiz ikilenir; e ile bitene sadece d gelir.',
+                  'Sessiz harf + y ile biten fiillerde y düşer, ied eklenir; kısa ünlü + sessiz harfle bitenlerde son harf ikilenir; e ile bitene yalnız d gelir.',
             ),
             Secim(
               soru: 'Hangisi doğrudur?',
@@ -577,7 +577,7 @@ const Kurs ingilizceA2 = Kurs(
             ),
             Bosluk(
               soru: 'Would you like ___ more tea? Yes, please.',
-              secenekler: ['any', 'some', 'many'],
+              secenekler: ['a', 'some', 'many'],
               dogru: 1,
               aciklama: 'İkramlarda ve tekliflerde some kullanılır.',
             ),

@@ -58,3 +58,5 @@
 - 2026-10-16 | İçerik yapısı, A2 ekleme noktaları, docs bölüm 8 | scout (claude-haiku-5-5) | ~79K token | tamam (ders id biçimi tutarsızlığı not edildi)
 - 2026-10-16 | Duolingo/Busuu/DuoCards/Trivia Crack güncel araştırma (web) | araştırma ajanı (claude-haiku-5-5, scout web erişimi olmadığı için genel ajan) | ~100K token | tamam (masaüstü yerleşimi doğrulanamadı; cihazda inceleme gerekir)
 - 2026-10-16 | İngilizce A2 kursu (12 ders, 120 alıştırma) + 36 A2 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (216 test, analyze temiz; verifier bekliyor)
+- 2026-10-16 | Esnek yerleşim: Olcu kırılma noktaları, LayoutBuilder, metin ölçeği 1.0–1.3, WM_GETMINMAXINFO 480x600, 25 yerleşim testi | implementer (claude-sonnet-5-5) | ~100K token | tamam (233 test, analyze temiz; win32 derlenmedi; verifier bekliyor)
+- 2026-10-16 | A2 kursu ve sorularını doğrula | verifier (claude-sonnet-5-5) | ~60K token | Kaldı → 1 tek-cevap sorunu (any/some) + 1 açıklama; ana oturum düzeltti, içerik testleri geçti
