@@ -1,3 +1,14 @@
+__pycache__/
+
+# Gizli bilgi ve yerel kayıtlar (Siber Güvenlik Denetmeni bulgusu) [İP:Jev'i projeye bağlama#TMGrRs]
+.env
+.env.*
+!.env.example
+*.key
+kararlar.jsonl
+*.oturum.jsonl
+*.log.jsonl
+
 # Yayın imza anahtarları hiçbir alt klasörden depoya girmez (depo herkese açık).
 *.jks
 *.keystore
