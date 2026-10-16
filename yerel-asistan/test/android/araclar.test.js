@@ -157,6 +157,15 @@ test('yamala: ağ yapılandırması yalnız yerel adreslere cleartext verir', ()
   }
 });
 
+test('yamalar: XML yorumlarında "--" yok (Android kaynak derleyicisi reddeder)', () => {
+  for (const ad of fs.readdirSync(YAMALAR).filter((f) => f.endsWith('.xml'))) {
+    const x = fs.readFileSync(path.join(YAMALAR, ad), 'utf8');
+    for (const m of x.matchAll(/<!--([\s\S]*?)-->/g)) {
+      assert.ok(!m[1].includes('--'), `${ad}: yorum içinde "--" var`);
+    }
+  }
+});
+
 test('yamala --ip: özel IP eklenir, tekrarsız, korunur; genel IP reddedilir', () => {
   const a = androidKur();
   Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, ipler: ['192.168.1.20'] });

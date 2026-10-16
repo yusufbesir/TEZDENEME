@@ -3,7 +3,7 @@
   Pırıl: açık metin (cleartext) trafik varsayılan olarak KAPALI.
   Yalnızca aşağıdaki yerel adreslere ws:// ile bağlanılabilir.
   Android bu dosyada IP aralığı (CIDR) desteklemez; bilgisayarınızın adresini
-  `node scripts/yamala.js --ip 192.168.1.20` ile ekleyin (README'ye bakın).
+  yamala.js betiğinin "ip" seçeneğiyle ekleyin (README'ye bakın).
   Sistem CA'ları dışında güven noktası yoktur; kullanıcı CA'ları güvenilmez.
 -->
 <network-security-config>

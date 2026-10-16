@@ -85,6 +85,7 @@ Kısayol: web dosyaları değiştiğinde `npm run esitle` (hazırla + `cap sync`
 | `ws://` adresi reddediliyor | `yamala.js --ip` ile PC adresini eklediniz mi ve APK'yı yeniden derlediniz mi? |
 | Mikrofon düğmesi yok | Telefonun ses tanıma servisi yok; yazarak kullanın. |
 | `cap sync` sonrası izinler kayboldu | `node scripts\yamala.js` komutunu tekrar çalıştırın. |
+| `Your project path contains non-ASCII characters` | Depo yolunda Türkçe harf var (ör. `Pırıl`). Klasörü taşımadan geçici sürücü harfiyle derleyin: `subst P: "<depo yolu>"`, `cd P:\yerel-asistan\android\android`, `.\gradlew.bat assembleDebug`; bitince `subst P: /d`. |
 
 ## Dosyalar
 
