@@ -3,7 +3,6 @@ Hem halka açık yönlendirme uçları hem de giriş/MFA uçları (Argon2'den Ö
 import hashlib
 import hmac
 import logging
-import random
 import threading
 import time
 from datetime import datetime, timezone as _tz
@@ -31,17 +30,21 @@ class _HizSinirlayici:
 
     Her istek tek bir atomik `INSERT ... ON CONFLICT DO UPDATE ... RETURNING sayi` çalıştırır (mevcut
     `qr_denemesayaci` tablosu; yeni tablo/migrasyon yok). Anahtar pencere numarasını içerir
-    (`hiz:<dakika>:<anahtar>`), pencere dolunca yeni satır başlar. Süresi dolan satırlar ara sıra silinir
-    (yalnızca `hiz:` önekli ve bitişi geçmiş satırlar).
+    (`hiz:<dakika>:<anahtar>`), pencere dolunca yeni satır başlar. Süresi dolan satırlar her işçide en çok
+    `TEMIZLIK_ARALIGI_SN` saniyede bir silinir (yalnızca `hiz:` önekli ve bitişi geçmiş satırlar; `bitis` indeksli).
+    Böylece tablo, trafikten bağımsız olarak yaklaşık son birkaç dakikanın satırlarıyla sınırlı kalır: satır sayısı
+    en fazla (dakikadaki farklı istemci sayısı × ~3) olur. Olasılıksal temizlikte düşük trafikte eski satırlar
+    uzun süre kalabiliyordu.
 
     Veritabanı hatasında istek İZİN VERİLİR (fail-open) ve uyarı loglanır: QR'ların açılması önceliklidir;
     giriş uçlarında ise parola/MFA deneme sayaçları (sayac.py) ayrıca DB ile korunur."""
 
-    TEMIZLIK_OLASILIGI = 1 / 500
+    TEMIZLIK_ARALIGI_SN = 60
     _LOG_ARALIGI_SN = 10
 
     def __init__(self):
         self._son_log = 0.0
+        self._son_temizlik = time.monotonic()
         self._kilit = threading.Lock()
 
     @staticmethod
@@ -73,9 +76,17 @@ class _HizSinirlayici:
         except Exception as hata:  # fail-open
             self._uyar(hata)
             return True
-        if random.random() < self.TEMIZLIK_OLASILIGI:
+        if self._temizlik_zamani_mi():
             self.temizle()
         return sayi <= sinir
+
+    def _temizlik_zamani_mi(self):
+        simdi = time.monotonic()
+        with self._kilit:
+            if simdi - self._son_temizlik < self.TEMIZLIK_ARALIGI_SN:
+                return False
+            self._son_temizlik = simdi
+            return True
 
     def temizle(self):
         """Süresi dolmuş hız sınırı satırlarını siler; başka sayaçlara/verilere dokunmaz."""

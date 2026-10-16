@@ -21,8 +21,10 @@ RUN --mount=type=bind,source=.,target=/baglam \
 
 # Uygulama root olmayan kullanıcıyla çalışır. Uygulama kodu (/app) root'a aittir ve uygulama kullanıcısı
 # tarafından DEĞİŞTİRİLEMEZ; yalnızca /veri (medya, statik) uygulama kullanıcısına yazılabilirdir.
-# Grup GID 999 açıkça verilir: yedek servisi medyayı bu grup (compose group_add: "999") üzerinden okur.
-RUN groupadd --system --gid 999 uygulama \
+# Grup GID 10001 açıkça verilir (UID ile aynı): yedek servisi medyayı bu grup (compose group_add: "10001") üzerinden okur.
+# Konteyner GID'leri host'a birebir eşlenir; host'ta 999 sıkça "docker" grubudur (kaçan süreç docker.sock ile root olabilir),
+# bu yüzden sistem aralığı (--system) dışında, host'ta normalde boş olan 10001 kullanılır.
+RUN groupadd --gid 10001 uygulama \
     && useradd --system --uid 10001 --gid uygulama --home /app uygulama \
     && mkdir -p /veri/medya /veri/static \
     && chown -R uygulama /veri

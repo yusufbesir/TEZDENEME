@@ -1,5 +1,6 @@
 """PostgreSQL destekli, işçiler arası paylaşılan hız sınırı: paylaşım, atomiklik, pencere, fail-open."""
 import threading
+import time
 from unittest import mock
 
 from django.conf import settings
@@ -40,7 +41,7 @@ class PaylasimliHizSiniriTransactionTest(TransactionTestCase):
                 connections.close_all()
 
         # Sahte saat 1970'te olduğundan satır "süresi dolmuş" görünür; rastgele temizliği kapat.
-        with mock.patch("time.time", return_value=1_000_000.0), mock.patch.object(hiz_sinirlayici, "TEMIZLIK_OLASILIGI", 0):
+        with mock.patch("time.time", return_value=1_000_000.0), mock.patch.object(hiz_sinirlayici, "_temizlik_zamani_mi", return_value=False):
             parcaciklar = [threading.Thread(target=is_, args=(12,)) for _ in range(8)]
             parcaciklar.append(threading.Thread(target=is_, args=(4,)))
             [p.start() for p in parcaciklar]
@@ -61,7 +62,7 @@ class PaylasimliHizSiniriTransactionTest(TransactionTestCase):
             "django.setup()\n"
             "from qr.hiz import hiz_sinirlayici\n"
             "with mock.patch('time.time', return_value=2_000_000.0):\n"
-            "    hiz_sinirlayici.TEMIZLIK_OLASILIGI = 0\n"
+            "    hiz_sinirlayici.TEMIZLIK_ARALIGI_SN = 10**9\n"
             "    print('IZIN', sum(hiz_sinirlayici.izin_ver('5.6.7.8', 10) for _ in range(8)))\n"
         )
         ortam = dict(os.environ, DJANGO_SETTINGS_MODULE="config.settings", MFA_SIFRELEME_ANAHTARI=settings.MFA_SIFRELEME_ANAHTARI, POSTGRES_DB=connection.settings_dict["NAME"])
@@ -82,11 +83,11 @@ class PaylasimliHizSiniriTransactionTest(TransactionTestCase):
 @override_settings(**TEST_AYARLARI)
 class PaylasimliHizSiniriTest(TemelTest):
     def test_pencere_dolunca_sifirlanir(self):
-        with mock.patch("time.time", return_value=6000.0), mock.patch.object(hiz_sinirlayici, "TEMIZLIK_OLASILIGI", 0):
+        with mock.patch("time.time", return_value=6000.0), mock.patch.object(hiz_sinirlayici, "_temizlik_zamani_mi", return_value=False):
             self.assertEqual([hiz_sinirlayici.izin_ver("a", 2) for _ in range(4)], [True, True, False, False])
-        with mock.patch("time.time", return_value=6000.0 + 59), mock.patch.object(hiz_sinirlayici, "TEMIZLIK_OLASILIGI", 0):
+        with mock.patch("time.time", return_value=6000.0 + 59), mock.patch.object(hiz_sinirlayici, "_temizlik_zamani_mi", return_value=False):
             self.assertFalse(hiz_sinirlayici.izin_ver("a", 2))
-        with mock.patch("time.time", return_value=6000.0 + 60), mock.patch.object(hiz_sinirlayici, "TEMIZLIK_OLASILIGI", 0):
+        with mock.patch("time.time", return_value=6000.0 + 60), mock.patch.object(hiz_sinirlayici, "_temizlik_zamani_mi", return_value=False):
             self.assertEqual([hiz_sinirlayici.izin_ver("a", 2) for _ in range(3)], [True, True, False])
 
     def test_anahtarlar_ayri_ve_sinir_sifir_kapali(self):
@@ -134,10 +135,17 @@ class PaylasimliHizSiniriTest(TemelTest):
         self.assertEqual(hiz_sinirlayici.temizle(), 1)
         self.assertEqual(set(DenemeSayaci.objects.values_list("anahtar", flat=True)), {"hiz:1:taze", "hesap:eski"})
 
-    def test_temizlik_izin_ver_icinden_tetiklenir(self):
-        with mock.patch.object(hiz_sinirlayici, "TEMIZLIK_OLASILIGI", 1.0), mock.patch.object(hiz_sinirlayici, "temizle") as t:
+    def test_temizlik_zamana_bagli_islemci_basina_dakikada_en_cok_bir(self):
+        """Temizlik olasılığa değil zamana bağlı: süre dolunca bir kez, hemen ardından tekrar değil."""
+        with mock.patch.object(hiz_sinirlayici, "temizle") as t:
+            hiz_sinirlayici._son_temizlik = time.monotonic() - hiz_sinirlayici.TEMIZLIK_ARALIGI_SN - 1
+            hiz_sinirlayici.izin_ver("q", 5)
+            hiz_sinirlayici.izin_ver("q", 5)
             hiz_sinirlayici.izin_ver("q", 5)
         t.assert_called_once()
+        with mock.patch.object(hiz_sinirlayici, "temizle") as t:
+            hiz_sinirlayici.izin_ver("q", 5)
+        t.assert_not_called()
 
     @override_settings(YONLENDIRME_HIZ_SINIRI=3)
     def test_yonlendirme_sinir_sonrasi_429(self):

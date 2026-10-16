@@ -17,8 +17,8 @@ docker compose run --rm -T --no-deps --user 0 \
     set -e
     chown -R -h 10002:10002 /yedekler
     chmod 700 /yedekler
-    # yedek-durum: sahibi yedek, grup 999 (app) yalnızca OKUR: dizin 2750 (setgid), dosyalar 640.
-    chown -R -h 10002:999 /yedek-durum
+    # yedek-durum: sahibi yedek, grup 10001 (app) yalnızca OKUR: dizin 2750 (setgid), dosyalar 640.
+    chown -R -h 10002:10001 /yedek-durum
     chmod 2750 /yedek-durum
     for f in /yedek-durum/*; do if [ -f "$f" ] && [ ! -L "$f" ]; then chmod 640 "$f"; fi; done'
-echo "Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:999 kip 2750, app yalnızca okur)."
+echo "Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:10001 kip 2750, app yalnızca okur)."

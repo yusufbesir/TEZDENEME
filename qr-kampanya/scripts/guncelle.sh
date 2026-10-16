@@ -5,6 +5,7 @@
 #   bash scripts/guncelle.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
+. scripts/dizin-guvenligi.sh
 # Eski kurulumlarda eksik olabilecek rol parolaları: mevcut satırlara DOKUNULMAZ, yalnızca .env'nin SONUNA eklenir.
 rastgele() { python3 -c "import secrets;print(secrets.token_urlsafe($1))" 2>/dev/null || openssl rand -base64 "$1" | tr -d '/+=\n'; }
 for ANAHTAR in POSTGRES_SAHIP_PAROLA POSTGRES_UYGULAMA_PAROLA; do
@@ -93,7 +94,8 @@ bash scripts/yedek-anahtari-hazirla.sh
 # Yedek servisi artık root değil (10002): eski kurulumlarda root'a ait yedekler/ dizini ve yedek-durum birimi ona devredilir
 # (yalnızca sahiplik değişir, hiçbir şey silinmez; tekrar çalıştırmak güvenlidir).
 bash scripts/yedek-dizini-hazirla.sh
-# Medya dosyalarına grup okuma izni (yalnızca ekleme): yedek kullanıcısı medyayı app'in grubu üzerinden okur.
+# Medya dosyalarının grubu 999 -> 10001 (yeni app imajı yukarıda derlendi) ve grup okuma izni; silme yok.
+# Yedek kullanıcısı medyayı app'in grubu üzerinden okur.
 bash scripts/medya-izni-hazirla.sh
 # YEDEK_ALICI .env'ye yeni eklenmiş olabilir; konteyner ortamı yeniden okusun.
 docker compose up -d --no-deps yedek
@@ -116,6 +118,8 @@ for i in $(seq 1 60); do
 done
 [ "$HAZIR" = "1" ] || { echo "HATA: uygulama 2 dakikada sağlıklı duruma geçmedi."; exit 1; }
 echo "Uygulama sağlıklı."
+# Yeni app (GID 10001) başladı: aradaki pencerede eski app'in (GID 999) yazdığı medya için izinler bir kez daha düzeltilir.
+bash scripts/medya-izni-hazirla.sh
 
 echo "6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)..."
 ASAMA="caddy-dogrulama"
@@ -155,5 +159,15 @@ if grep -qE '^[[:space:]]*(export[[:space:]]+)?YEDEK_UZAK_HEDEF=' .env 2>/dev/nu
    && ! grep -qE '^[[:space:]]*(export[[:space:]]+)?YEDEK_UZAK_ONAYLI_HEDEF=.' .env 2>/dev/null; then
   echo "BİLGİ: .env içinde YEDEK_UZAK_HEDEF var ama YEDEK_UZAK_ONAYLI_HEDEF yok: sunucu dışı kopya doğrulansa bile eski yerel yedekler SİLİNMEZ."
   echo "       Hedef gerçekten başka bir makinede/bulutta ise onaylamak için .env'e elle ekleyin: YEDEK_UZAK_ONAYLI_HEDEF=<YEDEK_UZAK_HEDEF'in ':' öncesi adı> (bu betik eklemez)."
+fi
+# Eski belgelerdeki cron örneği çıktıyı yedekler/ içine yönlendiriyordu; root kabuğu orada bir sembolik bağlantıyı izler.
+if ESKI_CRON=$(eski_cron_satirlari "${YEDEK_DIZINI:-./yedekler}" 2>/dev/null); then
+  echo "################################################################################"
+  echo " UYARI: root crontab'ında disari-kopyala.sh çıktısını yedek dizinine yönlendiren eski bir satır var:"
+  printf '   %s\n' "$ESKI_CRON"
+  echo " Yedek dizini yedek konteynerine yazılabilir; root kabuğu oradaki sembolik bağlantıyı izleyip başka dosyaya yazabilir."
+  echo " disari-kopyala.sh bu satır düzeltilene kadar HİÇBİR ŞEY yapmadan çıkar (kopyalama/silme yok). Düzeltilmiş satır (sudo crontab -e):"
+  echo "   30 4 * * * cd $PWD && bash scripts/disari-kopyala.sh >> /var/log/qr-disari-kopya.log 2>&1"
+  echo "################################################################################"
 fi
 echo "Güncelleme tamamlandı."

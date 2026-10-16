@@ -29,16 +29,30 @@
 #   4) Silme: YEDEK_SAKLAMA_GUN'den eski VE aynı ZAMAN'a ait db+medya+sha256 üçlüsünün HEPSİ uzakta doğrulanmışsa
 #      yerel üçlü silinir. En yeni TAM yerel yedek (üçlüsü eksiksiz en yeni ZAMAN) asla silinmez. YEDEK_UZAK_HEDEF tanımlı değilse hiçbir şey silinmez.
 # Yedek dosyaları root'a ait ve 600 izinlidir: bu betiği root ile çalıştırın (sudo crontab -e). Cron örneği:
-#   30 4 * * * cd /opt/qr-kampanya && bash scripts/disari-kopyala.sh >> yedekler/disari-kopya.log 2>&1
+#   30 4 * * * cd /opt/qr-kampanya && bash scripts/disari-kopyala.sh >> /var/log/qr-disari-kopya.log 2>&1
+# (Çıktıyı yedekler/ içine YÖNLENDİRMEYİN: o dizin yedek konteynerine yazılabilir; root kabuğunun `>>` yönlendirmesi
+#  oradaki bir sembolik bağlantıyı izler. Root crontab'ında böyle eski bir satır varsa betik hiçbir şey yazmadan, syslog'a uyarı
+#  bırakıp 1 koduyla çıkar.)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; . ./.env; set +a
+. scripts/dizin-guvenligi.sh
 
-DIZIN="${YEDEK_DIZINI:-./yedekler}"
-HEDEF="${YEDEK_UZAK_HEDEF:-}"
-SAKLAMA_GUN="${YEDEK_SAKLAMA_GUN:-14}"
+# Eski belgelerdeki cron örneği çıktıyı yedekler/ içindeki bir günlük dosyasına yönlendiriyordu: root kabuğu orada
+# konteynerin bıraktığı bir sembolik bağlantıyı izler. Böyle bir satır varsa stdout/stderr o bağlantıya gidiyor olabilir; bu
+# yüzden HİÇBİR ŞEY yazdırılmaz (uyarı yalnızca syslog'a gider), kopyalama/silme yapılmadan çıkılır.
+if _CRON_SATIRI=$(eski_cron_satirlari "${YEDEK_DIZINI:-./yedekler}" 2>/dev/null); then
+  logger -t qr-kampanya "disari-kopyala.sh DURDURULDU: root crontab satırı çıktıyı yedek dizinine yönlendiriyor (sembolik bağlantı riski). Satırı '>> /var/log/qr-disari-kopya.log 2>&1' ile değiştirin (docs/YEDEKLEME.md). Satır: ${_CRON_SATIRI%%$'\n'*}" >/dev/null 2>&1 || true
+  exit 1
+fi
+
+# Yedek dizini çözülür (sembolik bağlantı -> gerçek hedef), sahibi çözülmüş yoldan alınır; root'a ait ama grup/diğer yazılabilir
+# dizin reddedilir. Bkz. scripts/dizin-guvenligi.sh.
+guvenli_dizin_hazirla "${YEDEK_DIZINI:-./yedekler}" || exit 1
 GUNLUK="$DIZIN/yedek-gunlugu.log"
 DOGRULAMA="$DIZIN/uzak-dogrulama.json"
+HEDEF="${YEDEK_UZAK_HEDEF:-}"
+SAKLAMA_GUN="${YEDEK_SAKLAMA_GUN:-14}"
 
 if [ -z "$HEDEF" ]; then
   echo "YEDEK_UZAK_HEDEF .env içinde tanımlı değil (örn. b2:firma-qr-yedek). Kopyalama yapılmadı; HİÇBİR yerel yedek silinmedi."
@@ -77,11 +91,16 @@ case "$HEDEF" in
   *)   HEDEF_AD="(yerel-yol)" ;;
 esac
 
-# Yedek konteyneri root olmayan kullanıcıyla çalışır: bu betik (root) yeni dosya açarsa dosya, yedek dizininin sahibine
-# devredilir; yoksa konteyner günlüğe ekleyemez / uzak-dogrulama.json'u okuyamaz (panel bilgisi kaybolurdu).
-# Sembolik bağlantı izlenmez: konteynerin bıraktığı bir bağlantı root ile başka bir dosyanın sahibini değiştirmesin.
-sahip_uyumla() { local f; for f in "$@"; do [ -L "$f" ] || chown -h --reference="$DIZIN" -- "$f" 2>/dev/null || true; done; }
-gunluge() { echo "$(date -Iseconds) $*" | tee -a "$GUNLUK"; sahip_uyumla "$GUNLUK"; }
+# Yedek dizini yedek konteynerine (UID 10002) yazılabilir; ele geçirilmiş bir konteyner oraya sembolik bağlantı bırakabilir.
+# Bu yüzden betik (root) o dizine HİÇBİR ZAMAN root olarak yazmaz ya da oradan dosya okumaz: günlük ekleme, uzak-dogrulama.json
+# yazımı ve okuması dizinin SAHİBİ olarak (`sahip_olarak`, setpriv ile yetkiler düşürülerek) yapılır. Bağlantı izlense bile
+# yazılabilecek tek yer, konteynerin zaten yazabildiği yerlerdir. Dizin root'a aitse (ve grup/diğer yazılamazsa) konteyner
+# oraya yazamaz; doğrudan çalışılır. (DIZIN, DIZIN_SAHIBI ve sahip_olarak scripts/dizin-guvenligi.sh'den gelir.)
+gunluge() {
+  local satir; satir="$(date -Iseconds) $*"
+  echo "$satir"
+  printf '%s\n' "$satir" | sahip_olarak tee -a -- "$GUNLUK" >/dev/null || echo "UYARI: günlüğe yazılamadı: $GUNLUK" >&2
+}
 
 # JSON metin değerleri için kaçış: \ " ve kontrol karakterleri (serbest metin JSON'u bozmasın/enjekte etmesin).
 json_kacis() {
@@ -515,7 +534,7 @@ for ((i = ${#ZAMANLAR[@]} - 1; i >= 0; i--)); do
   if [ -f "$DIZIN/db-$Z.dump.age" ] && [ -f "$DIZIN/medya-$Z.tar.gz.age" ] && [ -f "$DIZIN/sha256-$Z.txt" ]; then EN_YENI="$Z"; break; fi
 done
 ONCEKI_ZAMAN=""
-[ -f "$DOGRULAMA" ] && ONCEKI_ZAMAN=$(sed -n 's/^ *"zaman": *"\([^"]*\)".*/\1/p' "$DOGRULAMA" | head -1 || true)
+ONCEKI_ZAMAN=$(sahip_olarak sed -n 's/^ *"zaman": *"\([^"]*\)".*/\1/p' -- "$DOGRULAMA" 2>/dev/null | head -1 || true)
 SIMDI=$(date -Iseconds)
 en_yeni_dogrulandi_mi() {
   [ -n "$EN_YENI" ] || return 1
@@ -530,11 +549,11 @@ elif [ -n "$ONCEKI_ZAMAN" ]; then ZAMAN_DEGERI="\"$(json_kacis "$ONCEKI_ZAMAN")\
 else ZAMAN_DEGERI="null"; fi
 LISTE=""
 for ad in ${DOGRULANAN[@]+"${DOGRULANAN[@]}"}; do LISTE+="${LISTE:+, }\"$ad\""; done
-( umask 077
-  NOT=""; [ "$YEREL_HEDEF" = "1" ] && NOT="yerel hedef, sunucu dışı sayılmadı"
+( NOT=""; [ "$YEREL_HEDEF" = "1" ] && NOT="yerel hedef, sunucu dışı sayılmadı"
   [ "$ONAYSIZ" = "1" ] && NOT="sunucu dışı kopya doğrulandı ama onaylanmadı (YEDEK_UZAK_ONAYLI_HEDEF)"
   printf '{\n  "zaman": %s,\n  "son_deneme": "%s",\n  "hedef": "%s",\n  "yontem": "%s",\n  "not": "%s",\n  "dogrulanan": [%s]\n}\n' \
-    "$ZAMAN_DEGERI" "$(json_kacis "$SIMDI")" "$(json_kacis "$HEDEF_AD")" "$(json_kacis "$YONTEM")" "$(json_kacis "$NOT")" "$LISTE" > "$DOGRULAMA.tmp" && sahip_uyumla "$DOGRULAMA.tmp" && mv "$DOGRULAMA.tmp" "$DOGRULAMA" )
+    "$ZAMAN_DEGERI" "$(json_kacis "$SIMDI")" "$(json_kacis "$HEDEF_AD")" "$(json_kacis "$YONTEM")" "$(json_kacis "$NOT")" "$LISTE" \
+    | sahip_olarak sh -c 'umask 077; t=$(mktemp "$1.XXXXXX") || exit 1; cat > "$t" && mv -fT -- "$t" "$1" || { rm -f -- "$t"; exit 1; }' sh "$DOGRULAMA" )
 if [ "$YEREL_HEDEF" = "1" ]; then
   gunluge "dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → $HEDEF_AD; yerel yedek SİLİNMEDİ"
   echo "Yerel hedef nedeniyle silme yapılmadı."

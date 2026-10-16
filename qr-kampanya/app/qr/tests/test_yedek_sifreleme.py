@@ -112,7 +112,8 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
         self.kok = Path(tempfile.mkdtemp(prefix="qr-disari-"))
         self.addCleanup(shutil.rmtree, self.kok, ignore_errors=True)
         (self.kok / "scripts").mkdir()
-        shutil.copy(betik_dizini() / "disari-kopyala.sh", self.kok / "scripts" / "disari-kopyala.sh")
+        for ad in ("disari-kopyala.sh", "dizin-guvenligi.sh"):
+            shutil.copy(betik_dizini() / ad, self.kok / "scripts" / ad)
         (self.kok / "bin").mkdir()
         # /tmp noexec olabilir (Docker testi): sahte rclone sh ile çalıştırılır.
         self.rclone = self.kok / "bin" / "rclone"
@@ -477,6 +478,183 @@ class DisariKopyalaSilmeTesti(SimpleTestCase):
         self.assertIn("no common hash", betik)
         self.assertIn("hashes could not be checked", betik)
         self.assertIn("--download", betik)
+
+    @unittest.skipUnless(hasattr(os, "geteuid") and os.geteuid() == 0 and shutil.which("setpriv"), "root ve setpriv gerekir")
+    def test_konteynerin_biraktigi_sembolik_baglantilar_root_ile_izlenmez(self):
+        """Yedek dizini 10002'ye aitken (konteyner yazabilir) günlük/doğrulama yollarına konan sembolik bağlantılar,
+        root çalışan betiğe başka dosyaları ezdirmez ya da onlara ekleme yaptırmaz; yazma dizinin sahibi olarak yapılır."""
+        eski = self.ucluyu_yaz(30)
+        self.ucluyu_yaz(0)
+        os.chmod(self.kok, 0o755)   # 10002 dizine ulaşabilsin (gerçek kurulumda proje dizini 755)
+        hedefler = {}
+        for ad in ("yedek-gunlugu.log", "uzak-dogrulama.json", "uzak-dogrulama.json.tmp"):
+            h = self.kok / f"korunan-{ad}"
+            h.write_text("ORIJINAL\n")
+            os.chmod(h, 0o600)          # root'a ait, 600 (ör. /etc/shadow benzeri)
+            (self.yedekler / ad).symlink_to(h)
+            hedefler[ad] = h
+        for yol in [self.yedekler, *self.yedekler.iterdir()]:
+            os.chown(yol, 10002, 10002, follow_symlinks=False)
+        os.chmod(self.yedekler, 0o700)
+        s = self.calistir()
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        for ad, h in hedefler.items():
+            self.assertEqual(h.read_text(), "ORIJINAL\n", f"{ad} bağlantısı root ile izlendi")
+            self.assertEqual(h.stat().st_uid, 0)
+        dogrulama = self.yedekler / "uzak-dogrulama.json"
+        self.assertFalse(dogrulama.is_symlink(), "doğrulama dosyası bağlantının yerine konmalıydı (mv -T)")
+        self.assertEqual(dogrulama.stat().st_uid, 10002)
+        self.assertEqual(len(json.loads(dogrulama.read_text())["dogrulanan"]), 6)
+        self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")))   # silme davranışı aynı
+        self.assertIn("günlüğe yazılamadı", s.stderr)   # bağlantılı günlük yazılamadı, sessizce geçilmedi
+        self.assertIn("SİLİNDİ yerel yedek", s.stdout)   # günlük satırları yine de çıktıda
+
+    def test_betik_yedek_dizinine_root_olarak_yazmaz(self):
+        betik = (betik_dizini() / "disari-kopyala.sh").read_text()
+        kod = "\n".join(sat for sat in betik.splitlines() if not sat.lstrip().startswith("#"))
+        self.assertNotIn("tee -a \"$GUNLUK\"", kod)
+        self.assertNotIn('> "$DOGRULAMA', kod)
+        self.assertNotIn("sahip_uyumla", kod)
+        self.assertIn("sahip_olarak", kod)
+        self.assertIn("setpriv --reuid", (betik_dizini() / "dizin-guvenligi.sh").read_text())
+        self.assertNotIn(">> yedekler/", betik)   # cron örneği de yedek dizinine yönlendirmez
+
+    # --- Güvenlik denetimi: sembolik bağlantılı DIZIN, grup/diğer yazılabilir root dizin, eski cron satırı -----------
+    ROOT_SETPRIV = unittest.skipUnless(hasattr(os, "geteuid") and os.geteuid() == 0 and shutil.which("setpriv"), "root ve setpriv gerekir")
+
+    @ROOT_SETPRIV
+    def test_yedek_dizini_sembolik_baglantiysa_gercek_hedefe_cozulur_ve_saldiri_isleyemez(self):
+        """YEDEKLER bir sembolik bağlantı (-> gercek-yedekler, sahibi 10002): sahip bağlantıdan değil çözülmüş yoldan alınır;
+        günlük/JSON bağlantıları root ile izlenmez."""
+        shutil.rmtree(self.yedekler)
+        gercek = self.kok / "gercek-yedekler"
+        gercek.mkdir()
+        self.yedekler.symlink_to(gercek)
+        eski = self.ucluyu_yaz(30)
+        self.ucluyu_yaz(0)
+        os.chmod(self.kok, 0o755)
+        hedefler = {}
+        for ad in ("yedek-gunlugu.log", "uzak-dogrulama.json", "uzak-dogrulama.json.tmp"):
+            h = self.kok / f"korunan-{ad}"
+            h.write_text("ORIJINAL\n")
+            os.chmod(h, 0o600)
+            (gercek / ad).symlink_to(h)
+            hedefler[ad] = h
+        for yol in [gercek, *gercek.iterdir()]:
+            os.chown(yol, 10002, 10002, follow_symlinks=False)
+        os.chmod(gercek, 0o700)
+        s = self.calistir()
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        for ad, h in hedefler.items():
+            self.assertEqual(h.read_text(), "ORIJINAL\n", f"{ad} bağlantısı root ile izlendi")
+            self.assertEqual(h.stat().st_uid, 0)
+        dogrulama = gercek / "uzak-dogrulama.json"
+        self.assertFalse(dogrulama.is_symlink())
+        self.assertEqual(dogrulama.stat().st_uid, 10002)
+        self.assertFalse(any(self.var(eski, t) for t in ("db", "medya", "sha")))   # silme davranışı aynı
+
+    @ROOT_SETPRIV
+    def test_root_a_ait_ama_herkese_yazilabilir_yedek_dizini_reddedilir_hicbir_sey_silinmez(self):
+        eski = self.ucluyu_yaz(30)
+        en_yeni = self.ucluyu_yaz(0)
+        for kip in (0o777, 0o770, 0o757):
+            with self.subTest(kip=oct(kip)):
+                os.chmod(self.yedekler, kip)
+                s = self.calistir()
+                self.assertNotEqual(s.returncode, 0, s.stdout)
+                self.assertIn("yazılabilir", s.stderr + s.stdout)
+                self.assertTrue(all(self.var(z, t) for z in (eski, en_yeni) for t in ("db", "medya", "sha")))
+                self.assertFalse((self.yedekler / "yedek-gunlugu.log").exists())
+                self.assertFalse((self.yedekler / "uzak-dogrulama.json").exists())
+
+    def test_yedek_dizini_yoksa_hata_verir(self):
+        shutil.rmtree(self.yedekler)
+        s = self.calistir()
+        self.assertNotEqual(s.returncode, 0)
+        self.assertIn("yedek dizini yok", s.stderr + s.stdout)
+
+    def sahte_crontab_calistir(self, crontab_metni, **ortam):
+        (self.kok / "bin" / "crontab").write_text('#!/bin/sh\nprintf \'%s\\n\' "$SAHTE_CRONTAB"\n')
+        (self.kok / "bin" / "logger").write_text('#!/bin/sh\nprintf \'%s\\n\' "$*" >> "$SAHTE_LOGGER_GUNLUGU"\n')
+        for ad in ("crontab", "logger"):
+            (self.kok / "bin" / ad).chmod(0o755)
+        return self.calistir(PATH=f"{self.kok / 'bin'}:{os.environ['PATH']}", SAHTE_CRONTAB=crontab_metni,
+                             SAHTE_LOGGER_GUNLUGU=str(self.kok / "logger.log"), **ortam)
+
+    def test_eski_cron_satiri_varsa_hicbir_cikti_vermeden_1_ile_cikar_ve_silmez(self):
+        eski = self.ucluyu_yaz(30)
+        en_yeni = self.ucluyu_yaz(0)
+        satirlar = (
+            "30 4 * * * cd /opt/qr-kampanya && bash scripts/disari-kopyala.sh >> yedekler/disari-kopya.log 2>&1",
+            "30 4 * * * cd /opt/qr-kampanya && bash scripts/disari-kopyala.sh >>./yedekler/x.log 2>&1",
+            f"30 4 * * * bash {self.kok}/scripts/disari-kopyala.sh >> {self.yedekler}/disari-kopya.log 2>&1",
+            "30 4 * * * bash scripts/disari-kopyala.sh 2>&1 | tee -a yedekler/disari-kopya.log",
+        )
+        for satir in satirlar:
+            with self.subTest(satir=satir):
+                (self.kok / "logger.log").unlink(missing_ok=True)
+                s = self.sahte_crontab_calistir("# yorum\n" + satir)
+                self.assertEqual(s.returncode, 1)
+                self.assertEqual(s.stdout, "")
+                self.assertEqual(s.stderr, "")
+                self.assertTrue(all(self.var(z, t) for z in (eski, en_yeni) for t in ("db", "medya", "sha")))
+                self.assertFalse((self.yedekler / "disari-kopya.log").exists())
+                self.assertFalse((self.yedekler / "yedek-gunlugu.log").exists())
+                self.assertFalse((self.kok / "uzak").exists())
+                cagri = (self.kok / "logger.log").read_text()
+                self.assertIn("-t qr-kampanya", cagri)
+                self.assertIn("/var/log/qr-disari-kopya.log", cagri)
+
+    def test_duzgun_cron_satiri_ve_yorum_satiri_engellemez(self):
+        self.ucluyu_yaz(0)
+        for metin in ("30 4 * * * cd /opt/qr-kampanya && bash scripts/disari-kopyala.sh >> /var/log/qr-disari-kopya.log 2>&1",
+                      "# 30 4 * * * bash scripts/disari-kopyala.sh >> yedekler/disari-kopya.log 2>&1",
+                      "30 4 * * * bash scripts/baska.sh >> yedekler/x.log 2>&1", ""):
+            with self.subTest(metin=metin):
+                s = self.sahte_crontab_calistir(metin)
+                self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+                self.assertFalse((self.kok / "logger.log").exists())
+
+    def test_guncelle_eski_cron_satirini_uyarir_ve_duzeltilmis_satiri_yazar(self):
+        betik = (betik_dizini() / "guncelle.sh").read_text()
+        self.assertIn("eski_cron_satirlari", betik)
+        self.assertIn(">> /var/log/qr-disari-kopya.log 2>&1", betik)
+        # Davranış: yalnızca işlev yüklenip çağrılır (docker gerekmez).
+        (self.kok / "bin" / "crontab").write_text('#!/bin/sh\nprintf \'%s\\n\' "$SAHTE_CRONTAB"\n')
+        (self.kok / "bin" / "crontab").chmod(0o755)
+        env = {"PATH": f"{self.kok / 'bin'}:{os.environ['PATH']}", "HOME": str(self.kok),
+               "SAHTE_CRONTAB": "30 4 * * * bash scripts/disari-kopyala.sh >> yedekler/disari-kopya.log 2>&1"}
+        s = subprocess.run(["bash", "-c", f'cd {self.kok} && . scripts/dizin-guvenligi.sh && eski_cron_satirlari ./yedekler'],
+                           capture_output=True, text=True, env=env, timeout=30)
+        self.assertEqual(s.returncode, 0, s.stderr)
+        self.assertIn("disari-kopya.log", s.stdout)
+
+    def test_geri_yukleme_testi_gunlugu_root_olarak_yazilmaz_statik(self):
+        betik = (betik_dizini() / "geri-yukleme-testi.sh").read_text()
+        kod = "\n".join(sat for sat in betik.splitlines() if not sat.lstrip().startswith("#"))
+        self.assertNotRegex(kod, r'(?<!sahip_olarak )tee -a "\$LOG"')
+        self.assertIn('sahip_olarak tee -a -- "$LOG"', kod)
+        self.assertIn("guvenli_dizin_hazirla", kod)
+
+    @unittest.skipUnless(os.environ.get("QR_TEST_RCLONE") or shutil.which("rclone"), "gerçek rclone yok")
+    def test_gercek_rclone_yedek_dizinindeki_sembolik_baglantiyi_izlemez(self):
+        """Gerçek rclone (ayarsız, -L yok): yedek dizinindeki bir bağlantının gösterdiği dosya uzağa kopyalanmaz."""
+        rclone = os.environ.get("QR_TEST_RCLONE") or shutil.which("rclone")
+        self.ucluyu_yaz(0)
+        gizli = self.kok / "gizli-host-dosyasi.txt"
+        gizli.write_text("HOST-GIZLI-ICERIK\n")
+        (self.yedekler / f"db-{zaman_adi(1)}.dump.age").symlink_to(gizli)
+        yapilandirma = self.kok / "rclone.conf"
+        yapilandirma.write_text("[yerel]\ntype = local\n")
+        uzak = self.kok / "yerel-hedef"
+        uzak.mkdir()
+        s = self.calistir(hedef=f"yerel:{uzak}", RCLONE_KOMUTU=rclone, RCLONE_CONFIG=str(yapilandirma), YEDEK_YEREL_HEDEF_IZIN="yerel")
+        self.assertEqual(s.returncode, 0, s.stderr + s.stdout)
+        kopyalanan = [p for p in uzak.rglob("*") if p.is_file()]
+        self.assertEqual(len(kopyalanan), 3, [p.name for p in kopyalanan])
+        for p in kopyalanan:
+            self.assertNotIn(b"HOST-GIZLI-ICERIK", p.read_bytes())
+        self.assertTrue((self.yedekler / f"db-{zaman_adi(1)}.dump.age").is_symlink())   # bağlantı silinmedi/izlenmedi
 
     @unittest.skipUnless(os.environ.get("QR_TEST_RCLONE") or shutil.which("rclone"), "gerçek rclone yok")
     def test_gercek_rclone_crypt_hedefi_ozetsiz_yolu_download_ile_dogrular(self):
@@ -1014,7 +1192,7 @@ class YedekAdiEnjeksiyonTesti(SimpleTestCase):
         self.kok = Path(tempfile.mkdtemp(prefix="qr-ad-"))
         self.addCleanup(shutil.rmtree, self.kok, ignore_errors=True)
         (self.kok / "scripts").mkdir()
-        for ad in ("yedek-ortak.sh", "geri-yukleme-testi.sh", "geri-yukle.sh"):
+        for ad in ("yedek-ortak.sh", "geri-yukleme-testi.sh", "geri-yukle.sh", "dizin-guvenligi.sh"):
             shutil.copy(betik_dizini() / ad, self.kok / "scripts" / ad)
         (self.kok / "bin").mkdir()
         docker = self.kok / "bin" / "docker"
@@ -1075,6 +1253,27 @@ class YedekAdiEnjeksiyonTesti(SimpleTestCase):
         self.assertIn("geçersiz", sonuc.stdout)
         self.assertFalse(self.gunluk.exists() and self.gunluk.read_text().strip())
         self.assertFalse((self.kok / "PWNED").exists())
+
+    @unittest.skipUnless(hasattr(os, "geteuid") and os.geteuid() == 0 and shutil.which("setpriv"), "root ve setpriv gerekir")
+    def test_geri_yukleme_testi_gunluk_baglantisini_root_olarak_izlemez(self):
+        """Günlük adı tahmin edilebilir (tarih); yedek dizini 10002'ye aitken oradaki bağlantı root'a dosya ezdirmez/eklettirmez."""
+        sahte_date = self.kok / "bin" / "date"
+        sahte_date.write_text('#!/bin/sh\ncase "$*" in *%Y%m%d-%H%M%S*) echo 20261015-031500;; *) exec /bin/date "$@";; esac\n')
+        sahte_date.chmod(0o755)
+        korunan = self.kok / "korunan.txt"
+        korunan.write_text("ORIJINAL\n")
+        os.chmod(korunan, 0o600)
+        gunluk = self.yedekler / "geri-yukleme-testi-20261015-031500.log"
+        gunluk.symlink_to(korunan)
+        os.chmod(self.kok, 0o755)
+        os.chown(self.yedekler, 10002, 10002)
+        os.chown(gunluk, 10002, 10002, follow_symlinks=False)
+        os.chmod(self.yedekler, 0o700)
+        sonuc = subprocess.run(["bash", str(self.kok / "scripts" / "geri-yukleme-testi.sh")],
+                               capture_output=True, text=True, env=self.ortam(), timeout=60, cwd=self.kok)
+        self.assertEqual(korunan.read_text(), "ORIJINAL\n", "günlük bağlantısı root ile izlendi")
+        self.assertEqual(korunan.stat().st_uid, 0)
+        self.assertIn("bulunamadı", sonuc.stdout)   # ekrana basmaya devam eder
 
     def test_betiklerde_ad_kabuk_metnine_gomulmez(self):
         for ad in ("geri-yukleme-testi.sh", "geri-yukle.sh", "yedek-ortak.sh", "disari-kopyala.sh"):
@@ -1181,7 +1380,7 @@ def pty_ile_calistir(komut, env, cwd, yanitlar, girdi=None, zaman_asimi=60):
 
 
 class AnahtarTestTabani(SimpleTestCase):
-    betikler = ("yedek-ortak.sh", "yedek-anahtari-hazirla.sh", "geri-yukleme-testi.sh", "geri-yukle.sh")
+    betikler = ("yedek-ortak.sh", "yedek-anahtari-hazirla.sh", "geri-yukleme-testi.sh", "geri-yukle.sh", "dizin-guvenligi.sh")
 
     def setUp(self):
         self.kok = Path(tempfile.mkdtemp(prefix="qr-anahtar-"))

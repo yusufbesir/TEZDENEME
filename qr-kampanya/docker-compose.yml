@@ -162,10 +162,10 @@ services:
       TARAMA_SAKLAMA_GUN: ${TARAMA_SAKLAMA_GUN:-730}
       TZ: Europe/Istanbul
     # Root DEĞİL (pg_dump ağ üzerinden bağlanır, root gerekmez) ve app'ten FARKLI UID (10002): konteyner kaçışında app süreci
-    # yedek dosyalarının sahibi olamaz. Medya (salt okunur) app'in grubu 999 üzerinden okunur (app imajında "uygulama" GID'i).
+    # yedek dosyalarının sahibi olamaz. Medya (salt okunur) app'in grubu 10001 üzerinden okunur (app imajında "uygulama" GID'i).
     # Yazılabilen yer yalnızca /yedekler, /yedek-durum ve /tmp (tmpfs).
     user: "10002:10002"
-    group_add: ["999"]
+    group_add: ["10001"]
     cap_drop: [ALL]
     read_only: true
     security_opt: [no-new-privileges:true]

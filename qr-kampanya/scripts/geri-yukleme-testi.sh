@@ -14,9 +14,12 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; . ./.env; set +a
 . scripts/yedek-ortak.sh
+. scripts/dizin-guvenligi.sh
 
+# Yedek dizini konteynere (10002) yazılabilir: günlük root olarak değil dizin sahibi olarak yazılır (sembolik bağlantı izlenmez).
 DIZIN="${YEDEK_DIZINI:-./yedekler}"
 mkdir -p "$DIZIN"
+guvenli_dizin_hazirla "$DIZIN" || exit 1
 LOG="$DIZIN/geri-yukleme-testi-$(date +%Y%m%d-%H%M%S).log"
 
 YEDEK=""; ANAHTAR_ARG=""
@@ -109,7 +112,7 @@ trap 'ortak_yankiyi_ac' EXIT
 trap 'ortak_yankiyi_ac; exit 130' INT
 trap 'ortak_yankiyi_ac; exit 143' TERM
 trap 'ortak_yankiyi_ac; exit 129' HUP
-calistir 2>&1 | tee -a "$LOG"
+calistir 2>&1 | sahip_olarak tee -a -- "$LOG"
 SONUC=${PIPESTATUS[0]}
 echo "Günlük: $LOG"
 exit "$SONUC"

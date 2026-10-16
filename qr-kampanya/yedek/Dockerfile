@@ -43,13 +43,13 @@ RUN --mount=type=bind,source=paketler,target=/paketler \
 
 # Çalışma kullanıcısı (root DEĞİL), UID/GID 10002: uygulama (app, UID 10001) ile BİLEREK farklıdır; konteyner kaçışında app
 # süreci host'ta yedek dosyalarının sahibi olup onları silemesin/değiştirmesin. Medya birimi (salt okunur) app'in grubu
-# üzerinden okunur: compose'da group_add: ["999"] (999 = app imajındaki "uygulama" grubunun GID'i).
+# üzerinden okunur: compose'da group_add: ["10001"] (10001 = app imajındaki "uygulama" grubunun GID'i).
 # Compose servisi bu kullanıcıyla (user: 10002:10002) çalıştırır. Dockerfile'da "USER" BİLEREK yoktur:
 # aynı imaj scripts/geri-yukleme-testi.sh içinde geçici postgres sunucusu olarak (kendi giriş noktasıyla) kullanılır.
 # /yedekler ve /yedek-durum bu kullanıcıya ait oluşturulur (yeni adlandırılmış birim ilk kullanımda bu sahipliği miras alır).
-# /yedek-durum: grup 999 (app) okuyabilsin diye 2750 (setgid: yeni dosyalar grup 999 alır).
+# /yedek-durum: grup 10001 (app) okuyabilsin diye 2750 (setgid: yeni dosyalar grup 10001 alır).
 RUN addgroup -g 10002 -S yedek \
     && adduser -S -D -H -u 10002 -G yedek -s /sbin/nologin yedek \
     && mkdir -p /yedekler /yedek-durum \
     && chown yedek:yedek /yedekler && chmod 700 /yedekler \
-    && chown 10002:999 /yedek-durum && chmod 2750 /yedek-durum
+    && chown 10002:10001 /yedek-durum && chmod 2750 /yedek-durum
