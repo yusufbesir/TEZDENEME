@@ -54,3 +54,6 @@
 - 2026-10-16 | Sade arayüzü doğrula | verifier (claude-sonnet-5-5) | ~33.8K token | Geçti (analyze temiz, 189 test; TekrarEkrani alan filtresi bulgu olarak not edildi)
 - 2026-10-16 | Yarışma ekranları: lobi, oyun, çark (1200 ms), süre çubuğu, şık/taç animasyonları, sonuç; 19 arayüz testi | implementer (claude-sonnet-5-5) | ~128K token | tamam (208 test)
 - 2026-10-16 | Yarışma ekranlarını doğrula | verifier (claude-sonnet-5-5) | ~35K token | Geçti (not: kayıt hatası sessiz)
+- 2026-10-16 | Yerleşim kodu keşfi (sabit boyutlar, Olcu eşiği, pencere alt sınırı) | scout (claude-haiku-5-5) | ~75K token | tamam (1280x720 kesilme nedeni kodla kanıtlanamadı; widget testi önerildi)
+- 2026-10-16 | İçerik yapısı, A2 ekleme noktaları, docs bölüm 8 | scout (claude-haiku-5-5) | ~79K token | tamam (ders id biçimi tutarsızlığı not edildi)
+- 2026-10-16 | Duolingo/Busuu/DuoCards/Trivia Crack güncel araştırma (web) | araştırma ajanı (claude-haiku-5-5, scout web erişimi olmadığı için genel ajan) | ~100K token | tamam (masaüstü yerleşimi doğrulanamadı; cihazda inceleme gerekir)
