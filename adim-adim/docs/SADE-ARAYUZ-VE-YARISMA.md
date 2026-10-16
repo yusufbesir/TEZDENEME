@@ -133,6 +133,13 @@ Alan+seviye başına: oynanan, kazanılan, en iyi puan, kategori başına doğru
 7. **Konuşma alıştırması**: Cihaz STT ile telaffuz; cihazda özel kalır.
 8. **Çevrimdışı A2 ve "Günlük hayat" ünitesi**: içerik genişlemesi; yarışma A2 soruları birlikte gelir.
 
+## 8a. Uygulama notları (2026-10-16, ilk sürüm)
+- Değişti: `/alan-sec` yönlendirmesi yalnız alan boşken çalışır; Profil'deki "Değiştir" alan doluyken de bu ekranı açar.
+- Değişti: Kategori kartlarında taç sayısı yerine doğru/yanlış gösterilir; toplam taç istatistik satırındadır (kayıt kategori başına taç tutmaz).
+- Oyun ekranı lobiden tam ekran Navigator ile açılır; ayrı go_router rotası yok.
+- Çark durduktan sonra kategori adı 700 ms görünür, sonra soru gelir; hareketi azalt açıkken bekleme yok.
+- Tekrar sekmesi de yalnızca seçili alanın kartlarını gösterir; diğer alanın kartları silinmez, alan değişince görünür.
+
 ## 9. Kaynaklar
 - Duolingo blog, "New Duolingo home screen design" (blog.duolingo.com/new-duolingo-home-screen-design)
 - 925 Studios, "Duolingo UX Breakdown" (925studios.co/blog/duolingo-design-breakdown)

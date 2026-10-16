@@ -6,7 +6,9 @@ Türkçe arayüzlü, çevrimdışı çalışan dil ve kodlama öğrenme uygulama
 ## Özet
 - Kurslar: İngilizce A1 (13 ders), HTML, CSS ve JavaScript (6'şar ders). İçerik özgün.
 - Alıştırma türleri: çoktan seçmeli, boşluk doldurma, yazma, sıralama, eşleştirme, dinleme (sesli okuma) ve kod boşluğu.
-- Öğrenme motoru: kısa dersler, XP ve seviye, günlük seri, günlük hedef, aralıklı tekrar (Leitner 5 kutu).
+- Öğrenme motoru: kısa dersler, XP ve seviye, günlük seri, günlük hedef, aralıklı tekrar (Leitner 5 kutu), 2 dakikalık mikro ders (önce zamanı gelen kartlar, sonra karışık türler).
+- Sade arayüz (2026-10-16): ilk açılışta alan seçimi (İngilizce / Programlama); uygulama yalnızca seçili alanın içeriğini gösterir. 4 sekme: Yol, Yarışma, Tekrar, Profil (ayarlar Profil'deki dişliden). Gerekçe ve araştırma kaynakları `docs/SADE-ARAYUZ-VE-YARISMA.md`.
+- Bilgi yarışması: ders motorundan bağımsız `lib/yarisma` paketi; çark, 6 kategori (genel kültür, tarih, sanat, matematik, fen, coğrafya), taç koşusu, 3 can, güçlendiriciler; sorular alan ve seviyeye göre (A1 İngilizce, HTML/CSS/JS Türkçe), 108 soru. İstatistikler ayrı `yarisma.v1.json` dosyasında.
 - Tasarım: özgün "basamak" yolu; OKLCH ile seçilmiş, WCAG AA kontrastlı, renk körlüğü güvenli renkler; açık ve koyu tema. Gerekçeler `docs/TASARIM.md`, platform kararı `docs/KARAR-PLATFORM.md`.
 - Veri yalnızca cihazda, tek JSON dosyasında (atomik yazma). Ağ isteği yok.
 
@@ -26,6 +28,7 @@ Yayın imzası: Android release derlemesi `%USERPROFILE%\.anahtar\key.properties
 - `lib/motor` saf öğrenme motoru (Flutter'a bağımlı değil)
 - `lib/depo` kalıcı kayıt
 - `lib/icerik` kurslar
+- `lib/yarisma` bilgi yarışması (model, soru bankası, oyun motoru, depo, ekranlar); ders katmanıyla yalnız XP üzerinden bağlı
 - `lib/ekranlar`, `lib/bilesenler` arayüz; `lib/tema` renk belirteçleri ve tema
 - `lib/servis` ses (metin okuma) ve bildirim
 - `test` birim ve arayüz testleri
