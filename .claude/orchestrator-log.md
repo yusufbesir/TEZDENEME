@@ -61,3 +61,5 @@
 - 2026-10-16 | Esnek yerleşim: Olcu kırılma noktaları, LayoutBuilder, metin ölçeği 1.0–1.3, WM_GETMINMAXINFO 480x600, 25 yerleşim testi | implementer (claude-sonnet-5-5) | ~100K token | tamam (233 test, analyze temiz; win32 derlenmedi; verifier bekliyor)
 - 2026-10-16 | A2 kursu ve sorularını doğrula | verifier (claude-sonnet-5-5) | ~60K token | Kaldı → 1 tek-cevap sorunu (any/some) + 1 açıklama; ana oturum düzeltti, içerik testleri geçti
 - 2026-10-16 | Esnek yerleşimi doğrula | verifier (claude-sonnet-5-5) | ~56K token | Kaldı → FittedBox 11 px alt sınırını deliyor (hedef_halkasi, yarisma istatistik, profil çubuk); implementer'a geri verildi
+- 2026-10-16 | Esnek yerleşim düzeltme turu: siganMetin/kisaSayi, FittedBox kaldırıldı, 11 px alt sınır testleri | implementer (claude-sonnet-5-5) | ~35K token | tamam (237 test; birleştirme ve verifier bekliyor)
+- 2026-10-16 | İngilizce B1 kursu (12 ders, 120 alıştırma) + 36 B1 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (224 test; birleştirme ve verifier bekliyor)
