@@ -1,5 +1,6 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları, tamamlanan dersler.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
+/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
 class Kart {
@@ -37,6 +38,7 @@ class OgrenciDurumu {
     this.koyuTema,
     this.sesAcik = true,
     this.hatirlatmaSaati,
+    this.alan,
   });
 
   final int xp;
@@ -51,6 +53,7 @@ class OgrenciDurumu {
   final bool? koyuTema; // null: sistem
   final bool sesAcik;
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
+  final String? alan; // 'dil' | 'kod'; null: henüz seçilmedi
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
@@ -89,6 +92,7 @@ class OgrenciDurumu {
     bool? sesAcik,
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
+    String? alan,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -105,6 +109,7 @@ class OgrenciDurumu {
       hatirlatmaSaati: hatirlatmaSil
           ? null
           : (hatirlatmaSaati ?? this.hatirlatmaSaati),
+      alan: alan ?? this.alan,
     );
   }
 
@@ -122,6 +127,7 @@ class OgrenciDurumu {
     'koyuTema': koyuTema,
     'sesAcik': sesAcik,
     'hatirlatmaSaati': hatirlatmaSaati,
+    'alan': alan,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -161,6 +167,7 @@ class OgrenciDurumu {
 
     final sonGun = j['sonGun'];
     final saat = j['hatirlatmaSaati'];
+    final alan = j['alan'];
     return OgrenciDurumu(
       xp: tamsayi(j['xp'], 0),
       seri: tamsayi(j['seri'], 0, max: 100000),
@@ -176,6 +183,7 @@ class OgrenciDurumu {
       koyuTema: j['koyuTema'] is bool ? j['koyuTema'] as bool : null,
       sesAcik: j['sesAcik'] is bool ? j['sesAcik'] as bool : true,
       hatirlatmaSaati: (saat is String && saatGecerli(saat)) ? saat : null,
+      alan: (alan == 'dil' || alan == 'kod') ? alan as String : null,
     );
   }
 }

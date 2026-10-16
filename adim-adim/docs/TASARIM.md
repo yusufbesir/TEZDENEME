@@ -39,5 +39,8 @@ Tüm metin renkleri 4.5:1 (AA) üstünde. Ana rengin üstündeki metin: açıkta
 - Seri ve XP ölçülü gösterilir; dış ödülün iç motivasyonu aşındırma riski bilinir.
 - Aralıklı tekrar: Leitner 5 kutu (1, 2, 4, 8, 16 gün). Etkisi araştırmalarda mütevazı; abartılmaz.
 
+## 2026-10-16 ek
+Sade arayüz, alan vurgu renkleri, yarışma kategori renkleri ve renk/öğrenme araştırmaları için bkz. `SADE-ARAYUZ-VE-YARISMA.md`. Oradaki Mehta & Zhu (2009) ve Elliot (2007) bulguları, yukarıdaki "renk psikolojisi kanıtı zayıf" notunu şöyle keskinleştirir: kırmızı zemin değerlendirme ekranlarında kullanılmaz; sıcak renk yalnızca küçük dikkat vurgusu olarak kalır.
+
 ## Kaynaklar
 - Okabe & Ito (2008) renk körlüğü güvenli palet; Cepeda ve ark. (2006) dağıtılmış çalışma meta-analizi; Settles & Meeder (2016) Duolingo yarı ömür regresyonu (ACL P16-1174); WCAG 2.2.

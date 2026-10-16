@@ -1,3 +1,7 @@
+/// Riverpod sağlayıcıları: depo, bugün, kurslar, öğrenci durumu ve alan kursları.
+/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
+library;
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -106,6 +110,24 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
   }
 
+  /// Alan seçimi: yalnızca 'dil' ya da 'kod'.
+  Future<OgrenciDurumu> alanSec(String alan) {
+    if (alan != 'dil' && alan != 'kod') {
+      throw ArgumentError.value(alan, 'alan', "'dil' ya da 'kod' olmalı");
+    }
+    return _uygula((d) => d.copyWith(alan: alan));
+  }
+
+  Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.mikroBitir(d, dogru, toplam, bugun));
+  }
+
+  Future<OgrenciDurumu> yarismaBitir(int puan) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.yarismaBitir(d, puan, bugun));
+  }
+
   Future<OgrenciDurumu> kartIsle(String kartId, bool dogruMu) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
@@ -167,3 +189,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
 final durumProvider = AsyncNotifierProvider<DurumNotifier, OgrenciDurumu>(
   DurumNotifier.new,
 );
+
+/// Seçilen alandaki kurslar; durum yüklenmediyse ya da alan seçilmediyse boş.
+final alanKurslariProvider = Provider<List<Kurs>>((ref) {
+  final alan = ref.watch(durumProvider).value?.alan;
+  return Motor.alanKurslari(ref.watch(kurslarProvider), alan);
+});

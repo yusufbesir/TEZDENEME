@@ -5,8 +5,12 @@ __pycache__/
 .env.*
 !.env.example
 *.key
-*.jks
-key.properties
 kararlar.jsonl
 *.oturum.jsonl
 *.log.jsonl
+
+# Yayın imza anahtarları hiçbir alt klasörden depoya girmez (depo herkese açık).
+*.jks
+*.keystore
+**/key.properties
+**/*.p12

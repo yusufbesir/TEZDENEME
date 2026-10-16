@@ -27,7 +27,7 @@
 - Sıfırlama `.bozuk-*` yedeklerini de siler (kullanıcının açık kararı).
 - Açılışta hatırlatma yeniden kurulurken izin penceresi açılmaz; izin yalnızca ayarlardan istenir.
 - Kullanıcı adı 40 karaktere kırpılır (atılmaz).
-- Android yayın derlemesi debug anahtarıyla imzalı; yayın öncesi kendi anahtarı gerekir (README).
+- Android yayın imzası: `key.properties` ile ayrı yayın anahtar deposu desteği eklendi; anahtar ve şifreler cihazda, depoda değil (docs/IMZA.md). Anahtar deposu henüz cihazda oluşturulmadı (Android araç zinciri yok).
 
 ## Doğrulanamayanlar
 - Paket sürümleri için güncel güvenlik duyuruları bu ortamda pub.dev'e erişilemediği için denetlenemedi. İnternetli bir ortamda `dart pub outdated` ve bağımlılık duyuruları ayrıca kontrol edilmeli.
