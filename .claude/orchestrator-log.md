@@ -91,3 +91,4 @@
 | 2026-10-16 | Doğrulama: güvenlik düzeltmesi B | verifier / claude-sonnet-5-5 | tahmini ~70k | Kaldı: 1 Orta (kendi alan adı kuralı Unicode benzeri ana makineyle atlatılıyor: U+3002, U+FF0E, U+FF61, tam genişlikli harf). 892 OK, caddy validate geçerli. İş implementer'a döndü |
 | 2026-10-16 | Güvenlik düzeltmesi B (devam 2): ana makine IDNA normalizasyonu (stdlib), Unicode benzeri alan adı atlatması kapatıldı | implementer / claude-sonnet-5-5 (aynı ajan) | tahmini ~30k | Tamamlandı: 7 yeni test, 899 OK |
 | 2026-10-16 | Yeniden doğrulama: güvenlik düzeltmesi B (Unicode dahil) | verifier / claude-sonnet-5-5 (aynı ajan) | tahmini toplam ~110k | Geçti: 899 OK, makemigrations temiz, yeni atlatma yok |
+| 2026-10-16 | Duraklatma: Yusuf'un isteğiyle (koordinatör iletisi) barkod işi bitene kadar bu iş parçacığı beklemede | — (ajan çalışmıyor) | 0 | Bütün işler commitli ve gönderildi (son: b81328a); açık iş yalnız panel/API erişim kararı |
