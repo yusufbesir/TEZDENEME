@@ -162,6 +162,23 @@ Düzen kararları kullanılabilir genişliğe göre (LayoutBuilder) verilir; sab
 - Windows pencere alt sınırı 480x600 mantıksal px (`WM_GETMINMAXINFO`, DPI ölçekli). Bu dosya Linux'ta derlenemedi; Windows'ta elle denenmeli.
 - Testler: `test/yerlesim_test.dart` (5 boyut x 2 metin ölçeği, taşma denetimi, kırılma noktaları).
 
+## 8c. Yeni özellik önerileri (2026-10-16, ikinci tur; araştırma temelli, bu turda yapılmaz)
+
+Kaynak: Haiku araştırma turu (Duolingo blog: yol ekranı, Duolingo Score 0–160/CEFR; Busuu: CEFR A1–C1, Study Plan, topluluk düzeltmesi; DuoCards: kaydırma + Leitner, Memo'nun evi; Trivia Crack: Tower Duel, Daily Challenge, Rescue Rush) ve öğrenme bilimi tablosu (bölüm 3).
+
+1. **Seviye puanı (CEFR göstergesi)**: Duolingo Score benzeri 0–160 ölçek. Hesap kodla: tamamlanan ders oranı × seviye ağırlığı (A1 0–40, A2 40–80, B1 80–120, B2 120–160) + yarışma doğruluk katkısı. Profil'de tek sayı ve bant adı ("B1'e yakın"). Dayanak: hedef belirginliği ve ilerleme geri bildirimi (Hattie: geri bildirim d=0,70).
+2. **Çalışma planı (Busuu Study Plan)**: hedef seviye + hedef tarih + haftalık gün → günlük ders sayısı kodla hesaplanır; AnaSayfa'da "Plana göre bugün 2 ders". Haftalık hedefle birleşir. Dayanak: dağıtılmış pratik (d=0,85), hedef koyma.
+3. **Günlük meydan okuma (Trivia Crack Daily Challenge)**: her gün 10 soru, seviye karışık, tek deneme, sonuç takvimde işaret; seri yerine "aylık taç" rozeti. Dayanak: pratik testi (d=0,74), sürdürülebilir dış ödül.
+4. **Kule düellosu tek kişilik uyarlaması (Tower Duel)**: 6 kategoride 7 deneme, en uzun doğru seri kategoriyi kuleye ekler; çevrimdışı, rakip yok, kişisel rekor. Yarışma motoruna yeni mod; mevcut `YarismaMotoru` yapısı yeniden kullanılır.
+5. **Çift yönlü kart (DuoCards tarzı)**: Tekrar'da kartı sağa/sola kaydırma (klavyede ok tuşları); "Neden?" kutusuyla açıklayıcı sorgulama (bölüm 8 madde 2) aynı ekranda. Dayanak: açıklayıcı sorgulama d=0,56.
+6. **Hata defterinden otomatik kart**: yanlış yarışma soruları Tekrar kuyruğuna Kart olarak eklenir (soru → Secim alıştırması), yarı ömür 0,5 günden başlar. Hata defteri (madde 3) ile yarı ömür modelini (madde 1) bağlar.
+7. **Ses hızı ve tekrar dinleme**: Dinle alıştırmalarında 0,8×/1,0× hız ve "bir kez daha" düğmesi; A2+ seviyelerde cümleler uzadığı için gerekli. Çift kodlama ilkesi.
+8. **Haftalık özet kartı**: Pazartesi ilk açılışta geçen haftanın özeti (XP, gün, en zayıf kategori, en güçlü ünite) ve tek öneri. Dayanak: öz-izleme ve üstbiliş (d≈0,6).
+9. **Erişilebilirlik kontrolü**: Ayarlar'da "metin ölçeği" yerel kaydırıcı (1,0–1,3 sınırları içinde), yüksek karşıtlık teması (WCAG AAA 7:1), odak halkası ve klavye gezinmesi testi.
+10. **İçerik genişlemesi**: İngilizce C1 (akademik yazı, deyimler), Programlama 4–6 (JS DOM, fetch, basit proje) ve her kurs için yarışma soruları; "Günlük hayat" ünitesi A2'de var, B1'e "İş İngilizcesi" ek ünitesi.
+
+Not: 8.7 (konuşma/telaffuz) ertelendi: Windows'ta konuşma tanıma paketi desteği zayıf, mikrofon izni gerekir; Yusuf kararıyla ayrı iş.
+
 ## 9. Kaynaklar
 - Duolingo blog, "New Duolingo home screen design" (blog.duolingo.com/new-duolingo-home-screen-design)
 - 925 Studios, "Duolingo UX Breakdown" (925studios.co/blog/duolingo-design-breakdown)
