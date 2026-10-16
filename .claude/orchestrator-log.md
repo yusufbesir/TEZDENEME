@@ -66,4 +66,4 @@
 - 2026-10-16 | Motor dalı birleştirme çakışmaları (4 dosya) | implementer (claude-sonnet-5-5) | ~50K token | tamam (315 test, analyze temiz)
 - 2026-10-16 | Motor özellikleri + birleştirme + yerleşim turu + B1 doğrula | verifier (claude-sonnet-5-5) | ~75K token | Geçti (327 test; 1 isteğe bağlı şık notu, ana oturum uyguladı: but→or)
 - 2026-10-16 | İngilizce B2 kursu (12 ders, 120 alıştırma) + 36 B2 yarışma sorusu | implementer (claude-sonnet-5-5) | ~100K token | tamam (234 test kendi dalında; verifier bekliyor)
-| 2026-10-16 19:27 UTC | B2 kursu doğrulama (commit dd440a0a; 337 test, 36 soru olgu kontrolü, tekrar kontrolü) | verifier / claude-sonnet-5-5 | ~61k | Geçti; engel olmayan notlar: Yaz kabul kümeleri dar (u2d1/u2d2), kıvrık apostrof normalizasyonu kontrol edilmedi |
+- 2026-10-16 | İngilizce B2 doğrulama (commit dd440a0a; 337 test, 36 soru olgu ve tekrar kontrolü) | verifier (claude-sonnet-5-5) | ~61K token | Geçti (engel olmayan not: Yaz kabul kümeleri dar, kıvrık apostrof normalizasyonu kontrol edilmedi)
