@@ -39,9 +39,11 @@ Roller `db/init/10-roller.sh` ile kurulur (migrasyon `0005` ek yetki kısıtlar�
 
 ## QR kod alanları
 
-Zorunlu olanlar yalnızca **kısa kod** (boşsa otomatik üretilir) ve **hedef** (harici URL veya sistem sayfası). Diğerleri isteğe bağlıdır: ad, tür, ürün, kampanya, mağaza, başlangıç/bitiş, bitiş sonrası adres, durum, açıklama, etiketler. Oluşturan/değiştiren kullanıcı ve tarihler otomatik tutulur.
+Zorunlu olanlar yalnızca **kısa kod** (boşsa otomatik üretilir) ve **hedef** (harici URL veya sistem sayfası). Diğerleri isteğe bağlıdır: ad, **hedef başlığı** (`baslik`, en çok 300 karakter), tür, ürün, kampanya, mağaza, başlangıç/bitiş, bitiş sonrası adres, durum, açıklama, etiketler. Oluşturan/değiştiren kullanıcı ve tarihler otomatik tutulur.
 
 Veritabanı kısıtlaması `qr_hedef_tutarli`: arşivde olmayan her kodun geçerli bir hedefi olmalıdır (harici ise URL dolu, sayfa ise sayfa seçili).
+
+**Genel ayarlar (ek alanlar, migration 0007):** `ayrilmis_kodlar` (satır veya virgülle ayrılmış ek ayrılmış kelimeler) ve `ayni_hedef_uyarisi` (varsayılan açık). Koddaki varsayılan ayrılmış liste: admin, panel, api, k, s, saglik, static, media, giris, cikis, robots, favicon. Ayrılmış kelime denetimi yalnızca yeni kodlarda (panel formu ve toplu içe aktarma) çalışır; mevcut kayıtlar etkilenmez.
 
 ## Tarih kuralı
 

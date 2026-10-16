@@ -18,7 +18,9 @@ from defusedxml import DefusedXmlException
 from django.core.exceptions import ValidationError
 
 from .dogrulama import guvenli_url_dogrula
-from .models import Kampanya, KampanyaSayfasi, Magaza, QRKod, Urun, kisa_kod_dogrula, otomatik_kisa_kod
+from .models import (
+    GenelAyarlar, Kampanya, KampanyaSayfasi, Magaza, QRKod, Urun, ayrilmis_kod_hatasi, kisa_kod_dogrula, otomatik_kisa_kod,
+)
 
 EN_FAZLA_BAYT = 5 * 1024 * 1024
 EN_FAZLA_SATIR = 20000
@@ -30,6 +32,7 @@ ZAMAN_DILIMI = ZoneInfo("Europe/Istanbul")
 ALANLAR = [
     ("kod", "Kısa kod"),
     ("ad", "QR kod adı"),
+    ("baslik", "Hedef başlığı"),
     ("tur", "Tür"),
     ("hedef_url", "Hedef URL"),
     ("sayfa", "Hedef sayfa (slug)"),
@@ -60,6 +63,7 @@ def normallestir(metin):
 _ESANLAMLI = {
     "kod": ["kod", "kisakod", "qrkod", "qrkodu", "kisakodu"],
     "ad": ["ad", "adi", "isim", "qradi", "qrkoduadi", "qrkodadi", "qrad"],
+    "baslik": ["baslik", "hedefbasligi", "hedefbaslik", "title"],
     "tur": ["tur", "turu", "qrturu"],
     "hedef_url": ["hedefurl", "hedef", "url", "hedefadres", "hedefadresi", "hedefbaglanti", "yonlendirmeurl", "yonlendirmeadresi"],
     "sayfa": ["sayfa", "sayfaslug", "slug", "hedefsayfa", "sayfaadresi"],
@@ -352,6 +356,8 @@ class SatirSonucu:
     ad: str = ""
     # Mevcut kaydı güncellerken değişecek alanlar {nitelik: yeni değer}; uygulama sırasında kilitli taze satıra yazılır.
     guncelleme: dict = field(default_factory=dict)
+    # Engellemeyen satır uyarıları (örn. aynı hedef başka kodlarda kullanılıyor).
+    uyarilar: list = field(default_factory=list)
 
     def hata(self, alan, mesaj):
         self.hatalar.append((alan, mesaj))
@@ -367,6 +373,10 @@ class Analiz:
     hatali: list
     iliskili_yeni: dict  # {("urun", "kod_kucuk"): nesne}
     iliskili_hata: dict = field(default_factory=dict)
+
+    @property
+    def ayni_hedef_sayisi(self):
+        return sum(1 for s in self.satirlar if s.uyarilar)
 
     @property
     def hata_listesi(self):
@@ -422,11 +432,24 @@ def analiz_et(ia):
     iliskili_yeni = {}
     iliskili_hata = {}
     kullanilan_kodlar = set(anahtarlar)
+    ayar = GenelAyarlar.al()
+    ayrilmis = ayar.ayrilmis_kume()
+    # Aynı hedef uyarısı: dosyadaki URL'lerden hangileri arşivlenmemiş başka kodlarda kullanılıyor (tam eşleşme).
+    ayni_hedef = {}
+    if ayar.ayni_hedef_uyarisi:
+        urller = sorted({d["hedef_url"] for d in degerler if d.get("hedef_url")})
+        for i in range(0, len(urller), 1000):
+            for url, kod in (
+                QRKod.objects.filter(hedef_turu=QRKod.HedefTuru.HARICI, hedef_url__in=urller[i:i + 1000])
+                .exclude(durum=QRKod.Durum.ARSIV).order_by("kod_anahtari").values_list("hedef_url", "kisa_kod")
+            ):
+                ayni_hedef.setdefault(url, []).append(kod)
 
     sonuclar = []
     for d, s in zip(degerler, satirlar):
         sonuclar.append(_satir_coz(
             s["no"], d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili_yeni, iliskili_hata, kullanilan_kodlar,
+            ayrilmis=ayrilmis, ayni_hedef=ayni_hedef,
         ))
 
     analiz = Analiz(sonuclar, [], [], [], [], [], iliskili_yeni, iliskili_hata)
@@ -442,7 +465,8 @@ def analiz_et(ia):
     return analiz
 
 
-def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili_yeni, iliskili_hata, kullanilan_kodlar):
+def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili_yeni, iliskili_hata, kullanilan_kodlar,
+              ayrilmis=frozenset(), ayni_hedef=None):
     r = SatirSonucu(no=no)
     kod = d.get("kod", "")
     anahtar = QRKod.anahtar(kod)
@@ -459,6 +483,10 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
             diger = ", ".join(str(n) for n in kod_satirlari[anahtar])
             r.hata("kod", f"Kod dosyada birden çok kez geçiyor (satırlar: {diger}).")
     eski = mevcut.get(anahtar) if kod else None
+    if kod and eski is None:  # ayrılmış kelimeler yalnızca yeni kodlar için denetlenir; mevcut kayıtlar etkilenmez
+        ayrilmis_hata = ayrilmis_kod_hatasi(kod, ayrilmis)
+        if ayrilmis_hata:
+            r.hata("kod", ayrilmis_hata)
     if eski is not None and eski.durum == QRKod.Durum.ARSIV:
         r.hata("kod", "Kod arşivde; arşivdeki kodlar içe aktarmayla güncellenemez.")
 
@@ -563,11 +591,12 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
             r.kod_otomatik = True
             while True:
                 uretilen = otomatik_kisa_kod()
-                if uretilen.lower() not in kullanilan_kodlar:
+                if uretilen.lower() not in kullanilan_kodlar and uretilen.lower() not in ayrilmis:
                     break
             kullanilan_kodlar.add(uretilen.lower())
             qr.kisa_kod = r.kod = uretilen
         qr.ad = d.get("ad", "")
+        qr.baslik = d.get("baslik", "")
         qr.tur = tur or QRKod.Tur.KAMPANYA
         qr.durum = durum or QRKod.Durum.AKTIF
         qr.aciklama = d.get("aciklama", "")
@@ -582,6 +611,8 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
             setattr(qr, tip, var)
         r.yeni_hedef = _hedef_metni(qr.hedef_turu, qr.hedef_url, sayfa)
         r.durum = "yeni"
+        if url and ayni_hedef and ayni_hedef.get(url):
+            r.uyarilar.append("Bu hedef zaten şu kodlarda kullanılıyor: " + ", ".join(ayni_hedef[url][:5]))
     else:
         qr = eski
         r.kod = eski.kisa_kod
@@ -599,6 +630,8 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
         # Boş hücre = "değiştirme"
         if d.get("ad"):
             ata("ad", "Ad", d["ad"])
+        if d.get("baslik"):
+            ata("baslik", "Başlık", d["baslik"])
         if tur:
             ata("tur", "Tür", tur, qr.get_tur_display(), QRKod.Tur(tur).label)
         if durum:

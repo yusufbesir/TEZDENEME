@@ -25,6 +25,30 @@ def otomatik_kisa_kod(uzunluk=8):
     return "".join(secrets.choice(OTOMATIK_KOD_ALFABESI) for _ in range(uzunluk))
 
 
+# Kısa kod olarak verilemeyecek varsayılan kelimeler (uygulama yollarıyla çakışmasın). Küçük harfle karşılaştırılır.
+# Ek kelimeler GenelAyarlar.ayrilmis_kodlar alanından gelir. Yalnızca YENİ kodlar denetlenir.
+VARSAYILAN_AYRILMIS_KODLAR = (
+    "admin", "panel", "api", "k", "s", "saglik", "static", "media", "giris", "cikis", "robots", "favicon",
+)
+
+
+def ayrilmis_kodlar_kumesi(ek_metin=""):
+    """Varsayılan + ayardaki (satır veya virgülle ayrılmış) ayrılmış kelimelerin küçük harfli kümesi."""
+    kume = set(VARSAYILAN_AYRILMIS_KODLAR)
+    for parca in re.split(r"[,\n\r;]+", ek_metin or ""):
+        parca = parca.strip().lower()
+        if parca:
+            kume.add(parca)
+    return kume
+
+
+def ayrilmis_kod_hatasi(kod, kume):
+    """Kod ayrılmış bir kelimeyse Türkçe hata metni, değilse None."""
+    if (kod or "").strip().lower() in kume:
+        return f"“{(kod or '').strip()}” ayrılmış bir kelimedir ve kısa kod olarak kullanılamaz."
+    return None
+
+
 def kisa_kod_dogrula(deger):
     if not KISA_KOD_DESENI.match(deger or ""):
         raise ValidationError(
@@ -189,6 +213,7 @@ class QRKod(ZamanDamgali):
     # Büyük/küçük harf duyarsız benzersizlik ve hızlı arama için normalize edilmiş anahtar.
     kod_anahtari = models.CharField(max_length=64, unique=True, editable=False)
     ad = models.CharField("QR kod adı", max_length=200, blank=True)
+    baslik = models.CharField("hedef başlığı", max_length=300, blank=True)
     tur = models.CharField("tür", max_length=20, choices=Tur.choices, default=Tur.KAMPANYA)
     urun = models.ForeignKey(Urun, verbose_name="ürün", null=True, blank=True, on_delete=models.PROTECT, related_name="qr_kodlar")
     kampanya = models.ForeignKey(Kampanya, verbose_name="kampanya", null=True, blank=True, on_delete=models.PROTECT, related_name="qr_kodlar")
@@ -368,6 +393,16 @@ class GenelAyarlar(models.Model):
     bitti_url = models.URLField("bitmişse yönlendirilecek adres", max_length=2000, blank=True, validators=[guvenli_url_dogrula])
     bulunamadi_mesaj = models.TextField("geçersiz kod mesajı", default="Bu QR kod tanınmadı.")
     yaklasan_bitis_gun = models.PositiveIntegerField("“süresi yaklaşıyor” uyarısı (gün)", default=7)
+    ayrilmis_kodlar = models.TextField(
+        "ayrılmış kodlar", blank=True,
+        help_text="Kısa kod olarak verilemeyecek ek kelimeler (satır veya virgülle ayırın). "
+                  "Varsayılanlar (admin, panel, api, k, s, saglik, static, media, giris, cikis, robots, favicon) her zaman ayrılmıştır. "
+                  "Yalnızca yeni kodlar denetlenir.",
+    )
+    ayni_hedef_uyarisi = models.BooleanField(
+        "aynı hedef uyarısı", default=True,
+        help_text="Yeni QR oluştururken aynı hedef adresi başka bir kodda kullanılıyorsa onay iste.",
+    )
 
     class Meta:
         verbose_name = "genel ayarlar"
@@ -381,6 +416,9 @@ class GenelAyarlar(models.Model):
     def al(cls):
         nesne, _ = cls.objects.get_or_create(pk=1)
         return nesne
+
+    def ayrilmis_kume(self):
+        return ayrilmis_kodlar_kumesi(self.ayrilmis_kodlar)
 
 
 class MFACihazi(models.Model):

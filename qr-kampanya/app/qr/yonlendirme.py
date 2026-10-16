@@ -209,6 +209,12 @@ def medya_yetki(request):
 
 
 @require_safe
+def robots_txt(request):
+    """Arama motorlarına kısa adresleri ve paneli taramamalarını söyler (/k/ yanıtları ayrıca X-Robots-Tag taşır)."""
+    return HttpResponse("User-agent: *\nDisallow: /k/\nDisallow: /panel/\n", content_type="text/plain; charset=utf-8")
+
+
+@require_safe
 def saglik(request):
     """Sağlık kontrolü: veritabanına erişilebiliyor mu? Ayrıntı sızdırmaz."""
     try:

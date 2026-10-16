@@ -17,6 +17,8 @@ Sistem internete açık bir üretim uygulaması olarak tasarlandı: HTTPS zorunl
 | Oturum güvenliği | HttpOnly + Secure + SameSite=Lax çerezler, tarayıcı kapanınca biten 8 saatlik oturum, girişte oturum anahtarı yenilenir. |
 | Kaba kuvvet koruması | Kullanıcı adı + IP başına 5 hatalı denemeden sonra 15 dk kilit; ayrıca IP döndürmeye karşı hesap başına (`HESAP_DENEME_SINIRI`, 10) geçici kilit ve IP başına (`IP_DENEME_SINIRI`, 20) sayaç. Parola ve MFA denemeleri aynı sayaçlarda sayılır; sayaçlar veritabanında atomik tutulur. |
 | Giriş ucu kaynak tüketimi | `/panel/giris` ve `/panel/mfa/*` POST istekleri parola doğrulamasından (Argon2) ÖNCE IP başına dakikada `GIRIS_HIZ_SINIRI` (10) ile sınırlanır; aşılırsa 429. Başarısız giriş denetim kayıtları sınırlıdır ve var olmayan kullanıcı adları açık yazılmaz (`bilinmeyen:<özet>`). |
+| QR oluşturma hız sınırı | Panelden tekil QR oluşturma POST'u ve toplu içe aktarma başlatma (dosya yükleme) isteği kullanıcı başına dakikada `QR_OLUSTURMA_HIZ_SINIRI` (30) ile sınırlanır (paylaşımlı sayaç, kullanıcı kimliği HMAC'li anahtar); aşılırsa 429. İçe aktarmanın içindeki satırlar sayılmaz. |
+| Arama motoru dizinleme | `/k/*` yanıtlarının tümü (302, bilgi sayfaları, 404/410/429) ve `/panel/*` `X-Robots-Tag: noindex, nofollow` taşır; `/robots.txt` `/k/` ve `/panel/` yollarını engeller. |
 | CSRF | Django CSRF koruması; bütün değişiklikler yalnızca POST. |
 | XSS | Şablonlarda otomatik kaçış; kullanıcı içeriği HTML olarak yorumlanmaz; sıkı İçerik Güvenlik Politikası (satır içi betik yok). |
 | SQL injection | Yalnızca Django ORM (parametreli sorgular). |

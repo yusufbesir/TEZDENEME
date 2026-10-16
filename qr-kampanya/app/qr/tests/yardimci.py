@@ -33,6 +33,7 @@ TEST_AYARLARI = dict(
     HESAP_DENEME_SINIRI=10,
     IP_DENEME_SINIRI=20,
     GIRIS_HIZ_SINIRI=0,
+    QR_OLUSTURMA_HIZ_SINIRI=0,
     # Ortamdan bağımsız: .env'deki MFA_ZORUNLU=1 testleri etkilemesin (MFA gerektiren testler kendi
     # override_settings(MFA_ZORUNLU=True) ayarını verir).
     MFA_ZORUNLU=False,

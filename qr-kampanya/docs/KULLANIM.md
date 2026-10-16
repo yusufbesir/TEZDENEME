@@ -36,6 +36,14 @@
 
 **Baskıdan önce:** İndirdiğiniz QR'ı telefonla tarayıp doğru sayfanın açıldığını kontrol edin. Baskıda QR en az 2 × 2 cm olmalı, etrafında beyaz boşluk bırakılmalıdır.
 
+**Hedef başlığı:** isteğe bağlı `Hedef başlığı` alanı, kodun gittiği sayfayı tanımlamanıza yardım eder; listede ad yanında görünür, aramaya (`q`), CSV/Excel dışa aktarmaya ve toplu içe aktarmada isteğe bağlı `baslik` sütununa dahildir.
+
+**Ayrılmış kelimeler:** `admin`, `panel`, `api`, `k`, `s`, `saglik`, `static`, `media`, `giris`, `cikis`, `robots`, `favicon` (büyük/küçük harf fark etmez) ve **Ayarlar** ekranındaki “ayrılmış kodlar” listesi kısa kod olarak verilemez; otomatik üretilen kod listede çıkarsa yeniden üretilir. Mevcut kodlar etkilenmez.
+
+**Aynı hedef uyarısı:** Ayarlar'da açıksa, yeni QR oluştururken aynı hedef adresi arşivlenmemiş başka kodlarda kullanılıyorsa form ilk gönderimde kaydedilmez, kodlar listelenir; “Yine de kaydet” kutusunu işaretleyip tekrar göndererek kaydedebilirsiniz. Toplu içe aktarmada engel yoktur, önizlemede yalnızca uyarı sayısı gösterilir.
+
+**Oluşturma hız sınırı:** Kullanıcı başına dakikada en çok `QR_OLUSTURMA_HIZ_SINIRI` (varsayılan 30) yeni QR oluşturma isteği; toplu içe aktarmayı başlatma (dosya yükleme) isteği de bu sayaçtan 1 sayılır. Aşılırsa bir dakika bekleyin (429).
+
 ## 4. Hedefi değiştirmek (basılı kod aynı kalır)
 
 1. QR kodun detay sayfasında **Düzenle**.

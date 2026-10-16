@@ -451,6 +451,6 @@ class CsvAyracTest(TemelTest):
         yanit = self.client.get("/panel/qr/disa-aktar?bicim=csv")
         self.assertTrue(yanit.content.startswith(b"\xef\xbb\xbf"))
         ilk = yanit.content.decode("utf-8-sig").splitlines()[0]
-        self.assertTrue(ilk.startswith("Kısa kod;Ad;Tür;"))
+        self.assertTrue(ilk.startswith("Kısa kod;Ad;Başlık;Tür;"))
         satirlar = list(csv.reader(io.StringIO(yanit.content.decode("utf-8-sig")), delimiter=";"))
         self.assertEqual(satirlar[1][1], "'=cmd;x")

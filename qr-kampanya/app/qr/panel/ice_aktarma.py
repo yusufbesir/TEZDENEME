@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from .. import ice_aktarma as ia_modul
+from ..hiz import qr_olusturma_hiz_siniri
 from ..models import IceAktarma, QRKod
 from ..servisler import denetim_yaz, qr_kaydet
 from .qrler import _zip_yaniti
@@ -62,6 +63,7 @@ def ice_aktarma_liste(request):
 
 
 @yetki("qr.add_qrkod")
+@qr_olusturma_hiz_siniri
 @require_POST
 def ice_aktarma_yukle(request):
     dosya = request.FILES.get("dosya")
@@ -134,6 +136,7 @@ def _ozet_baglam(ia, analiz, guncelleme_izni):
         "guncelleme_sayisi": len(analiz.mevcut),
         "degismedi_sayisi": len(analiz.degismedi),
         "hatali_sayisi": len(analiz.hatali),
+        "ayni_hedef_sayisi": analiz.ayni_hedef_sayisi,
         "hatalar": analiz.hata_listesi[:HATA_GOSTERIM_SINIRI],
         "hata_toplam": len(analiz.hata_listesi),
         "iliskili_yeni": [

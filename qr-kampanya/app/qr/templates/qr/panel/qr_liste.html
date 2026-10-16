@@ -3,7 +3,7 @@
 {% block icerik %}
 <h1>QR kodlar</h1>
 <form method="get" class="filtre">
-  <div><label for="q">Ara (kod, ad, ürün, kampanya, etiket)</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
+  <div><label for="q">Ara (kod, ad, başlık, ürün, kampanya, etiket)</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
   <div><label for="tur">Tür</label><select id="tur" name="tur"><option value="">Tümü</option>{% for k, v in turler %}<option value="{{ k }}"{% if f.tur == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
   <div><label for="durum">Durum</label><select id="durum" name="durum"><option value="">Tümü</option>{% for k, v in durumlar %}<option value="{{ k }}"{% if f.durum == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
   <div><label for="kampanya">Kampanya</label><select id="kampanya" name="kampanya"><option value="">Tümü</option>{% for k in kampanyalar %}<option value="{{ k.pk }}"{% if f.kampanya == k.pk|stringformat:"s" %} selected{% endif %}>{{ k.ad }}</option>{% endfor %}</select></div>
@@ -39,7 +39,7 @@
     <tr>
       <td><input type="checkbox" name="secili" value="{{ q.pk }}" aria-label="{{ q.kisa_kod }} seç"></td>
       <td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td>
-      <td>{{ q.ad }}</td><td>{{ q.get_tur_display }}</td>
+      <td>{{ q.ad }}{% if q.baslik %}<br><small class="sessiz">{{ q.baslik|truncatechars:40 }}</small>{% endif %}</td><td>{{ q.get_tur_display }}</td>
       <td>{% if q.hedef_turu == "sayfa" %}Sayfa: {{ q.sayfa.baslik }}{% else %}{{ q.hedef_url|truncatechars:50 }}{% endif %}</td>
       <td><span class="etiket-durum durum-{{ q.durum }}">{{ q.get_durum_display }}</span></td>
       <td>{{ q.bitis|date:"d.m.Y H:i"|default:"-" }}</td>

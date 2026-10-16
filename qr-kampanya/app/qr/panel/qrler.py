@@ -19,6 +19,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from ..dogrulama import url_gecerli_mi
+from ..hiz import qr_olusturma_hiz_siniri
 from ..models import Kampanya, KampanyaSayfasi, Magaza, QRKod, Tarama
 from ..servisler import denetim_yaz, qr_durum_degistir, qr_kaydet, qr_png, qr_svg
 from .formlar import QRKodForm
@@ -53,7 +54,7 @@ def qr_sorgusu(get):
     q = (get.get("q") or "").strip()
     if q:
         sorgu = sorgu.filter(
-            Q(kisa_kod__icontains=q) | Q(ad__icontains=q)
+            Q(kisa_kod__icontains=q) | Q(ad__icontains=q) | Q(baslik__icontains=q)
             | Q(urun__ad__icontains=q) | Q(urun__kod__icontains=q)
             | Q(kampanya__ad__icontains=q) | Q(kampanya__kod__icontains=q)
             | Q(etiketler__icontains=q)
@@ -90,12 +91,12 @@ def qr_disa_aktar(request):
     """Liste filtresine göre CSV/XLSX (?bicim=csv|xlsx)."""
     bicim = "xlsx" if request.GET.get("bicim") == "xlsx" else "csv"
     basliklar = [
-        "Kısa kod", "Ad", "Tür", "Durum", "Kısa URL", "Hedef", "Kampanya", "Mağaza", "Ürün",
+        "Kısa kod", "Ad", "Başlık", "Tür", "Durum", "Kısa URL", "Hedef", "Kampanya", "Mağaza", "Ürün",
         "Başlangıç", "Bitiş", "Etiketler", "Oluşturulma",
     ]
     satirlar = (
         [
-            q.kisa_kod, q.ad, q.get_tur_display(), q.get_durum_display(), q.kisa_url, hedef_metni(q),
+            q.kisa_kod, q.ad, q.baslik, q.get_tur_display(), q.get_durum_display(), q.kisa_url, hedef_metni(q),
             q.kampanya.ad if q.kampanya else "", q.magaza.ad if q.magaza else "", q.urun.ad if q.urun else "",
             yerel_metin(q.baslangic), yerel_metin(q.bitis), q.etiketler, yerel_metin(q.olusturma),
         ]
@@ -121,6 +122,7 @@ def _formu_kaydet(request, form, not_metni=""):
 
 
 @yetki("qr.add_qrkod")
+@qr_olusturma_hiz_siniri
 @require_http_methods(["GET", "POST"])
 def qr_olustur(request):
     form = QRKodForm(request.POST or None)

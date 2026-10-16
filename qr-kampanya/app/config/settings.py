@@ -170,6 +170,7 @@ IP_DENEME_SINIRI = int(env("IP_DENEME_SINIRI", "20"))
 # /panel/giris ve /panel/mfa/* POST istekleri için IP başına dakikalık ucuz sınır (parola doğrulamasından önce; 0 = kapalı).
 GIRIS_HIZ_SINIRI = int(env("GIRIS_HIZ_SINIRI", "10"))
 YONLENDIRME_HIZ_SINIRI = int(env("YONLENDIRME_HIZ_SINIRI", "120"))  # IP başına dakikada
+QR_OLUSTURMA_HIZ_SINIRI = int(env("QR_OLUSTURMA_HIZ_SINIRI", "30"))  # kullanıcı başına dakikada tekil QR oluşturma
 MFA_ZORUNLU = env_bool("MFA_ZORUNLU", not DEBUG)
 
 # MFA (TOTP) gizli anahtarlarının veritabanında şifrelenmesi için Fernet anahtarı (urlsafe base64, 32 bayt).

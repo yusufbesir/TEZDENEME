@@ -8,6 +8,7 @@ from qr import yonlendirme
 urlpatterns = [
     path("k/<str:kod>", yonlendirme.qr_yonlendir, name="qr_yonlendir"),
     path("s/<slug:slug>", yonlendirme.sayfa_goster, name="sayfa_goster"),
+    path("robots.txt", yonlendirme.robots_txt, name="robots_txt"),
     path("saglik", yonlendirme.saglik, name="saglik"),
     path("ic/medya-yetki", yonlendirme.medya_yetki, name="medya_yetki"),
     path("panel/", include("qr.panel_urls")),

@@ -10,6 +10,10 @@
   <div class="sayi-kart"><strong>{{ hatali_sayisi }}</strong> hatalı satır</div>
 </div>
 
+{% if ayni_hedef_sayisi %}
+<p class="uyari-kutu" role="status">Uyarı: {{ ayni_hedef_sayisi }} satırın hedef adresi zaten başka kodlarda kullanılıyor (engellenmez, bilgi amaçlıdır).</p>
+{% endif %}
+
 {% if hatali_sayisi %}
 <h2>Hatalı satırlar (içe aktarılmaz)</h2>
 <div class="tablo-kap"><table>
@@ -32,8 +36,8 @@
 {% if yeni_sayisi %}
 <h2>Oluşturulacak QR kodlar</h2>
 <div class="tablo-kap"><table>
-  <thead><tr><th>Satır</th><th>Kod</th><th>Ad</th><th>Hedef</th></tr></thead>
-  <tbody>{% for r in yeni %}<tr><td>{{ r.no }}</td><td>{{ r.kod }}{% if r.kod_otomatik %} <span class="sessiz">(otomatik)</span>{% endif %}</td><td>{{ r.qr.ad }}</td><td>{{ r.yeni_hedef }}</td></tr>{% endfor %}</tbody>
+  <thead><tr><th>Satır</th><th>Kod</th><th>Ad</th><th>Hedef</th><th>Uyarı</th></tr></thead>
+  <tbody>{% for r in yeni %}<tr><td>{{ r.no }}</td><td>{{ r.kod }}{% if r.kod_otomatik %} <span class="sessiz">(otomatik)</span>{% endif %}</td><td>{{ r.qr.ad }}</td><td>{{ r.yeni_hedef }}</td><td>{{ r.uyarilar|join:" " }}</td></tr>{% endfor %}</tbody>
 </table></div>
 {% if yeni_sayisi > onizleme_siniri %}<p class="sessiz">İlk {{ onizleme_siniri }} satır gösteriliyor.</p>{% endif %}
 {% endif %}

@@ -121,3 +121,27 @@ def giris_hiz_siniri(gorunum):
         return gorunum(request, *args, **kwargs)
 
     return sarmal
+
+
+def qr_olusturma_hiz_siniri(gorunum):
+    """POST isteklerinde KULLANICI başına dakikalık QR oluşturma sınırı (QR_OLUSTURMA_HIZ_SINIRI).
+    Panelden tekil QR oluşturma ve toplu içe aktarmayı başlatma (dosya yükleme) isteği aynı sayaçtan 1 sayılır;
+    içe aktarmanın içindeki satırlar sayılmaz. Giriş yapılmış kullanıcı gerektirir (yetki dekoratöründen sonra uygulanır).
+    Aşılırsa 429 döner; görünüm çalışmaz."""
+
+    @wraps(gorunum)
+    def sarmal(request, *args, **kwargs):
+        kullanici = getattr(request, "user", None)
+        if (
+            request.method == "POST" and kullanici is not None and kullanici.is_authenticated
+            and not hiz_sinirlayici.izin_ver(f"qrolustur|{kullanici.pk}", settings.QR_OLUSTURMA_HIZ_SINIRI)
+        ):
+            yanit = HttpResponse(
+                "Çok fazla QR kod oluşturma isteği gönderdiniz. Lütfen bir dakika sonra tekrar deneyin.",
+                status=429, content_type="text/plain; charset=utf-8",
+            )
+            yanit["Retry-After"] = "60"
+            return yanit
+        return gorunum(request, *args, **kwargs)
+
+    return sarmal
