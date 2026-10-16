@@ -72,3 +72,5 @@
 - 2026-10-16 | Yarışma ekranları: lobi, oyun, çark (1200 ms), süre çubuğu, şık/taç animasyonları, sonuç; 19 arayüz testi | implementer (claude-sonnet-5-5) | ~128K token | tamam (208 test)
 - 2026-10-16 | Yarışma ekranlarını doğrula | verifier (claude-sonnet-5-5) | ~35K token | Geçti (not: kayıt hatası sessiz)
 | 2026-10-16 | Proje talimatları kutusunu docs/kurallar/ altına taşı, kısa kutu taslağı yaz [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 60.000 girdi / 12.000 çıktı | Başarılı. 3 kural dosyası, dizin ve 2.912 karakterlik taslak eklendi. |
+| 2026-10-16 | LibreOffice Python bileşenlerini paketten çıkarma (Windows Writer kilitlenmesi) [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | ~40k | Başarılı. 125 test geçti. |
+| 2026-10-16 | Python çıkarma doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. 125 test; 1373 çıkarılan dosya eşleşti, vendor’da yanlış eşleşme 0. |
