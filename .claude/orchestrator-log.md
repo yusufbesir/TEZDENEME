@@ -37,3 +37,7 @@
 2026-10-16 | Exe/kısayol/kurulum simgesi (afterPack+resedit) | implementer/sonnet-5-5 | ~49k token | testler geçti
 2026-10-16 | "Kuralları saklayın" bölümü yeniden tasarım | implementer/sonnet-5-5 | ~44k token | 126 test geçti
 2026-10-16 | Simge + kurallar bölümü doğrulama | verifier/sonnet-5-5 | ~?k token | Geçti; yeni exe cikti/1.1.5; cihaz aracı kopuk, teslim bekliyor
+2026-10-16 | QR + Data Matrix kodlayıcı | implementer/sonnet | ~71k token | Geçti (gerçek çözücü 360/360)
+2026-10-16 | Linux/macOS paketleme | implementer/sonnet | ~67k token | AppImage, deb, mac zip derlendi; dmg yalnız macOS
+2026-10-16 | Arayüz: 8 özellik (sablon.html) | implementer/sonnet | ~400k token | 158 test geçti
+2026-10-16 | 1.2.0 bağımsız doğrulama | verifier/sonnet | ~54k token | Geçti
