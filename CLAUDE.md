@@ -14,12 +14,6 @@ Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtı
 - Her ajan çalışmasından sonra `docs/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
 - Bilmediğin şeyi tahmin etme, sor.
 - Mevcut bir dosyanın üzerine yazmadan önce sor.
-- Önemli işleri tek ajana bırakma; araştırma, uygulama ve doğrulama gibi birkaç ajana paylaştır, başında dur ve sonuçları birleştir.
-- Projede bağımsız bir Denetmen ajan vardır. Tüm oturumları (koordinatör dahil) düzenli aralıklarla okur; alınan kararları, ajan ve model atamalarını, kurallara uyulup uyulmadığını raporlar.
-- Denetmen yalnızca kullanıcıya rapor verir; başka ajanlardan talimat almaz, işlerini değiştirmez, düzeltme yapmaz. Diğer oturumlar Denetmen'in raporlarını yönlendirmez ve değiştirmez.
-- İz kaydı: Her oturumun benzersiz etiketi `[İP:<iş parçacığı başlığı>#<oturum kimliğinin son 6 karakteri>]`, koordinatör için `[İP:Koordinatör#<son 6>]` olur. Bu etiket kasa notlarına, commit'lere, PR'lara, raporlara ve çıktılara eklenir.
-- Her notta kullanılan alt ajanlar (rol ve model) ile birlikte çalışılan diğer iş parçacıklarının etiketleri "Birlikte çalışılanlar" bölümünde yazılır. Geri alma gerekirse silme yasağına uyulur; yalnızca ekleme yapılır.
-- Denetmen raporları kısa ve sade bir özet olur; hangi iş parçacığının hangi iş için kimle ortak çalıştığını düz cümlelerle anlatır, etiketler raporun sonunda "Kaynakça" bölümünde listelenir.
 
 ### Ajanlar
 
