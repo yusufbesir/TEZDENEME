@@ -4,6 +4,7 @@
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Renk: petrol (ana); son 5 saniyede hardal (vurgu). Kırmızı kullanılmaz
 /// (docs/SADE-ARAYUZ-VE-YARISMA.md bölüm 7). Sayım `Timer.periodic` (1 sn).
+/// Sayaç etiketi genişliği içeriğe göre esner (en az 44 px).
 /// Her yeni soru için üstten farklı `key` verilmeli (sayaç sıfırlanır).
 library;
 
@@ -102,10 +103,12 @@ class _SureCubuguDurumu extends State<SureCubugu> {
               ),
             ),
             const SizedBox(width: Olcu.b1),
-            SizedBox(
-              width: 44,
+            // Sabit genişlik yok: sayı büyüse de (metin ölçeği) kesilmez.
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 44),
               child: Text(
                 '${_kalan < 0 ? 0 : _kalan} s',
+                softWrap: false,
                 textAlign: TextAlign.end,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: uyari ? r.vurgu : r.metin,

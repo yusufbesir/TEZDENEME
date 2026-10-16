@@ -140,6 +140,21 @@ Alan+seviye başına: oynanan, kazanılan, en iyi puan, kategori başına doğru
 - Çark durduktan sonra kategori adı 700 ms görünür, sonra soru gelir; hareketi azalt açıkken bekleme yok.
 - Tekrar sekmesi de yalnızca seçili alanın kartlarını gösterir; diğer alanın kartları silinmez, alan değişince görünür.
 
+## 8b. Esnek yerleşim (2026-10-16)
+Düzen kararları kullanılabilir genişliğe göre (LayoutBuilder) verilir; sabitler `Olcu` içinde tek yerdedir (`lib/tema/tema.dart`).
+
+| Pencere genişliği | Gezinme | Yol ekranı |
+|---|---|---|
+| dar, < 600 | alt gezinme çubuğu | tek sütun, 56 px hedef halkası üst şeritte |
+| orta, 600–899 | daraltılmış NavigationRail | tek sütun |
+| geniş, >= 900 | genişletilmiş rail | iki sütun yalnız sağ panele >= 300 px kalıyorsa, yoksa tek sütun |
+
+- Sağ panel 300–420 px arası, görünür kaydırma çubuğu (`Scrollbar`, `thumbVisibility`) ile; ana içerik 720 px'e kadar ortalanır.
+- Metin ölçeği `MaterialApp.builder` içinde [1,0 ; 1,3] aralığına kıstırılır; hiçbir yerde 1,0'ın altına inmez. Yazı küçültülmez: sığmayan içerik kaydırılır ya da satıra sarılır; `FittedBox` yalnız sayı/ikon gruplarındadır.
+- Izgaralar `maxCrossAxisExtent: 240` ile akar, hücre yüksekliği metin ölçeğiyle büyür. Seviye seçici dar pencerede yatay kaydırılır.
+- Windows pencere alt sınırı 480x600 mantıksal px (`WM_GETMINMAXINFO`, DPI ölçekli). Bu dosya Linux'ta derlenemedi; Windows'ta elle denenmeli.
+- Testler: `test/yerlesim_test.dart` (5 boyut x 2 metin ölçeği, taşma denetimi, kırılma noktaları).
+
 ## 9. Kaynaklar
 - Duolingo blog, "New Duolingo home screen design" (blog.duolingo.com/new-duolingo-home-screen-design)
 - 925 Studios, "Duolingo UX Breakdown" (925studios.co/blog/duolingo-design-breakdown)

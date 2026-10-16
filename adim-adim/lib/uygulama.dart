@@ -3,6 +3,8 @@
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// MaterialApp builder'ı yükleme ekranını gösterir ve metin ölçeğini
+/// [1,0 ; 1,3] aralığına kıstırır.
 library;
 
 import 'package:flutter/material.dart';
@@ -120,7 +122,17 @@ class AdimAdimUygulama extends ConsumerWidget {
             ),
           );
         }
-        return child ?? const SizedBox.shrink();
+        // Metin ölçeği [1,0 ; 1,3] aralığına kıstırılır: ne okunmaz küçülür
+        // ne de yerleşimi bozacak kadar büyür.
+        final medya = MediaQuery.of(context);
+        final olcek = medya.textScaler
+            .scale(1.0)
+            .clamp(Olcu.metinOlcekEn, Olcu.metinOlcekEnCok)
+            .toDouble();
+        return MediaQuery(
+          data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
+          child: child ?? const SizedBox.shrink(),
+        );
       },
     );
   }

@@ -1,5 +1,8 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
 /// ders" düğmesi ve alan kurslarının tek doğrusal basamak yolu.
+/// Yerleşim kullanılabilir genişliğe göre seçilir (LayoutBuilder): yan panel
+/// (Öğrenci kartı + günlük hedef) yalnız panele en az Olcu.panelMin kalıyorsa
+/// ve pencere geniş (>= 900) ise yanda durur; yoksa tek sütundur.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -30,42 +33,84 @@ class AnaSayfa extends ConsumerWidget {
     final durum = ref.watch(durumProvider).value ?? const OgrenciDurumu();
     final kurslar = ref.watch(alanKurslariProvider);
     final bugun = ref.watch(bugunProvider);
-    final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;
 
     if (durum.alan == null || kurslar.isEmpty) {
       return _AlanYok(alanVar: durum.alan != null);
     }
 
-    final yol = _YolListesi(kurslar: kurslar, durum: durum, bugun: bugun);
+    final pencereGenis = Olcu.genis(MediaQuery.sizeOf(context).width);
 
     return SafeArea(
-      child: genis
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 3, child: yol),
-                Expanded(
-                  flex: 2,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(
-                      0,
-                      Olcu.b3,
-                      Olcu.b3,
-                      Olcu.b3,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ProfilKarti(durum: durum, bugun: bugun),
-                        const SizedBox(height: Olcu.b2),
-                        _GunlukKart(durum: durum, bugun: bugun),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : yol,
+      child: LayoutBuilder(
+        builder: (context, kisit) {
+          // İki sütun: yol en az yolMinGenislik, panel en az panelMin kalırsa.
+          final iki =
+              pencereGenis &&
+              kisit.maxWidth - Olcu.panelMin >= Olcu.yolMinGenislik;
+          final yol = _YolListesi(
+            kurslar: kurslar,
+            durum: durum,
+            bugun: bugun,
+            seritteHalka: !iki,
+          );
+          if (!iki) return yol;
+          final panelGenislik = (kisit.maxWidth * 0.4).clamp(
+            Olcu.panelMin,
+            Olcu.panelMax,
+          );
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: yol),
+              SizedBox(
+                width: panelGenislik,
+                height: kisit.maxHeight,
+                child: _YanPanel(durum: durum, bugun: bugun),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Yan panel: Öğrenci kartı + günlük hedef; görünür kaydırma çubuğu.
+class _YanPanel extends StatefulWidget {
+  const _YanPanel({required this.durum, required this.bugun});
+  final OgrenciDurumu durum;
+  final String bugun;
+
+  @override
+  State<_YanPanel> createState() => _YanPanelDurumu();
+}
+
+class _YanPanelDurumu extends State<_YanPanel> {
+  final _kaydirma = ScrollController();
+
+  @override
+  void dispose() {
+    _kaydirma.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      controller: _kaydirma,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _kaydirma,
+        padding: const EdgeInsets.fromLTRB(0, Olcu.b3, Olcu.b3, Olcu.b3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ProfilKarti(durum: widget.durum, bugun: widget.bugun),
+            const SizedBox(height: Olcu.b2),
+            _GunlukKart(durum: widget.durum, bugun: widget.bugun),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -134,16 +179,19 @@ class _YolListesi extends StatelessWidget {
     required this.kurslar,
     required this.durum,
     required this.bugun,
+    required this.seritteHalka,
   });
   final List<Kurs> kurslar;
   final OgrenciDurumu durum;
   final String bugun;
 
+  /// Tek sütunda hedef halkası üst şeritte görünür (yan panel yoksa).
+  final bool seritteHalka;
+
   @override
   Widget build(BuildContext context) {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
-    final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;
     final parlaklik = Theme.of(context).brightness;
     final alanRengi = AlanRenkleri.renk(durum.alan, parlaklik);
     final bugunXp = durum.gunlukXp[bugun] ?? 0;
@@ -184,15 +232,15 @@ class _YolListesi extends StatelessWidget {
             nabiz: durum.sonGun == bugun && seri > 0,
             renk: r.vurgu,
           ),
-          if (!genis) ...[
+          if (seritteHalka) ...[
             const SizedBox(width: Olcu.b2),
             HedefHalkasi(xp: bugunXp, hedef: durum.gunlukHedef, boyut: 56),
           ],
         ],
       ),
       const SizedBox(height: Olcu.b2),
-      SizedBox(
-        height: Olcu.hedef,
+      ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: Olcu.hedef),
         child: OutlinedButton.icon(
           icon: const Icon(Icons.timer_outlined),
           label: const Text('2 dakikalık ders'),
