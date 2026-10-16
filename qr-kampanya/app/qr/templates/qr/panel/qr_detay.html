@@ -13,6 +13,8 @@
   </div>
   <div class="kart">
     <p>Kısa URL: <span class="kisa-url">{{ qr.kisa_url }}</span></p>
+    {% url 'panel:qr_png' qr.pk as png_adresi %}
+    {% include "qr/panel/_paylasim.html" with kisa_url=qr.kisa_url paylasim=paylasim png_adresi=png_adresi kutu_no="detay" %}
     <p>Durum: <span class="etiket-durum durum-{{ qr.durum }}">{{ qr.get_durum_display }}</span>
        · Zaman durumu: <span class="etiket-durum durum-{{ zaman_durumu }}">{% if zaman_durumu == "gecerli" %}Geçerli{% elif zaman_durumu == "baslamadi" %}Başlamadı{% else %}Süresi doldu{% endif %}</span></p>
     <p>Tür: {{ qr.get_tur_display }}

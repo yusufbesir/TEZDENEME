@@ -1,4 +1,6 @@
 """Panel formları."""
+from urllib.parse import urlsplit
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -6,11 +8,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 
-from .. import roller
+from .. import baslik_cek, roller
 from ..dogrulama import idn_mi
 from ..models import (
     GenelAyarlar, Kampanya, KampanyaSayfasi, Magaza, QRKod, Urun, ayrilmis_kod_hatasi, otomatik_kisa_kod,
 )
+from ..servisler import kod_uretici, sirali_kod_ayir
 
 Kullanici = get_user_model()
 
@@ -102,13 +105,28 @@ class QRKodForm(TemelForm):
             label="Yine de kaydet", required=False,
             help_text="Aynı hedef adresi başka bir kodda kullanılıyor; yine de yeni kod oluşturmak için işaretleyin.",
         )
-        self.fields["sayfa"].label_from_instance = lambda s: f"{s.baslik} (/s/{s.slug}) - {s.get_durum_display()}"
+        if "sayfa" in self.fields:
+            self.fields["sayfa"].label_from_instance = lambda s: f"{s.baslik} (/s/{s.slug}) - {s.get_durum_display()}"
+        if not self.instance.pk and "baslik" in self.fields:
+            self.fields["baslik"].help_text = (
+                "Boş bırakırsanız ve hedef harici bir adresse, hedef sayfanın başlığı otomatik çekilmeye çalışılır "
+                "(genel ayarlardan kapatılabilir)."
+            )
+        self._sirali_otomatik = False
 
     def clean_kisa_kod(self):
         if self.instance.pk:
             return self.instance.kisa_kod
         deger = (self.cleaned_data.get("kisa_kod") or "").strip()
-        ayrilmis = GenelAyarlar.al().ayrilmis_kume()
+        ayar = GenelAyarlar.al()
+        ayrilmis = ayar.ayrilmis_kume()
+        if not deger and ayar.kod_uretim_bicimi == GenelAyarlar.KodBicimi.SIRALI:
+            # Doğrulama sırasında sayaç ilerletilmez (başarısız form numara yakmasın); gerçek kod kaydederken ayrılır (save).
+            self._sirali_otomatik = True
+            try:
+                return kod_uretici(kalici=False, ayrilmis=ayrilmis)()
+            except ValueError as hata:
+                raise ValidationError(str(hata)) from hata
         if not deger:
             for _ in range(20):
                 aday = otomatik_kisa_kod()
@@ -163,10 +181,74 @@ class QRKodForm(TemelForm):
         self.add_error(None, f"Bu hedef zaten şu kodlarda kullanılıyor: {', '.join(kodlar)}. "
                              "Yine de kaydetmek için “Yine de kaydet” kutusunu işaretleyip tekrar gönderin.")
 
+    def save(self, commit=True):
+        """Yeni kayıtta: (1) sıralı kod biçiminde kod şimdi kalıcı olarak ayrılır (sayaç satır kilidiyle artırılır);
+        (2) başlık boşsa ve ayar açıksa hedef sayfanın başlığı güvenli biçimde çekilmeye çalışılır (başarısızlık sessizdir)."""
+        if not self.instance.pk:
+            if self._sirali_otomatik:
+                try:
+                    self.instance.kisa_kod = sirali_kod_ayir()
+                except ValueError as hata:
+                    raise ValidationError(str(hata)) from hata
+            self._baslik_doldur()
+        return super().save(commit=commit)
+
+    def _baslik_doldur(self):
+        qr = self.instance
+        if (
+            (qr.baslik or "").strip() or qr.hedef_turu != QRKod.HedefTuru.HARICI or not qr.hedef_url
+            or not GenelAyarlar.al().baslik_otomatik_cek
+        ):
+            return
+        qr.baslik = baslik_cek.sayfa_basligi(qr.hedef_url)
+
     def uyarilari_goster(self, request):
         """Kayıt başarılı olduktan sonra (yönlendirme sonrası görünür) uyarıları mesaj olarak ekler."""
         for uyari in getattr(self, "uyarilar", []):
             messages.warning(request, uyari)
+
+
+class HizliKisaltForm(QRKodForm):
+    """Hızlı kısalt: yalnızca hedef URL + isteğe bağlı kısa kod + isteğe bağlı başlık. Doğrulama QRKodForm ile aynıdır
+    (ayrılmış kod, aynı hedef uyarısı+onay, IDN uyarısı, otomatik başlık/sıralı kod); tür “Kısa link”, hedef harici, durum aktiftir."""
+
+    degisiklik_notu = None
+
+    class Meta(QRKodForm.Meta):
+        fields = ["hedef_url", "kisa_kod", "baslik"]
+        widgets = {}
+        labels = {"hedef_url": "Uzun adres (URL)", "kisa_kod": "Kısa kod (isteğe bağlı)", "baslik": "Başlık (isteğe bağlı)"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.tur = QRKod.Tur.LINK
+        self.instance.hedef_turu = QRKod.HedefTuru.HARICI
+        self.instance.durum = QRKod.Durum.AKTIF
+        self.fields["hedef_url"].required = True
+        self.fields["hedef_url"].widget.attrs.update({"placeholder": "https://", "autofocus": True})
+
+    def clean(self):
+        self.cleaned_data["hedef_turu"] = QRKod.HedefTuru.HARICI
+        return super().clean()
+
+    def kaydet_hazirla(self):
+        """Ad: boşsa başlıktan, o da yoksa hedefin alan adından türetilir. Çağrı: save(commit=False) sonrası."""
+        qr = self.instance
+        if not qr.ad:
+            qr.ad = ad_turet(qr.baslik, qr.hedef_url)
+        return qr
+
+
+def ad_turet(baslik, url):
+    """QR kod adı: başlık varsa başlık (200 karakter), yoksa hedefin alan adı (www. atılır)."""
+    baslik = " ".join((baslik or "").split())
+    if baslik:
+        return baslik[:200]
+    try:
+        host = (urlsplit(url or "").hostname or "").lower()
+    except ValueError:
+        host = ""
+    return (host[4:] if host.startswith("www.") else host)[:200]
 
 
 # --- Kampanya / ürün / mağaza ---
@@ -245,9 +327,24 @@ class GenelAyarlarForm(TemelForm):
         fields = [
             "marka_adi", "pasif_mesaj", "baslamadi_mesaj", "baslamadi_url", "bitti_mesaj", "bitti_url",
             "bulunamadi_mesaj", "yaklasan_bitis_gun", "ayrilmis_kodlar", "ayni_hedef_uyarisi",
+            "baslik_otomatik_cek", "kod_uretim_bicimi",
         ]
         widgets = {k: forms.Textarea(attrs={"rows": 2}) for k in ("pasif_mesaj", "baslamadi_mesaj", "bitti_mesaj", "bulunamadi_mesaj")}
         widgets["ayrilmis_kodlar"] = forms.Textarea(attrs={"rows": 3})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["kod_uretim_bicimi"].required = False  # gönderilmezse mevcut değer korunur
+
+    def clean_kod_uretim_bicimi(self):
+        return self.cleaned_data.get("kod_uretim_bicimi") or self.instance.kod_uretim_bicimi
+
+    def save(self, commit=True):
+        # Sıralı kod sayacı formda yoktur; formun eski kopyası eşzamanlı artırılmış sayacın üzerine yazılmasın.
+        if commit:
+            self.instance.save(update_fields=list(self.Meta.fields))
+            return self.instance
+        return super().save(commit=False)
 
 
 # --- Kullanıcılar ---

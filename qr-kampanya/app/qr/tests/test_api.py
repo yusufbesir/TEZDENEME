@@ -300,7 +300,7 @@ class OkumaEylemleriTesti(ApiTemel):
         v = self.get(self.duz, {"action": "stats", "limit": 100}).json()
         self.assertEqual((v["toplam_kod"], v["toplam_tarama_bot_haric"], v["toplam_tarama_bot_dahil"]), (3, 4, 6))
         self.assertEqual(v["links"][1]["tarama_toplam"], 3)
-        for kotu in ({"limit": 0}, {"limit": 101}, {"limit": "abc"}, {"limit": -1}, {"filter": "xyz"}):
+        for kotu in ({"limit": 0}, {"limit": 101}, {"limit": "abc"}, {"limit": "1_0"}, {"limit": "٣"}, {"limit": -1}, {"filter": "xyz"}):
             self.assertEqual(self.get(self.duz, {"action": "stats", **kotu}).status_code, 400, kotu)
 
     def test_db_stats_ve_version(self):
@@ -449,11 +449,17 @@ class ParolaGirisiTesti(ApiTemel):
     def giris_post(self, **veri):
         return self.client.post(API, {"action": "db-stats", **veri})
 
-    def test_varsayilan_kapali_403(self):
+    def test_varsayilan_kapali_401_ayni_mesaj(self):
+        """Parola girişi kapalı hesap, yanlış parolayla AYNI 401 ve mesajı alır (parolanın doğruluğu sızmaz);
+        gerçek neden denetim kaydındadır."""
         yanit = self.giris_post(username="editor", password=PAROLA)
-        self.assertEqual(yanit.status_code, 403)
+        self.assertEqual(yanit.status_code, 401)
+        self.assertEqual(yanit.json()["message"], "Kimlik doğrulanamadı.")
         KullaniciApiAyari.objects.create(kullanici=self.editor, parola_girisi=False)
-        self.assertEqual(self.giris_post(username="editor", password=PAROLA).status_code, 403)
+        self.assertEqual(self.giris_post(username="editor", password=PAROLA).status_code, 401)
+        yanlis = self.giris_post(username="editor", password="yanlis-parola-1")
+        self.assertEqual((yanlis.status_code, yanlis.json()["message"]), (401, "Kimlik doğrulanamadı."))
+        self.assertTrue(DenetimKaydi.objects.filter(eylem="api_giris_basarisiz", ozet__contains="kapalı").exists())
 
     def test_parola_ile_basari_ve_denetim(self):
         self.ac(self.editor)
@@ -499,17 +505,22 @@ class ParolaGirisiTesti(ApiTemel):
         self.ac(self.editor)
         gizli = pyotp.random_base32()
         MFACihazi.objects.create(kullanici=self.editor, gizli_anahtar=gizli, onayli=True)
-        self.assertEqual(self.giris_post(username="editor", password=PAROLA).status_code, 401)
-        self.assertEqual(self.giris_post(username="editor", password=PAROLA, totp="000000").status_code, 401)
+        eksik = self.giris_post(username="editor", password=PAROLA)
+        self.assertEqual((eksik.status_code, eksik.json()["message"]), (401, "Kimlik doğrulanamadı."))
+        yanlis = self.giris_post(username="editor", password=PAROLA, totp="000000")
+        self.assertEqual((yanlis.status_code, yanlis.json()["message"]), (401, "Kimlik doğrulanamadı."))
+        self.assertTrue(DenetimKaydi.objects.filter(eylem="api_giris_basarisiz", ozet__contains="totp").exists())
         yanit = self.giris_post(username="editor", password=PAROLA, totp=pyotp.TOTP(gizli).now())
         self.assertEqual(yanit.status_code, 200)
         # Aynı kod yeniden kullanılamaz.
         self.assertEqual(self.giris_post(username="editor", password=PAROLA, totp=pyotp.TOTP(gizli).now()).status_code, 401)
 
-    def test_mfa_zorunlu_ama_kurulu_degil(self):
+    def test_mfa_zorunlu_ama_kurulu_degil_401(self):
         self.ac(self.editor)
         with override_settings(MFA_ZORUNLU=True):
-            self.assertEqual(self.giris_post(username="editor", password=PAROLA).status_code, 403)
+            yanit = self.giris_post(username="editor", password=PAROLA)
+            self.assertEqual((yanit.status_code, yanit.json()["message"]), (401, "Kimlik doğrulanamadı."))
+            self.assertTrue(DenetimKaydi.objects.filter(eylem="api_giris_basarisiz", ozet__contains="MFA zorunlu").exists())
 
     def test_deneme_siniri_429(self):
         self.ac(self.editor)

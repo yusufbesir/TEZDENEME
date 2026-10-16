@@ -74,9 +74,15 @@ class TemelTest(TestCase):
         return k
 
     def setUp(self):
+        from unittest import mock
+
         from django.core.cache import cache
 
         cache.clear()
+        # Testlerde ağ yok: otomatik başlık çekme varsayılan olarak boş döner (yakalayan testler kendi yamasını kullanır).
+        yama = mock.patch("qr.baslik_cek.sayfa_basligi", return_value="")
+        self.baslik_yamasi = yama.start()
+        self.addCleanup(yama.stop)
 
     def giris(self, kullanici):
         self.client.force_login(kullanici)

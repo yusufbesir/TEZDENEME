@@ -30,7 +30,7 @@ Authorization: Bearer <ANAHTAR>
 
 ### 2.2 Kullanıcı adı + parola (isteğe bağlı, varsayılan KAPALI)
 
-Anahtar yerine, `Authorization` başlığı olmadan **POST gövdesinde** `username` ve `password` gönderilebilir. Her kullanıcı bunu kendisi açmalıdır: panelde **API anahtarlarım** sayfasında “Parola girişini aç” (mevcut parola istenir). Kapalıyken doğru parola bile 403 alır.
+Anahtar yerine, `Authorization` başlığı olmadan **POST gövdesinde** `username` ve `password` gönderilebilir. Her kullanıcı bunu kendisi açmalıdır: panelde **API anahtarlarım** sayfasında “Parola girişini aç” (mevcut parola istenir). Kapalıyken doğru parola bile 401 alır.
 
 ```bash
 curl -s -X POST https://ALAN-ADINIZ/api/v1/ \
@@ -39,7 +39,8 @@ curl -s -X POST https://ALAN-ADINIZ/api/v1/ \
 
 - Parola ve `totp` **yalnızca POST gövdesinde** kabul edilir; sorgu dizesinde gelirse 401.
 - Hesapta MFA etkinse `totp` kodu **zorunludur** (MFA atlatılamaz). Aynı kod ikinci kez kabul edilmez; bu yüzden MFA’lı hesapta en fazla 30 saniyede bir istek yapılabilir. Sık kullanım için API anahtarı kullanın.
-- MFA zorunlu (`MFA_ZORUNLU`) ama hesapta kurulu değilse 403.
+- MFA zorunlu (`MFA_ZORUNLU`) ama hesapta kurulu değilse de 401.
+- **Tek tip 401:** parola girişinde yanlış parola, eksik/yanlış `totp`, parola girişinin kapalı olması ve MFA’nın kurulu olmaması durumlarının hepsi aynı HTTP 401 ve aynı `Kimlik doğrulanamadı.` mesajını döndürür ve aynı başarısız-deneme sayacına yazılır; böylece yanıt parolanın doğru olup olmadığını ele vermez. Gerçek neden yalnızca denetim kaydında (`api_giris_basarisiz`) görünür.
 - Başarısız denemeler panel girişiyle **aynı sayaçları** kullanır (IP başına dakikada `GIRIS_HIZ_SINIRI`=10, kullanıcı+IP / IP / hesap kilitleri); aşılırsa 429 ve doğru parola bile reddedilir. Başarılı ve başarısız girişler denetim kaydına yazılır (parola yazılmaz).
 - Parola her istekte gönderildiği için yalnızca HTTPS üzerinden ve güvenilir betiklerde kullanın.
 
@@ -59,8 +60,8 @@ curl -s -X POST https://ALAN-ADINIZ/api/v1/ \
 |---|---|
 | 200 | Başarılı |
 | 400 | Geçersiz parametre (Türkçe mesaj) |
-| 401 | Kimlik doğrulama başarısız (yanlış/iptal anahtar, yanlış parola, eksik `totp`) |
-| 403 | Kimliğin sahibinin bu işlem için yetkisi yok; veya hesapta parola girişi kapalı |
+| 401 | Kimlik doğrulama başarısız (yanlış/iptal anahtar; parola girişinde: yanlış parola, eksik/yanlış `totp`, hesapta parola girişi kapalı, MFA zorunlu ama kurulu değil — hepsi aynı 401 ve aynı mesaj: `Kimlik doğrulanamadı.`) |
+| 403 | Kimliğin sahibinin bu işlem için yetkisi yok |
 | 404 | Kısa bağlantı bulunamadı |
 | 405 | Yöntem desteklenmiyor |
 | 409 | Aynı hedef başka kodlarda kullanılıyor (`force=1` ile geçilir) |
@@ -74,7 +75,7 @@ curl -s -X POST https://ALAN-ADINIZ/api/v1/ \
 |---|---|
 | `url` | Zorunlu. Panel formuyla aynı güvenlik denetimi (yalnızca http/https, özel/iç ağ adresleri reddedilir). |
 | `keyword` | İsteğe bağlı kısa kod. Boşsa otomatik üretilir. Ayrılmış kelimeler ve biçim kuralları panelle aynıdır; büyük/küçük harf duyarsız benzersizdir. |
-| `title` | İsteğe bağlı hedef başlığı. |
+| `title` | İsteğe bağlı hedef başlığı. Boşsa ve ayar açıksa sunucu hedef sayfanın başlığını güvenli biçimde çekmeye çalışır (başarısız olursa boş kalır; bkz. GUVENLIK.md). Yanıttaki `title` kaydedilen değerdir. |
 | `ad` | İsteğe bağlı QR kod adı. Yoksa başlıktan, o da yoksa kısa koddan türetilir. |
 | `force` | `1` ise “aynı hedef” uyarısı geçilir. |
 
@@ -114,7 +115,7 @@ curl -s -H "Authorization: Bearer <ANAHTAR>" "https://ALAN-ADINIZ/api/v1/?action
 | Parametre | |
 |---|---|
 | `filter` | `top` (en çok taranan, varsayılan), `bottom`, `last` (en son oluşturulan), `rand` |
-| `limit` | 1-100, varsayılan 10 (verilmezse boş dönmez) |
+| `limit` | 1-100, varsayılan 10 (verilmezse boş dönmez). Yalnızca ASCII rakam kabul edilir (`1_0`, `+5`, `٣` 400 alır). |
 
 ```bash
 curl -s -H "Authorization: Bearer <ANAHTAR>" "https://ALAN-ADINIZ/api/v1/?action=stats&filter=top&limit=5"

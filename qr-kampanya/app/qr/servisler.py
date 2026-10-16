@@ -7,7 +7,7 @@ import segno
 from django.db import transaction
 
 from .middleware import ip_maskele, istemci_ip
-from .models import DenetimKaydi, HedefGecmisi, QRKod
+from .models import DenetimKaydi, GenelAyarlar, HedefGecmisi, QRKod, otomatik_kisa_kod
 
 QR_HATA_DUZELTME = "m"  # %15 hata toleransı: baskı hasarlarına karşı dayanıklı, kod yoğunluğu makul
 
@@ -107,6 +107,86 @@ def qr_durum_degistir(qr_listesi, yeni_durum, request):
             qr_kaydet(qr, request)
             sayi += 1
     return sayi
+
+
+# --- Otomatik kısa kod üretimi ---
+
+TABAN36 = "0123456789abcdefghijklmnopqrstuvwxyz"
+SIRALI_BASLANGIC = 36 ** 2  # 1296 = taban-36 "100": kısa kod deseni en az 3 karakter ister
+SIRALI_EN_FAZLA_ATLAMA = 10000
+
+
+def taban36(sayi):
+    """Negatif olmayan tam sayı -> küçük harfli taban-36 metni (1296 -> "100")."""
+    if sayi < 0:
+        raise ValueError("Negatif sayı")
+    if sayi == 0:
+        return "0"
+    rakamlar = []
+    while sayi:
+        sayi, kalan = divmod(sayi, 36)
+        rakamlar.append(TABAN36[kalan])
+    return "".join(reversed(rakamlar))
+
+
+def _kod_kullanilabilir(kod, ayrilmis, kullanilan):
+    anahtar = QRKod.anahtar(kod)
+    return anahtar not in ayrilmis and anahtar not in kullanilan and not QRKod.objects.filter(kod_anahtari=anahtar).exists()
+
+
+def sirali_kod_ayir(ayrilmis=None, kullanilan=None):
+    """Sıradaki sıralı kodu AYIRIR (sayacı ilerletir) ve döndürür.
+
+    Yarış koşulu yoktur: GenelAyarlar satırı `select_for_update` ile kilitlenir, sayaç aynı işlemde artırılır; eşzamanlı
+    iki istek aynı sayıyı alamaz. Ayrılmış ya da zaten kullanılan kod çıkarsa atlanır (numara yanar, boşluk kalabilir).
+    Çağıran bir işlemin içindeyse kilit o işlem bitene kadar tutulur (sayaç geri alınırsa numara da geri gelir)."""
+    GenelAyarlar.al()  # satır yoksa oluştur
+    with transaction.atomic():
+        ayar = GenelAyarlar.objects.select_for_update().get(pk=1)
+        if ayrilmis is None:
+            ayrilmis = ayar.ayrilmis_kume()
+        kullanilan = kullanilan if kullanilan is not None else ()
+        sayac = max(ayar.sirali_sayac, SIRALI_BASLANGIC)
+        for _ in range(SIRALI_EN_FAZLA_ATLAMA):
+            kod, sayac = taban36(sayac), sayac + 1
+            if _kod_kullanilabilir(kod, ayrilmis, kullanilan):
+                GenelAyarlar.objects.filter(pk=1).update(sirali_sayac=sayac)
+                return kod
+        raise ValueError("Sıralı kod üretilemedi: art arda çok sayıda kod kullanımda.")
+
+
+def kod_uretici(kalici=True, ayrilmis=None, kullanilan=None):
+    """Genel ayardaki biçime göre (`rastgele` | `sirali`) çağrıldıkça yeni kısa kod veren fonksiyon döndürür.
+
+    kalici=False (önizleme): sıralı kodda sayaç ilerletilmez/kilitlenmez; bellekte, sayacın o anki değerinden ilerlenir.
+    `kullanilan`: aynı toplu işlemde zaten verilmiş kodların küçük harfli kümesi (üretilen kod buraya eklenir)."""
+    ayar = GenelAyarlar.al()
+    ayrilmis = ayar.ayrilmis_kume() if ayrilmis is None else ayrilmis
+    kullanilan = set() if kullanilan is None else kullanilan
+    sirali = ayar.kod_uretim_bicimi == GenelAyarlar.KodBicimi.SIRALI
+    imlec = [max(ayar.sirali_sayac, SIRALI_BASLANGIC)]
+
+    def uret():
+        if not sirali:
+            for _ in range(50):
+                aday = otomatik_kisa_kod()
+                if _kod_kullanilabilir(aday, ayrilmis, kullanilan):
+                    kullanilan.add(QRKod.anahtar(aday))
+                    return aday
+            raise ValueError("Otomatik kod üretilemedi, lütfen tekrar deneyin.")
+        if kalici:
+            kod = sirali_kod_ayir(ayrilmis, kullanilan)
+        else:
+            for _ in range(SIRALI_EN_FAZLA_ATLAMA):
+                kod, imlec[0] = taban36(imlec[0]), imlec[0] + 1
+                if _kod_kullanilabilir(kod, ayrilmis, kullanilan):
+                    break
+            else:
+                raise ValueError("Sıralı kod üretilemedi: art arda çok sayıda kod kullanımda.")
+        kullanilan.add(QRKod.anahtar(kod))
+        return kod
+
+    return uret
 
 
 def qr_svg(veri, olcek=10):

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .panel import api_anahtarlari, giris, ice_aktarma, icerik, mfa, pano, qrler, rapor, yonetim
+from .panel import api_anahtarlari, giris, hizli, ice_aktarma, icerik, mfa, pano, qrler, rapor, yonetim
 
 app_name = "panel"
 
@@ -19,6 +19,9 @@ urlpatterns = [
     path("api-anahtarlari/parola-girisi", api_anahtarlari.parola_girisi_ayarla, name="api_parola_girisi"),
     path("api-anahtarlari/yeni", api_anahtarlari.olustur, name="api_anahtari_olustur"),
     path("api-anahtarlari/<int:pk>/iptal", api_anahtarlari.iptal, name="api_anahtari_iptal"),
+
+    path("kisalt/", hizli.hizli_kisalt, name="hizli_kisalt"),
+    path("kisalt/<int:pk>/", hizli.hizli_sonuc, name="hizli_sonuc"),
 
     path("qr/", qrler.qr_liste, name="qr_liste"),
     path("qr/yeni", qrler.qr_olustur, name="qr_olustur"),

@@ -35,6 +35,7 @@ from .sayac import GirisDenemesi
 from .servisler import denetim_yaz, qr_kaydet
 
 API_SURUMU = "1"
+KIMLIK_DOGRULANAMADI = "Kimlik doğrulanamadı."
 BICIMLER = ("json", "xml", "simple")
 EYLEMLER = ("shorturl", "expand", "url-stats", "stats", "db-stats", "version")
 SIMPLE_EYLEMLERI = ("shorturl", "expand")
@@ -167,27 +168,33 @@ def _parola_girisi(request, bicim):
         yanit["Retry-After"] = str(settings.GIRIS_KILIT_SURESI_SN)
         return None, yanit
 
-    def basarisiz(mesaj):
+    def basarisiz(neden):
+        """Her başarısızlık (yanlış parola, eksik/yanlış totp, parola girişi kapalı, MFA kurulu değil) istemciye AYNI 401 ve AYNI
+        mesajla döner ve aynı başarısız-deneme sayacına yazılır; böylece yanıt parolanın doğru olup olmadığını ele vermez.
+        Gerçek neden yalnızca denetim kaydına yazılır."""
         if deneme.sayi_ui <= DENETIM_KAYIT_SINIRI:
-            denetim_yaz(request, "api_giris_basarisiz", None, f"Denenen kullanıcı adı: {kullanici_adi_ozeti(kullanici_adi)}")
+            denetim_yaz(
+                request, "api_giris_basarisiz", None,
+                f"Denenen kullanıcı adı: {kullanici_adi_ozeti(kullanici_adi)}; neden: {neden}",
+            )
         if deneme.sinira_ulasti:
             return None, _hiz_yaniti(bicim, "Çok fazla başarısız deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.")
-        yanit = _yanit(bicim, 401, mesaj)
+        yanit = _yanit(bicim, 401, KIMLIK_DOGRULANAMADI)
         yanit["WWW-Authenticate"] = 'Bearer realm="api"'
         return None, yanit
 
     kullanici = authenticate(request, username=kullanici_adi, password=parola) if kullanici_adi and parola else None
     if kullanici is None:
-        return basarisiz("Kullanıcı adı veya parola hatalı.")
+        return basarisiz("kullanıcı adı veya parola hatalı")
     ayar = KullaniciApiAyari.objects.filter(kullanici=kullanici).first()
     if ayar is None or not ayar.parola_girisi:
-        return None, _yanit(bicim, 403, "Bu hesapta API parola girişi kapalı. Panelde “API anahtarlarım” sayfasından açabilir veya API anahtarı kullanabilirsiniz.")
+        return basarisiz("parola doğru ama hesapta API parola girişi kapalı")
     cihaz = MFACihazi.objects.filter(kullanici=kullanici, onayli=True).first()
     if cihaz is not None:
         if not kod_dogrula(cihaz.pk, request.POST.get("totp", "")):
-            return basarisiz("Kullanıcı adı veya parola hatalı ya da totp kodu eksik/geçersiz.")
+            return basarisiz("parola doğru ama totp kodu eksik/geçersiz")
     elif settings.MFA_ZORUNLU:
-        return None, _yanit(bicim, 403, "İki adımlı doğrulama (MFA) zorunlu; önce panelden kurun.")
+        return basarisiz("parola doğru ama MFA zorunlu ve hesapta kurulu değil")
     deneme.basarili()
     request.user = kullanici
     denetim_yaz(request, "api_giris_basarili", kullanici, f"{kullanici.get_username()} API'ye parolayla giriş yaptı")
@@ -255,7 +262,7 @@ def _eylem_shorturl(request, anahtar, bicim):
         return _yanit(bicim, 400, " ".join(ayrintilar) or "Geçersiz istek.")
     qr = form.save(commit=False)
     if not qr.ad:
-        qr.ad = qr.kisa_kod  # ad verilmedi: başlık da yoksa kısa koddan türet
+        qr.ad = qr.baslik[:200] or qr.kisa_kod  # ad verilmedi: (çekilmiş olabilen) başlıktan, o da yoksa kısa koddan türet
     kaynak = anahtar.kaynak
     try:
         qr.full_clean()
@@ -317,10 +324,8 @@ def _eylem_stats(request, anahtar, bicim):
     if not ham_limit:
         limit = VARSAYILAN_LIMIT
     else:
-        try:
-            limit = int(ham_limit)
-        except ValueError:
-            limit = 0
+        # Yalnızca ASCII rakam: int() "1_0", " 5", "+5", "٣" gibi biçimleri de kabul eder.
+        limit = int(ham_limit) if ham_limit.isascii() and ham_limit.isdigit() else 0
         if not 1 <= limit <= EN_FAZLA_LIMIT:
             return _yanit(bicim, 400, f"limit 1 ile {EN_FAZLA_LIMIT} arasında bir tam sayı olmalı.")
     sorgu = QRKod.objects.select_related("sayfa").annotate(

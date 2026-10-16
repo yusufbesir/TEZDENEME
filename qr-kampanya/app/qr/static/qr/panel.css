@@ -102,3 +102,7 @@ input[disabled], input[readonly] { background: #eee9dc; color: #555; }
   .menu a, .menu-cikis { border-bottom: 0; padding: .35rem .6rem; border-radius: 6px; width: auto; }
   .menu a:hover, .menu-cikis:hover { background: #2a2a2a; }
 }
+
+/* Paylaşım kutusu ve hızlı kısalt */
+.paylasim input[type="text"] { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; }
+#yer-imi-kodu { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; }

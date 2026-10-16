@@ -200,6 +200,7 @@ class QRKod(ZamanDamgali):
         MAGAZA = "magaza", "Mağaza"
         BILGI = "bilgi", "Bilgilendirme"
         DIGER = "diger", "Diğer"
+        LINK = "link", "Kısa link"
 
     class HedefTuru(models.TextChoices):
         HARICI = "harici", "Harici web adresi"
@@ -387,6 +388,10 @@ class DenetimKaydi(models.Model):
 class GenelAyarlar(models.Model):
     """Tek satırlık genel ayarlar (varsayılan yönlendirme davranışları, marka)."""
 
+    class KodBicimi(models.TextChoices):
+        RASTGELE = "rastgele", "Rastgele (tahmin edilmesi zor)"
+        SIRALI = "sirali", "Sıralı (1, 2, … taban-36: 100, 101, …)"
+
     marka_adi = models.CharField("marka adı", max_length=100, default="Örnek Firma")
     pasif_mesaj = models.TextField("pasif kod mesajı", default="Bu QR kod şu anda kullanımda değil.")
     baslamadi_mesaj = models.TextField("başlamamış kampanya mesajı", default="Bu kampanya henüz başlamadı. Lütfen daha sonra tekrar deneyin.")
@@ -404,6 +409,20 @@ class GenelAyarlar(models.Model):
     ayni_hedef_uyarisi = models.BooleanField(
         "aynı hedef uyarısı", default=True,
         help_text="Yeni QR oluştururken aynı hedef adresi başka bir kodda kullanılıyorsa onay iste.",
+    )
+    baslik_otomatik_cek = models.BooleanField(
+        "başlığı otomatik çek", default=True,
+        help_text="Yeni kayıtta başlık boş bırakılırsa ve hedef harici bir adresse, sunucu hedef sayfanın başlığını "
+                  "(<title>) güvenli biçimde çekmeye çalışır. Başarısız olursa başlık boş kalır.",
+    )
+    kod_uretim_bicimi = models.CharField(
+        "otomatik kod biçimi", max_length=10, choices=KodBicimi.choices, default=KodBicimi.RASTGELE,
+        help_text="Kısa kod boş bırakıldığında üretilecek kodun biçimi. Sıralı kodlar tahmin edilebilir; "
+                  "yalnızca gizli olması gerekmeyen bağlantılar için kullanın.",
+    )
+    sirali_sayac = models.PositiveBigIntegerField(
+        "sıralı kod sayacı", default=1296, editable=False,
+        help_text="Sıradaki sıralı kodun sayısı (taban-36 “100” = 1296'dan başlar). Satır kilidiyle artırılır.",
     )
 
     class Meta:

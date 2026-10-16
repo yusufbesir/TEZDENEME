@@ -204,7 +204,7 @@ def ice_aktarma_uygula(request, pk):
                 messages.error(request, "Bu içe aktarma zaten uygulanmış veya iptal edilmiş.")
                 return redirect("panel:ice_aktarma_liste")
             not_metni = (NOT_ONEKI + ia.dosya_adi)[:300]
-            analiz = ia_modul.analiz_et(ia)
+            analiz = ia_modul.analiz_et(ia, kalici=True)
             sonuc = _uygula(request, analiz, guncelle, not_metni)
             sonuc["dosya_adi"] = ia.dosya_adi
             sonuc["guncelleme_acik"] = guncelle

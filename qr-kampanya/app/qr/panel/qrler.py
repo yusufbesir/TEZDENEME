@@ -23,7 +23,7 @@ from ..hiz import qr_olusturma_hiz_siniri
 from ..models import Kampanya, KampanyaSayfasi, Magaza, QRKod, Tarama
 from ..servisler import denetim_yaz, qr_durum_degistir, qr_kaydet, qr_png, qr_svg
 from .formlar import QRKodForm
-from .yardimci import csv_yaz, sayfalandir, tablo_yaniti, yerel_metin, yetki
+from .yardimci import csv_yaz, paylasim_baglantilari, sayfalandir, tablo_yaniti, yerel_metin, yetki
 
 TOPLU_EN_FAZLA = 1000
 ISLEMLER = {
@@ -169,6 +169,7 @@ def qr_detay(request, pk):
         "tarama": tarama,
         "test_url": test_url,
         "zaman_durumu": qr.zaman_durumu(),
+        "paylasim": paylasim_baglantilari(qr.kisa_url, qr.baslik or qr.ad),
         "gecmis": qr.hedef_gecmisi.select_related("kullanici", "eski_sayfa", "yeni_sayfa").order_by("-zaman", "-id")[:100],
     })
 

@@ -2,6 +2,7 @@
 import csv
 from datetime import datetime, time, timedelta
 from functools import wraps
+from urllib.parse import quote
 
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
@@ -83,6 +84,19 @@ def etkin_bitis_ekle(qrler):
     for q in qrler:
         q.etkin_bitis = q.bitis or (q.kampanya.bitis if q.kampanya_id else None)
     return qrler
+
+
+def paylasim_baglantilari(kisa_url, metin=""):
+    """Paylaşım kutusu için YALNIZCA bağlantılar (harici betik/eklenti yok). Değerler yüzde-kodlanır (HTML'e ayrıca şablonda
+    kaçırılır); metindeki satır sonu/kontrol karakterleri tek boşluğa indirilir (mailto başlık enjeksiyonunu önler)."""
+    metin = " ".join(str(metin or "").split())[:200]
+    mesaj = f"{metin} {kisa_url}".strip()
+    url_k, mesaj_k, metin_k = quote(kisa_url, safe=""), quote(mesaj, safe=""), quote(metin, safe="")
+    return {
+        "whatsapp": f"https://wa.me/?text={mesaj_k}",
+        "eposta": f"mailto:?subject={quote(metin or kisa_url, safe='')}&body={mesaj_k}",
+        "x": f"https://x.com/intent/post?text={metin_k}&url={url_k}",
+    }
 
 
 def insan_boyutu(bayt):

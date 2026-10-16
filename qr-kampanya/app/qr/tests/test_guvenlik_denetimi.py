@@ -390,8 +390,8 @@ class EszamanliDegisiklikTesti(IceAktarmaTabani):
         ia = self.yukle(csv_dosyasi("kod,ad\nESZ003,Yeni Ad\n"))
         gercek = ia_modul.analiz_et
 
-        def araya_gir(kayit):
-            analiz = gercek(kayit)  # önizleme/analiz eski hedefi okudu
+        def araya_gir(kayit, **kw):
+            analiz = gercek(kayit, **kw)  # önizleme/analiz eski hedefi okudu
             QRKod.objects.filter(pk=qr.pk).update(hedef_url="https://example.com/baska-kullanici")
             return analiz
 

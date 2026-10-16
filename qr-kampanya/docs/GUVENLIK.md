@@ -25,7 +25,7 @@ Sistem internete açık bir üretim uygulaması olarak tasarlandı: HTTPS zorunl
 | Girdi doğrulama | Sunucu tarafında form ve model doğrulaması; içe aktarmada satır satır doğrulama. |
 | Hedef URL doğrulaması | Yalnızca `http`/`https`; `javascript:`, `data:`, `file:` vb. reddedilir; URL içinde kullanıcı:parola, `localhost`, özel/yerel IP adresleri reddedilir. Kayıtlı URL her yönlendirmede yeniden doğrulanır. |
 | Açık yönlendirme | `/k/<kod>` yalnızca yöneticinin kaydettiği hedefe gider; istekten gelen bir adrese yönlendirme yapan uç yoktur. |
-| SSRF | Sunucu, kullanıcı tarafından girilen URL'leri **hiçbir zaman çağırmaz**. “Hedefi test et” bağlantıyı kullanıcının tarayıcısında açar. |
+| SSRF | Sunucu, kullanıcı tarafından girilen URL'leri yönlendirme, “Hedefi test et” veya içe aktarma sırasında **çağırmaz**; bunlar tarayıcıda açılır. **Tek istisna** yeni kayıtta isteğe bağlı otomatik başlık çekmedir (aşağıda “Başlık çekme ve SSRF önlemleri”); genel ayarlardan kapatılabilir (`baslik_otomatik_cek`). |
 | Dosya yükleme | Yalnızca JPG/PNG/WebP, 5 MB sınırı, Pillow ile görsel doğrulaması, rastgele dosya adı; SVG/HTML yüklenemez; görseller ayrı ve sıkı CSP ile sunulur. |
 | Görsellere erişim | Caddy her `/medya/` isteğinde önce uygulamaya sorar (`forward_auth` → `/ic/medya-yetki`). Yalnızca **yayındaki** sayfaların görselleri herkese açıktır; taslak ve arşiv sayfaların görsellerini yalnızca panele MFA ile giriş yapmış ve sayfa görme yetkisi olan kullanıcılar görür. Diğer her istek 404. `/ic/*` dışarıya kapalıdır. |
 | Gizli bilgiler | `.env` (izin 600, `.gitignore`'da). Kaynak kodda parola/anahtar yok. Zayıf `DJANGO_SECRET_KEY` ile üretimde uygulama başlamaz. |
@@ -40,6 +40,19 @@ Sistem internete açık bir üretim uygulaması olarak tasarlandı: HTTPS zorunl
 | Günlükler | Docker günlük döndürme (10 MB × 5). Caddy erişim günlüklerinde istemci IP'si maskelenir (IPv4 /24, IPv6 /48), çerez ve `X-Forwarded-For` yazılmaz; veritabanında IP saklanmaz. |
 | Yedekleme | Günlük otomatik, doğrulanmış yedek; **age ile şifreli** (açık anahtarla şifrelenir, özel anahtar yedek konteynerinde yoktur); sha256 ile bütünlük kontrolü; geri yükleme testi betiği. Eski yerel yedekler yalnızca sunucu dışı kopyası rclone ile doğrulandıysa silinir; doğrulama yoksa hiçbir yedek silinmez ve panel uyarı gösterir. |
 | Bağımlılıklar | Bütün Python paketleri (geçişliler dahil) sürüm ve **hash** ile sabittir (`--require-hashes`); hash'i tutmayan paket kurulmaz. `scripts/guvenlik-tarama.sh` (pip-audit) bilinen zafiyetleri tarar. Son tarama: `docs/kanit/pip-audit-2026-10-15.txt` (zafiyet yok). |
+
+## Başlık çekme ve SSRF önlemleri
+
+Yeni bir kayıtta (hızlı kısalt, yeni QR formu, API `shorturl`) başlık boş bırakılır ve hedef harici bir adresse, sunucu hedef sayfanın `<title>` değerini çekmeye çalışır (`app/qr/baslik_cek.py`). Sunucunun kullanıcı girdisine bağlandığı tek yer burasıdır; önlemler:
+
+- **Şema ve ad:** yalnızca `http`/`https`; `guvenli_url_dogrula` (kimlik bilgisi, `localhost`, `.local/.internal/.lan` uzantıları, IP sabitleri) önce uygulanır.
+- **DNS çözümü ve tüm adresler genel olmalı:** ad çözülür; dönen adreslerin **herhangi biri** genel (global) IP değilse istek yapılmaz. Reddedilenler: özel (10/8, 172.16/12, 192.168/16, fc00::/7), loopback, link-local (169.254/16 — bulut meta veri uçları dahil, fe80::/10), CGNAT (100.64/10), multicast, ayrılmış, belirtilmemiş (0.0.0.0, ::), belgeleme aralıkları ve IPv4 içeren IPv6 biçimleri (v4-mapped, 6to4, Teredo, NAT64) için gömülü IPv4 de denetlenir. `127.1`, ondalık/sekizlik yazımlar çözümleyici tarafından gerçek adrese çevrildiği için aynı denetime düşer.
+- **DNS rebinding'e karşı:** bağlantı, doğrulanan IP adresine kurulur (ikinci bir çözümleme yok). `Host` başlığı ve TLS SNI/sertifika doğrulaması özgün ad ile yapılır (sertifika doğrulaması açıktır).
+- **Yönlendirmeler elle, en fazla 3:** her adımda şema/ad denetimi ve DNS+IP denetimi yinelenir; genel bir adresten özel bir adrese yönlendirme reddedilir.
+- **Sınırlar:** toplam süre 3 sn ve DNS çözümü, bağlantı, durum satırı/başlıklar ve gövde okumanın tamamını kapsar. Her okumadan önce soket zaman aşımı kalan süreye çekilir, tek `recv` okunur (`read1`) ve ayrıca süre dolunca soketi kapatan bir bekçi zamanlayıcı çalışır; bu yüzden damla damla veri gönderen sunucu süreyi uzatamaz, süre dolarsa kısmi veri kullanılmadan boş başlık döner. En fazla 256 KB okunur, yalnızca `200` + `text/html`, sıkıştırma istenmez (`Accept-Encoding: identity`), çerez/kimlik bilgisi gönderilmez.
+- **Çıktı:** HTML entity çözülür, kontrol ve çift yönlü (bidi) karakterler atılır, boşluklar sadeleştirilir, 300 karaktere kesilir. Başlık metin olarak saklanır; şablonlar kaçırır (HTML olarak yorumlanmaz).
+- **Sessiz başarısızlık:** her hata (reddedilen adres, zaman aşımı, TLS hatası, uygunsuz içerik) boş başlık demektir ve kaydı engellemez; ayrıntı kullanıcıya veya yanıta sızdırılmaz (ağ taraması için bir sorgu aracı olmasın).
+- **Kalan risk:** sunucunun genel internete giden bir istek yapması, hedef sitenin günlüklerinde sunucu IP'sinin (`QRKampanya-BaslikOkuyucu/1.0`) görünmesine yol açar. Yalnızca yeni kayıtta ve başlık boşken çalışır; kapatmak için Ayarlar'da “başlığı otomatik çek” kutusunu kaldırın. Yönlendirme ucu (`/k/`) ve içe aktarma hiçbir zaman ağ isteği yapmaz.
 
 ## Üretime geçmeden önce kontrol listesi
 

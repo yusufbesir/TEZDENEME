@@ -44,6 +44,18 @@
 
 **Oluşturma hız sınırı:** Kullanıcı başına dakikada en çok `QR_OLUSTURMA_HIZ_SINIRI` (varsayılan 30) yeni QR oluşturma isteği; toplu içe aktarmayı başlatma (dosya yükleme) isteği de bu sayaçtan 1 sayılır. Aşılırsa bir dakika bekleyin (429).
 
+## 3a. Hızlı kısalt, yer imi düğmesi ve paylaşım
+
+**Hızlı kısalt** (menüde en üstte): yalnızca uzun adresi yapıştırırsınız; isteğe bağlı kısa kod ve başlık da girebilirsiniz. **Kısalt**'a basınca “Kısa link” türünde bir kayıt oluşur. Doğrulama normal QR formuyla aynıdır: ayrılmış kelimeler, aynı hedef uyarısı (“Yine de kaydet” onayı), oluşturma hız sınırı. QR adı boşsa başlıktan, o da yoksa hedefin alan adından türetilir. Sonuç ekranında kısa link, **Kopyala** düğmesi, QR önizleme (PNG/SVG indirme), paylaşım kutusu ve **Bir tane daha** formu bulunur. Gereken yetki: QR ekleme (Editör, Yönetici).
+
+**Başlığı otomatik çekme:** Başlığı boş bırakırsanız ve hedef harici bir adresse, sunucu hedef sayfanın başlığını (`<title>`) çekmeye çalışır (hızlı kısalt, “Yeni QR kod” formu ve API `shorturl`). Yalnızca yeni kayıtta çalışır; başarısız olursa başlık boş kalır, kayıt engellenmez. Güvenlik önlemleri için [GUVENLIK.md](GUVENLIK.md). **Ayarlar → başlığı otomatik çek** kutusundan kapatılır.
+
+**Yer imi düğmesi:** Hızlı kısalt sayfasındaki “Yer imi düğmesi” bölümündeki düğmeyi tarayıcınızın yer imleri çubuğuna sürükleyin (sürükleyemiyorsanız kodu kopyalayıp yeni bir yer iminin adresine yapıştırın). Herhangi bir sayfadayken tıklarsanız, o sayfanın adresi ve başlığı Hızlı kısalt sayfasına yeni pencerede **önceden doldurulmuş** olarak açılır (`/panel/kisalt/?url=…&baslik=…`). **Hiçbir şey kendiliğinden kaydedilmez**: kayıt yalnızca sayfada “Kısalt”a basınca (POST + CSRF) olur. Giriş yapmamışsanız önce giriş sayfası açılır. Yer imi kodu panelin tam adresini içerir; panel adresi değişirse düğmeyi yeniden ekleyin. Sıkı içerik güvenlik politikası (CSP) kullanan bazı sitelerde tarayıcı yer imi betiğini çalıştırmayabilir; panel sayfasında düğmeye tıklamak ise bilerek bir şey yapmaz.
+
+**Paylaşım kutusu** (QR detay sayfası ve hızlı kısalt sonucu): kısa link metin kutusu + **Kopyala**, **WhatsApp ile paylaş**, **E-posta ile paylaş** (mailto), **X'te paylaş** ve **QR PNG indir**. Paylaşım düğmeleri yalnızca bağlantıdır; harici betik veya izleme yoktur. Başlık/ad bağlantıya yüzde-kodlanarak eklenir.
+
+**Sıralı kod seçeneği:** Ayarlar → “otomatik kod biçimi”: `rastgele` (varsayılan; tahmin edilmesi zor 8 karakter) ya da `sirali` (küçük harf+rakam, taban-36 artan: `100`, `101`, … `10z`, `110`, …; en az 3 karakter kuralı için sayaç “100”den başlar). Kısa kod alanı boş bırakıldığında (panel formu, hızlı kısalt, API `shorturl`, toplu içe aktarmada kodsuz satırlar) bu biçim kullanılır; kendiniz yazdığınız kodlar sayaca dokunmaz. Ayrılmış ya da zaten var olan kod çıkarsa atlanır (numara boşluk bırakabilir). Sayaç veritabanında satır kilidiyle artırılır, eşzamanlı isteklerde aynı kod iki kez verilmez. Toplu içe aktarma önizlemesi sayaç harcamaz; kodlar “uygula” adımında ayrılır. **Dikkat:** sıralı kodlar tahmin edilebilir; gizli olması gereken bağlantılar için rastgele biçimi kullanın.
+
 ## 4. Hedefi değiştirmek (basılı kod aynı kalır)
 
 1. QR kodun detay sayfasında **Düzenle**.

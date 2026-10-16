@@ -21,6 +21,7 @@ from .dogrulama import guvenli_url_dogrula
 from .models import (
     GenelAyarlar, Kampanya, KampanyaSayfasi, Magaza, QRKod, Urun, ayrilmis_kod_hatasi, kisa_kod_dogrula, otomatik_kisa_kod,
 )
+from .servisler import kod_uretici
 
 EN_FAZLA_BAYT = 5 * 1024 * 1024
 EN_FAZLA_SATIR = 20000
@@ -402,7 +403,7 @@ def _yerel(dt):
     return timezone.localtime(dt, ZAMAN_DILIMI).strftime("%d.%m.%Y %H:%M") if dt else ""
 
 
-def analiz_et(ia):
+def analiz_et(ia, kalici=False):
     """İçe aktarma kaydındaki satırları eşleştirmeye göre doğrular. DB'ye yazmaz."""
     eslesme = ia.eslesme or {}
     alanlar = eslesme.get("alanlar", [])
@@ -434,6 +435,11 @@ def analiz_et(ia):
     kullanilan_kodlar = set(anahtarlar)
     ayar = GenelAyarlar.al()
     ayrilmis = ayar.ayrilmis_kume()
+    # Otomatik kod: genel ayardaki biçime uyar. kalici=True yalnızca uygulama adımında (işlem içinde) sıralı sayacı
+    # gerçekten ilerletir; önizlemede sayaç değişmez.
+    kod_uret = None
+    if ayar.kod_uretim_bicimi == GenelAyarlar.KodBicimi.SIRALI:  # rastgele biçim: aşağıdaki mevcut döngü aynen kullanılır
+        kod_uret = kod_uretici(kalici=kalici, ayrilmis=ayrilmis, kullanilan=kullanilan_kodlar)
     # Aynı hedef uyarısı: dosyadaki URL'lerden hangileri arşivlenmemiş başka kodlarda kullanılıyor (tam eşleşme).
     ayni_hedef = {}
     if ayar.ayni_hedef_uyarisi:
@@ -449,7 +455,7 @@ def analiz_et(ia):
     for d, s in zip(degerler, satirlar):
         sonuclar.append(_satir_coz(
             s["no"], d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili_yeni, iliskili_hata, kullanilan_kodlar,
-            ayrilmis=ayrilmis, ayni_hedef=ayni_hedef,
+            ayrilmis=ayrilmis, ayni_hedef=ayni_hedef, kod_uret=kod_uret,
         ))
 
     analiz = Analiz(sonuclar, [], [], [], [], [], iliskili_yeni, iliskili_hata)
@@ -466,7 +472,7 @@ def analiz_et(ia):
 
 
 def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili_yeni, iliskili_hata, kullanilan_kodlar,
-              ayrilmis=frozenset(), ayni_hedef=None):
+              ayrilmis=frozenset(), ayni_hedef=None, kod_uret=None):
     r = SatirSonucu(no=no)
     kod = d.get("kod", "")
     anahtar = QRKod.anahtar(kod)
@@ -589,11 +595,14 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
         qr = QRKod(kisa_kod=kod)
         if not kod:
             r.kod_otomatik = True
-            while True:
-                uretilen = otomatik_kisa_kod()
-                if uretilen.lower() not in kullanilan_kodlar and uretilen.lower() not in ayrilmis:
-                    break
-            kullanilan_kodlar.add(uretilen.lower())
+            if kod_uret is not None:
+                uretilen = kod_uret()
+            else:
+                while True:
+                    uretilen = otomatik_kisa_kod()
+                    if uretilen.lower() not in kullanilan_kodlar and uretilen.lower() not in ayrilmis:
+                        break
+                kullanilan_kodlar.add(uretilen.lower())
             qr.kisa_kod = r.kod = uretilen
         qr.ad = d.get("ad", "")
         qr.baslik = d.get("baslik", "")
