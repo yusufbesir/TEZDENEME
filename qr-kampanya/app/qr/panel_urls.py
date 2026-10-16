@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .panel import api_anahtarlari, giris, hizli, ice_aktarma, icerik, mfa, pano, qrler, rapor, yonetim
+from .panel import api_anahtarlari, giris, hizli, ice_aktarma, icerik, link_agaci, mfa, pano, qrler, rapor, yonetim
 
 app_name = "panel"
 
@@ -66,6 +66,23 @@ urlpatterns = [
     path("sayfalar/<int:pk>/duzenle", icerik.sayfa_duzenle, name="sayfa_duzenle"),
     path("sayfalar/<int:pk>/onizle", icerik.sayfa_onizle, name="sayfa_onizle"),
     path("sayfalar/<int:pk>/gorsel/<int:gorsel_pk>/sil", icerik.sayfa_gorsel_sil, name="sayfa_gorsel_sil"),
+
+    path("link-agaclari/", link_agaci.agac_liste, name="agac_liste"),
+    path("link-agaclari/yeni", link_agaci.agac_olustur, name="agac_olustur"),
+    path("link-agaclari/<int:pk>/", link_agaci.agac_detay, name="agac_detay"),
+    path("link-agaclari/<int:pk>/duzenle", link_agaci.agac_duzenle, name="agac_duzenle"),
+    path("link-agaclari/<int:pk>/onizle", link_agaci.agac_onizle, name="agac_onizle"),
+    path("link-agaclari/<int:pk>/stil.css", link_agaci.agac_stil, name="agac_stil"),
+    path("link-agaclari/<int:pk>/png", link_agaci.agac_png, name="agac_png"),
+    path("link-agaclari/<int:pk>/svg", link_agaci.agac_svg, name="agac_svg"),
+    path("link-agaclari/<int:pk>/durum", link_agaci.agac_durum, name="agac_durum"),
+    path("link-agaclari/<int:pk>/cop", link_agaci.agac_cope_tasi_gorunumu, name="agac_cope_tasi"),
+    path("link-agaclari/<int:pk>/geri-yukle", link_agaci.agac_geri_yukle, name="agac_geri_yukle"),
+    path("link-agaclari/<int:pk>/kisa-link", link_agaci.agac_kisa_link, name="agac_kisa_link"),
+    path("link-agaclari/<int:pk>/oge-ekle", link_agaci.agac_oge_ekle_gorunumu, name="agac_oge_ekle"),
+    path("link-agaclari/<int:pk>/oge/<int:oge_pk>/cikar", link_agaci.agac_oge_sil_gorunumu, name="agac_oge_cikar"),
+    path("link-agaclari/<int:pk>/oge/<int:oge_pk>/tasi", link_agaci.agac_oge_tasi_gorunumu, name="agac_oge_tasi"),
+    path("link-agaclari/<int:pk>/oge/<int:oge_pk>/duzenle", link_agaci.agac_oge_duzenle, name="agac_oge_duzenle"),
 
     path("ayarlar", yonetim.ayarlar, name="ayarlar"),
     path("kullanicilar/", yonetim.kullanici_liste, name="kullanici_liste"),

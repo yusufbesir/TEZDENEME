@@ -20,8 +20,8 @@ class GuvenlikBasliklariMiddleware:
         if request.path.startswith("/panel/"):
             yanit["Cache-Control"] = "no-store"
             yanit.setdefault("X-Robots-Tag", "noindex, nofollow")
-        elif request.path.startswith("/k/"):
-            # Kısa adres yanıtlarının hepsi (302, bilgi sayfaları, 404/410, 429) arama motoru dizinine girmesin.
+        elif request.path.startswith(("/k/", "/l/")):
+            # Kısa adres ve link ağacı yanıtlarının hepsi (302, bilgi sayfaları, 404/410, 429) arama motoru dizinine girmesin.
             yanit["X-Robots-Tag"] = "noindex, nofollow"
         return yanit
 

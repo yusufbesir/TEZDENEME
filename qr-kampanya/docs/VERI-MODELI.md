@@ -4,7 +4,7 @@
 
 ## Özet
 
-- 11 tablo + Django'nun kullanıcı/rol tabloları.
+- 18 uygulama tablosu + Django'nun kullanıcı/rol tabloları.
 - **Hiçbir QR kodu veya sayfa silinmez**; arşivlenir. QR kodlarda “silme” yalnızca **çöp kutusuna taşımadır** (kalıcı silme yoktur). İlişkiler `PROTECT` ile korunur.
 - Kısa kod büyük/küçük harf duyarsız benzersizdir ve oluşturulduktan sonra değiştirilemez.
 
@@ -23,6 +23,9 @@
 | `qr_denemesayaci` | Giriş/MFA başarısız deneme sayaçları (anahtar bir özettir; süresi dolunca yeniden kullanılır) | — | anahtar (unique), bitis | Süresi dolanlar otomatik sıfırlanır/temizlenir |
 | `qr_apianahtari` | API anahtarları (kullanıcı, ad, önek, HMAC özeti; düz anahtar saklanmaz) | kullanıcı (PROTECT) | onek (unique) | Silinmez; iptal = `iptal_zamani` dolar |
 | `qr_kullaniciapiayari` | Kullanıcı başına API ayarı (`parola_girisi`, varsayılan kapalı) | kullanıcı (CASCADE, 1-1) | kullanici (unique) | Kullanıcı panelden değiştirir |
+| `qr_linkagaci` | Link ağaçları (`/l/<slug>`): başlık, açıklama, tema (açık/koyu), vurgu rengi (`#RRGGBB`), durum (taslak/yayında/çöp), `onceki_durum`, `cope_atilma`, oluşturan | `slug` (küçük harf, 3-64, ayrılmış kelime denetimi, değiştirilemez) | durum | **Silinemez** (model hata verir, veritabanı tetikleyicisi 0012), çöp kutusuna taşınır |
+| `qr_linkagaciogesi` | Ağaçtaki düğmeler: `agac`, `sira`, `etiket` (100), `qr` (zorunlu, PROTECT; her bağlantı kısa linkten geçer), `gorunur` | — | — | Ağaçtan çıkarılabilir (kısa link ve taramaları silinmez); ağaç silinmediği için CASCADE fiilen çalışmaz |
+| `qr_linkagacigoruntuleme` | Günlük görüntüleme sayacı (ağaç, gün, sayı; IP/UA yok; `INSERT … ON CONFLICT DO UPDATE sayi = sayi + 1`) | (`agac`, `gun`) | — | Silinmez (ağaç PROTECT) |
 | `qr_tarama` | Takma adlı (pseudonymous) tarama olayları (zaman, sonuç, cihaz, bot, özet, `yonlendiren` alan adı, `ulke` kodu) | — | (qr, zaman), zaman | Saklama süresi sonunda temizlenir (`TARAMA_SAKLAMA_GUN`) |
 | `qr_denetimkaydi` | Yönetici işlemleri | — | zaman, eylem | Değiştirilemez ve silinemez (model düzeyinde) |
 | `qr_genelayarlar` | Varsayılan yönlendirme davranışları, marka, herkese açık istatistik anahtarları (`herkese_acik_istatistik`, `istatistikte_hedef_goster`; ikisi de varsayılan kapalı) | tek satır (id=1) | — | — |

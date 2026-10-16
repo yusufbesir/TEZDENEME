@@ -23,7 +23,7 @@
 | Rol | Yapabilecekleri |
 |---|---|
 | Yönetici | Her şey; kullanıcı ekleme, rol verme, MFA sıfırlama, genel ayarlar |
-| Editör | QR kod, kampanya, sayfa, ürün, mağaza ekleme/düzenleme/arşivleme; içe/dışa aktarma |
+| Editör | QR kod, kampanya, sayfa, ürün, mağaza, link ağacı ekleme/düzenleme/arşivleme; içe/dışa aktarma |
 | İzleyici | Yalnızca görüntüleme ve rapor indirme |
 
 ## 3. Tek QR kod oluşturmak
@@ -160,6 +160,20 @@ YOURLS uyumlu: kısa adresin sonuna `+` eklenirse (`https://alan.adiniz/k/ABC123
 - Açıkken sayfa kimlik doğrulaması gerektirmez ve şunları gösterir: kod, toplam tarama (bot hariç), son 30 gün grafiği, en çok yönlendiren siteler ve ülkeler. **Hedef adres gösterilmez**; göstermek için **herkese açık istatistikte hedef adresi göster** ayarını açın (hedef gizli olabilir).
 - Arşivdeki ve çöp kutusundaki kodlar için 404 verilir. Sayfa arama motorlarına kapalıdır (`noindex`), önbelleğe alınmaz ve yönlendirmeyle aynı IP başına hız sınırına tabidir. Bu istekler **tarama olarak sayılmaz**.
 - Açmadan önce: kısa kodu bilen herkes o kodun tarama sayılarını görebilir. Kısa kodlar basılı olduğundan bunu bilinçli bir tercih olarak ele alın.
+
+## 9e. Link ağacı (Linktree benzeri)
+
+**Link ağaçları** menüsü, tek adreste (`https://ALAN-ADINIZ/l/ADRES`) birkaç bağlantıyı düğme olarak listeleyen sade, mobil öncelikli bir sayfa üretir. Örn. Instagram biyografisine tek bağlantı koyup altına site, mağaza, WhatsApp bağlantılarını dizebilirsiniz.
+
+1. **Yeni link ağacı**: adres (3-64 karakter, küçük harf/rakam/tire/alt çizgi; kısa kodlardaki ayrılmış kelimeler kullanılamaz ve oluşturulduktan sonra **değiştirilemez**), başlık, kısa açıklama, tema (açık/koyu), vurgu rengi (`#RRGGBB`) ve durum (taslak/yayında).
+2. **Bağlantı ekleme** (ağacın ayrıntı sayfasında): var olan bir kısa linki seçin **ya da** bir adres yazın. Adres yazarsanız Hızlı kısalt ile aynı doğrulamalarla (özel/yerel IP reddi vb.) yeni bir **Kısa link** türünde kod oluşturulur. Her düğme `/k/<kod>` üzerinden geçtiği için **tıklamalar normal QR taraması olarak sayılır**. Düğmeleri yukarı/aşağı taşıyabilir, gizleyebilir, yazısını değiştirebilir veya ağaçtan **çıkarabilirsiniz** (çıkarmak kısa linki silmez). En fazla 100 öğe.
+3. **Herkese açık sayfada** yalnızca *yayındaki* ağaç görünür; düğmelerden yalnızca görünür olanlar ve kısa linki **aktif ve tarih aralığı içinde** olanlar gösterilir (pasif, arşiv, çöp, başlamamış veya bitmiş kodlar otomatik gizlenir; ayrıntı sayfasında “Herkese açık” sütunu nedenini söyler). Taslak, çöp kutusundaki veya olmayan ağaç aynı 404'ü verir. Sayfa arama motorlarına kapalıdır (`noindex`).
+4. **Önizleme** taslak dahil her durumu yalnızca panelde gösterir ve görüntüleme saymaz.
+5. **Çöp kutusu**: ağaç silinmez; “Çöp kutusuna taşı” ile adresi 404 verir, listede **Durum = Çöp kutusunda** filtresiyle görünür ve ayrıntı sayfasından **Geri yükle** ile önceki durumuna döner.
+6. **Ağacın QR'ı** (PNG/SVG) doğrudan `/l/ADRES` adresini içerir. Taramaları da saymak istiyorsanız **Ağaç için kısa link oluştur** ile ağaç adresine giden bir kısa link üretin ve onun QR'ını kullanın.
+7. **İstatistik**: ayrıntı sayfasında toplam ve son 30 gün **günlük görüntüleme** grafiği (bot ve HEAD istekleri sayılmaz; IP/User-Agent saklanmaz) ve öğe başına **tıklama** (o kısa linkin bot hariç toplam taraması; link başka yerlerde de kullanılıyorsa onlar da dahildir).
+
+Yetkiler: İzleyici görüntüler; Editör ve Yönetici ekler/değiştirir. Oluşturma, düzenleme, öğe değişiklikleri, durum değişiklikleri ve çöp işlemleri **Denetim** kaydına yazılır. Rol yetkileri `rolleri_kur` komutuyla (kurulumda `hazirlik` servisi çalıştırır) güncellenir.
 
 ## 10. Hatalı ve mükerrer kayıtlar
 

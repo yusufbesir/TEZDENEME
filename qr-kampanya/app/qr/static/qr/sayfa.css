@@ -37,3 +37,14 @@ a { color: var(--vurgu); }
 .ozet-tablo td { padding: .3rem .2rem; border-bottom: 1px solid var(--cizgi); overflow-wrap: anywhere; }
 .ozet-tablo td.sayi { text-align: right; white-space: nowrap; }
 .kisa-url { overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
+/* Link ağacı (/l/<slug>): tema sınıfları; vurgu rengi /l/<slug>/stil.css ile gelir (CSP: satır içi stil yok) */
+body.agac { --vurgu: #2563eb; --buton-yazi: #fff; }
+body.agac.tema-acik { --zemin: #f5f6f8; --yazi: #1a1a1a; --kart: #fff; --kart-yazi: #1a1a1a; --cizgi: #e2e2e2; }
+body.agac.tema-koyu { --zemin: #101216; --yazi: #eceff4; --kart: #1a1d23; --kart-yazi: #eceff4; --cizgi: #2a2e36; }
+.agac-kap { max-width: 480px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+.agac-baslik { text-align: center; padding-bottom: 1rem; }
+.agac-baslik h1 { color: var(--yazi); font-size: 1.6rem; }
+.agac-baslik p { margin: 0; opacity: .85; overflow-wrap: anywhere; }
+.agac-liste { display: flex; flex-direction: column; gap: .8rem; }
+.agac-dugme { display: block; text-align: center; background: var(--vurgu); color: var(--buton-yazi); text-decoration: none; font-weight: 600; padding: .95rem 1.2rem; border-radius: 12px; overflow-wrap: anywhere; }
+.agac-dugme:hover, .agac-dugme:focus { filter: brightness(1.1); }

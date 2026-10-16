@@ -110,6 +110,9 @@ BEGIN
   IF to_regclass('public.qr_hedefgecmisi') IS NOT NULL THEN
     REVOKE DELETE ON public.qr_hedefgecmisi FROM qr_uygulama;
   END IF;
+  IF to_regclass('public.qr_linkagaci') IS NOT NULL THEN
+    REVOKE DELETE ON public.qr_linkagaci FROM qr_uygulama;
+  END IF;
 END
 $$;
 SQL

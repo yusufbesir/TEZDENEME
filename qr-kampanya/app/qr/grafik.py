@@ -139,8 +139,26 @@ def _guzel_ust_sinir(en_yuksek):
     return 10 * taban
 
 
-def svg_cubuk_grafik(sonuc, baslik="", bot_dahil=False):
-    """`seri()` sonucundan SVG (SafeString). `baslik` kullanıcı verisi olabilir (QR adı vb.): kaçırılır."""
+def gunluk_seri(sayimlar, gun_sayisi=30, simdi=None):
+    """{gün (date): sayı} sözlüğünden `seri()` ile aynı biçimde son `gun_sayisi` günün (bugün dahil) günlük serisi.
+    Bot ayrımı yoktur (kaynak zaten botları saymaz). Saat dilimi: Django'nun etkin dilimi."""
+    tz = timezone.get_current_timezone()
+    bugun = (simdi or timezone.now()).astimezone(tz).date()
+    ilk = bugun - timedelta(days=gun_sayisi - 1)
+    kovalar = []
+    for i in range(gun_sayisi):
+        g = ilk + timedelta(days=i)
+        kovalar.append({"baslangic": _yerel_gece_yarisi(g, tz), "etiket": _gun_etiketi(g), "sayi": int(sayimlar.get(g, 0)), "bot": 0})
+    return {
+        "aralik": "30g" if gun_sayisi == 30 else "7g", "birim": "gun", "kovalar": kovalar,
+        "toplam": sum(k["sayi"] for k in kovalar), "bot_toplam": 0,
+        "baslangic": _yerel_gece_yarisi(ilk, tz), "bitis": _yerel_gece_yarisi(bugun + timedelta(days=1), tz),
+    }
+
+
+def svg_cubuk_grafik(sonuc, baslik="", bot_dahil=False, olcu="tarama", bot_notu=True):
+    """`seri()` sonucundan SVG (SafeString). `baslik` kullanıcı verisi olabilir (QR adı vb.): kaçırılır.
+    `olcu`: grafiğin ölçtüğü şey ("tarama", "görüntüleme"); `bot_notu=False` ise “(bot hariç)” notu eklenmez."""
     kovalar = sonuc["kovalar"]
     n = len(kovalar)
     gen, yuk = 720, 240
@@ -150,7 +168,7 @@ def svg_cubuk_grafik(sonuc, baslik="", bot_dahil=False):
     ust_sinir = _guzel_ust_sinir(en_yuksek)
     birim_ad = {"saat": "saatlik", "gun": "günlük", "hafta": "haftalık"}[sonuc["birim"]]
     aralik_ad = dict(ARALIKLAR)[sonuc["aralik"]]
-    ozet = f"{aralik_ad}, {birim_ad} tarama sayısı" + (" (bot dahil)" if bot_dahil else " (bot hariç)")
+    ozet = f"{aralik_ad}, {birim_ad} {olcu} sayısı" + ((" (bot dahil)" if bot_dahil else " (bot hariç)") if bot_notu else "")
     ad_metni = f"{baslik}: {ozet}" if baslik else ozet
 
     adim = cizim_gen / max(n, 1)

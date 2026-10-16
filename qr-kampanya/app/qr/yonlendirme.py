@@ -21,7 +21,9 @@ from django.views.decorators.http import require_safe
 from .dogrulama import url_gecerli_mi
 from .hiz import hiz_sinirlayici
 from .middleware import ip_anahtari, istemci_ip
-from .models import GenelAyarlar, KampanyaSayfasi, QRKod, SayfaGorseli, Tarama
+from .models import (
+    RENK_DESENI, GenelAyarlar, KampanyaSayfasi, LinkAgaci, LinkAgaciGoruntuleme, QRKod, SayfaGorseli, Tarama,
+)
 from .tarama_bilgisi import ulke_kodu, yonlendiren_alan_adi
 
 log = logging.getLogger(__name__)
@@ -156,6 +158,68 @@ def sayfa_goster(request, slug):
     elif sayfa.bitis and an >= sayfa.bitis:
         durum = "bitti"
     return render(request, "qr/genel/sayfa.html", {"sayfa": sayfa, "zaman_durumu": durum, "ayar": GenelAyarlar.al()})
+
+
+def gorunur_agac_ogeleri(agac):
+    """Herkese açık ağaçta gösterilecek öğeler: görünür olanlar VE QR'ı aktif ve tarih aralığı içinde olanlar
+    (pasif/arşiv/çöp/tarih dışı gizlenir; tarih kuralı QRKod.zaman_durumu ile aynıdır)."""
+    ogeler = agac.ogeler.select_related("qr", "qr__kampanya").filter(gorunur=True, qr__durum=QRKod.Durum.AKTIF)
+    return [o for o in ogeler if o.qr.zaman_durumu() == "gecerli"]
+
+
+def _yayindaki_agac(slug):
+    agac = LinkAgaci.objects.filter(slug=slug).first()
+    if agac is None or agac.durum != LinkAgaci.Durum.YAYINDA:
+        raise Http404  # taslak / çöp / yok: aynı 404
+    return agac
+
+
+def _hiz_siniri_asildi(request):
+    return not hiz_sinirlayici.izin_ver(ip_anahtari(istemci_ip(request)), settings.YONLENDIRME_HIZ_SINIRI)
+
+
+def _agac_goruntuleme_say(request, agac):
+    if request.method == "HEAD":  # önizleyiciler/izleme araçları sayılmaz
+        return
+    try:
+        if cihaz_turu(request.META.get("HTTP_USER_AGENT", "")[:500]) == Tarama.Cihaz.BOT:
+            return
+        LinkAgaciGoruntuleme.artir(agac.pk)
+    except Exception:  # sayaç hatası sayfayı asla engellememeli
+        log.exception("Link ağacı görüntülemesi yazılamadı (ağaç=%s)", agac.slug)
+
+
+@require_safe
+def link_agaci_goster(request, slug):
+    """Herkese açık link ağacı (/l/<slug>): yalnızca yayındaki ağaç."""
+    if _hiz_siniri_asildi(request):
+        return HttpResponse("Çok fazla istek. Lütfen biraz sonra tekrar deneyin.", status=429, content_type="text/plain; charset=utf-8")
+    agac = _yayindaki_agac(slug)
+    _agac_goruntuleme_say(request, agac)
+    yanit = render(request, "qr/genel/link_agaci.html", {
+        "agac": agac, "ogeler": gorunur_agac_ogeleri(agac),
+        "stil_adresi": f"/l/{agac.slug}/stil.css",
+    })
+    yanit["Cache-Control"] = "no-store"
+    return yanit
+
+
+def agac_stil_yaniti(agac):
+    """Vurgu rengi için CSS (CSP style-src 'self' satır içi stile izin vermez; renk bu 'self' stil dosyasıyla verilir).
+    Renk modelde #RRGGBB olarak doğrulanır; yine de çıktıya yazılmadan önce desen yeniden denetlenir."""
+    if not RENK_DESENI.fullmatch(agac.vurgu_rengi or ""):
+        agac = LinkAgaci(vurgu_rengi="#2563eb")
+    govde = f"body.agac {{ --vurgu: {agac.vurgu_rengi}; --buton-yazi: {agac.vurgu_yazi_rengi}; }}\n"
+    yanit = HttpResponse(govde, content_type="text/css; charset=utf-8")
+    yanit["Cache-Control"] = "no-cache"
+    return yanit
+
+
+@require_safe
+def link_agaci_stil(request, slug):
+    if _hiz_siniri_asildi(request):
+        return HttpResponse("Çok fazla istek.", status=429, content_type="text/plain; charset=utf-8")
+    return agac_stil_yaniti(_yayindaki_agac(slug))
 
 
 def _medya_adi(xuri):

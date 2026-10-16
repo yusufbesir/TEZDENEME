@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from .. import baslik_cek, roller
 from ..dogrulama import idn_mi
 from ..models import (
-    GenelAyarlar, Kampanya, KampanyaSayfasi, Magaza, QRKod, Urun, ayrilmis_kod_hatasi, otomatik_kisa_kod,
+    GenelAyarlar, Kampanya, KampanyaSayfasi, LinkAgaci, Magaza, QRKod, Urun, ayrilmis_kod_hatasi, otomatik_kisa_kod,
 )
 from ..servisler import kod_uretici, sirali_kod_ayir
 
@@ -351,6 +351,61 @@ class KampanyaSayfasiForm(TemelForm):
         if self.instance.pk:
             return self.instance.slug
         return self.cleaned_data["slug"].strip().lower()
+
+
+# --- Link ağacı ---
+
+class LinkAgaciForm(TemelForm):
+    class Meta:
+        model = LinkAgaci
+        fields = ["slug", "baslik", "aciklama", "tema", "vurgu_rengi", "durum"]
+        widgets = {"vurgu_rengi": forms.TextInput(attrs={"type": "color"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Çöp kutusuna yalnızca “Çöp kutusuna taşı” işlemiyle girilir.
+        self.fields["durum"].choices = [(d, e) for d, e in LinkAgaci.Durum.choices if d != LinkAgaci.Durum.COP]
+        if self.instance.pk:
+            self.fields["slug"].disabled = True
+            self.fields["slug"].help_text = "Ağaç adresi (/l/…) oluşturulduktan sonra değiştirilemez."
+        else:
+            self.fields["slug"].help_text = (
+                "3-64 karakter; küçük harf, rakam, tire ve alt çizgi. Adres: /l/<bu değer>. Oluşturulduktan sonra değiştirilemez."
+            )
+
+    def clean_slug(self):
+        if self.instance.pk:
+            return self.instance.slug
+        deger = (self.cleaned_data.get("slug") or "").strip().lower()
+        if LinkAgaci.objects.filter(slug=deger).exists():
+            raise ValidationError("Bu ağaç adresi zaten kullanılıyor.")
+        return deger
+
+
+class LinkAgaciOgeEkleForm(forms.Form):
+    """Ağaca öğe ekleme: var olan bir kısa link (QR) seçilir YA DA bir URL yazılır (yeni kısa link oluşturulur)."""
+
+    qr = forms.ModelChoiceField(
+        label="var olan kısa link", required=False,
+        queryset=QRKod.objects.exclude(durum__in=[QRKod.Durum.COP, QRKod.Durum.ARSIV]).order_by("kod_anahtari"),
+    )
+    url = forms.URLField(label="ya da adres (URL)", required=False, max_length=2000, assume_scheme="https")
+    etiket = forms.CharField(label="düğme yazısı", required=False, max_length=100)
+    ayni_hedef_onay = forms.BooleanField(label="Aynı hedef başka kodda varsa yine de oluştur", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["qr"].label_from_instance = lambda q: f"{q.kisa_kod} - {q.ad or q.baslik or q.hedef_url}"[:120]
+
+    def clean(self):
+        veri = super().clean()
+        qr, url = veri.get("qr"), (veri.get("url") or "").strip()
+        if self.errors:
+            return veri
+        if bool(qr) == bool(url):
+            raise ValidationError("Var olan bir kısa link seçin YA DA bir adres yazın (ikisi birden değil).")
+        veri["url"] = url
+        return veri
 
 
 # --- Genel ayarlar ---

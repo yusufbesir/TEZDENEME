@@ -21,6 +21,7 @@
     {% if perms.qr.add_qrkod %}<a href="{% url 'panel:ice_aktarma_liste' %}">İçe aktar</a>{% endif %}
     {% if perms.qr.view_kampanya %}<a href="{% url 'panel:kampanya_liste' %}">Kampanyalar</a>{% endif %}
     {% if perms.qr.view_kampanyasayfasi %}<a href="{% url 'panel:sayfa_liste' %}">Sayfalar</a>{% endif %}
+    {% if perms.qr.view_linkagaci %}<a href="{% url 'panel:agac_liste' %}">Link ağaçları</a>{% endif %}
     {% if perms.qr.view_urun %}<a href="{% url 'panel:urun_liste' %}">Ürünler</a>{% endif %}
     {% if perms.qr.view_magaza %}<a href="{% url 'panel:magaza_liste' %}">Mağazalar</a>{% endif %}
     {% if perms.qr.view_tarama %}<a href="{% url 'panel:istatistik' %}">İstatistik</a>{% endif %}

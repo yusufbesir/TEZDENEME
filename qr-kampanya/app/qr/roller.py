@@ -1,14 +1,14 @@
 """Kullanıcı rolleri ve yetkileri.
 
 - Yönetici: her şey + kullanıcı yönetimi + genel ayarlar
-- Editör:   QR kod, kampanya, sayfa, ürün, mağaza ekleme/düzenleme/arşivleme; içe/dışa aktarma
+- Editör:   QR kod, kampanya, sayfa, ürün, mağaza, link ağacı ekleme/düzenleme/arşivleme; içe/dışa aktarma
 - İzleyici: yalnızca görüntüleme ve rapor alma
 """
 YONETICI = "Yönetici"
 EDITOR = "Editör"
 IZLEYICI = "İzleyici"
 
-ICERIK_MODELLERI = ["qrkod", "kampanya", "kampanyasayfasi", "sayfagorseli", "urun", "magaza"]
+ICERIK_MODELLERI = ["qrkod", "kampanya", "kampanyasayfasi", "sayfagorseli", "urun", "magaza", "linkagaci"]
 SALT_OKUNUR_MODELLER = ["tarama", "hedefgecmisi", "denetimkaydi", "genelayarlar"]
 
 

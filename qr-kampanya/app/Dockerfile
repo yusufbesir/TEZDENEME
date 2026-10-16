@@ -37,4 +37,4 @@ ENV FORWARDED_ALLOW_IPS=127.0.0.1 STATIC_ROOT=/veri/static MEDIA_ROOT=/veri/medy
 USER uygulama
 EXPOSE 8000
 ENTRYPOINT ["/app/baslat.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "4", "--timeout", "300", "--access-logfile", "-", "--no-control-socket"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "4", "--timeout", "300", "--access-logfile", "-", "--access-logformat", "- - - %(t)s \"%(m)s %(U)s %(H)s\" %(s)s %(b)s", "--no-control-socket"]

@@ -8,6 +8,7 @@
 {% block robots %}<meta name="robots" content="noindex">{% endblock %}
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="{% static 'qr/sayfa.css' %}">
+{% block ek_bas %}{% endblock %}
 </head>
 <body class="{% block govde_sinifi %}tema-siyah-bej{% endblock %}">
 {% block icerik %}{% endblock %}

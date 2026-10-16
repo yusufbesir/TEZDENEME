@@ -1,0 +1,109 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}{{ agac.baslik }}{% endblock %}
+{% block icerik %}
+<h1>{{ agac.baslik }} <span class="etiket-durum durum-{{ agac.durum }}">{{ agac.get_durum_display }}</span></h1>
+<p>Adres: <span class="kisa-url">{{ agac.mutlak_url }}</span>{% if agac.aciklama %}<br>{{ agac.aciklama }}{% endif %}</p>
+{% if cop_mu %}<p class="yardim">Bu ağaç çöp kutusunda: herkese açık adresi 404 verir. Geri yüklenene kadar değiştirilemez.</p>{% endif %}
+
+<div class="eylemler">
+  <a class="dugme ikincil" href="{% url 'panel:agac_onizle' agac.pk %}" target="_blank" rel="noopener noreferrer">Önizle (yeni sekme)</a>
+  {% if yayinda %}<a class="dugme ikincil" href="/l/{{ agac.slug }}" target="_blank" rel="noopener noreferrer">Yayındaki sayfayı aç</a>{% endif %}
+  {% if degistirilebilir %}
+  <a class="dugme ikincil" href="{% url 'panel:agac_duzenle' agac.pk %}">Düzenle</a>
+  <form method="post" action="{% url 'panel:agac_durum' agac.pk %}">{% csrf_token %}
+    {% if yayinda %}<input type="hidden" name="durum" value="taslak"><button type="submit" class="dugme ikincil">Taslağa al</button>
+    {% else %}<input type="hidden" name="durum" value="yayinda"><button type="submit" class="dugme">Yayınla</button>{% endif %}
+  </form>
+  <form method="post" action="{% url 'panel:agac_cope_tasi' agac.pk %}">{% csrf_token %}<button type="submit" class="dugme tehlike">Çöp kutusuna taşı</button></form>
+  {% elif cop_mu and degistirme_izni %}
+  <form method="post" action="{% url 'panel:agac_geri_yukle' agac.pk %}">{% csrf_token %}<button type="submit" class="dugme">Geri yükle</button></form>
+  {% endif %}
+</div>
+
+<h2>Bağlantılar</h2>
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Sıra</th><th>Düğme yazısı</th><th>Kısa link</th><th>Tıklama (QR tarama)</th><th>Herkese açık</th>{% if degistirilebilir %}<th>İşlem</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for o in ogeler %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>
+      {% if degistirilebilir %}
+      <form method="post" action="{% url 'panel:agac_oge_duzenle' agac.pk o.pk %}" class="satir-ici">{% csrf_token %}
+        <input type="text" name="etiket" value="{{ o.etiket }}" maxlength="100" aria-label="Düğme yazısı">
+        <button type="submit" class="dugme ikincil kucuk">Kaydet</button>
+      </form>
+      {% else %}{{ o.etiket }}{% endif %}
+    </td>
+    <td><a href="{% url 'panel:qr_detay' o.qr.pk %}">{{ o.qr.kisa_kod }}</a> <span class="sessiz">({{ o.qr.get_durum_display }})</span></td>
+    <td>{{ o.tiklama }}</td>
+    <td>{% if o.herkese_acik %}Evet{% elif not o.gorunur %}Hayır (gizli){% else %}Hayır (kısa link {{ o.qr.get_durum_display|lower }} / tarih dışı){% endif %}</td>
+    {% if degistirilebilir %}
+    <td>
+      <form method="post" action="{% url 'panel:agac_oge_tasi' agac.pk o.pk %}" class="satir-ici">{% csrf_token %}
+        <button type="submit" name="yon" value="yukari" class="dugme ikincil kucuk"{% if forloop.first %} disabled{% endif %}>Yukarı</button>
+        <button type="submit" name="yon" value="asagi" class="dugme ikincil kucuk"{% if forloop.last %} disabled{% endif %}>Aşağı</button>
+      </form>
+      <form method="post" action="{% url 'panel:agac_oge_duzenle' agac.pk o.pk %}" class="satir-ici">{% csrf_token %}
+        <input type="hidden" name="gorunur" value="{% if o.gorunur %}0{% else %}1{% endif %}">
+        <button type="submit" class="dugme ikincil kucuk">{% if o.gorunur %}Gizle{% else %}Göster{% endif %}</button>
+      </form>
+      <form method="post" action="{% url 'panel:agac_oge_cikar' agac.pk o.pk %}" class="satir-ici">{% csrf_token %}
+        <button type="submit" class="dugme tehlike kucuk">Çıkar</button>
+      </form>
+    </td>
+    {% endif %}
+  </tr>
+  {% empty %}<tr><td colspan="6">Henüz bağlantı yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="yardim">“Çıkar” yalnızca düğmeyi ağaçtan kaldırır; kısa link ve taramaları silinmez. Pasif, arşivdeki, çöpteki veya tarih aralığı dışındaki kısa linkler herkese açık sayfada otomatik gizlenir.</p>
+
+{% if degistirilebilir %}
+<h2>Bağlantı ekle</h2>
+<form method="post" action="{% url 'panel:agac_oge_ekle' agac.pk %}" class="kart">
+  {% csrf_token %}
+  <p class="yardim">Var olan bir kısa linki seçin YA DA bir adres yazın; adres yazarsanız yeni bir kısa link (tür: Kısa link) oluşturulur ve tıklamalar sayılır.</p>
+  {% for alan in ekle_formu %}
+  <div class="alan{% if alan.field.widget.input_type == 'checkbox' %} onay{% endif %}">
+    {% if alan.field.widget.input_type == 'checkbox' %}{{ alan }} {{ alan.label_tag }}{% else %}{{ alan.label_tag }}{{ alan }}{% endif %}
+  </div>
+  {% endfor %}
+  <div class="eylemler"><button type="submit" class="dugme">Ekle</button></div>
+</form>
+{% endif %}
+
+<h2>Görüntüleme</h2>
+<div class="ikili">
+  <div class="kart">
+    <p class="buyuk-sayi">{{ toplam_goruntuleme }}</p>
+    <p class="sessiz">Toplam görüntüleme (bot ve HEAD istekleri sayılmaz). Son 30 gün: {{ son_30_gun }}</p>
+    <div class="grafik">{{ grafik_svg }}</div>
+  </div>
+</div>
+
+{% if not cop_mu %}
+<h2>Ağacın QR kodu ve kısa linki</h2>
+<div class="ikili">
+  <div class="kart">
+    <img class="qr-onizleme" src="{% url 'panel:agac_png' agac.pk %}" alt="{{ agac.slug }} ağaç QR kodu" width="220" height="220">
+    <div class="eylemler">
+      <a class="dugme ikincil kucuk" href="{% url 'panel:agac_png' agac.pk %}?indir=1">PNG indir</a>
+      <a class="dugme ikincil kucuk" href="{% url 'panel:agac_svg' agac.pk %}?indir=1">SVG indir</a>
+    </div>
+    <p class="yardim">Bu QR doğrudan {{ agac.mutlak_url }} adresini içerir (taramalar kısa link üzerinden sayılmaz). Taramaları saymak için aşağıdan kısa link oluşturun.</p>
+  </div>
+  <div class="kart">
+    {% for q in linkler %}<p><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_url }}</a></p>{% endfor %}
+    {% if kisa_link_izni %}
+    <form method="post" action="{% url 'panel:agac_kisa_link' agac.pk %}">{% csrf_token %}
+      <button type="submit" class="dugme">Ağaç için kısa link oluştur</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+<div class="eylemler"><a class="dugme ikincil" href="{% url 'panel:agac_liste' %}">Link ağaçları</a></div>
+{% endblock %}

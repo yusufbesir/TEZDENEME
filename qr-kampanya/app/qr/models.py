@@ -11,7 +11,8 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.core.validators import RegexValidator
+from django.db import connection, models
 from django.utils import timezone
 
 from .alanlar import SifreliMetinAlani
@@ -594,3 +595,123 @@ class KullaniciApiAyari(models.Model):
     kullanici = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="api_ayari")
     parola_girisi = models.BooleanField("API'de parola girişi", default=False)
     guncelleme = models.DateTimeField(auto_now=True)
+
+
+# --- Link ağacı (Linktree benzeri herkese açık bağlantı sayfası) ---
+
+LINK_AGACI_SLUG_DESENI = re.compile(r"[a-z0-9][a-z0-9_-]{1,62}[a-z0-9]")
+RENK_DESENI = re.compile(r"#[0-9A-Fa-f]{6}")
+
+
+def link_agaci_slug_dogrula(deger):
+    if not LINK_AGACI_SLUG_DESENI.fullmatch(deger or ""):
+        raise ValidationError(
+            "Ağaç adresi 3-64 karakter olmalı; yalnızca küçük harf, rakam, tire (-) ve alt çizgi (_) içerebilir, "
+            "harf veya rakamla başlayıp bitmelidir."
+        )
+
+
+class LinkAgaci(ZamanDamgali):
+    """Herkese açık `/l/<slug>` bağlantı sayfası. Silinmez: çöp kutusuna taşınır (`onceki_durum` geri yüklemede kullanılır).
+    Her düğme bir QRKod (kısa link) üzerinden geçer; böylece tıklamalar Tarama olarak sayılır."""
+
+    class Durum(models.TextChoices):
+        TASLAK = "taslak", "Taslak"
+        YAYINDA = "yayinda", "Yayında"
+        COP = "cop", "Çöp kutusunda"
+
+    class Tema(models.TextChoices):
+        ACIK = "acik", "Açık"
+        KOYU = "koyu", "Koyu"
+
+    slug = models.CharField("ağaç adresi", max_length=64, unique=True, validators=[link_agaci_slug_dogrula])
+    baslik = models.CharField("başlık", max_length=150)
+    aciklama = models.CharField("kısa açıklama", max_length=300, blank=True)
+    tema = models.CharField("tema", max_length=10, choices=Tema.choices, default=Tema.ACIK)
+    vurgu_rengi = models.CharField(
+        "vurgu rengi", max_length=7, default="#2563eb",
+        validators=[RegexValidator(re.compile(r"\A#[0-9A-Fa-f]{6}\Z"), "Renk #RRGGBB biçiminde olmalı (örn. #2563eb).")],
+    )
+    durum = models.CharField("durum", max_length=10, choices=Durum.choices, default=Durum.TASLAK, db_index=True)
+    cope_atilma = models.DateTimeField("çöpe taşınma zamanı", null=True, blank=True)
+    onceki_durum = models.CharField("çöpe atılmadan önceki durum", max_length=10, blank=True)
+    olusturan = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        verbose_name = "link ağacı"
+        verbose_name_plural = "link ağaçları"
+        ordering = ["-guncelleme", "-id"]
+
+    def __str__(self):
+        return f"{self.baslik} (/l/{self.slug})"
+
+    @property
+    def mutlak_url(self):
+        return f"{settings.KISA_URL_TABANI}/l/{self.slug}"
+
+    @property
+    def vurgu_yazi_rengi(self):
+        """Vurgu renginin üzerindeki yazı için okunaklı renk (algısal parlaklığa göre siyah/beyaz)."""
+        r, g, b = (int(self.vurgu_rengi[i:i + 2], 16) for i in (1, 3, 5))
+        return "#111111" if (0.299 * r + 0.587 * g + 0.114 * b) > 150 else "#ffffff"
+
+    def clean(self):
+        # Ayrılmış kelime denetimi kısa kodlarla aynıdır (genel ayarlardaki ek kelimeler dahil); yalnızca yeni adreslerde.
+        if not self.pk and self.slug:
+            hata = ayrilmis_kod_hatasi(self.slug, GenelAyarlar.al().ayrilmis_kume())
+            if hata:
+                raise ValidationError({"slug": hata.replace("kısa kod", "ağaç adresi")})
+
+    def save(self, *args, **kwargs):
+        self.vurgu_rengi = (self.vurgu_rengi or "").lower()
+        if self.pk:
+            eski = LinkAgaci.objects.filter(pk=self.pk).values_list("slug", flat=True).first()
+            if eski is not None and eski != self.slug:
+                raise ValidationError("Ağaç adresi oluşturulduktan sonra değiştirilemez.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Link ağaçları silinmez, çöp kutusuna taşınır.")
+
+
+class LinkAgaciOgesi(models.Model):
+    """Ağaçtaki bir düğme. Hedef her zaman bir QRKod (kısa link) olduğundan tıklamalar sayılır."""
+
+    agac = models.ForeignKey(LinkAgaci, verbose_name="ağaç", on_delete=models.CASCADE, related_name="ogeler")
+    sira = models.IntegerField("sıra", default=0)
+    etiket = models.CharField("düğme yazısı", max_length=100)
+    qr = models.ForeignKey(QRKod, verbose_name="kısa link", on_delete=models.PROTECT, related_name="agac_ogeleri")
+    gorunur = models.BooleanField("görünür", default=True)
+
+    class Meta:
+        verbose_name = "link ağacı öğesi"
+        verbose_name_plural = "link ağacı öğeleri"
+        ordering = ["sira", "id"]
+
+    def __str__(self):
+        return f"{self.etiket} → {self.qr.kisa_kod}"
+
+
+class LinkAgaciGoruntuleme(models.Model):
+    """Günlük görüntüleme sayacı (yerel gün). IP/User-Agent saklanmaz. Artırma tek SQL ifadesiyle atomiktir."""
+
+    agac = models.ForeignKey(LinkAgaci, on_delete=models.PROTECT, related_name="goruntulemeler")
+    gun = models.DateField("gün")
+    sayi = models.PositiveIntegerField("görüntüleme", default=0)
+
+    class Meta:
+        verbose_name = "link ağacı görüntülemesi"
+        verbose_name_plural = "link ağacı görüntülemeleri"
+        constraints = [models.UniqueConstraint(fields=["agac", "gun"], name="agac_gun_benzersiz")]
+
+    @classmethod
+    def artir(cls, agac_id, gun=None):
+        """(agac, gün) sayacını 1 artırır; satır yoksa oluşturur (INSERT ... ON CONFLICT DO UPDATE SET sayi = sayi + 1)."""
+        gun = gun or timezone.localdate()
+        tablo = connection.ops.quote_name(cls._meta.db_table)
+        with connection.cursor() as imlec:
+            imlec.execute(
+                f"INSERT INTO {tablo} (agac_id, gun, sayi) VALUES (%s, %s, 1) "
+                f"ON CONFLICT (agac_id, gun) DO UPDATE SET sayi = {tablo}.sayi + 1",
+                [agac_id, gun],
+            )

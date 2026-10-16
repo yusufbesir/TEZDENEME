@@ -123,3 +123,7 @@ th a:hover, th a:focus-visible { text-decoration: underline; }
 .aralik-secici { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin: .5rem 0; }
 .aralik-secici .secili { background: var(--siyah); color: var(--bej); }
 .sessiz { color: var(--gri); font-size: .9rem; margin: .25rem 0 0; }
+/* Link ağacı: satır içi küçük formlar */
+.satir-ici { display: inline-flex; gap: .3rem; align-items: center; margin: 0 .2rem .2rem 0; }
+.satir-ici input[type="text"] { min-width: 10rem; }
+.buyuk-sayi { font-size: 2rem; font-weight: 800; margin: 0; }
