@@ -6,6 +6,8 @@ import 'package:adim_adim/model/icerik.dart';
 import 'package:adim_adim/servis/bildirim.dart';
 import 'package:adim_adim/servis/ses.dart';
 import 'package:adim_adim/uygulama.dart';
+import 'package:adim_adim/yarisma/depo.dart';
+import 'package:adim_adim/yarisma/saglayicilar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,6 +55,7 @@ Future<ProviderContainer> uygulamayiAc(
           depo ?? BellekDepo(const OgrenciDurumu(alan: 'dil')),
         ),
         kurslarProvider.overrideWithValue(kurslar ?? [sahteKurs]),
+        yarismaDepoProvider.overrideWithValue(BellekYarismaDepo()),
         bugunProvider.overrideWithValue('2026-10-15'),
         sesProvider.overrideWithValue(ses ?? SahteSes()),
         bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),

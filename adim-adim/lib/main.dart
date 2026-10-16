@@ -10,6 +10,8 @@ import 'depo/depo.dart';
 import 'durum/saglayicilar.dart';
 import 'guncelleme/eski_surum_temizleyici.dart';
 import 'uygulama.dart';
+import 'yarisma/depo.dart';
+import 'yarisma/saglayicilar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,9 +23,19 @@ Future<void> main() async {
     debugPrint('Dosya deposu açılamadı, bellek deposu kullanılıyor: $e');
     depo = BellekDepo();
   }
+  YarismaDepo yarismaDepo;
+  try {
+    yarismaDepo = await DosyaYarismaDepo.varsayilan();
+  } catch (e) {
+    debugPrint('Yarışma deposu açılamadı, bellek deposu kullanılıyor: $e');
+    yarismaDepo = BellekYarismaDepo();
+  }
   runApp(
     ProviderScope(
-      overrides: [depoProvider.overrideWithValue(depo)],
+      overrides: [
+        depoProvider.overrideWithValue(depo),
+        yarismaDepoProvider.overrideWithValue(yarismaDepo),
+      ],
       child: const AdimAdimUygulama(),
     ),
   );
