@@ -7,6 +7,7 @@
 /// ve 1,5 (uygulama 1,3'e kıstırır). Taşma = RenderFlex overflow hatası.
 library;
 
+import 'package:adim_adim/bilesenler/hedef_halkasi.dart';
 import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
@@ -16,6 +17,7 @@ import 'package:adim_adim/yarisma/ekranlar/oyun_ekrani.dart';
 import 'package:adim_adim/yarisma/motor.dart';
 import 'package:adim_adim/yarisma/saglayicilar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -104,7 +106,99 @@ Future<void> _oyunAc(WidgetTester tester, Size boyut, double olcek) async {
   await tester.pumpAndSettle();
 }
 
+/// Ekrandaki tüm metin nesnelerinin etkin yazı boyutunun (textScaler dahil)
+/// en küçüğünü döndürür; boş metinler sayılmaz.
+double _enKucukYazi(WidgetTester tester) {
+  var en = double.infinity;
+  void gez(RenderObject r) {
+    if (r is RenderParagraph) {
+      final metin = r.text.toPlainText(includeSemanticsLabels: false).trim();
+      final boyut = r.text.style?.fontSize;
+      if (metin.isNotEmpty && boyut != null) {
+        final etkin = r.textScaler.scale(boyut);
+        if (etkin < en) en = etkin;
+      }
+    }
+    r.visitChildren(gez);
+  }
+
+  gez(tester.binding.rootElement!.renderObject!);
+  return en;
+}
+
+OgrenciDurumu _ucDurum() => OgrenciDurumu(
+  alan: 'dil',
+  ad: 'Çok uzun bir öğrenci adı soyadı Yusuf Beşir Yılmazoğlu Karadeniz',
+  xp: 1234,
+  seri: 1234,
+  enSeri: 1234,
+  sonGun: '2026-10-15',
+  gunlukHedef: 200,
+  gunlukXp: const {'2026-10-15': 1234, '2026-10-14': 9876},
+  tamamlanan: const {sahteDers1: 2},
+);
+
 void main() {
+  group('uç veri: yazı 11 px altına inmez, taşma yok', () {
+    for (final boyut in const [Size(480, 600), Size(1280, 720)]) {
+      testWidgets('4 haneli XP, uzun ad: ${boyut.width.toInt()} ölçek 1.5', (
+        tester,
+      ) async {
+        await uygulamayiAc(
+          tester,
+          BellekDepo(_ucDurum()),
+          kurslar: [sahteKurs, sahteKodKurs],
+          boyut: boyut,
+          metinOlcegi: 1.5,
+        );
+        for (final sekme in ['Yol', 'Yarışma', 'Tekrar', 'Profil']) {
+          await dokun(tester, _sekme(tester, sekme));
+          await _tasmaYok(tester, sekme);
+          expect(
+            _enKucukYazi(tester),
+            greaterThanOrEqualTo(11),
+            reason: '$sekme: etkin yazı 11 px altına indi',
+          );
+          expect(
+            find.descendant(
+              of: find.byType(FittedBox),
+              matching: find.byType(Text),
+            ),
+            findsNothing,
+            reason: '$sekme: FittedBox içinde metin var',
+          );
+        }
+      });
+    }
+
+    testWidgets('HedefHalkasi 4 haneli XP kısaltır, 11 px altına inmez', (
+      tester,
+    ) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      for (final b in [56.0, 96.0]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: acikTema(),
+            home: Scaffold(
+              body: Center(child: HedefHalkasi(xp: 1234, hedef: 200, boyut: b)),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await _tasmaYok(tester, 'halka $b');
+        expect(_enKucukYazi(tester), greaterThanOrEqualTo(11));
+      }
+    });
+
+    test('kisaSayi', () {
+      expect(kisaSayi(999), '999');
+      expect(kisaSayi(1234), '1,2k');
+      expect(kisaSayi(2000), '2k');
+      expect(kisaSayi(12345), '12,3k');
+    });
+  });
+
   group('taşma yok: boyut x metin ölçeği', () {
     for (final boyut in _boyutlar) {
       for (final olcek in _olcekler) {

@@ -225,9 +225,23 @@ class _Cubuk extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text('$deger', maxLines: 1, style: yazi.labelMedium),
+          LayoutBuilder(
+            builder: (context, k) {
+              // Küçültme yok: labelMedium (12), sonra labelSmall (11), sonra "1,2k".
+              final sigan = siganMetin(
+                context,
+                adaylar: ['$deger', kisaSayi(deger)],
+                stiller: [yazi.labelMedium!, yazi.labelSmall!],
+                genislik: k.maxWidth,
+              );
+              return Text(
+                sigan.metin,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: sigan.stil,
+              );
+            },
           ),
           const SizedBox(height: 4),
           Flexible(
