@@ -55,3 +55,4 @@
 - 2026-10-16 | Yarışma ekranları: lobi, oyun, çark (1200 ms), süre çubuğu, şık/taç animasyonları, sonuç; 19 arayüz testi | implementer (claude-sonnet-5-5) | ~128K token | tamam (208 test)
 - 2026-10-16 | Yarışma ekranlarını doğrula | verifier (claude-sonnet-5-5) | ~35K token | Geçti (not: kayıt hatası sessiz)
 | 2026-10-16 | Proje talimatları kutusunu docs/kurallar/ altına taşı, kısa kutu taslağı yaz [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 60.000 girdi / 12.000 çıktı | Başarılı. 3 kural dosyası, dizin ve 2.912 karakterlik taslak eklendi. |
+| 2026-10-16 | Rehber taraması önerilerini doğrula: ajan efor seviyeleri ve öneri dokümanı [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | verifier / claude-sonnet-5-5 | 21.132 toplam | Geçti: 69 Python, 35 kabuk testi |
