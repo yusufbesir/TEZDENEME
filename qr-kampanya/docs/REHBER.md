@@ -83,20 +83,22 @@ Basılı QR'ı müşteri kendi telefonuyla okutur. Bu yüzden **yönlendirme adr
 | `/l/<adres>` | Link ağacı sayfası | **Evet.** |
 | `/s/<adres>` | Kampanya sayfası | **Evet.** |
 | `/saglik`, `/robots.txt`, statik dosyalar, görseller (`/medya/`) | Sistemin kendi ihtiyaçları | Evet, açık kalır. |
-| `/panel/` | Yönetim paneli | İsteğe bağlı kısıtlanır. |
-| `/api/` | API | İsteğe bağlı kısıtlanır. |
+| `/panel/` | Yönetim paneli | **Hayır. Varsayılan kapalı;** yalnız izin verdiğiniz ağdan açılır. |
+| `/api/` | API | **Hayır. Varsayılan kapalı;** yalnız izin verdiğiniz ağdan açılır. |
 
-### Yönetimi kendi ağınıza kapatmak
+### Yönetim varsayılan olarak kapalıdır
 
-Sabit bir IP'den (ev, ofis, VPN) çalışıyorsanız panel ve API'yi yalnızca o ağa açabilirsiniz:
+Sistem kişisel kullanım içindir: internete **yalnızca kısa linkler** açıktır. Panel (`/panel/`), API (`/api/`) ve kök adres, siz izin verdiğiniz ağı yazana kadar herkese "sayfa bulunamadı" (404) verir; kurulumdan sonra bu ağı bir kez tanımlamanız gerekir:
 
-1. Çıkış IP'nizi öğrenin (örneğin `curl -s https://ifconfig.me`).
-2. Sunucuda `.env` dosyasına şunu ekleyin: `YONETIM_IZINLI_AGLAR=203.0.113.5/32`. **`203.0.113.5` yalnız örnektir; 1. adımda öğrendiğiniz kendi IP'nizle değiştirin.** Virgülle birden çok ağ yazılabilir; IPv6 da olur.
+1. Çıkış IP'nizi öğrenin (örneğin `curl -s https://ifconfig.me`). `scripts/kurulum.sh` etkileşimli terminalde SSH bağlantınızdan türetilen adresi öneri olarak gösterip sorar ve `.env` dosyasına ekler.
+2. Elle yapacaksanız sunucuda `.env` dosyasına şunu ekleyin: `YONETIM_IZINLI_AGLAR=203.0.113.5/32`. **`203.0.113.5` yalnız örnektir; 1. adımda öğrendiğiniz kendi IP'nizle değiştirin.** Virgülle birden çok ağ yazılabilir; IPv6 da olur.
 3. `docker compose up -d` komutunu çalıştırın.
 
-Kısıt açıkken izinli olmayan bir ağdan `/panel/` ve `/api/` adresleri "sayfa bulunamadı" (404) gösterir. QR yönlendirmesi, link ağacı ve kampanya sayfaları çalışmaya devam eder. Kısıtın açık olup olmadığı **Sistem bilgisi** ekranındaki "Panel/API ağ kısıtı" satırında görünür.
+**IP'niz sabit değilse:** sunucuya bir VPN kurun (ör. WireGuard ya da Tailscale) ve VPN'in özel adres aralığını izinli ağ olarak yazın (örn. `YONETIM_IZINLI_AGLAR=10.8.0.0/24`; aralığı kendi VPN yapılandırmanızdan alın, buradaki değer yalnız örnektir). Panele VPN bağlıyken, VPN'in sunucuya verdiği özel adres üzerinden ulaşırsınız; böylece panel internete açılmaz.
 
-**Kendinizi kilitlerseniz (kurtarma):** sunucuya SSH ile girin (SSH bu kısıttan etkilenmez), `.env` içindeki `YONETIM_IZINLI_AGLAR=` satırını boşaltın ve `docker compose up -d` çalıştırın. **Önce kendi IP'nizi ekleyin;** IP'niz sık değişiyorsa bu özelliği açmayın. Ayrıntı: [GUVENLIK.md](GUVENLIK.md) "Panel ve API için IP kısıtı".
+İzinli olmayan bir ağdan `/panel/` ve `/api/` adresleri "sayfa bulunamadı" (404) gösterir. QR yönlendirmesi, link ağacı ve kampanya sayfaları her zaman çalışır. Durum **Sistem bilgisi** ekranındaki "Panel/API ağ kısıtı" satırında görünür (kapalı / izinli ağ sayısı / kısıt yok). Eski davranışı (kısıtsız) yalnız bilinçli olarak `.env` içinde `YONETIM_ERISIMI=acik` yazarak alabilirsiniz; önerilmez.
+
+**Panele giremiyorsanız (kurtarma):** sunucuya SSH ile girin (SSH bu kısıttan etkilenmez), `.env` dosyasına doğru ağı yazın (`YONETIM_IZINLI_AGLAR=...`; aynı anahtar iki kez varsa sonuncusu geçerlidir) ve `docker compose up -d` çalıştırın. Ayrıntı: [GUVENLIK.md](GUVENLIK.md) "Panel ve API erişimi".
 
 ---
 
@@ -584,7 +586,7 @@ Sistem şunları kendiliğinden yapar: HTTPS, parola + MFA, rol yetkileri, hız 
 
 ### Panele giremiyorum
 
-- **Sayfa bulunamadı (404):** `YONETIM_IZINLI_AGLAR` açıksa ve IP'niz listede değilse panel görünmez. Sunucuya SSH ile girip satırı güncelleyin ya da boşaltın, ardından `docker compose up -d` (bölüm 2).
+- **Sayfa bulunamadı (404):** panel varsayılan olarak kapalıdır; `YONETIM_IZINLI_AGLAR` boşsa ya da IP'niz listede değilse panel görünmez. Sunucuya SSH ile girip satırı ekleyin/güncelleyin, ardından `docker compose up -d` (bölüm 2).
 - **Giriş kilitlendi (5 hatalı deneme):** 15 dakika bekleyin. Acil durumda sunucuda: `docker compose exec app python manage.py sayac_sifirla KULLANICI_ADI [--ip IP]`.
 - **MFA kodu kabul edilmiyor:** telefonunuzun saatinin otomatik ayarlı olduğundan emin olun. Aynı kod iki kez kullanılamaz; yeni kodu bekleyin.
 - **Telefon kayboldu / MFA kurulumu çalışmıyor:** sunucuda `docker compose exec app python manage.py mfa_sifirla <kullanici_adi>` çalıştırıp yeniden kurun. `MFA_SIFRELEME_ANAHTARI` kaybolduysa da çözüm aynı sıfırlamadır (veriler etkilenmez); bu yüzden `.env` kopyasını saklayın.

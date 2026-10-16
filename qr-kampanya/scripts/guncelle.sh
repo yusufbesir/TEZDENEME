@@ -6,6 +6,18 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 . scripts/dizin-guvenligi.sh
+# shellcheck source=scripts/yonetim-agi.sh
+. scripts/yonetim-agi.sh
+# Panel/API artık varsayılan KAPALI. Eski .env'de YONETIM_ERISIMI yok ve izinli ağ boşsa güncelleme paneli kapatır: açıkça uyar.
+# .env'deki mevcut satırlar değiştirilmez; yalnızca (tty varsa onayla) sona satır eklenir.
+if ! yonetim_erisimi_var_mi && ! yonetim_ag_dolu_mu; then
+  echo "################################################################################"
+  echo " UYARI: .env içinde YONETIM_ERISIMI yok ve YONETIM_IZINLI_AGLAR boş."
+  echo " Bu sürümde panel ve API VARSAYILAN KAPALIDIR: güncelleme sonrası /panel/ ve /api/ herkese 404 döner"
+  echo " (kısa bağlantılar çalışmaya devam eder). Eski davranış için .env'ye YONETIM_ERISIMI=acik yazabilirsiniz (önerilmez)."
+  echo "################################################################################"
+  yonetim_ag_sor
+fi
 # Eski kurulumlarda eksik olabilecek rol parolaları: mevcut satırlara DOKUNULMAZ, yalnızca .env'nin SONUNA eklenir.
 rastgele() { python3 -c "import secrets;print(secrets.token_urlsafe($1))" 2>/dev/null || openssl rand -base64 "$1" | tr -d '/+=\n'; }
 for ANAHTAR in POSTGRES_SAHIP_PAROLA POSTGRES_UYGULAMA_PAROLA; do

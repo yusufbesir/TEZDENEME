@@ -79,7 +79,7 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - [ ] Örnek/deneme verileri temizlendi (deneme QR kodları arşivlendi).
 - [ ] Gizlilik/KVKK aydınlatma metni kampanya sayfalarında veya web sitenizde yayında (tarama istatistiği için).
 - [ ] `bash scripts/test.sh` sunucuda çalıştırıldı ve bütün testler geçti.
-- [ ] `QR_EKLENTILER` boş ya da yalnızca bizzat incelediğiniz eklentileri içeriyor; `YONETIM_IZINLI_AGLAR` ya boş (bilinçli) ya da kendi ağınızı içeriyor.
+- [ ] `QR_EKLENTILER` boş ya da yalnızca bizzat incelediğiniz eklentileri içeriyor; `YONETIM_IZINLI_AGLAR` kendi ağınızı içeriyor (boşsa panel/API kapalıdır), `YONETIM_ERISIMI=acik` yazılmadı.
 
 ## Bilinen sınırlamalar
 
@@ -119,22 +119,23 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - Düğmeler yalnızca kısa linke (`/k/<kod>`) gider; tıklamalar normal tarama olarak sayılır. Sayfada harici betik/kaynak yoktur; vurgu rengi CSP'ye uygun olarak `/l/<adres>/stil.css` (aynı kökenden, doğrulanmış `#RRGGBB`) ile verilir. Etiket, başlık ve açıklama kaçırılır.
 - “Ağaç için kısa link” hedefi sunucu tarafından üretilir ve yalnızca sitenin kendi `/l/<adres>` yoluna izin veren dar bir istisnadan geçer (`dogrulama.kendi_l_adresi_mi`); `/panel/`, `/k/`, `/s/` gibi başka iç yollar için istisna yoktur. Genel kural (özel/yerel IP reddi) değişmez.
 
-## Panel ve API için IP kısıtı (isteğe bağlı)
+## Panel ve API erişimi (varsayılan kapalı)
 
-Varsayılan: **kısıt yok**. Kullanıcı sayınız az ve sabit bir ağdan (ofis, ev, VPN) çalışıyorsanız `.env` içindeki `YONETIM_IZINLI_AGLAR` ile panel ve API'yi yalnızca o ağlara açabilirsiniz.
+Varsayılan: **panel ve API kapalıdır**. Sistem kişisel kullanım içindir; internete yalnızca kısa linkler açıktır (beyaz liste). `.env` içindeki `YONETIM_IZINLI_AGLAR` ile panel ve API'yi yalnızca belirli ağlara açarsınız. Liste boşken kısıtlı yollar herkese 404 verir (fail closed) ve uygulama açılışta günlüğe tek satır uyarı yazar.
 
 ```bash
 # .env  (virgülle ayrılmış CIDR; tek adres için /32 ya da /128; IPv6 desteklenir)
 YONETIM_IZINLI_AGLAR=203.0.113.0/24,2001:db8::/32
+# İsteğe bağlı: kisitli (varsayılan) | acik. acik = ağ kısıtı yok; yalnız bilinçli seçim (liste doluysa yine uygulanır).
+# YONETIM_ERISIMI=kisitli
 ```
 
-Sonra `docker compose up -d` (değişkenleri uygulama konteyneri yeniden oluşturulurken okur).
-
-- **Neyi kapsar:** `/panel/…`, `/api/…`, Django yönetim sitesi yolu `/admin/…` (bu projede kurulu değildir; yine de kapsanır) ve kök `/` (panele yönlendirdiği için). İzinli olmayan ağdan bu yollar **404** verir, bilinmeyen bir adresle aynı sayfayı gösterir; panelin var olduğu belli edilmez. Geçerli bir API anahtarı ya da açık bir oturum izinli olmayan ağda işe yaramaz.
-- **Neyi kapsamaz:** `/k/` (QR yönlendirmesi ve `/k/<kod>+`), `/l/`, `/s/`, `/saglik`, `/robots.txt`, statik dosyalar ve medya (`/medya/`, `/ic/medya-yetki`) hep herkese açık kalır; QR kodlar ve kampanya sayfaları çalışmaya devam eder.
+Sonra `docker compose up -d` (değişkenleri uygulama konteyneri yeniden oluşturulurken okur). `YONETIM_ERISIMI` geçersizse (kisitli/acik dışında) uygulama başlamaz.
+- **Neyi kapsar:** beyaz listede olmayan HER yol: `/panel/…`, `/api/…`, `/admin/…`, kök `/`, giriş sayfası ve bilinmeyen yollar. Ardışık eğik çizgi, `.`/`..` bölümleri, `%` kaçışları ve büyük/küçük harf oyunları beyaz listeye girmez (kısıtlı sayılır); karar, URL çözümleyicinin gördüğü yol (`path_info`) üzerinden verilir. İzinli olmayan ağdan bu yollar **404** verir, bilinmeyen bir adresle aynı sayfayı gösterir; panelin var olduğu belli edilmez. Geçerli bir API anahtarı ya da açık bir oturum izinli olmayan ağda işe yaramaz.
+- **Beyaz liste (herkese açık):** `/k/` (QR yönlendirmesi ve `/k/<kod>+`), `/l/`, `/s/`, `/saglik`, `/robots.txt`, statik dosyalar ve medya (`/medya/`, `/ic/`; `/ic/` Caddy'de dışarıya zaten kapalıdır) hep herkese açık kalır; QR kodlar ve kampanya sayfaları çalışmaya devam eder.
 - **İstemci IP'si nasıl bulunur:** Projenin her yerinde (hız sınırları, denetim kaydı) kullanılan yöntemle: `GUVENILIR_VEKIL=1` iken (compose'ta Caddy arkasında böyledir) `X-Forwarded-For` başlığının **en sağdaki** değeri (Caddy'nin gördüğü gerçek bağlantı adresini sona ekler; başlığın başına istemcinin yazdığı sahte değerler **sayılmaz**); aksi hâlde doğrudan bağlantı adresi. Yani başlığa izinli bir IP yazmak kısıtı aşmaz. Caddy'nin önüne başka bir vekil (ör. Cloudflare) koyarsanız en sağdaki adres o vekilin adresi olur; o durumda kısıt amaçlandığı gibi çalışmaz, önce vekil yapılandırmasını (güvenilen vekil, gerçek istemci başlığı) gözden geçirin.
 - **Hatalı değer:** CIDR geçersizse (ör. `203.0.113.0/99`, `abc`, ana makine bitleri açık `203.0.113.5/24`) uygulama **başlamaz** ve nedenini yazar; sessizce atlanıp “kısıt yokmuş gibi” açılmaz.
-- **Kendinizi kilitlemeyin:** Önce kendi çıkış IP'nizi (`curl -s https://ifconfig.me` ya da VPN adresiniz) ekleyin. Kilitlenirseniz sunucuda `.env` içindeki satırı boşaltıp `docker compose up -d` çalıştırın (SSH erişiminiz kısıttan etkilenmez). Sabit IP'niz yoksa bu özelliği açmayın; MFA ve hız sınırları zaten vardır.
+- **Kendinizi kilitlemeyin:** Önce kendi çıkış IP'nizi (`curl -s https://ifconfig.me` ya da VPN adresiniz) ekleyin. Kilitlenirseniz sunucuda `.env` içindeki satırı düzeltip `docker compose up -d` çalıştırın (SSH erişiminiz kısıttan etkilenmez). Sabit IP'niz yoksa sunucuya bir VPN kurup (ör. WireGuard ya da Tailscale) onun özel adres aralığını yazın; kısıtı `acik` yapmak önerilmez (MFA ve hız sınırları ek önlemdir, yerine geçmez).
 - **Sınırlar:** Bu bir ağ güvenlik duvarı değildir; kısıt uygulama katmanındadır (Caddy ve uygulama istekleri yine alır, 404 döner). Hizmet engelleme saldırılarına karşı ayrıca sunucu güvenlik duvarını (`ufw`) kullanın. İzinli olmayan ağdaki 404 sayfasında yalnızca ayrıntılı başlıklar (ör. `Cache-Control`) farklı olabilir; gövde ve durum kodu aynıdır.
 
 ## Eklentiler

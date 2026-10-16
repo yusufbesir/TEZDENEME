@@ -585,10 +585,10 @@ class AgKisitiAyristirmaTesti(SimpleTestCase):
             self.assertIn("geçersiz CIDR", s.stderr)
 
     def test_kisitli_yol_siniflandirmasi(self):
-        for yol in ("/panel/", "/panel", "/panel/giris", "/api/v1/", "/api", "/admin/", "/admin/login/", "//panel/giris", "/panel//x", "/"):
+        for yol in ("/panel/", "/panel", "/panel/giris", "/api/v1/", "/api", "/admin/", "/admin/login/", "//panel/giris", "/panel//x", "/", "/panelx/", "/apiv1/", "/giris", "/PANEL/", "/yok"):
             self.assertTrue(ag_kisiti.kisitli_yol_mu(yol), yol)
         for yol in ("/k/abc", "/k/abc+", "/l/agac", "/l/agac/stil.css", "/s/sayfa", "/saglik", "/robots.txt", "/static/qr/panel.css",
-                    "/medya/a.png", "/ic/medya-yetki", "/panelx/", "/apiv1/"):
+                    "/medya/a.png", "/ic/medya-yetki"):
             self.assertFalse(ag_kisiti.kisitli_yol_mu(yol), yol)
 
     def test_ip_izinli_mi(self):

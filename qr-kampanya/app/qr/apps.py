@@ -11,5 +11,9 @@ class QrConfig(AppConfig):
 
         from . import eklenti_yonetimi, sinyaller  # noqa: F401  (sinyaller: hesap olaylarında API erişimini kapatır)
 
+        from . import ag_kisiti
+
+        ag_kisiti.acilis_uyarisi_yaz()  # kisitli + izinli ağ yok -> tek satır uyarı (panel/API kapalı)
+
         if settings.QR_EKLENTILER:
             eklenti_yonetimi.yukle(settings.QR_EKLENTILER)

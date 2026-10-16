@@ -132,7 +132,8 @@ def sistem_bilgisi(request):
         "son_migration": _son_migration(),
         "imaj_etiketi": settings.QR_IMAJ_ETIKETI,
         "imaj_digest": settings.QR_IMAJ_DIGEST,
-        "kisit_var": bool(settings.YONETIM_IZINLI_AGLAR),
+        "erisim_kipi": settings.YONETIM_ERISIMI,
+        "izinli_ag_sayisi": len(settings.YONETIM_IZINLI_AGLAR),
     })
 
 

@@ -161,12 +161,20 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # (GUVENILIR_VEKIL=1). Aksi halde X-Forwarded-For istemci tarafından sahte girilebilir.
 GUVENILIR_VEKIL = env_bool("GUVENILIR_VEKIL", False)
 
-# İsteğe bağlı panel/API ağ kısıtı: virgülle ayrılmış CIDR listesi (örn. "203.0.113.0/24,2001:db8::/32"). Boş = kısıt yok.
-# Doluysa /panel/, /api/ ve /admin/ yalnızca bu ağlardan açılır, diğerleri 404 alır; /k/, /l/, /s/, /saglik, /robots.txt, statik
-# ve medya etkilenmez. Hatalı CIDR'de uygulama BAŞLAMAZ (ImproperlyConfigured). İstemci IP'si GUVENILIR_VEKIL kuralıyla bulunur.
-from qr.ag_kisiti import aglari_oku  # noqa: E402
+# Panel/API ağ kısıtı: VARSAYILAN KAPALI (beyaz liste). İnternete yalnızca kısa bağlantılar (/k/, /l/, /s/, /saglik, /robots.txt,
+# statik, /medya/, /ic/) açıktır; bunların dışındaki her yol (/panel/, /api/, /admin/, kök, bilinmeyenler) yalnızca
+# YONETIM_IZINLI_AGLAR (virgülle ayrılmış CIDR, örn. "203.0.113.0/24,2001:db8::/32") içindeki ağlardan açılır, diğerleri 404 alır.
+# YONETIM_ERISIMI=kisitli (varsayılan): liste boşsa panel/API herkese kapalıdır (fail closed). acik: yalnız açık seçimle kısıtı kaldırır.
+# Hatalı CIDR ya da kip değerinde uygulama BAŞLAMAZ (ImproperlyConfigured). İstemci IP'si GUVENILIR_VEKIL kuralıyla bulunur.
+from qr.ag_kisiti import aglari_oku, erisim_kipini_oku  # noqa: E402
 
 YONETIM_IZINLI_AGLAR = aglari_oku(env("YONETIM_IZINLI_AGLAR", ""))
+YONETIM_ERISIMI = erisim_kipini_oku(env("YONETIM_ERISIMI", "kisitli"))
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    # Yalnızca `manage.py test`: mevcut testler panele IP'siz erişir; üretim varsayılanı kisitli kalır. Kısıtın kendisi
+    # test_yonetim_erisimi.py içinde override_settings ve ayrı süreçle denenir. (compose YONETIM_ERISIMI'ni her zaman geçirdiği için
+    # ortam değişkeni burada yok sayılır.)
+    YONETIM_ERISIMI = "acik"
 
 # Eklentiler (docs/EKLENTILER.md): app/eklentiler/ altındaki modüllerden yalnızca burada adı geçenler yüklenir. Varsayılan: hiçbiri.
 # Eklenti sunucuda uygulamayla AYNI yetkiyle çalışır; yalnızca güvendiğiniz kodu ekleyin. Hatalı ad -> uygulama başlamaz.

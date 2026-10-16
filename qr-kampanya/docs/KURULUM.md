@@ -105,7 +105,7 @@ Bu komut güvenle tekrar çalıştırılabilir (verileri silmez). Kontrol: `bash
 
 ### İsteğe bağlı: panel ve API'yi belirli ağlara kısıtlamak
 
-Kurulumdan sonra, sabit bir IP/ağdan çalışıyorsanız `.env` dosyasına `YONETIM_IZINLI_AGLAR=203.0.113.0/24` (virgülle birden çok CIDR; IPv6 olur) ekleyip `docker compose up -d` çalıştırın. Doluyken `/panel/`, `/api/` ve `/admin/` yalnızca bu ağlardan açılır, diğerleri 404 alır; QR yönlendirmesi (`/k/`), link ağacı (`/l/`), kampanya sayfaları (`/s/`), `/saglik`, `/robots.txt`, statik dosyalar ve medya **herkese açık kalır**. Hatalı CIDR'de uygulama başlamaz. **Önce kendi çıkış IP'nizi ekleyin**, aksi hâlde panelden kilitlenirsiniz (kurtarma: satırı boşaltıp `docker compose up -d`). Ayrıntı ve sınırlar: [GUVENLIK.md](GUVENLIK.md) “Panel ve API için IP kısıtı”.
+Kurulumdan sonra `.env` dosyasına `YONETIM_IZINLI_AGLAR=203.0.113.0/24` (virgülle birden çok CIDR; IPv6 olur) ekleyip `docker compose up -d` çalıştırın. **Panel ve API varsayılan olarak kapalıdır:** `scripts/kurulum.sh` etkileşimli terminalde izinli ağı sorar (SSH adresinizden öneri çıkarır); sormadıysa ya da boş bıraktıysanız bu satırı eklemeden panele giremezsiniz. Doluyken `/panel/`, `/api/` ve diğer her yol yalnızca bu ağlardan açılır, diğerleri 404 alır; QR yönlendirmesi (`/k/`), link ağacı (`/l/`), kampanya sayfaları (`/s/`), `/saglik`, `/robots.txt`, statik dosyalar ve medya **herkese açık kalır**. Hatalı CIDR'de uygulama başlamaz. **Önce kendi çıkış IP'nizi ekleyin**, aksi hâlde panelden kilitlenirsiniz (kurtarma: SSH ile satırı düzeltip `docker compose up -d`). Ayrıntı ve sınırlar: [GUVENLIK.md](GUVENLIK.md) “Panel ve API için IP kısıtı”.
 
 ### İsteğe bağlı: eklentiler ve sistem bilgisi
 

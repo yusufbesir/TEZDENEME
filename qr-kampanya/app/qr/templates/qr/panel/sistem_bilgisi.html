@@ -13,7 +13,7 @@
   <tr><th scope="row">Uygulanmış son migration (qr)</th><td>{{ son_migration }}</td></tr>
   <tr><th scope="row">Docker imaj etiketi</th><td>{{ imaj_etiketi|default:"Verilmemiş" }}</td></tr>
   <tr><th scope="row">Docker imaj digest</th><td>{{ imaj_digest|default:"Verilmemiş" }}</td></tr>
-  <tr><th scope="row">Panel/API ağ kısıtı</th><td>{% if kisit_var %}Açık (YONETIM_IZINLI_AGLAR){% else %}Kapalı{% endif %}</td></tr>
+  <tr><th scope="row">Panel/API ağ kısıtı</th><td>{% if erisim_kipi == "acik" and not izinli_ag_sayisi %}Kısıt yok (YONETIM_ERISIMI=acik){% elif izinli_ag_sayisi %}Yalnız izinli ağlar ({{ izinli_ag_sayisi }} ağ){% else %}Panel/API kapalı (izinli ağ tanımlı değil){% endif %}</td></tr>
   </tbody>
 </table>
 </div>

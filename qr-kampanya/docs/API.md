@@ -137,7 +137,7 @@ Yanıt: `links` listesi (her biri `keyword`, `shorturl`, `longurl`, `title`, `du
 {"statusCode": 200, "status": "success", "message": "success", "version": "1", "uygulama_surumu": "1.0.0"}
 ```
 
-Diğer eylemler gibi kimlik doğrulaması gerekir. `YONETIM_IZINLI_AGLAR` doluysa ve istemci izinli bir ağda değilse `/api/` yolu (geçerli anahtarla bile) 404 döner ([GUVENLIK.md](GUVENLIK.md)).
+Diğer eylemler gibi kimlik doğrulaması gerekir. Varsayılan olarak (`YONETIM_ERISIMI=kisitli`) `/api/` yalnızca `YONETIM_IZINLI_AGLAR` içindeki ağlara açıktır; liste boşsa ya da istemci izinli bir ağda değilse `/api/` yolu (geçerli anahtarla bile) 404 döner ([GUVENLIK.md](GUVENLIK.md)).
 
 ## 5. Biçimler
 

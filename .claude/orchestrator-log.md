@@ -92,3 +92,5 @@
 | 2026-10-16 | Güvenlik düzeltmesi B (devam 2): ana makine IDNA normalizasyonu (stdlib), Unicode benzeri alan adı atlatması kapatıldı | implementer / claude-sonnet-5-5 (aynı ajan) | tahmini ~30k | Tamamlandı: 7 yeni test, 899 OK |
 | 2026-10-16 | Yeniden doğrulama: güvenlik düzeltmesi B (Unicode dahil) | verifier / claude-sonnet-5-5 (aynı ajan) | tahmini toplam ~110k | Geçti: 899 OK, makemigrations temiz, yeni atlatma yok |
 | 2026-10-16 | Duraklatma: Yusuf'un isteğiyle (koordinatör iletisi) barkod işi bitene kadar bu iş parçacığı beklemede | — (ajan çalışmıyor) | 0 | Bütün işler commitli ve gönderildi (son: b81328a); açık iş yalnız panel/API erişim kararı |
+| 2026-10-16 | Yalnız kısa linkler açık: yönetim erişimi varsayılan kapalı (beyaz liste, YONETIM_ERISIMI, kurulum/güncelleme sorusu, belgeler) | implementer / claude-sonnet-5-5 | tahmini toplam ~103k (27 araç çağrısı) | Tamamlandı: 22+1 yeni test, 922 OK |
+| 2026-10-16 | Doğrulama: yönetim erişimi varsayılan kapalı | verifier / claude-sonnet-5-5 | tahmini ~80k | Geçti: 922 OK; atlatma ve XFF sahteciliği denendi; docker compose ile .env'de son satırın geçerli olduğu doğrulandı; enjeksiyon reddedildi |

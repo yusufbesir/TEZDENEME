@@ -80,6 +80,11 @@ else
   echo "       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md)."
 fi
 
+# Panel/API varsayılan KAPALI: izinli ağ sorulur (tty varsa) ve .env'nin sonuna eklenir; yoksa talimat basılır.
+# shellcheck source=scripts/yonetim-agi.sh
+. scripts/yonetim-agi.sh
+yonetim_ag_sor
+
 mkdir -p yedekler && chmod 700 yedekler
 docker compose build
 # Yedek servisi root olmayan kullanıcıyla (10002) çalışır: yedekler/ dizini ona devredilir (silme yok).

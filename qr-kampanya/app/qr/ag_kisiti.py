@@ -1,13 +1,17 @@
-"""Panel/API için isteğe bağlı IP (ağ) kısıtı.
+"""Panel/API için ağ (IP) kısıtı: varsayılan KAPALI, beyaz liste.
 
-settings.YONETIM_IZINLI_AGLAR boşsa (varsayılan) kısıt YOKTUR. Doluysa `/panel/`, `/api/` ve `/admin/` yalnızca bu ağlardan
-erişilebilir; diğerleri 404 alır (varlığı ele verilmez). `/k/`, `/l/`, `/s/`, `/saglik`, `/robots.txt`, statik ve medya etkilenmez.
+Herkese açık yollar yalnızca: /k/, /l/, /s/, /saglik, /robots.txt, statik önek (STATIC_URL), /medya/ ve /ic/. Bunların dışındaki
+HER yol (kök, /panel/, /api/, /admin/, giriş sayfası, bilinmeyenler) kısıtlıdır ve yalnızca settings.YONETIM_IZINLI_AGLAR içindeki
+ağlardan erişilebilir; diğerleri 404 alır (varlığı ele verilmez).
+settings.YONETIM_ERISIMI: `kisitli` (varsayılan) iken liste boşsa kısıtlı yollar herkese 404 döner (fail closed). `acik` yalnız
+açık seçimle kısıtı kaldırır (liste doluysa yine uygulanır).
 İstemci IP'si, projenin her yerinde kullanılan `middleware.istemci_ip` ile belirlenir: X-Forwarded-For yalnızca
 GUVENILIR_VEKIL=1 iken (Caddy arkasında) ve yalnızca en sağdaki (vekilin eklediği) değer dikkate alınır; istemcinin
 gönderdiği sahte başlık değerleri kullanılmaz.
 """
 import ipaddress
-import re
+import logging
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -15,11 +19,39 @@ from django.http import Http404
 
 from .middleware import istemci_ip
 
-KISITLI_ILK_SEGMENTLER = frozenset({"panel", "api", "admin"})
+# Beyaz liste: yalnızca kısa bağlantılar ve bunların dayandığı uçlar internete açıktır. /ic/ Caddy'de dışarıya kapalıdır;
+# forward_auth alt isteği (medya yetkisi) uygulamaya doğrudan geldiği için kısıta takılmamalıdır.
+TAM_ACIK_YOLLAR = frozenset({"/saglik", "/robots.txt"})
+ACIK_ONEKLER = ("/k/", "/l/", "/s/", "/medya/", "/ic/")
+
+KIPLER = ("kisitli", "acik")
+logger = logging.getLogger(__name__)
+
+
+def erisim_kipini_oku(ham):
+    """YONETIM_ERISIMI: `kisitli` (varsayılan; boş değer de kisitli sayılır) ya da `acik`. Başka değer ImproperlyConfigured."""
+    deger = (ham or "").strip().lower() or "kisitli"
+    if deger not in KIPLER:
+        raise ImproperlyConfigured(
+            f"YONETIM_ERISIMI geçersiz: {ham!r}. Geçerli değerler: kisitli (varsayılan) ya da acik. "
+            "Uygulama güvenli tarafta kalmak için başlamadı."
+        )
+    return deger
+
+
+def kapali_uyarisi_gerekli_mi():
+    return getattr(settings, "YONETIM_ERISIMI", "kisitli") == "kisitli" and not getattr(settings, "YONETIM_IZINLI_AGLAR", ())
+
+
+def acilis_uyarisi_yaz():
+    """Fail closed durumunda (kisitli + izinli ağ yok) açılışta tek satır uyarı yazar (gizli bilgi içermez)."""
+    if kapali_uyarisi_gerekli_mi():
+        logger.warning("Panel ve API KAPALI: YONETIM_IZINLI_AGLAR boş (YONETIM_ERISIMI=kisitli). Yalnızca kısa bağlantılar açık; "
+                       ".env içine YONETIM_IZINLI_AGLAR=<CIDR> yazıp docker compose up -d çalıştırın.")
 
 
 def aglari_oku(ham):
-    """Virgülle ayrılmış CIDR listesini ip_network demetine çevirir. Boş/yalnız boşluk -> () (kısıt yok).
+    """Virgülle ayrılmış CIDR listesini ip_network demetine çevirir. Boş/yalnız boşluk -> () (izinli ağ yok).
     Hatalı öğe (CIDR değil, ana makine bitleri açık, vb.) ImproperlyConfigured fırlatır: sessizce atlanmaz (fail closed)."""
     aglar = []
     for parca in (ham or "").split(","):
@@ -36,12 +68,34 @@ def aglari_oku(ham):
     return tuple(aglar)
 
 
-def kisitli_yol_mu(yol):
-    """/panel, /api, /admin ile altındakiler (ardışık eğik çizgiler tekilleştirilir). Kök yol (/) de panele yönlendirdiği için kapsanır."""
-    temiz = re.sub(r"/+", "/", yol or "/")
-    if temiz == "/":
+def acik_yol_mu(yol):
+    """Herkese açık (beyaz listedeki) yol mu? Bunun DIŞINDAKİ her yol (kök, /panel/, /api/, /admin/, bilinmeyenler) kısıtlıdır.
+
+    Karar `path_info` (URL çözümleyicinin gördüğü yol) üzerinden verilir; yönlendirme ile aynı dizeye bakıldığı için
+    SCRIPT_NAME farkı atlatma yaratmaz. Şüpheli biçimler (ardışık eğik çizgi, `.`/`..` bölümleri, kaçış karakteri `%`,
+    ters eğik çizgi, denetim karakterleri) beyaz listeye girmez; büyük/küçük harf duyarlıdır (URL çözümleyici gibi).
+    """
+    if not isinstance(yol, str) or not yol.startswith("/"):
+        return False
+    if "//" in yol or "%" in yol or "\\" in yol or any(ord(c) < 32 or ord(c) == 127 for c in yol):
+        return False
+    if any(parca in (".", "..") for parca in yol.split("/")):
+        return False
+    if yol in TAM_ACIK_YOLLAR:
         return True
-    return temiz.split("/", 2)[1] in KISITLI_ILK_SEGMENTLER
+    onekler = ACIK_ONEKLER + (_statik_oneki(),)
+    return any(yol.startswith(onek) and len(yol) > len(onek) for onek in onekler if onek)
+
+
+def kisitli_yol_mu(yol):
+    return not acik_yol_mu(yol)
+
+
+def _statik_oneki():
+    oneki = urlparse(getattr(settings, "STATIC_URL", "") or "").path
+    if not oneki.startswith("/") or oneki == "/":
+        return ""  # kök ya da tam adres olarak verilmiş statik önek beyaz listeyi genişletmez
+    return oneki if oneki.endswith("/") else oneki + "/"
 
 
 def ip_izinli_mi(ip, aglar):
@@ -60,6 +114,9 @@ class YonetimAgKisitiMiddleware:
 
     def __call__(self, request):
         aglar = getattr(settings, "YONETIM_IZINLI_AGLAR", ())
-        if aglar and kisitli_yol_mu(request.path_info) and not ip_izinli_mi(istemci_ip(request), aglar):
+        kip = getattr(settings, "YONETIM_ERISIMI", "kisitli")  # ayar eksikse de güvenli taraf: kisitli
+        # `acik` + boş liste = kısıt yok (yalnız açık seçimle). Aksi halde kısıtlı yollar yalnız izinli ağlara açılır;
+        # kisitli + boş liste herkes için 404'tür (fail closed).
+        if (kip != "acik" or aglar) and kisitli_yol_mu(request.path_info) and not ip_izinli_mi(istemci_ip(request), aglar):
             raise Http404  # varlığı ele verme: bilinmeyen yolla aynı 404 sayfası
         return self.get_response(request)
