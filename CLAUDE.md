@@ -47,3 +47,7 @@ Jev, TypeSafe AI'ın karar modelidir. Metin ve kod üretmez; tipli sorulara seç
 - Kritik kategorilerde (mimari, güvenlik, veri bütünlüğü, geri alınamaz) Jev yalnız görüş verir; karar kullanıcı ve Opus'tadır.
 - Jev'e erişilemezse yanıtta "Jev'e erişilemedi" diye açıkça yaz. Jev denetim işlerinde kullanılmaz.
 - Jev'e yalnız Vercel AI Gateway üzerinden gidilir; anahtar yalnız `AI_GATEWAY_API_KEY` ortam değişkeninde ya da cihazdaki mevcut anahtar dosyasında durur. Ayrıntı: `docs/jev/karar-kurgusu.md`.
+
+## Proje Kuralları (ayrıntı)
+
+Kullanıcının kalıcı kuralları (hafıza, silme yasağı, güvenlik, dosya düzeni, etiket ve token kaydı vb.) `docs/kurallar/` altındadır. İlgili işte önce `docs/kurallar/README.md` dizinine ve ilgili dosyanın özetine bak; tamamını açma. Kural silinmez, değişiklik kullanıcıya önerilir.
