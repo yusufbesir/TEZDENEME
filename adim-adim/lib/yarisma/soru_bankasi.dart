@@ -6,6 +6,7 @@ import 'model.dart';
 import 'sorular/ingilizce_a1.dart';
 import 'sorular/ingilizce_a2.dart';
 import 'sorular/ingilizce_b1.dart';
+import 'sorular/ingilizce_b2.dart';
 import 'sorular/programlama_1.dart';
 import 'sorular/programlama_2.dart';
 import 'sorular/programlama_3.dart';
@@ -15,6 +16,7 @@ final List<YarismaSorusu> tumSorular = List.unmodifiable([
   ...ingilizceA1Sorulari,
   ...ingilizceA2Sorulari,
   ...ingilizceB1Sorulari,
+  ...ingilizceB2Sorulari,
   ...programlama1Sorulari,
   ...programlama2Sorulari,
   ...programlama3Sorulari,
@@ -32,6 +34,7 @@ List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
     YarismaSeviye(kursId: 'ingilizce-1', etiket: 'A1'),
     YarismaSeviye(kursId: 'ingilizce-2', etiket: 'A2'),
     YarismaSeviye(kursId: 'ingilizce-3', etiket: 'B1'),
+    YarismaSeviye(kursId: 'ingilizce-4', etiket: 'B2'),
   ],
   'kod' => const [
     YarismaSeviye(kursId: 'html-1', etiket: 'HTML'),

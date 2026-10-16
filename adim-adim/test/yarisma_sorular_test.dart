@@ -4,24 +4,30 @@ import 'package:adim_adim/yarisma/model.dart';
 import 'package:adim_adim/yarisma/soru_bankasi.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_a2.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_b1.dart';
+import 'package:adim_adim/yarisma/sorular/ingilizce_b2.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('toplam 180 soru var: 108 İngilizce (A1+A2+B1) + 3x24 programlama', () {
-    expect(tumSorular.length, 180);
-    expect(sorulariBul('dil', 'ingilizce-1').length, 36);
-    expect(sorulariBul('dil', 'ingilizce-2').length, 36);
-    expect(sorulariBul('dil', 'ingilizce-3').length, 36);
-    expect(
-      sorulariBul('dil', 'ingilizce-1').length +
-          sorulariBul('dil', 'ingilizce-2').length +
-          sorulariBul('dil', 'ingilizce-3').length,
-      108,
-    );
-    expect(sorulariBul('kod', 'html-1').length, 24);
-    expect(sorulariBul('kod', 'css-1').length, 24);
-    expect(sorulariBul('kod', 'js-1').length, 24);
-  });
+  test(
+    'toplam 216 soru var: 144 İngilizce (A1+A2+B1+B2) + 3x24 programlama',
+    () {
+      expect(tumSorular.length, 216);
+      expect(sorulariBul('dil', 'ingilizce-1').length, 36);
+      expect(sorulariBul('dil', 'ingilizce-2').length, 36);
+      expect(sorulariBul('dil', 'ingilizce-3').length, 36);
+      expect(sorulariBul('dil', 'ingilizce-4').length, 36);
+      expect(
+        sorulariBul('dil', 'ingilizce-1').length +
+            sorulariBul('dil', 'ingilizce-2').length +
+            sorulariBul('dil', 'ingilizce-3').length +
+            sorulariBul('dil', 'ingilizce-4').length,
+        144,
+      );
+      expect(sorulariBul('kod', 'html-1').length, 24);
+      expect(sorulariBul('kod', 'css-1').length, 24);
+      expect(sorulariBul('kod', 'js-1').length, 24);
+    },
+  );
 
   test('tüm sorular geçerli', () {
     for (final s in tumSorular) {
@@ -38,7 +44,7 @@ void main() {
   });
 
   test(
-    'her (alan, kursId, kategori) için en az 4 soru; A1, A2 ve B1 için 6',
+    'her (alan, kursId, kategori) için en az 4 soru; A1, A2, B1 ve B2 için 6',
     () {
       for (final alan in ['dil', 'kod']) {
         for (final sv in seviyeler(alan)) {
@@ -50,7 +56,8 @@ void main() {
             expect(adet, greaterThanOrEqualTo(4), reason: '${sv.kursId} $k');
             if (sv.kursId == 'ingilizce-1' ||
                 sv.kursId == 'ingilizce-2' ||
-                sv.kursId == 'ingilizce-3') {
+                sv.kursId == 'ingilizce-3' ||
+                sv.kursId == 'ingilizce-4') {
               expect(adet, 6, reason: '${sv.kursId} $k');
             }
           }
@@ -65,6 +72,7 @@ void main() {
       ('ingilizce-1', 'A1'),
       ('ingilizce-2', 'A2'),
       ('ingilizce-3', 'B1'),
+      ('ingilizce-4', 'B2'),
     ]);
     final kod = seviyeler('kod');
     expect(kod.map((s) => (s.kursId, s.etiket)), [
@@ -95,6 +103,27 @@ void main() {
     expect(ingilizceB1Sorulari.length, 36);
     for (final k in YarismaKategori.values) {
       expect(ingilizceB1Sorulari.where((s) => s.kategori == k).length, 6);
+    }
+  });
+
+  test('B2 soruları geçerli, alan dil, kursId ingilizce-4', () {
+    for (final s in ingilizceB2Sorulari) {
+      expect(s.gecerliMi, isTrue, reason: s.id);
+      expect(s.alan, 'dil', reason: s.id);
+      expect(s.seviyeKursId, 'ingilizce-4', reason: s.id);
+      expect(s.id, startsWith('ingilizce-4.${s.kategori.kimlik}.'));
+    }
+    expect(ingilizceB2Sorulari.length, 36);
+    for (final k in YarismaKategori.values) {
+      expect(ingilizceB2Sorulari.where((s) => s.kategori == k).length, 6);
+    }
+    // Doğru şık indeksleri dağılmış olmalı (her indeks en az 6 kez).
+    for (var i = 0; i < 4; i++) {
+      expect(
+        ingilizceB2Sorulari.where((s) => s.dogru == i).length,
+        greaterThanOrEqualTo(6),
+        reason: 'indeks $i',
+      );
     }
   });
 
