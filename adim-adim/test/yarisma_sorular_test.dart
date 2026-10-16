@@ -2,12 +2,14 @@
 // Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 import 'package:adim_adim/yarisma/model.dart';
 import 'package:adim_adim/yarisma/soru_bankasi.dart';
+import 'package:adim_adim/yarisma/sorular/ingilizce_a2.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('toplam 108 soru var: 36 İngilizce + 3x24 programlama', () {
-    expect(tumSorular.length, 108);
+  test('toplam 144 soru var: 72 İngilizce (A1+A2) + 3x24 programlama', () {
+    expect(tumSorular.length, 144);
     expect(sorulariBul('dil', 'ingilizce-1').length, 36);
+    expect(sorulariBul('dil', 'ingilizce-2').length, 36);
     expect(sorulariBul('kod', 'html-1').length, 24);
     expect(sorulariBul('kod', 'css-1').length, 24);
     expect(sorulariBul('kod', 'js-1').length, 24);
@@ -27,7 +29,7 @@ void main() {
     }
   });
 
-  test('her (alan, kursId, kategori) için en az 4 soru; A1 için 6', () {
+  test('her (alan, kursId, kategori) için en az 4 soru; A1 ve A2 için 6', () {
     for (final alan in ['dil', 'kod']) {
       for (final sv in seviyeler(alan)) {
         for (final k in YarismaKategori.values) {
@@ -36,8 +38,8 @@ void main() {
             sv.kursId,
           ).where((s) => s.kategori == k).length;
           expect(adet, greaterThanOrEqualTo(4), reason: '${sv.kursId} $k');
-          if (sv.kursId == 'ingilizce-1') {
-            expect(adet, 6, reason: 'A1 $k');
+          if (sv.kursId == 'ingilizce-1' || sv.kursId == 'ingilizce-2') {
+            expect(adet, 6, reason: '${sv.kursId} $k');
           }
         }
       }
@@ -46,7 +48,10 @@ void main() {
 
   test('seviyeler listesi doğru', () {
     final dil = seviyeler('dil');
-    expect(dil.map((s) => (s.kursId, s.etiket)), [('ingilizce-1', 'A1')]);
+    expect(dil.map((s) => (s.kursId, s.etiket)), [
+      ('ingilizce-1', 'A1'),
+      ('ingilizce-2', 'A2'),
+    ]);
     final kod = seviyeler('kod');
     expect(kod.map((s) => (s.kursId, s.etiket)), [
       ('html-1', 'HTML'),
@@ -54,6 +59,16 @@ void main() {
       ('js-1', 'JS'),
     ]);
     expect(seviyeler('bilinmeyen'), isEmpty);
+  });
+
+  test('A2 soruları geçerli, alan dil, kursId ingilizce-2', () {
+    for (final s in ingilizceA2Sorulari) {
+      expect(s.gecerliMi, isTrue, reason: s.id);
+      expect(s.alan, 'dil', reason: s.id);
+      expect(s.seviyeKursId, 'ingilizce-2', reason: s.id);
+      expect(s.id, startsWith('ingilizce-2.${s.kategori.kimlik}.'));
+    }
+    expect(ingilizceA2Sorulari.length, 36);
   });
 
   test('tumSorular değiştirilemez', () {
