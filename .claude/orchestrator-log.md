@@ -42,3 +42,4 @@
 2026-10-16 | Arayüz: 8 özellik (sablon.html) | implementer/sonnet | ~400k token | 158 test geçti
 2026-10-16 | 1.2.0 bağımsız doğrulama | verifier/sonnet | ~54k token | Geçti
 2026-10-16 | Sekme düzeni (Doğrula/Geçmiş ayrı, Rehber→Yardım, seçici çerçevesi) | orchestrator + verifier/haiku | ~58k token | verifier Kaldı (panel yuvalama), düzeltildi, tarayıcıda 8 sekme doğrulandı, 159 test; 1.2.1
+2026-10-16 | Tek barkod geçmişi (1.2.2) | orchestrator (tek dosya, küçük) | ~60k token | 160 test, tarayıcıda 2 kayıt, kelime kaydedilmedi
