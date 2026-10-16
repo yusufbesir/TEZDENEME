@@ -67,3 +67,6 @@
 - 2026-10-16 | Motor özellikleri + birleştirme + yerleşim turu + B1 doğrula | verifier (claude-sonnet-5-5) | ~75K token | Geçti (327 test; 1 isteğe bağlı şık notu, ana oturum uyguladı: but→or)
 - 2026-10-16 | İngilizce B2 kursu (12 ders, 120 alıştırma) + 36 B2 yarışma sorusu | implementer (claude-sonnet-5-5) | ~100K token | tamam (234 test kendi dalında; verifier bekliyor)
 - 2026-10-16 | İngilizce B2 doğrulama (commit dd440a0a; 337 test, 36 soru olgu ve tekrar kontrolü) | verifier (claude-sonnet-5-5) | ~61K token | Geçti (engel olmayan not: Yaz kabul kümeleri dar, kıvrık apostrof normalizasyonu kontrol edilmedi)
+| 2026-10-16 | Proje talimatları kutusunu docs/kurallar/ altına taşı, kısa kutu taslağı yaz [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 60.000 girdi / 12.000 çıktı | Başarılı. 3 kural dosyası, dizin ve 2.912 karakterlik taslak eklendi. |
+| 2026-10-16 | Yola bağlı kurallar, boyut testi, CHECKPOINT.md, yerleşim tablosu [İP:Talimat düzeni#zkd4TM] | thread (ajan yok) / claude-sonnet-5-5 | tahmini 50.000 girdi / 8.000 çıktı | Başarılı. 7 boyut testi geçti. |
+| 2026-10-16 | Rehber taraması önerilerini doğrula: ajan efor seviyeleri ve öneri dokümanı [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | verifier / claude-sonnet-5-5 | 21.132 toplam | Geçti: 69 Python, 35 kabuk testi |
