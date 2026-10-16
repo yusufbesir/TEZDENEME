@@ -38,3 +38,19 @@
 | 2026-10-15 | Jev cihaz kökünde otomatik keşfi kaldır, jev_cagri.py için SHA-256 pini ve sembolik bağ reddi [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 44.890 toplam | Tamam: 65 test geçti |
 | 2026-10-15 | Skill kilidine sha256 içerik özeti ve skill-etkinlestir.sh kilit doğrulaması [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 53.703 toplam | Tamam: 69 Python, 35 kabuk testi geçti |
 | 2026-10-15 | Denetmenlerin ikinci tur düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | 39.797 toplam | Geçti |
+| 2026-10-15 | Adım Adım: eski sürüm temizleyici güncelleme mekanizması (Windows), guncelle.ps1, 19 test | implementer / claude-sonnet-5-5 | ~45.000 (30K girdi, 15K çıktı, tahmini) | Başarılı. 120 test geçti, analyze temiz. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
+| 2026-10-15 | Adım Adım: güncelleme mekanizmasının doğrulanması (5 kural) | verifier / claude-sonnet-5-5 | ~35.000 | Geçti. 2 düşük gözlem (ps1 Windows'ta çalıştırılmadı; sürücü harfli yol testi yalnız fromJson). [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
+| 2026-10-15 | Adım Adım: Siber Güvenlik Denetmeni bulgusu, yayın imzası için key.properties desteği, .gitignore, docs/IMZA.md | koordinatör (Fable) / claude-fable-5-1 | – | Uygulandı; anahtar deposu cihazda oluşturulacak (JDK gerekli). [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
+- 2026-10-15 | PR #16 denetim bulguları (ps1 yedek/geri alma/bağlantı/TOCTOU, yolHatasi ayrılmış adlar, -Pdagitim, IMZA.md, kök .gitignore) | ana oturum (Fable 5.1) kendisi uyguladı | - | tamam
+- 2026-10-15 | PR #16 düzeltmelerini doğrula | verifier (claude-sonnet-5-5) | ~34.2K token | Geçti (121 test, analyze temiz; sürücü kökü notu düzeltildi)
+- 2026-10-15 | Siber Güvenlik notu: release imza koruması varsayılan açık (gradle.properties dagitim=true, taskGraph denetimi) | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
+- 2026-10-15 | Siber Güvenlik: key.properties yalnız %USERPROFILE%\.anahtar'dan okunur, depo içi geri dönüş kaldırıldı | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
+- 2026-10-15 | Siber Güvenlik düşük öneriler: storeFile mutlak yol zorunlu, *.p12 gitignore | ana oturum (Fable 5.1) | - | tamam
+- 2026-10-16 | Alan alanı, mikroSec/mikroBitir/yarismaBitir/alanKurslari motor işlevleri, notifier metotları | implementer (claude-sonnet-5-5) | ~50.7K token | tamam (17 test eklendi, 138 geçti)
+- 2026-10-16 | Alan + mikro ders motorunu doğrula | verifier (claude-sonnet-5-5) | ~32.4K token | Geçti (analyze kapsamda temiz, 111 test)
+- 2026-10-16 | Yarışma paketi: model, 108 soru, motor, depo, sağlayıcılar, 45 test | implementer (claude-sonnet-5-5) | ~106K token | tamam
+- 2026-10-16 | Yarışma paketi ve soru olgularını doğrula | verifier (claude-sonnet-5-5) | ~80K token | Geçti (1 dil bilgisi düzeltmesi: neden→nereden, ana oturum uyguladı)
+- 2026-10-16 | Sade arayüz, alan seçimi, 4 sekme, mikro ders ekranı, animasyonlar, 13 arayüz testi | implementer (claude-sonnet-5-5) | ~90K token | tamam (189 test)
+- 2026-10-16 | Sade arayüzü doğrula | verifier (claude-sonnet-5-5) | ~33.8K token | Geçti (analyze temiz, 189 test; TekrarEkrani alan filtresi bulgu olarak not edildi)
+- 2026-10-16 | Yarışma ekranları: lobi, oyun, çark (1200 ms), süre çubuğu, şık/taç animasyonları, sonuç; 19 arayüz testi | implementer (claude-sonnet-5-5) | ~128K token | tamam (208 test)
+- 2026-10-16 | Yarışma ekranlarını doğrula | verifier (claude-sonnet-5-5) | ~35K token | Geçti (not: kayıt hatası sessiz)

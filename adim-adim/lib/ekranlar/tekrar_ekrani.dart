@@ -1,3 +1,8 @@
+/// Tekrar sekmesi: seçili alanın zamanı gelen Leitner kartlarını sorar.
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,35 +25,24 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
   List<({String kartId, Alistirma alistirma})>? _oturum;
   ({int dogru, int toplam})? _sonuc;
 
-  /// Kart kimliğinden (dersId#indeks) alıştırmayı bulur; bulunamazsa null.
-  Alistirma? _coz(String kartId) {
-    final ayrac = kartId.lastIndexOf('#');
-    if (ayrac <= 0) return null;
-    final dersId = kartId.substring(0, ayrac);
-    final indeks = int.tryParse(kartId.substring(ayrac + 1));
-    if (indeks == null || indeks < 0) return null;
-    for (final k in ref.read(kurslarProvider)) {
-      final d = k.dersBul(dersId);
-      if (d != null) {
-        return indeks < d.alistirmalar.length ? d.alistirmalar[indeks] : null;
-      }
-    }
-    return null;
-  }
-
   List<({String kartId, Alistirma alistirma})> _bekleyenler() {
     final durum = ref.read(durumProvider).value;
     if (durum == null) return const [];
     final bugun = ref.read(bugunProvider);
+    // Yalnızca seçili alanın kurslarına ait kartlar; diğer alanın kartları
+    // orada bekler, kaybolmaz.
+    final kurslar = ref.read(alanKurslariProvider);
     return [
       for (final id in Motor.tekrarBekleyen(durum, bugun))
-        if (_coz(id) case final a?) (kartId: id, alistirma: a),
+        if (Motor.kartCoz(kurslar, id) case final a?)
+          (kartId: id, alistirma: a),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(durumProvider);
+    ref.watch(alanKurslariProvider);
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
 

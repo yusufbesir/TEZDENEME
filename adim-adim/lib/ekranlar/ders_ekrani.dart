@@ -1,9 +1,15 @@
+/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri).
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
-import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ders_ozeti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
@@ -80,7 +86,15 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
         child: ders == null || ders.alistirmalar.isEmpty
             ? _Bulunamadi(onGeri: _cik)
             : _ozet != null
-            ? _Ozet(ozet: _ozet!, onDon: _cik, dersAdi: ders.ad)
+            ? DersOzeti(
+                baslik: 'Ders tamamlandı',
+                altBaslik: ders.ad,
+                dogru: _ozet!.dogru,
+                toplam: _ozet!.toplam,
+                xp: _ozet!.xp,
+                seri: _ozet!.seri,
+                onDon: _cik,
+              )
             : AlistirmaOturumu(
                 alistirmalar: ders.alistirmalar,
                 onSonuc: (i, dogru) => ref
@@ -115,89 +129,6 @@ class _Bulunamadi extends StatelessWidget {
             ),
             const SizedBox(height: Olcu.b2),
             FilledButton(onPressed: onGeri, child: const Text('Yola dön')),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Ozet extends StatelessWidget {
-  const _Ozet({required this.ozet, required this.onDon, required this.dersAdi});
-  final ({int dogru, int toplam, int xp, int seri}) ozet;
-  final VoidCallback onDon;
-  final String dersAdi;
-
-  @override
-  Widget build(BuildContext context) {
-    final r = context.renkler;
-    final yazi = Theme.of(context).textTheme;
-    final tam = ozet.dogru == ozet.toplam;
-    Widget satir(IconData simge, Color renk, String baslik, String deger) =>
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: Olcu.b1),
-          child: Semantics(
-            label: '$baslik: $deger',
-            excludeSemantics: true,
-            child: Row(
-              children: [
-                Icon(simge, color: renk, size: 32),
-                const SizedBox(width: Olcu.b2),
-                Expanded(child: Text(baslik, style: yazi.bodyLarge)),
-                Text(deger, style: yazi.titleLarge),
-              ],
-            ),
-          ),
-        );
-    return SayfaGovdesi(
-      child: Padding(
-        padding: const EdgeInsets.all(Olcu.b3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Spacer(),
-            Icon(
-              tam ? Icons.emoji_events : Icons.check_circle,
-              size: 64,
-              color: tam ? r.vurgu : r.dogru,
-            ),
-            const SizedBox(height: Olcu.b2),
-            Text(
-              'Ders tamamlandı',
-              textAlign: TextAlign.center,
-              style: yazi.headlineMedium,
-            ),
-            const SizedBox(height: Olcu.b1),
-            Text(
-              dersAdi,
-              textAlign: TextAlign.center,
-              style: yazi.bodyLarge?.copyWith(color: r.metinIkincil),
-            ),
-            const SizedBox(height: Olcu.b3),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(Olcu.b2),
-                child: Column(
-                  children: [
-                    satir(
-                      Icons.check_circle_outline,
-                      r.dogru,
-                      'Doğru',
-                      '${ozet.dogru}/${ozet.toplam}',
-                    ),
-                    satir(Icons.bolt, r.vurgu, 'Kazanılan XP', '+${ozet.xp}'),
-                    satir(
-                      Icons.local_fire_department,
-                      r.vurgu,
-                      'Seri',
-                      '${ozet.seri} gün',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Spacer(),
-            FilledButton(onPressed: onDon, child: const Text('Yola dön')),
           ],
         ),
       ),
