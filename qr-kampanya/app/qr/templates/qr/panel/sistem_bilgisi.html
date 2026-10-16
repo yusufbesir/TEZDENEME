@@ -1,0 +1,20 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Sistem bilgisi{% endblock %}
+{% block icerik %}
+<h1>Sistem bilgisi</h1>
+<p class="yardim">Salt okunur bilgi sayfası. Bu sayfa internete bağlanmaz ve “yeni sürüm var mı” diye bakmaz; sürüm denetimi elle yapılır (docs/BAKIM.md, <code>scripts/surum-denetimi.sh</code>).</p>
+<div class="tablo-kap">
+<table>
+  <tbody>
+  <tr><th scope="row">Uygulama sürümü</th><td>{{ uygulama_surumu }}</td></tr>
+  <tr><th scope="row">Python</th><td>{{ python_surumu }}</td></tr>
+  <tr><th scope="row">Django</th><td>{{ django_surumu }}</td></tr>
+  <tr><th scope="row">PostgreSQL sunucusu</th><td>{{ postgresql_surumu }}</td></tr>
+  <tr><th scope="row">Uygulanmış son migration (qr)</th><td>{{ son_migration }}</td></tr>
+  <tr><th scope="row">Docker imaj etiketi</th><td>{{ imaj_etiketi|default:"Verilmemiş" }}</td></tr>
+  <tr><th scope="row">Docker imaj digest</th><td>{{ imaj_digest|default:"Verilmemiş" }}</td></tr>
+  <tr><th scope="row">Panel/API ağ kısıtı</th><td>{% if kisit_var %}Açık (YONETIM_IZINLI_AGLAR){% else %}Kapalı{% endif %}</td></tr>
+  </tbody>
+</table>
+</div>
+{% endblock %}

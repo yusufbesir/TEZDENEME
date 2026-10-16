@@ -8,6 +8,7 @@
 |---|---|
 | Her hafta | Panel ana ekranında son yedeğin “başarılı” olduğuna bakın. |
 | Her ay | `bash scripts/geri-yukleme-testi.sh` · sunucu güncellemeleri (`sudo apt update && sudo apt upgrade`) · disk: `df -h` · `bash scripts/guvenlik-tarama.sh` (bilinen güvenlik açığı taraması; “temiz” demeli, açık bulursa aşağıdaki bağımlılık güncellemesini yapın) |
+| Her ay (isteğe bağlı) | `bash scripts/surum-denetimi.sh --cevrimici` (yeni imaj/paket sürümü var mı; hiçbir şeyi güncellemez, aşağıdaki “Sürüm denetimi”) |
 | Güvenlik duyurusunda | Bağımlılık güncellemesi (aşağıda) |
 | Yılda bir | Alan adı yenilemesini, sunucu dışı yedeklerin varlığını ve yönetici hesaplarını gözden geçirin. |
 
@@ -38,6 +39,22 @@ Kullanılan Python paketlerinin tam listesi ve “parmak izleri” (hash) `app/r
 Not: Kurulum sırasında hash'i uyuşmayan paket reddedilir; bu bilinçli bir korumadır. İki tarama/kilit aracının (pip-tools, pip-audit) kendi kurulumu hash'siz yapılır; bunlar yalnızca bakım aracıdır, uygulama imajına girmez.
 
 Django 5.2 LTS'nin desteği 2028 Nisan'da biter; o tarihten önce bir sonraki LTS sürümüne geçiş planlanmalıdır.
+
+## Sürüm denetimi (elle, ağsız varsayılan)
+
+Uygulama kendi kendine “yeni sürüm var mı” diye **bakmaz**, hiçbir şeyi otomatik güncellemez. Elle denetim için:
+
+```bash
+bash scripts/surum-denetimi.sh              # çevrimdışı: sabit imaj etiketlerini ve doğrudan bağımlılıkları listeler, ağa bağlanmaz
+bash scripts/surum-denetimi.sh --cevrimici  # ayrıca PyPI ve Docker Hub/GHCR'ye salt okunur sorgu yapar, daha yeni sürüm var mı raporlar
+```
+
+- Kapsam: `docker-compose.yml`, `app/Dockerfile` ve `yedek/Dockerfile` içindeki `ad:etiket` imajları; `app/requirements.in` içindeki doğrudan bağımlılıklar (kilitli sürüm `app/requirements.txt`'den okunur). Yerel derlenen `qr-kampanya-*` imajları listelenmez.
+- `--cevrimici` için `curl` ve `python3` gerekir. Ağ yoksa ya da bir uç yanıt vermezse o satır için açık hata yazılır, “güncel” denilmez ve çıkış kodu 1 olur; sürüm uydurulmaz. “Daha yeni sürüm var” bilgisi hata değildir (çıkış 0).
+- İmaj karşılaştırması bir sezgidir: aynı sonekli (ör. `-alpine`) ve sayısal sürümlü etiketlere bakılır, yalnızca etiket listesinin ilk sayfaları taranır; ana sürüm atlamalarını (`17` → `18`, Python `3.13` → `3.14`) sürüm notlarıyla değerlendirin. `age` aracının sürümü (`yedek/Dockerfile` içindeki `AGE_SURUMU`) bu betikle denetlenmez.
+- Betik **hiçbir şeyi değiştirmez**. Güncellemeye karar verirseniz aşağıdaki “Bağımlılık güncellemesi” ve “Taban imaj digest'lerini güncellemek” adımlarını izleyin.
+- Panelde **Sistem bilgisi** (Yönetici) yalnızca mevcut sürümleri gösterir (uygulama sürümü, Python, Django, PostgreSQL, son migration, imaj etiketi). Uygulama sürümü `app/config/surum.py` içinde tek yerde tanımlıdır; yayın yaptığınızda orada artırın.
+- Önerilen sıklık: ayda bir (aylık bakım listesiyle birlikte) ve güvenlik duyurusu geldiğinde.
 
 ## Taban imaj digest'lerini güncellemek (sabitleme)
 

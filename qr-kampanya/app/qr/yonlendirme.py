@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.views.decorators.http import require_safe
 
+from . import kancalar
 from .dogrulama import url_gecerli_mi
 from .hiz import hiz_sinirlayici
 from .middleware import ip_anahtari, istemci_ip
@@ -79,7 +80,7 @@ def _tarama_kaydet(request, qr, sonuc):
     try:
         ua = request.META.get("HTTP_USER_AGENT", "")[:500]
         cihaz = cihaz_turu(ua)
-        Tarama.objects.create(
+        tarama = Tarama.objects.create(
             qr=qr,
             sonuc=sonuc,
             cihaz=cihaz,
@@ -89,6 +90,8 @@ def _tarama_kaydet(request, qr, sonuc):
             yonlendiren=yonlendiren_alan_adi(request.META.get("HTTP_REFERER", ""), request),
             ulke=ulke_kodu(istemci_ip(request)),
         )
+        # Eklenti kancası işlem kesinleşince çalışır; eklentiye IP/UA verilmez (Tarama zaten saklamaz). Hatası yakalanır.
+        kancalar.commit_sonrasi_tetikle("tarama_kaydedildi", tarama=tarama)
     except Exception:  # İstatistik hatası yönlendirmeyi asla engellememeli.
         log.exception("Tarama kaydı yazılamadı (kod=%s)", qr.kisa_kod)
 
@@ -185,6 +188,7 @@ def _agac_goruntuleme_say(request, agac):
         if cihaz_turu(request.META.get("HTTP_USER_AGENT", "")[:500]) == Tarama.Cihaz.BOT:
             return
         LinkAgaciGoruntuleme.artir(agac.pk)
+        kancalar.commit_sonrasi_tetikle("link_agaci_goruntulendi", agac=agac)
     except Exception:  # sayaç hatası sayfayı asla engellememeli
         log.exception("Link ağacı görüntülemesi yazılamadı (ağaç=%s)", agac.slug)
 

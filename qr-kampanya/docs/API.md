@@ -129,7 +129,13 @@ Yanıt: `links` listesi (her biri `keyword`, `shorturl`, `longurl`, `title`, `du
 
 ### version
 
-`version`: API sürümü (`"1"`). Uygulamanın ayrı bir sürüm numarası tanımlı olmadığı için yalnızca API sürümü döner.
+`version`: API sürümü (`"1"`; uyumluluk için değişmez). `uygulama_surumu`: uygulamanın sürümü (`app/config/surum.py` içindeki tek tanım, ör. `"1.0.0"`; panelde Sistem bilgisi sayfasındaki değerle aynıdır).
+
+```json
+{"statusCode": 200, "status": "success", "message": "success", "version": "1", "uygulama_surumu": "1.0.0"}
+```
+
+Diğer eylemler gibi kimlik doğrulaması gerekir. `YONETIM_IZINLI_AGLAR` doluysa ve istemci izinli bir ağda değilse `/api/` yolu (geçerli anahtarla bile) 404 döner ([GUVENLIK.md](GUVENLIK.md)).
 
 ## 5. Biçimler
 

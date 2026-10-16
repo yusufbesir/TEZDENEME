@@ -103,6 +103,14 @@ docker compose up -d
 
 Bu komut güvenle tekrar çalıştırılabilir (verileri silmez). Kontrol: `bash scripts/rol-dogrulama.sh` sonunda `SONUÇ: GEÇTİ` yazmalıdır.
 
+### İsteğe bağlı: panel ve API'yi belirli ağlara kısıtlamak
+
+Kurulumdan sonra, sabit bir IP/ağdan çalışıyorsanız `.env` dosyasına `YONETIM_IZINLI_AGLAR=203.0.113.0/24` (virgülle birden çok CIDR; IPv6 olur) ekleyip `docker compose up -d` çalıştırın. Doluyken `/panel/`, `/api/` ve `/admin/` yalnızca bu ağlardan açılır, diğerleri 404 alır; QR yönlendirmesi (`/k/`), link ağacı (`/l/`), kampanya sayfaları (`/s/`), `/saglik`, `/robots.txt`, statik dosyalar ve medya **herkese açık kalır**. Hatalı CIDR'de uygulama başlamaz. **Önce kendi çıkış IP'nizi ekleyin**, aksi hâlde panelden kilitlenirsiniz (kurtarma: satırı boşaltıp `docker compose up -d`). Ayrıntı ve sınırlar: [GUVENLIK.md](GUVENLIK.md) “Panel ve API için IP kısıtı”.
+
+### İsteğe bağlı: eklentiler ve sistem bilgisi
+
+Eklentiler varsayılan kapalıdır; etkinleştirme `.env` içinde `QR_EKLENTILER=ad1,ad2` ve imajı yeniden derlemekle olur ([EKLENTILER.md](EKLENTILER.md); eklenti sunucuda tam yetkiyle çalışır, yalnızca güvendiğiniz kodu ekleyin). Panelin **Sistem bilgisi** sayfasında imaj etiketi otomatik görünür (`UYGULAMA_SURUMU`, yoksa “yerel”); kullandığınız imajın digest'ini göstermek isterseniz `.env`'e `QR_IMAJ_DIGEST=sha256:...` yazın (sayfa hiçbir yere bağlanmaz, yalnızca bu değeri gösterir).
+
 ## 5. Kontrol ve uçtan uca test
 
 ```bash

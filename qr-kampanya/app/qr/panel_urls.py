@@ -90,4 +90,6 @@ urlpatterns = [
     path("kullanicilar/<int:pk>/duzenle", yonetim.kullanici_duzenle, name="kullanici_duzenle"),
     path("kullanicilar/<int:pk>/mfa-sifirla", mfa.kullanici_mfa_sifirla, name="kullanici_mfa_sifirla"),
     path("denetim/", yonetim.denetim_liste, name="denetim"),
+    path("sistem-bilgisi", yonetim.sistem_bilgisi, name="sistem_bilgisi"),
+    path("eklentiler", yonetim.eklentiler, name="eklentiler"),
 ]

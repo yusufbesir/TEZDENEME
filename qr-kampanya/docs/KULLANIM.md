@@ -195,3 +195,9 @@ Betiklerle kısa bağlantı oluşturmak veya sorgulamak için **API anahtarları
 - **API’de parola girişi** (varsayılan kapalı): aynı sayfadaki kutudan, mevcut parolanızı girerek açıp kapatırsınız. MFA’nız etkinse API çağrılarında doğrulama kodu da gerekir. Anahtar kullanmak daha güvenlidir.
 
 Kullanım örnekleri ve eylemler: [API.md](API.md).
+
+## 13. Sistem bilgisi ve Eklentiler (yalnızca Yönetici)
+
+- **Sistem bilgisi** menüsü: uygulama sürümü, Python ve Django sürümleri, PostgreSQL sunucu sürümü, uygulanmış son migration ve (`.env`'de verilmişse) Docker imaj etiketi/digest'i. Salt okunurdur ve **internete hiç bağlanmaz**; “yeni sürüm var mı” sorusu için elle `bash scripts/surum-denetimi.sh --cevrimici` çalıştırın ([BAKIM.md](BAKIM.md)). Uygulama sürümü API'de de görünür (`action=version` → `uygulama_surumu`).
+- **Eklentiler** menüsü: sunucudaki eklenti dosyalarını, hangilerinin etkin olduğunu, açıklamalarını ve bağlandıkları olayları gösterir. Panelden eklenti yüklenemez/açılıp kapatılamaz; nasıl etkinleştirildiği ve yazıldığı [EKLENTILER.md](EKLENTILER.md) içindedir. **Eklenti sunucuda tam yetkiyle çalışır; yalnızca güvendiğiniz kodu ekleyin.**
+- Panel ve API'ye yalnızca belirli ağlardan erişilmesini istiyorsanız `YONETIM_IZINLI_AGLAR` ayarına bakın ([GUVENLIK.md](GUVENLIK.md)). Açıkken izinli olmayan bir ağdan panel “sayfa bulunamadı” (404) gösterir.

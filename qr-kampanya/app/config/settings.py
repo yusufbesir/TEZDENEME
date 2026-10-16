@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "qr.ag_kisiti.YonetimAgKisitiMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -159,6 +160,22 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # Varsayılan KAPALI: yalnızca güvenilen vekil (Caddy) arkasında, compose ortamında açılır
 # (GUVENILIR_VEKIL=1). Aksi halde X-Forwarded-For istemci tarafından sahte girilebilir.
 GUVENILIR_VEKIL = env_bool("GUVENILIR_VEKIL", False)
+
+# İsteğe bağlı panel/API ağ kısıtı: virgülle ayrılmış CIDR listesi (örn. "203.0.113.0/24,2001:db8::/32"). Boş = kısıt yok.
+# Doluysa /panel/, /api/ ve /admin/ yalnızca bu ağlardan açılır, diğerleri 404 alır; /k/, /l/, /s/, /saglik, /robots.txt, statik
+# ve medya etkilenmez. Hatalı CIDR'de uygulama BAŞLAMAZ (ImproperlyConfigured). İstemci IP'si GUVENILIR_VEKIL kuralıyla bulunur.
+from qr.ag_kisiti import aglari_oku  # noqa: E402
+
+YONETIM_IZINLI_AGLAR = aglari_oku(env("YONETIM_IZINLI_AGLAR", ""))
+
+# Eklentiler (docs/EKLENTILER.md): app/eklentiler/ altındaki modüllerden yalnızca burada adı geçenler yüklenir. Varsayılan: hiçbiri.
+# Eklenti sunucuda uygulamayla AYNI yetkiyle çalışır; yalnızca güvendiğiniz kodu ekleyin. Hatalı ad -> uygulama başlamaz.
+from qr.eklenti_yonetimi import eklenti_adlarini_oku  # noqa: E402
+
+QR_EKLENTILER = eklenti_adlarini_oku(env("QR_EKLENTILER", ""))
+# Sistem bilgisi sayfası için isteğe bağlı bilgi etiketleri (compose aktarır; internete bağlanılmaz).
+QR_IMAJ_ETIKETI = env("QR_IMAJ_ETIKETI", "").strip()
+QR_IMAJ_DIGEST = env("QR_IMAJ_DIGEST", "").strip()
 
 # --- Uygulama ayarları ---
 TARAMA_SAKLAMA_GUN = int(env("TARAMA_SAKLAMA_GUN", "730"))

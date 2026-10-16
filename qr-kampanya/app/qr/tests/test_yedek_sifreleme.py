@@ -1310,7 +1310,10 @@ case "$*" in
       [ "${SAHTE_URETIM_HATA:-0}" = "1" ] && { echo "sahte uretim hatasi" >&2; exit 1; }
       ( umask 077; printf '# created: 2026-10-15T00:00:00Z\n# public key: %s\n%s\n' "$SAHTE_ACIK" "$SAHTE_ANAHTAR" > "$mnt/anahtar.txt" )
       echo "Public key: $SAHTE_ACIK" >&2
-      [ "${SAHTE_URETIM_BEKLE:-0}" = "1" ] && sleep 30   # üretim sürerken kesinti testi (anahtar dosyası yazıldı, konteyner sürüyor)
+      # Üretim sürerken kesinti testi (anahtar dosyası yazıldı, konteyner sürüyor). Hazır olma işareti, bekleyen sürecin KENDİSİ
+      # tarafından (exec'ten hemen önce) yazılır: işaret görüldüğünde bekleyen alt süreç gerçekten vardır ve grup sinyalini alır.
+      # (Alt süreç henüz yaratılmamışken gelen grup sinyali bu süreci ıskalar; bkz. uretim_sirasinda_kes.)
+      if [ "${SAHTE_URETIM_BEKLE:-0}" = "1" ]; then sh -c ': > "$SAHTE_HAZIR"; exec sleep 30'; fi
       exit 0
     fi
     if [ "$mod" = turet ]; then
@@ -1648,21 +1651,46 @@ class AnahtarUretimiVeSilmeTesti(AnahtarTestTabani):
 
     # --- Tur 2: anahtar üretimi sırasında Ctrl-C/TERM -> tmpfs üretim dizini kalmaz --------------------------------------------
     def uretim_sirasinda_kes(self, sinyaller, aralik=0.0):
+        """Anahtar üretimi sürerken betiğin süreç grubuna sinyal gönderir.
+
+        Eşzamanlama: sinyal, sahte docker'ın bekleyen alt sürecinin yazdığı hazır olma işaretini gördükten SONRA gönderilir.
+        (Eski sürüm "herhangi bir /dev/shm/qr-yedek-uretim.*/anahtar.txt var" koşulunu bekliyordu: bu hem başka bir koşudan
+        kalan artığı hem de dosyanın yazıldığı ama bekleyen alt sürecin henüz yaratılmadığı anı yakalayabiliyordu. Yük altında
+        sinyal o aralığa düşünce alt süreç sinyali hiç almıyor, `sleep 30` tam süresince sürüyor ve communicate zaman aşımına
+        düşüyordu.) Zaman aşımında süreç grubu öldürülür: artık süreç ve /dev/shm artığı bırakılmaz."""
         self.env_yaz(alici=False)
         env = self.ortam()
+        hazir = self.kok / "uretim-hazir.isaret"
+        hazir.unlink(missing_ok=True)     # alt testler arasında eski işaret kalmasın
         env["SAHTE_URETIM_BEKLE"] = "1"
+        env["SAHTE_HAZIR"] = str(hazir)
+        onceki = set(self.tmpfs_artigi())
+        # İkinci neden (görülen): test takımı `nohup ... &` ile başlatılırsa SIGHUP "yok sayılır" olarak miras kalır; bash
+        # "girişte yok sayılan sinyal tuzağa alınamaz" kuralı gereği betikte HUP tuzağı çalışmaz ve alt süreçler de HUP'u
+        # yok sayar -> HUP alt testi 30 sn sonra zaman aşımına düşer. Betik, test edilen gerçek davranışı (varsayılan sinyal
+        # durumunda) görsün diye çocuk süreçte INT/TERM/HUP varsayılana döndürülür.
         p = subprocess.Popen(["bash", str(self.kok / "scripts" / "yedek-anahtari-hazirla.sh")], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             env=env, cwd=self.kok, start_new_session=True, text=True)
-        bitis = time.time() + 30
-        while time.time() < bitis:       # üretim dizini + anahtar dosyası yazılana kadar bekle
-            if any((d / "anahtar.txt").exists() for d in self.tmpfs_artigi()):
-                break
-            time.sleep(0.05)
-        self.assertTrue(self.tmpfs_artigi(), "üretim dizini oluşmadı")
-        for sinyal in sinyaller:
-            os.killpg(p.pid, sinyal)
-            time.sleep(aralik)
-        cikti, hata = p.communicate(timeout=30)
+                             env=env, cwd=self.kok, start_new_session=True, text=True,
+                             preexec_fn=lambda: [signal.signal(s, signal.SIG_DFL) for s in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)])
+        try:
+            bitis = time.time() + 30
+            while time.time() < bitis and not hazir.exists():       # üretim dizini + anahtar yazıldı ve bekleyen süreç ayakta
+                if p.poll() is not None:
+                    break
+                time.sleep(0.02)
+            self.assertTrue(hazir.exists(), "üretim hazır olma işareti gelmedi")
+            yeni = [d for d in self.tmpfs_artigi() if d not in onceki]
+            self.assertTrue(yeni and all((d / "anahtar.txt").exists() for d in yeni), "bu koşunun üretim dizini oluşmadı")
+            for sinyal in sinyaller:
+                os.killpg(p.pid, sinyal)
+                time.sleep(aralik)
+            cikti, hata = p.communicate(timeout=30)
+        finally:
+            if p.poll() is None:
+                os.killpg(p.pid, signal.SIGKILL)
+                p.communicate()
+                for artik in set(self.tmpfs_artigi()) - onceki:      # SIGKILL temizlik tuzağını çalıştırmaz: sonraki testleri bozmasın
+                    shutil.rmtree(artik, ignore_errors=True)
         return p.returncode, cikti, hata
 
     def test_uretim_sirasinda_ctrl_c_ve_term_tmpfs_dizinini_temizler_env_ve_gizli_degismez(self):
@@ -1688,6 +1716,17 @@ class AnahtarUretimiVeSilmeTesti(AnahtarTestTabani):
         # Sıra güvencesi: gösterimden sonra anahtar önce kaydedilir, kaydedilemezse tmpfs kopyası SİLİNMEZ.
         self.assertIn("bellekteki kopya SİLİNMEDİ", govde)
         self.assertLess(kod.index("ANAHTAR_GOSTERILDI=1"), kod.index('anahtari_goster_ve_sor "$TMP_ANAHTAR"'))
+
+    def test_art_arda_sinyaller_icin_isleyiciler_temizligi_exit_ile_kesmez(self):
+        """Terminal kapanırken INT+TERM+HUP birlikte gelebilir. EXIT tuzağı çalışırken ikinci bir işleyicinin `exit` çağırması
+        temizliği yarıda keser ve tmpfs'te özel anahtarlı üretim dizini kalırdı (yük altında görülen aralıklı hata)."""
+        kod = (betik_dizini() / "yedek-anahtari-hazirla.sh").read_text()
+        govde = kod[kod.index("cikis_temizle() {"):kod.index("trap cikis_temizle EXIT")]
+        self.assertLess(govde.index("SINYAL_ISLENDI=1"), govde.index("trap - EXIT"))     # temizlik başlar başlamaz bayrak
+        for sinyal, kodu in (("INT", 130), ("TERM", 143), ("HUP", 129)):
+            self.assertIn(f"trap 'sinyalle_cik {kodu}' {sinyal}", kod)
+        self.assertNotRegex(kod, r"trap 'exit \d+' (INT|TERM|HUP)")                        # doğrudan `exit` işleyicisi kalmadı
+        self.assertIn('[ "$SINYAL_ISLENDI" = "0" ] || return 0', kod)
 
     def test_istemde_ctrl_c_terminal_yankisini_geri_acar(self):
         self.env_yaz(alici=False)

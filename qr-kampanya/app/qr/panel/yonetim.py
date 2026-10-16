@@ -1,13 +1,20 @@
 """Genel ayarlar, kullanıcılar ve denetim kayıtları."""
+import platform
+
+import django
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import connection, transaction
+from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_safe
 
-from .. import roller
+from config.surum import UYGULAMA_SURUMU
+
+from .. import eklenti_yonetimi, roller
 from ..models import DenetimKaydi, GenelAyarlar
 from ..servisler import denetim_yaz
 from .formlar import GenelAyarlarForm, KullaniciDuzenleForm, KullaniciOlusturForm
@@ -93,3 +100,43 @@ def denetim_liste(request):
         "sayfa": sayfa, "sorgu_dizesi": sorgu_dizesi, "f": request.GET,
         "eylemler": DenetimKaydi.objects.order_by().values_list("eylem", flat=True).distinct().order_by("eylem"),
     })
+
+
+# --- Sistem bilgisi ve eklentiler (yalnızca Yönetici, salt okunur; internete bağlanılmaz) ---
+
+def _postgresql_surumu():
+    try:
+        with connection.cursor() as imlec:
+            imlec.execute("SELECT version()")
+            return imlec.fetchone()[0]
+    except Exception:  # bilgi sayfası veritabanı hatasında çökmesin
+        return "Okunamadı"
+
+
+def _son_migration():
+    try:
+        uygulananlar = sorted(ad for uygulama, ad in MigrationRecorder(connection).applied_migrations() if uygulama == "qr")
+        return uygulananlar[-1] if uygulananlar else "Yok"
+    except Exception:
+        return "Okunamadı"
+
+
+@yetki("qr.change_genelayarlar")
+@require_safe
+def sistem_bilgisi(request):
+    return render(request, "qr/panel/sistem_bilgisi.html", {
+        "uygulama_surumu": UYGULAMA_SURUMU,
+        "python_surumu": platform.python_version(),
+        "django_surumu": django.get_version(),
+        "postgresql_surumu": _postgresql_surumu(),
+        "son_migration": _son_migration(),
+        "imaj_etiketi": settings.QR_IMAJ_ETIKETI,
+        "imaj_digest": settings.QR_IMAJ_DIGEST,
+        "kisit_var": bool(settings.YONETIM_IZINLI_AGLAR),
+    })
+
+
+@yetki("qr.change_genelayarlar")
+@require_safe
+def eklentiler(request):
+    return render(request, "qr/panel/eklentiler.html", {"eklentiler": eklenti_yonetimi.eklenti_listesi(settings.QR_EKLENTILER)})

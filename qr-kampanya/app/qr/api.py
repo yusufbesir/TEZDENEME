@@ -25,6 +25,8 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
+from config.surum import UYGULAMA_SURUMU
+
 from .hiz import hiz_sinirlayici
 from .middleware import ip_anahtari, istemci_ip
 from .models import ApiAnahtari, KullaniciApiAyari, MFACihazi, QRKod, Tarama
@@ -355,8 +357,8 @@ def _eylem_db_stats(request, anahtar, bicim):
 
 
 def _eylem_version(request, anahtar, bicim):
-    # Uygulama sürümü projede tanımlı değildir; yalnızca API sürümü döner.
-    return _yanit(bicim, 200, "success", {"version": API_SURUMU})
+    # "version": API sürümü (uyumluluk için değişmedi); "uygulama_surumu": config/surum.py'deki tek tanım.
+    return _yanit(bicim, 200, "success", {"version": API_SURUMU, "uygulama_surumu": UYGULAMA_SURUMU})
 
 
 EYLEM_ISLEVLERI = {

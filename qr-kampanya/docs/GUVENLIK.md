@@ -77,6 +77,7 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - [ ] Örnek/deneme verileri temizlendi (deneme QR kodları arşivlendi).
 - [ ] Gizlilik/KVKK aydınlatma metni kampanya sayfalarında veya web sitenizde yayında (tarama istatistiği için).
 - [ ] `bash scripts/test.sh` sunucuda çalıştırıldı ve bütün testler geçti.
+- [ ] `QR_EKLENTILER` boş ya da yalnızca bizzat incelediğiniz eklentileri içeriyor; `YONETIM_IZINLI_AGLAR` ya boş (bilinçli) ya da kendi ağınızı içeriyor.
 
 ## Bilinen sınırlamalar
 
@@ -115,3 +116,29 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 - Görüntüleme sayacı günlüktür (ağaç + gün + sayı); **IP ve User-Agent saklanmaz.** HEAD istekleri ve bot desenine uyan istemciler sayılmaz.
 - Düğmeler yalnızca kısa linke (`/k/<kod>`) gider; tıklamalar normal tarama olarak sayılır. Sayfada harici betik/kaynak yoktur; vurgu rengi CSP'ye uygun olarak `/l/<adres>/stil.css` (aynı kökenden, doğrulanmış `#RRGGBB`) ile verilir. Etiket, başlık ve açıklama kaçırılır.
 - “Ağaç için kısa link” hedefi sunucu tarafından üretilir ve yalnızca sitenin kendi `/l/<adres>` yoluna izin veren dar bir istisnadan geçer (`dogrulama.kendi_l_adresi_mi`); `/panel/`, `/k/`, `/s/` gibi başka iç yollar için istisna yoktur. Genel kural (özel/yerel IP reddi) değişmez.
+
+## Panel ve API için IP kısıtı (isteğe bağlı)
+
+Varsayılan: **kısıt yok**. Kullanıcı sayınız az ve sabit bir ağdan (ofis, ev, VPN) çalışıyorsanız `.env` içindeki `YONETIM_IZINLI_AGLAR` ile panel ve API'yi yalnızca o ağlara açabilirsiniz.
+
+```bash
+# .env  (virgülle ayrılmış CIDR; tek adres için /32 ya da /128; IPv6 desteklenir)
+YONETIM_IZINLI_AGLAR=203.0.113.0/24,2001:db8::/32
+```
+
+Sonra `docker compose up -d` (değişkenleri uygulama konteyneri yeniden oluşturulurken okur).
+
+- **Neyi kapsar:** `/panel/…`, `/api/…`, Django yönetim sitesi yolu `/admin/…` (bu projede kurulu değildir; yine de kapsanır) ve kök `/` (panele yönlendirdiği için). İzinli olmayan ağdan bu yollar **404** verir, bilinmeyen bir adresle aynı sayfayı gösterir; panelin var olduğu belli edilmez. Geçerli bir API anahtarı ya da açık bir oturum izinli olmayan ağda işe yaramaz.
+- **Neyi kapsamaz:** `/k/` (QR yönlendirmesi ve `/k/<kod>+`), `/l/`, `/s/`, `/saglik`, `/robots.txt`, statik dosyalar ve medya (`/medya/`, `/ic/medya-yetki`) hep herkese açık kalır; QR kodlar ve kampanya sayfaları çalışmaya devam eder.
+- **İstemci IP'si nasıl bulunur:** Projenin her yerinde (hız sınırları, denetim kaydı) kullanılan yöntemle: `GUVENILIR_VEKIL=1` iken (compose'ta Caddy arkasında böyledir) `X-Forwarded-For` başlığının **en sağdaki** değeri (Caddy'nin gördüğü gerçek bağlantı adresini sona ekler; başlığın başına istemcinin yazdığı sahte değerler **sayılmaz**); aksi hâlde doğrudan bağlantı adresi. Yani başlığa izinli bir IP yazmak kısıtı aşmaz. Caddy'nin önüne başka bir vekil (ör. Cloudflare) koyarsanız en sağdaki adres o vekilin adresi olur; o durumda kısıt amaçlandığı gibi çalışmaz, önce vekil yapılandırmasını (güvenilen vekil, gerçek istemci başlığı) gözden geçirin.
+- **Hatalı değer:** CIDR geçersizse (ör. `203.0.113.0/99`, `abc`, ana makine bitleri açık `203.0.113.5/24`) uygulama **başlamaz** ve nedenini yazar; sessizce atlanıp “kısıt yokmuş gibi” açılmaz.
+- **Kendinizi kilitlemeyin:** Önce kendi çıkış IP'nizi (`curl -s https://ifconfig.me` ya da VPN adresiniz) ekleyin. Kilitlenirseniz sunucuda `.env` içindeki satırı boşaltıp `docker compose up -d` çalıştırın (SSH erişiminiz kısıttan etkilenmez). Sabit IP'niz yoksa bu özelliği açmayın; MFA ve hız sınırları zaten vardır.
+- **Sınırlar:** Bu bir ağ güvenlik duvarı değildir; kısıt uygulama katmanındadır (Caddy ve uygulama istekleri yine alır, 404 döner). Hizmet engelleme saldırılarına karşı ayrıca sunucu güvenlik duvarını (`ufw`) kullanın. İzinli olmayan ağdaki 404 sayfasında yalnızca ayrıntılı başlıklar (ör. `Cache-Control`) farklı olabilir; gövde ve durum kodu aynıdır.
+
+## Eklentiler
+
+Eklenti sistemi **varsayılan kapalıdır** ve panelden kod yüklemeyi içermez. Eklentiler `app/eklentiler/` altındaki dosyalardır ve yalnızca `.env` içindeki `QR_EKLENTILER` listesinde adı geçerse çalışır (ad deseni `^[a-z][a-z0-9_]{0,40}$`, yalnızca `eklentiler.<ad>` içe aktarılır). **Eklenti sunucuda uygulamayla aynı yetkiyle çalışır** (veritabanı, `.env` sırları, dosyalar, ağ) ve rol/MFA ile sınırlanmaz; yalnızca güvendiğiniz kodu koyun. Kanca hataları ana işlemi bozmaz; eklentiye IP/User-Agent verilmez. Ayrıntı: [EKLENTILER.md](EKLENTILER.md). Üretim kontrol listesine: “`QR_EKLENTILER` boş ya da yalnızca incelediğim eklentileri içeriyor”.
+
+## Sürüm bilgisi ve otomatik güncelleme yapılmaması
+
+Sistem bilgisi sayfası ve `scripts/surum-denetimi.sh` (varsayılan çevrimdışı) **internete bağlanmaz**; uygulama kendi kendine güncelleme kontrolü yapmaz, hiçbir şeyi indirip kurmaz. `--cevrimici` bayrağı yalnızca elle çalıştırdığınızda PyPI ve Docker Hub/GHCR'ye salt okunur sorgu yapar; yanıtlara güvenip sürüm değiştirmek yine sizin kararınızdır ([BAKIM.md](BAKIM.md)).

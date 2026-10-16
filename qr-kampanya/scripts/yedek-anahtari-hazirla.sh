@@ -171,6 +171,7 @@ anahtari_kalici_kaydet() {
 # .env yazılmadıysa anahtar önce gizli/'e kaydedilir. Kaydedilemezse tmpfs kopyası SİLİNMEZ (tek kopya olabilir).
 cikis_temizle() {
   local kod=$?
+  SINYAL_ISLENDI=1   # temizlik başladı: bundan sonra gelen sinyallerin işleyicileri `exit` ile temizliği yarıda KESMEZ
   trap - EXIT
   trap '' INT TERM HUP   # temizlik/kayıt sürerken ikinci sinyal işlemi yarıda kesmesin
   { exec 7>&- 7<&-; } 2>/dev/null || true
@@ -194,9 +195,19 @@ cikis_temizle() {
   exit "$kod"
 }
 trap cikis_temizle EXIT
-trap 'exit 130' INT
-trap 'exit 143' TERM
-trap 'exit 129' HUP
+# Sinyal işleyicileri: İLK sinyal çıkışı (ve böylece cikis_temizle'yi) başlatır. Art arda sinyaller (terminal kapanırken
+# INT+TERM+HUP birlikte gelebilir) için ikinci işleyici `exit` çağırıp temizliği yarıda kesmemeli: aksi hâlde EXIT tuzağı
+# çoktan kaldırılmış olduğundan tmpfs'teki üretim dizini (özel anahtar dahil) SİLİNMEDEN kalırdı. Bu yüzden ilk sinyalden
+# (ya da temizliğin başlamasından) sonra gelen sinyaller yok sayılır.
+SINYAL_ISLENDI=0
+sinyalle_cik() {
+  [ "$SINYAL_ISLENDI" = "0" ] || return 0
+  SINYAL_ISLENDI=1
+  exit "$1"
+}
+trap 'sinyalle_cik 130' INT
+trap 'sinyalle_cik 143' TERM
+trap 'sinyalle_cik 129' HUP
 
 if [ "$MOD" = "goster" ]; then
   [ -f "$ANAHTAR" ] || { echo "Sunucuda özel anahtar dosyası yok ($ANAHTAR); yapılacak bir şey yok."; exit 0; }

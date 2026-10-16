@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
+from . import kancalar
 from .dogrulama import kendi_l_adresi_mi
 from .middleware import ip_maskele, istemci_ip
 from .models import DenetimKaydi, GenelAyarlar, HedefGecmisi, LinkAgaci, LinkAgaciOgesi, QRKod, otomatik_kisa_kod
@@ -80,6 +81,7 @@ def qr_kaydet(qr, request, not_metni="", kaynak="", alanlar=None):
             yeni_hedef_url=qr.hedef_url or "", yeni_sayfa_id=qr.sayfa_id, not_metni=not_metni or "İlk hedef",
         )
         denetim_yaz(request, "qr_olustur", qr, f"{qr.kisa_kod} oluşturuldu" + (f" (kaynak: {kaynak})" if kaynak else ""))
+        kancalar.commit_sonrasi_tetikle("qr_olusturuldu", qr=qr)
         return qr
 
     if _hedef(eski) != _hedef(qr):
@@ -90,6 +92,7 @@ def qr_kaydet(qr, request, not_metni="", kaynak="", alanlar=None):
             not_metni=not_metni,
         )
         denetim_yaz(request, "qr_hedef_degistir", qr, f"{qr.kisa_kod}: {eski.hedef_url or eski.sayfa_id} → {qr.hedef_url or qr.sayfa_id}")
+        kancalar.commit_sonrasi_tetikle("qr_hedef_degisti", qr=qr, eski_hedef=_hedef(eski), yeni_hedef=_hedef(qr))
     if eski.durum != qr.durum:
         denetim_yaz(request, "qr_durum_degistir", qr, f"{qr.kisa_kod}: {eski.durum} → {qr.durum}")
     else:
