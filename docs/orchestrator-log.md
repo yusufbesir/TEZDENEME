@@ -76,3 +76,5 @@
 | 2026-10-16 | Python çıkarma doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. 125 test; 1373 çıkarılan dosya eşleşti, vendor’da yanlış eşleşme 0. |
 | 2026-10-16 | Güncelleme temizliğinde Electron original-fs (app.asar yanlış okunuyordu) [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | ~25k | Başarılı. 126 test geçti. |
 | 2026-10-16 | original-fs düzeltmesi doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~25k | Geçti. 126 test; tüm fs erişimi seçilen fs üzerinden. |
+| 2026-10-16 | VC++ DLL'lerini MSI'daki amd64 sürümlerinden alma, mimari denetimi, 1.0.3 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 44068 | Tamamlandı, 130 test geçti; vendor DLL'leri x64 ile değiştirildi |
+| 2026-10-16 | VC++ DLL x64 düzeltmesi doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. 130 test; gerçek MSI'dan 10 DLL 0x8664; vendor denetimi exit 0. |
