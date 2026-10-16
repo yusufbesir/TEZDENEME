@@ -47,3 +47,5 @@
 | 2026-10-15 | Kaldırıcı güvenlik turu doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~45k | Geçti. 107 test; makensis yok, NSIS okunarak denetlendi; 4 düşük not. |
 | 2026-10-16 | LibreOffice hazırlama betiği: VC++ DLL, yazı tipi, CRL değişkenleri, belgeler [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | ~40k | Başarılı. 114 test geçti; gerçek MSI ile uçtan uca denenmedi. |
 | 2026-10-16 | LibreOffice hazırlama betiği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~25k | Geçti. 114 test; gerçek MSI çıktısında 10 DLL ve 127 yazı tipi planlandı. |
+| 2026-10-16 | Denetim DD-2 (hazır paket kayıt doğrulaması) ve DD-3 (imzacı tam eşleşme) [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | ~25k | Başarılı. 121 test geçti. |
+| 2026-10-16 | DD-2/DD-3 doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~25k | Geçti. 121 test; zaten hazır dalı gerçek paketle denendi, hiçbir şey yazmadı. |
