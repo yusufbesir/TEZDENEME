@@ -3,6 +3,7 @@
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Kabuğun dışında, Profil'deki dişliyle `push` ile açılır.
+/// Hedef etiketi sabit genişlik yerine içeriğe göre genişler.
 library;
 
 import 'package:flutter/material.dart';
@@ -302,10 +303,12 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                             notifier.ayarGuncelle(gunlukHedef: v.round()),
                       ),
                     ),
-                    SizedBox(
-                      width: 72,
+                    // Sabit genişlik yok: metin ölçeğiyle birlikte genişler.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 72),
                       child: Text(
                         '${durum.gunlukHedef} XP',
+                        softWrap: false,
                         textAlign: TextAlign.end,
                         style: yazi.titleMedium,
                       ),

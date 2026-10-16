@@ -1,3 +1,7 @@
+// Win32 pencere sarmalayıcısı. Sahibi Yusuf (yusufbesir). Değiştirme kuralı:
+// silme yalnız Yusuf kararıyla; pencere alt sınırı (WM_GETMINMAXINFO, 480x600
+// mantıksal px) uygulamanın en küçük okunur düzenine bağlıdır.
+
 #include "win32_window.h"
 
 #include <dwmapi.h>
@@ -197,6 +201,16 @@ Win32Window::MessageHandler(HWND hwnd,
 
       return 0;
     }
+    case WM_GETMINMAXINFO: {
+      // Pencere alt sınırı: 480x600 mantıksal px (DPI ile ölçekli). Bunun
+      // altında düzen okunur kalamaz; kullanıcı daha fazla küçültemez.
+      auto* bilgi = reinterpret_cast<MINMAXINFO*>(lparam);
+      double scale_factor = FlutterDesktopGetDpiForHWND(hwnd) / 96.0;
+      bilgi->ptMinTrackSize.x = Scale(480, scale_factor);
+      bilgi->ptMinTrackSize.y = Scale(600, scale_factor);
+      return 0;
+    }
+
     case WM_SIZE: {
       RECT rect = GetClientArea();
       if (child_content_ != nullptr) {

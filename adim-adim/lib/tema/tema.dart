@@ -1,3 +1,10 @@
+/// Tasarım sabitleri, kırılma noktaları (dar/orta/geniş) ve açık/koyu tema.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Kırılma noktaları ve metin ölçeği sınırı yalnız burada tanımlanır.
+library;
+
 import 'package:flutter/material.dart';
 
 import 'renkler.dart';
@@ -12,8 +19,31 @@ abstract final class Olcu {
   static const double b2 = 16;
   static const double b3 = 24;
   static const double b4 = 32;
-  static const double genisEkran = 900;
   static const double icerikGenislik = 720;
+
+  // Kırılma noktaları (pencere genişliği, mantıksal px) — tek yerde.
+  /// Altı: dar (alt gezinme çubuğu, tek sütun, 56 px hedef halkası).
+  static const double darEkran = 600;
+
+  /// 600–899: orta (daraltılmış NavigationRail, tek sütun).
+  /// >= 900: geniş (genişletilmiş rail; yeterli yer varsa iki sütun).
+  static const double genisEkran = 900;
+
+  /// Rail genişlikleri (daraltılmış / genişletilmiş) ve ayırıcı çizgi.
+  static const double railDar = 80;
+  static const double railGenis = 180;
+
+  /// Yol sütununun en az genişliği ve yan panelin sınırları.
+  static const double yolMinGenislik = 360;
+  static const double panelMin = 300;
+  static const double panelMax = 420;
+
+  /// Metin ölçeği sınırları: hiçbir yerde 1,0'ın altına inmez.
+  static const double metinOlcekEn = 1.0;
+  static const double metinOlcekEnCok = 1.3;
+
+  static bool dar(double genislik) => genislik < darEkran;
+  static bool genis(double genislik) => genislik >= genisEkran;
 
   /// Animasyonlar en çok 250 ms; sistem animasyonları kapattıysa 0.
   static Duration sure(BuildContext context, [int ms = 200]) {

@@ -1,4 +1,6 @@
 /// Gezinme kabuğu: 4 sekme (Yol, Yarışma, Tekrar, Profil); Tekrar'da rozet.
+/// Düzen pencere genişliğine göre seçilir (LayoutBuilder): dar < 600 alt
+/// çubuk, orta 600–899 daraltılmış rail, geniş >= 900 genişletilmiş rail.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -23,7 +25,7 @@ const _hedefler = <({String ad, IconData simge, IconData secili})>[
   (ad: 'Profil', simge: Icons.person_outline, secili: Icons.person),
 ];
 
-/// Gezinme kabuğu: mobilde alt çubuk, genişlikte (>= 900) yan ray.
+/// Gezinme kabuğu: dar pencerede alt çubuk, orta/geniş pencerede yan ray.
 class Kabuk extends ConsumerWidget {
   const Kabuk({super.key, required this.kabuk});
   final StatefulNavigationShell kabuk;
@@ -64,45 +66,53 @@ class Kabuk extends ConsumerWidget {
             durum,
             bugun,
           ).where((id) => Motor.kartCoz(alanKurslari, id) != null).length;
-    final genis = MediaQuery.sizeOf(context).width >= Olcu.genisEkran;
-    if (genis) {
-      return Scaffold(
-        body: Row(
-          children: [
-            NavigationRail(
-              extended: true,
-              minExtendedWidth: 180,
+    return LayoutBuilder(
+      builder: (context, kisit) {
+        final genislik = kisit.maxWidth;
+        if (Olcu.dar(genislik)) {
+          return Scaffold(
+            body: kabuk,
+            bottomNavigationBar: NavigationBar(
               selectedIndex: kabuk.currentIndex,
               onDestinationSelected: _git,
               destinations: [
                 for (var i = 0; i < _hedefler.length; i++)
-                  NavigationRailDestination(
+                  NavigationDestination(
                     icon: _simge(_hedefler[i].simge, i, bekleyen),
                     selectedIcon: _simge(_hedefler[i].secili, i, bekleyen),
-                    label: Text(_hedefler[i].ad),
+                    label: _hedefler[i].ad,
                   ),
               ],
             ),
-            const VerticalDivider(width: 1),
-            Expanded(child: kabuk),
-          ],
-        ),
-      );
-    }
-    return Scaffold(
-      body: kabuk,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: kabuk.currentIndex,
-        onDestinationSelected: _git,
-        destinations: [
-          for (var i = 0; i < _hedefler.length; i++)
-            NavigationDestination(
-              icon: _simge(_hedefler[i].simge, i, bekleyen),
-              selectedIcon: _simge(_hedefler[i].secili, i, bekleyen),
-              label: _hedefler[i].ad,
-            ),
-        ],
-      ),
+          );
+        }
+        final genis = Olcu.genis(genislik);
+        return Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
+                extended: genis,
+                minExtendedWidth: Olcu.railGenis,
+                labelType: genis
+                    ? NavigationRailLabelType.none
+                    : NavigationRailLabelType.all,
+                selectedIndex: kabuk.currentIndex,
+                onDestinationSelected: _git,
+                destinations: [
+                  for (var i = 0; i < _hedefler.length; i++)
+                    NavigationRailDestination(
+                      icon: _simge(_hedefler[i].simge, i, bekleyen),
+                      selectedIcon: _simge(_hedefler[i].secili, i, bekleyen),
+                      label: Text(_hedefler[i].ad),
+                    ),
+                ],
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: kabuk),
+            ],
+          ),
+        );
+      },
     );
   }
 }
