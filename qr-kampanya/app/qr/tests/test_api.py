@@ -366,7 +366,7 @@ class PanelTesti(ApiTemel):
     def test_olustur_listele_iptal(self):
         self.giris(self.editor)
         self.assertContains(self.client.get("/panel/api-anahtarlari/"), "Henüz API anahtarı yok")
-        yanit = self.client.post("/panel/api-anahtarlari/yeni", {"ad": "Betik"})
+        yanit = self.client.post("/panel/api-anahtarlari/yeni", {"ad": "Betik", "parola": PAROLA})
         self.assertEqual(yanit.status_code, 200)
         kayit = ApiAnahtari.objects.get(ad="Betik")
         duz = yanit.context["anahtar"]
@@ -429,7 +429,7 @@ class PanelTesti(ApiTemel):
 
     def test_izleyici_anahtar_olusturur_ama_shorturl_403(self):
         self.giris(self.izleyici)
-        yanit = self.client.post("/panel/api-anahtarlari/yeni", {"ad": "izleyici"})
+        yanit = self.client.post("/panel/api-anahtarlari/yeni", {"ad": "izleyici", "parola": PAROLA})
         duz = yanit.context["anahtar"]
         self.client.logout()
         self.assertEqual(self.kisalt(duz).status_code, 403)

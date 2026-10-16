@@ -417,10 +417,10 @@ API, betiklerin panel dışından kısa link oluşturması ve sorgulaması için
 ### Anahtar oluşturma
 
 1. Menüden **API anahtarlarım**'a girin.
-2. **Yeni API anahtarı**'na basın, bir ad yazın.
+2. **Yeni API anahtarı**'na basın, bir ad yazın ve **mevcut parolanızı** girin; iki adımlı doğrulamanız açıksa **doğrulama kodunu** da girin. En fazla 10 aktif anahtarınız olabilir.
 3. Anahtar **yalnızca bir kez** gösterilir: **Kopyala**'ya basıp hemen parola yöneticinize kaydedin. Kaybederseniz anahtarı **İptal et** ile iptal edip yenisini oluşturun.
 
-Anahtar sizin yetkilerinizle çalışır. Sızdığından şüpheleniyorsanız listedeki **İptal et** bağlantısıyla hemen iptal edin.
+Anahtar sizin yetkilerinizle çalışır. Sızdığından şüpheleniyorsanız listedeki **İptal et** bağlantısıyla hemen iptal edin. Parolanız değişince, MFA'nız sıfırlanınca, rolünüz değişince veya hesabınız pasifleştirilince bütün anahtarlarınız otomatik iptal edilir; yenilerini oluşturmanız gerekir.
 
 ### Kullanım örnekleri (curl)
 

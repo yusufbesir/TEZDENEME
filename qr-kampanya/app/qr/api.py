@@ -6,9 +6,12 @@ Güvenlik kararları:
   `username` + `password` (+ MFA etkinse `totp`); parola sorgu dizesinde kabul edilmez. Oturum çerezi kullanılmaz
   (CSRF muaf olmasının nedeni budur: tarayıcı çerezi bu uçta hiçbir yetki vermez). JSONP yoktur; tarayıcıdan
   erişim için API_CORS_KOKENLERI ile CORS vardır.
-- Başarısız kimlik doğrulama IP başına, başarılı istekler anahtar başına paylaşımlı hız sayacıyla sınırlanır.
+- Başarısız kimlik doğrulama IP başına, başarılı istekler anahtar başına VE kullanıcı başına (bütün anahtarlar +
+  parola girişi ortak) paylaşımlı hız sayacıyla sınırlanır.
 - Yetki anahtar sahibinin Django izinleridir; oluşturma panel formuyla (QRKodForm) AYNI doğrulamayı kullanır.
 """
+import hashlib
+import random
 import re
 from dataclasses import dataclass
 import xml.etree.ElementTree as ET
@@ -17,6 +20,7 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
@@ -24,12 +28,13 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_post_parameters
 
 from config.surum import UYGULAMA_SURUMU
 
 from .hiz import hiz_sinirlayici
 from .middleware import ip_anahtari, istemci_ip
-from .models import ApiAnahtari, KullaniciApiAyari, MFACihazi, QRKod, Tarama
+from .models import ApiAnahtari, DenetimKaydi, KullaniciApiAyari, MFACihazi, QRKod, Tarama
 from .panel.formlar import QRKodForm
 from .panel.giris import DENETIM_KAYIT_SINIRI, kullanici_adi_ozeti
 from .panel.mfa import kod_dogrula
@@ -43,6 +48,9 @@ EYLEMLER = ("shorturl", "expand", "url-stats", "stats", "db-stats", "version")
 SIMPLE_EYLEMLERI = ("shorturl", "expand")
 FILTRELER = ("top", "bottom", "last", "rand")
 VARSAYILAN_LIMIT, EN_FAZLA_LIMIT = 10, 100
+RAND_EN_FAZLA_LIMIT = 10  # filter=rand: rastgele kümeye yalnızca bu kadar kod seçilir (tam tablo sıralaması yok)
+ONBELLEK_SURESI_SN = 60  # stats / db-stats sonuçları (kullanıcı + parametre başına)
+PAROLA_GIRISI_DENETIM_ARALIGI = timedelta(hours=1)  # kullanıcı başına en fazla 1 başarılı-giriş denetim kaydı
 # Anahtarın başlık dışında (sorgu dizesi/gövde) gönderilmesi: ad veya değer biçimi yakalanır.
 YASAKLI_PARAMETRELER = {"api_key", "apikey", "api-key", "anahtar", "token", "access_token", "signature"}
 # Sorgu dizesinde (günlüklere yazılır) asla kabul edilmeyen parola girişi alanları; yalnızca POST gövdesinde okunur.
@@ -61,6 +69,11 @@ class Kimlik:
     kullanici: object
     kaynak: str
     sayac: str
+
+    @property
+    def kullanici_sayac(self):
+        """Kullanıcı başına ORTAK sayaç: kullanıcının bütün anahtarları ve parola girişi aynı sayaca yazar."""
+        return f"api-kullanici|{self.kullanici.pk}"
 
 
 # --- Yanıt üretimi ---
@@ -199,8 +212,12 @@ def _parola_girisi(request, bicim):
         return basarisiz("parola doğru ama MFA zorunlu ve hesapta kurulu değil")
     deneme.basarili()
     request.user = kullanici
-    denetim_yaz(request, "api_giris_basarili", kullanici, f"{kullanici.get_username()} API'ye parolayla giriş yaptı")
-    return Kimlik(kullanici, "API, parola girişi", f"apiparola|{kullanici.pk}"), None
+    # Her istekte kayıt yazmak tabloyu şişirir: kullanıcı başına saatte en fazla 1 başarılı-giriş kaydı (başarısızlıklar sınırsız-ama-kilitli).
+    if not DenetimKaydi.objects.filter(
+        eylem="api_giris_basarili", kullanici=kullanici, zaman__gte=timezone.now() - PAROLA_GIRISI_DENETIM_ARALIGI,
+    ).exists():
+        denetim_yaz(request, "api_giris_basarili", kullanici, f"{kullanici.get_username()} API'ye parolayla giriş yaptı")
+    return Kimlik(kullanici, "API, parola girişi", f"api-kullanici|{kullanici.pk}"), None
 
 
 def _cors_kokenleri():
@@ -318,7 +335,7 @@ def _eylem_url_stats(request, anahtar, bicim):
     return _yanit(bicim, 200, "success", veri)
 
 
-def _eylem_stats(request, anahtar, bicim):
+def _eylem_stats(request, anahtar_kimlik, bicim):
     filtre = _parametre(request, "filter") or "top"
     if filtre not in FILTRELER:
         return _yanit(bicim, 400, f"Geçersiz filter. İzin verilenler: {', '.join(FILTRELER)}.")
@@ -330,21 +347,48 @@ def _eylem_stats(request, anahtar, bicim):
         limit = int(ham_limit) if ham_limit.isascii() and ham_limit.isdigit() else 0
         if not 1 <= limit <= EN_FAZLA_LIMIT:
             return _yanit(bicim, 400, f"limit 1 ile {EN_FAZLA_LIMIT} arasında bir tam sayı olmalı.")
-    sorgu = QRKod.objects.select_related("sayfa").annotate(
+    if filtre == "rand":
+        # ORDER BY RANDOM() bütün tabloyu (ve taramalar birleşimini) hesaplayıp sıralardı. Bunun yerine yalnızca kod
+        # kimlikleri (dizin taraması) okunur, en çok RAND_EN_FAZLA_LIMIT tanesi Python'da seçilir ve yalnızca onlar
+        # sayılır. Sonuç rastgele olduğu için önbelleğe ALINMAZ.
+        kimlikler = list(QRKod.objects.values_list("pk", flat=True))
+        secilen = random.sample(kimlikler, min(limit, RAND_EN_FAZLA_LIMIT, len(kimlikler)))
+        sorgu = _stats_sorgusu().filter(pk__in=secilen).order_by("kod_anahtari")
+        veri = {"links": _baglanti_ogeleri(sorgu)}
+        veri.update(_genel_toplamlar())
+        return _yanit(bicim, 200, "success", veri)
+    anahtar = _onbellek_anahtari("stats", anahtar_kimlik, f"{filtre}|{limit}")
+    veri = cache.get(anahtar)
+    if veri is None:
+        siralama = {
+            "top": ("-tarama_bot_haric", "kod_anahtari"), "bottom": ("tarama_bot_haric", "kod_anahtari"),
+            "last": ("-olusturma", "-id"),
+        }[filtre]
+        veri = {"links": _baglanti_ogeleri(_stats_sorgusu().order_by(*siralama)[:limit])}
+        veri.update(_genel_toplamlar())
+        cache.set(anahtar, veri, ONBELLEK_SURESI_SN)
+    return _yanit(bicim, 200, "success", veri)
+
+
+def _stats_sorgusu():
+    return QRKod.objects.select_related("sayfa").annotate(
         tarama_toplam=Count("taramalar"), tarama_bot_haric=Count("taramalar", filter=Q(taramalar__bot=False)),
     )
-    siralama = {
-        "top": ("-tarama_bot_haric", "kod_anahtari"), "bottom": ("tarama_bot_haric", "kod_anahtari"),
-        "last": ("-olusturma", "-id"), "rand": ("?",),
-    }[filtre]
-    baglantilar = []
-    for qr in sorgu.order_by(*siralama)[:limit]:
+
+
+def _baglanti_ogeleri(sorgu):
+    ogeler = []
+    for qr in sorgu:
         oge = _kod_ozeti(qr)
         oge.update({"tarama_toplam": qr.tarama_toplam, "tarama_bot_haric": qr.tarama_bot_haric, "olusturma": _zaman(qr.olusturma)})
-        baglantilar.append(oge)
-    veri = {"links": baglantilar}
-    veri.update(_genel_toplamlar())
-    return _yanit(bicim, 200, "success", veri)
+        ogeler.append(oge)
+    return ogeler
+
+
+def _onbellek_anahtari(eylem, kimlik, parametreler):
+    """Kullanıcı + eylem + parametre başına önbellek anahtarı (kullanıcılar arası paylaşım yok; anahtar sabit uzunlukta ve güvenli karakterli)."""
+    ozet = hashlib.sha256(parametreler.encode()).hexdigest()[:32]
+    return f"api:{eylem}:{kimlik.kullanici.pk}:{ozet}"
 
 
 def _genel_toplamlar():
@@ -353,7 +397,12 @@ def _genel_toplamlar():
 
 
 def _eylem_db_stats(request, anahtar, bicim):
-    return _yanit(bicim, 200, "success", _genel_toplamlar())
+    onbellek = _onbellek_anahtari("db-stats", anahtar, "")
+    veri = cache.get(onbellek)
+    if veri is None:
+        veri = _genel_toplamlar()
+        cache.set(onbellek, veri, ONBELLEK_SURESI_SN)
+    return _yanit(bicim, 200, "success", veri)
 
 
 def _eylem_version(request, anahtar, bicim):
@@ -372,6 +421,7 @@ EYLEM_IZINLERI = {
 
 
 @csrf_exempt
+@sensitive_post_parameters("password", "totp")
 def api_v1(request):
     """CORS başlıklarını (yalnızca API_CORS_KOKENLERI listesindeki köken için) saran dış kabuk."""
     kokenler = _cors_kokenleri()
@@ -423,8 +473,11 @@ def _api_isle(request):
         kimlik, hata = _parola_girisi(request, bicim)
         if hata is not None:
             return hata
-    if not hiz_sinirlayici.izin_ver(kimlik.sayac, settings.API_HIZ_SINIRI):
+    kullanici_sayaci = kimlik.kullanici_sayac
+    if kimlik.sayac != kullanici_sayaci and not hiz_sinirlayici.izin_ver(kimlik.sayac, settings.API_HIZ_SINIRI):
         return _hiz_yaniti(bicim, "Bu kimlik için dakikalık istek sınırı aşıldı. Lütfen bir dakika sonra tekrar deneyin.")
+    if not hiz_sinirlayici.izin_ver(kullanici_sayaci, settings.API_KULLANICI_HIZ_SINIRI):
+        return _hiz_yaniti(bicim, "Bu kullanıcı için dakikalık istek sınırı aşıldı. Lütfen bir dakika sonra tekrar deneyin.")
 
     if jsonp:
         return _yanit("json", 400, "JSONP desteklenmez. Tarayıcıdan erişim için CORS kullanın (API_CORS_KOKENLERI ile izinli köken tanımlanır).")

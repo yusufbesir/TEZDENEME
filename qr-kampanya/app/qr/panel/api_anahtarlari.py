@@ -1,19 +1,31 @@
 """API anahtarlarım: oluştur (anahtar yalnızca bir kez gösterilir), listele, iptal et. Silme yoktur.
 Yönetici tüm anahtarları görüp iptal edebilir; diğer roller yalnızca kendi anahtarlarını."""
 from django import forms
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.db import transaction
+from django.forms.utils import ErrorDict
+from django.http import HttpResponse
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from .. import roller
+from ..hiz import hiz_sinirlayici
 from ..middleware import istemci_ip
-from ..models import ApiAnahtari, KullaniciApiAyari
+from ..models import ApiAnahtari, KullaniciApiAyari, MFACihazi
 from ..sayac import GirisDenemesi
 from ..servisler import denetim_yaz
+from .mfa import kod_dogrula
+from .giris import DENETIM_KAYIT_SINIRI
 from .yardimci import sayfalandir, yetki
+
+KIMLIK_HATASI = "Parola veya doğrulama kodu hatalı; anahtar oluşturulmadı."
+KILIT_MESAJI = "Çok fazla başarısız deneme yapıldı. Lütfen bir süre sonra tekrar deneyin."
 
 
 class ParolaGirisiForm(forms.Form):
@@ -23,6 +35,15 @@ class ParolaGirisiForm(forms.Form):
 
 class ApiAnahtariForm(forms.Form):
     ad = forms.CharField(label="anahtar adı", max_length=100, help_text="Anahtarı tanımak için bir etiket (örn. “Muhasebe betiği”).")
+    parola = forms.CharField(
+        label="mevcut parola", strip=False, widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        help_text="Anahtar oluşturmak için hesap parolanız gerekir.",
+    )
+    totp = forms.CharField(
+        label="doğrulama kodu", required=False, max_length=32, strip=True,
+        widget=forms.TextInput(attrs={"autocomplete": "one-time-code", "inputmode": "numeric"}),
+        help_text="İki adımlı doğrulama açıksa authenticator uygulamasındaki 6 haneli kod zorunludur.",
+    )
 
 
 def _yonetici_mi(kullanici):
@@ -45,17 +66,67 @@ def liste(request):
     })
 
 
+def _hatali_form(form, mesaj):
+    """Parola/kod alanları geri doldurulmadan, yalnızca anahtar adı korunarak genel (alan belirtmeyen) hata ile yeni form."""
+    yeni = ApiAnahtariForm(initial={"ad": form.cleaned_data.get("ad", "")})
+    yeni._errors = ErrorDict()
+    yeni._errors[NON_FIELD_ERRORS] = yeni.error_class([mesaj], error_class="nonfield")
+    return yeni
+
+
+def _form_sayfasi(request, form, durum=200):
+    return render(request, "qr/panel/form.html", {"form": form, "baslik": "Yeni API anahtarı", "geri": "panel:api_anahtarlari"}, status=durum)
+
+
 @yetki("qr.view_qrkod")
+@sensitive_post_parameters("parola", "totp")
+@never_cache
 @require_http_methods(["GET", "POST"])
 def olustur(request):
+    """Yeni anahtar: mevcut parola (+ MFA etkinse geçerli TOTP) zorunlu. Böylece ele geçirilmiş bir oturum parolasız
+    kalıcı API erişimi üretemez. Doğrulama panel girişiyle AYNI sayaçları (GirisDenemesi, "api-ayar" önekiyle
+    parola_girisi_ayarla ile ortak) ve TOTP tekrar kullanım engelini (kod_dogrula) kullanır.
+    Kullanıcı başına aktif anahtar üst sınırı: settings.API_AZAMI_ANAHTAR."""
     form = ApiAnahtariForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            kayit, duz = ApiAnahtari.uret(request.user, form.cleaned_data["ad"].strip())
-            denetim_yaz(request, "api_anahtari_olustur", kayit, f"“{kayit.ad}” oluşturuldu (önek {kayit.onek})")
-        # Düz anahtar yalnızca bu yanıtta bulunur; oturuma/veritabanına yazılmaz, yönlendirme yapılmaz.
-        return render(request, "qr/panel/api_anahtari_olusturuldu.html", {"kayit": kayit, "anahtar": duz})
-    return render(request, "qr/panel/form.html", {"form": form, "baslik": "Yeni API anahtarı", "geri": "panel:api_anahtarlari"})
+    if request.method != "POST":
+        return _form_sayfasi(request, form)
+    # Parola/Argon2 doğrulamasından ÖNCE kullanıcı başına dakikalık sınır.
+    if not hiz_sinirlayici.izin_ver(f"apianahtar-olustur|{request.user.pk}", settings.API_ANAHTAR_OLUSTURMA_HIZ_SINIRI):
+        yanit = HttpResponse("Çok fazla anahtar oluşturma isteği. Lütfen bir dakika sonra tekrar deneyin.", status=429, content_type="text/plain; charset=utf-8")
+        yanit["Retry-After"] = "60"
+        return yanit
+    if not form.is_valid():
+        return _form_sayfasi(request, form)
+    kullanici = request.user
+    deneme = GirisDenemesi("api-ayar", kullanici.get_username(), istemci_ip(request), kullanici)
+    if not deneme.say():
+        return _form_sayfasi(request, _hatali_form(form, KILIT_MESAJI), 429)
+    cihaz = MFACihazi.objects.filter(kullanici=kullanici, onayli=True).first()
+    if not kullanici.check_password(form.cleaned_data["parola"]):
+        neden = "mevcut parola yanlış"
+    elif cihaz is not None and not kod_dogrula(cihaz.pk, form.cleaned_data["totp"]):
+        neden = "parola doğru ama doğrulama kodu eksik/geçersiz"
+    else:
+        neden = None
+    if neden:
+        if deneme.sayi_ui <= DENETIM_KAYIT_SINIRI:
+            denetim_yaz(request, "api_anahtari_olustur_basarisiz", kullanici, f"Anahtar oluşturma reddedildi: {neden}")
+        if deneme.sinira_ulasti:
+            return _form_sayfasi(request, _hatali_form(form, KILIT_MESAJI), 429)
+        return _form_sayfasi(request, _hatali_form(form, KIMLIK_HATASI))  # parola mı kod mu yanlış: ayrım verilmez
+    deneme.basarili()
+    with transaction.atomic():
+        # Aynı kullanıcının eşzamanlı iki isteği üst sınırı aşamasın: kullanıcı satırı kilitlenir, sayım kilit altında yapılır.
+        get_user_model().objects.select_for_update().get(pk=kullanici.pk)
+        aktif = ApiAnahtari.objects.filter(kullanici=kullanici, iptal_zamani__isnull=True).count()
+        if aktif >= settings.API_AZAMI_ANAHTAR:
+            return _form_sayfasi(request, _hatali_form(
+                form, f"En fazla {settings.API_AZAMI_ANAHTAR} aktif API anahtarınız olabilir. Yenisini oluşturmak için kullanılmayan bir anahtarı iptal edin.",
+            ), 400)
+        kayit, duz = ApiAnahtari.uret(kullanici, form.cleaned_data["ad"].strip())
+        denetim_yaz(request, "api_anahtari_olustur", kayit, f"“{kayit.ad}” oluşturuldu (önek {kayit.onek})")
+    # Düz anahtar yalnızca bu yanıtta bulunur; oturuma/veritabanına yazılmaz, yönlendirme yapılmaz.
+    return render(request, "qr/panel/api_anahtari_olusturuldu.html", {"kayit": kayit, "anahtar": duz})
 
 
 @yetki("qr.view_qrkod")
@@ -76,6 +147,7 @@ def iptal(request, pk):
 
 
 @yetki("qr.view_qrkod")
+@sensitive_post_parameters("parola")
 @never_cache
 @require_POST
 def parola_girisi_ayarla(request):

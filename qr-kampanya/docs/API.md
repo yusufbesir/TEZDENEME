@@ -8,10 +8,10 @@ https://ALAN-ADINIZ/api/v1/
 
 ## 1. Anahtar almak
 
-1. Panelde **API anahtarlarım** > **Yeni API anahtarı** > bir ad girin (örn. “Muhasebe betiği”).
+1. Panelde **API anahtarlarım** > **Yeni API anahtarı** > bir ad girin (örn. “Muhasebe betiği”) ve **mevcut parolanızı** yazın. İki adımlı doğrulamanız (MFA) açıksa geçerli **doğrulama kodu** (TOTP) da zorunludur; aynı kod ikinci kez kabul edilmez. Parola/kod yanlışsa anahtar oluşmaz ve deneme, panel girişiyle ortak başarısız-deneme sayaçlarına yazılır. Kullanıcı başına en fazla **10 aktif anahtar** olabilir (`API_AZAMI_ANAHTAR`); aşılırsa yeni anahtar oluşmaz, kullanılmayan birini iptal edin. Anahtar oluşturma ucu da kullanıcı başına dakikada `API_ANAHTAR_OLUSTURMA_HIZ_SINIRI` (5) ile sınırlıdır.
 2. Anahtar **yalnızca bir kez** gösterilir. Kopyalayıp güvenli bir yere (parola yöneticisi, sunucu gizli değişkeni) kaydedin. Sunucuda düz hâli saklanmaz; kaybederseniz anahtarı iptal edip yenisini oluşturun.
 3. Anahtar sizin **yetkilerinizle** çalışır: okuma eylemleri için `qr.view_qrkod`, `shorturl` için `qr.add_qrkod` izni gerekir. İzleyici rolü anahtar oluşturabilir ama `shorturl` 403 alır.
-4. Sızdığından şüphelendiğiniz anahtarı hemen panelden iptal edin. Yönetici rolü tüm kullanıcıların anahtarlarını görüp iptal edebilir.
+4. Sızdığından şüphelendiğiniz anahtarı hemen panelden iptal edin. Hesabınızda **parola değişince, MFA sıfırlanınca, rol değişince veya hesap pasifleştirilince** bütün aktif anahtarlarınız otomatik iptal edilir ve API parola girişi kapatılır (kayıtlar silinmez; yeniden etkinleştirmek anahtarları geri getirmez, yenilerini oluşturmanız gerekir). Yönetici rolü tüm kullanıcıların anahtarlarını görüp iptal edebilir.
 
 Anahtar biçimi: `qrk_<12 karakter önek>_<gizli kısım>`. Listede yalnızca önek görünür.
 
@@ -115,7 +115,9 @@ curl -s -H "Authorization: Bearer <ANAHTAR>" "https://ALAN-ADINIZ/api/v1/?action
 | Parametre | |
 |---|---|
 | `filter` | `top` (en çok taranan, varsayılan), `bottom`, `last` (en son oluşturulan), `rand` |
-| `limit` | 1-100, varsayılan 10 (verilmezse boş dönmez). Yalnızca ASCII rakam kabul edilir (`1_0`, `+5`, `٣` 400 alır). |
+| `limit` | 1-100, varsayılan 10 (verilmezse boş dönmez). Yalnızca ASCII rakam kabul edilir (`1_0`, `+5`, `٣` 400 alır). `filter=rand` için en fazla 10 kayıt döner. |
+
+`stats` ve `db-stats` sonuçları kullanıcı ve parametre başına 60 saniye önbellekte tutulur (yeni kayıtlar en çok 60 sn gecikmeyle görünür); `filter=rand` önbelleğe alınmaz.
 
 ```bash
 curl -s -H "Authorization: Bearer <ANAHTAR>" "https://ALAN-ADINIZ/api/v1/?action=stats&filter=top&limit=5"
@@ -148,7 +150,7 @@ curl -s -X POST -H "Authorization: Bearer <ANAHTAR>" -d action=shorturl -d url=h
 
 ## 6. Hız sınırları
 
-- Başarılı istekler anahtar (parola girişinde kullanıcı) başına dakikada `API_HIZ_SINIRI` (varsayılan 60).
+- Başarılı istekler anahtar başına dakikada `API_HIZ_SINIRI` (varsayılan 60) **ve** kullanıcı başına ortak olarak dakikada `API_KULLANICI_HIZ_SINIRI` (varsayılan `API_HIZ_SINIRI`) ile sınırlanır; kullanıcının bütün anahtarları ve parola girişi aynı kullanıcı sayacını paylaşır, yani çok anahtar oluşturarak sınır aşılamaz.
 - Başarısız kimlik doğrulama IP başına dakikada `API_BASARISIZ_HIZ_SINIRI` (varsayılan 10); aşılınca 429.
 - Sayaçlar veritabanında paylaşımlıdır; aşılırsa bir dakika bekleyin.
 

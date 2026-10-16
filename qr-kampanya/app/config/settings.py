@@ -194,6 +194,11 @@ QR_OLUSTURMA_HIZ_SINIRI = int(env("QR_OLUSTURMA_HIZ_SINIRI", "30"))  # kullanıc
 # API: anahtar başına dakikada başarılı istek; IP başına dakikada başarısız kimlik doğrulama (docs/API.md).
 API_HIZ_SINIRI = int(env("API_HIZ_SINIRI", "60"))
 API_BASARISIZ_HIZ_SINIRI = int(env("API_BASARISIZ_HIZ_SINIRI", "10"))
+# Kullanıcı başına ORTAK dakikalık API sınırı (kullanıcının bütün anahtarları + parola girişi toplamı; anahtar sayısı çoğaltılarak aşılamaz).
+API_KULLANICI_HIZ_SINIRI = int(env("API_KULLANICI_HIZ_SINIRI", str(API_HIZ_SINIRI)))
+# Kullanıcı başına en çok aktif (iptal edilmemiş) API anahtarı; panelden anahtar oluşturma ucu için kullanıcı başına dakikalık sınır.
+API_AZAMI_ANAHTAR = int(env("API_AZAMI_ANAHTAR", "10"))
+API_ANAHTAR_OLUSTURMA_HIZ_SINIRI = int(env("API_ANAHTAR_OLUSTURMA_HIZ_SINIRI", "5"))
 # API için CORS'a izinli kökenler (virgülle ayrılmış, örn. https://uygulama.ornek.com). Boş = CORS başlığı yok. Yıldız kabul edilmez.
 API_CORS_KOKENLERI = tuple(k.strip().rstrip("/") for k in env("API_CORS_KOKENLERI", "").split(",") if k.strip() and k.strip() != "*")
 MFA_ZORUNLU = env_bool("MFA_ZORUNLU", not DEBUG)

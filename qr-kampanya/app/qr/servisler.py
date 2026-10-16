@@ -31,6 +31,25 @@ def denetim_yaz(request, eylem, nesne=None, ozet=""):
     )
 
 
+def api_erisimini_kapat(kullanici, neden, request=None):
+    """Kullanıcının bütün aktif API anahtarlarını iptal eder (satır silinmez; iptal_zamani doldurulur) ve API'de
+    parola girişini kapatır. Etki olduysa denetim kaydına TEK satır yazar. (iptal edilen anahtar sayısı, parola girişi
+    kapatıldı mı) döndürür. Düz anahtarlar/parola hiçbir yere yazılmaz."""
+    from .models import ApiAnahtari, KullaniciApiAyari
+
+    simdi = timezone.now()
+    with transaction.atomic():
+        iptal = ApiAnahtari.objects.filter(kullanici=kullanici, iptal_zamani__isnull=True).update(iptal_zamani=simdi)
+        kapandi = KullaniciApiAyari.objects.filter(kullanici=kullanici, parola_girisi=True).update(parola_girisi=False, guncelleme=simdi)
+        if iptal or kapandi:
+            denetim_yaz(
+                request, "api_erisimi_kapatildi", kullanici,
+                f"{kullanici.get_username()}: {neden}; {iptal} API anahtarı iptal edildi; "
+                f"API parola girişi {'kapatıldı' if kapandi else 'zaten kapalıydı'}",
+            )
+    return iptal, bool(kapandi)
+
+
 def kullanici_oturumlarini_sonlandir(kullanici, koru_anahtar=None):
     """Kullanıcının kimliği doğrulanmış bütün oturumlarını siler (`koru_anahtar` hariç). Silinen sayıyı döndürür."""
     from django.contrib.sessions.models import Session

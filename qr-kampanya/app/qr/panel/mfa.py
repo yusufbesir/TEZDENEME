@@ -26,7 +26,7 @@ from ..hiz import giris_hiz_siniri
 from ..middleware import istemci_ip
 from ..models import GenelAyarlar, MFACihazi
 from ..sayac import GirisDenemesi, tam_giris
-from ..servisler import denetim_yaz, kullanici_oturumlarini_sonlandir, qr_svg
+from ..servisler import api_erisimini_kapat, denetim_yaz, kullanici_oturumlarini_sonlandir, qr_svg
 from ..sifreleme import SifrelemeHatasi, belirec_bicimli_mi, coz, sifrele
 from .yardimci import yetki
 
@@ -325,6 +325,7 @@ def _sifirla(request, hedef, ozet, koru_oturum=None):
     silinen, _ = MFACihazi.objects.filter(kullanici=hedef).delete()
     kullanici_oturumlarini_sonlandir(hedef, koru_anahtar=koru_oturum)
     denetim_yaz(request, "mfa_sifirlandi", hedef, ozet)
+    api_erisimini_kapat(hedef, "MFA sıfırlandı", request)  # ele geçirilmiş oturum/cihazla açılmış API erişimi kalmasın
     return silinen
 
 

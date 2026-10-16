@@ -13,6 +13,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST
 
 from ..hiz import giris_hiz_siniri
@@ -62,6 +63,7 @@ def giris_sonrasi_adim(request, kullanici):
 
 
 @giris_hiz_siniri
+@sensitive_post_parameters("password")
 @never_cache
 @require_http_methods(["GET", "POST"])
 def giris(request):
