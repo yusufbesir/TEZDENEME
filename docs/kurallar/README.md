@@ -17,6 +17,7 @@
 | Her oturumda geçerli, kısa (birkaç satır) | `CLAUDE.md` (200 satırın altında kalmalı) | Her oturumda yüklenir; şişerse bağlam maliyeti artar |
 | Yalnızca belirli dosyalar/klasörlerde geçerli | `.claude/rules/<konu>.md` + `paths:` | Yalnızca o yollar açılınca yüklenir |
 | Tekrarlanan adım adım iş (not yazma, yayın vb.) | `.claude/skills/<ad>/SKILL.md` | Çağrılınca yüklenir, kuralı değil prosedürü taşır |
+| Mevcut skill'ler | `kasa-notu-yaz`, `is-kaydi`, `denetmen-raporu` | Kasa notu, iş kaydı (commit, PR, günlük, CHECKPOINT), denetmen raporu |
 | Uzun gerekçe, kullanıcı kararı, referans | `docs/kurallar/<konu>.md` | Gerektiğinde okunur, başlıklarla taranır |
 | Değişen durum (açık PR, bekleyen karar) | `CHECKPOINT.md` | Kalıcı kural değildir, sık güncellenir |
 | Her oturumda şart olan kısa özet | Proje talimatları kutusu (`talimat-kutusu-ozet.md`, 4.000 karakterin altı) | Kutu uzayınca uyarı verir |
