@@ -27,3 +27,4 @@
 2026-10-15 | 1.1.1 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti
 2026-10-15 | 1.1.2 kullanıcı başına kurulum (allowElevation:false, installer.nsh), derleme | orkestratör (küçük yapılandırma işi) | ana oturum | Tamamlandı (32 + 112 test)
 2026-10-15 | 1.1.2 bağımsız doğrulama | verifier / claude-sonnet-5-5 | alt-ajan token ölçülemedi | Geçti (makro etkisi derlenmiş pakette doğrulanamadı, şablon kodundan dolaylı kanıt)
+| 2026-10-16 | Barkod 1.1.3: Başlat menüsü Kaldır kısayolu + ayar silme sorusu (varsayılan Hayır) | implementer yerine orkestratör (tek dosya) + verifier/sonnet-5-5 | verifier ~39k token | Geçti (33+112 test, derleme doğrulandı) |
