@@ -41,3 +41,4 @@
 2026-10-16 | Linux/macOS paketleme | implementer/sonnet | ~67k token | AppImage, deb, mac zip derlendi; dmg yalnız macOS
 2026-10-16 | Arayüz: 8 özellik (sablon.html) | implementer/sonnet | ~400k token | 158 test geçti
 2026-10-16 | 1.2.0 bağımsız doğrulama | verifier/sonnet | ~54k token | Geçti
+2026-10-16 | Sekme düzeni (Doğrula/Geçmiş ayrı, Rehber→Yardım, seçici çerçevesi) | orchestrator + verifier/haiku | ~58k token | verifier Kaldı (panel yuvalama), düzeltildi, tarayıcıda 8 sekme doğrulandı, 159 test; 1.2.1
