@@ -4,7 +4,7 @@
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Hedef dolunca renk ana renkten doğru rengine geçer (≤250 ms).
 /// Halka verilen alana LayoutBuilder ile uyar; yazı çapla orantılıdır ama 11 px
-/// altına inmez, sığmayan sayı grubu FittedBox ile ölçeklenir.
+/// altına inmez; sığmayan sayı küçültülmez, kısaltılır (1,2k).
 library;
 
 import 'dart:math' as math;
@@ -26,7 +26,7 @@ class HedefHalkasi extends StatelessWidget {
   final double boyut;
 
   /// Küçük halka (üst şerit): yalnızca "xp/hedef" yazar.
-  bool get kucuk => boyut < 72;
+  bool get kucuk => boyut < 84;
 
   bool get tamam => hedef > 0 && xp >= hedef;
 
@@ -50,11 +50,27 @@ class HedefHalkasi extends StatelessWidget {
             kisit.maxHeight.isFinite ? kisit.maxHeight : boyut,
           ),
         );
-        final kucukMu = cap < 72;
+        final kucukMu = cap < 84;
         final yazi = Theme.of(context).textTheme;
         // Yazı boyutu halka çapıyla orantılı; 11 px altına inmez.
         final sayiBoyutu = math.max(enKucukYazi, cap * 0.165);
         final altBoyut = math.max(enKucukYazi, cap * 0.115);
+        final dolgu = kucukMu ? 6.0 : 10.0;
+        final ic = cap - 2 * dolgu;
+        // Küçültmek yerine daha kısa biçim: "1234/200" → "1,2k/200" → "1,2k".
+        final sayiStili = kucukMu
+            ? yazi.labelSmall!.copyWith(fontSize: altBoyut)
+            : yazi.titleMedium!.copyWith(fontSize: sayiBoyutu);
+        final sigan = siganMetin(
+          context,
+          adaylar: [
+            '$xp/$hedef',
+            '${kisaSayi(xp)}/${kisaSayi(hedef)}',
+            kisaSayi(xp),
+          ],
+          stiller: [sayiStili],
+          genislik: ic,
+        );
         return Semantics(
           label: etiket,
           excludeSemantics: true,
@@ -76,46 +92,42 @@ class HedefHalkasi extends StatelessWidget {
                     kalinlik: kucukMu ? 5 : 8,
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(kucukMu ? 8 : 14),
+                    padding: EdgeInsets.all(dolgu),
                     child: Center(
-                      // Yalnız sayı/ikon grubu gerekirse ölçeklenir.
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: kucukMu
-                            ? Text(
-                                '$xp/$hedef',
-                                maxLines: 1,
-                                style: yazi.labelSmall?.copyWith(
-                                  fontSize: altBoyut,
+                      child: kucukMu
+                          ? Text(
+                              sigan.metin,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                              style: sigan.stil,
+                            )
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  tamam
+                                      ? Icons.check_circle
+                                      : Icons.flag_outlined,
+                                  size: math.max(16, cap * 0.19),
+                                  color: renk,
                                 ),
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    tamam
-                                        ? Icons.check_circle
-                                        : Icons.flag_outlined,
-                                    size: math.max(16, cap * 0.21),
-                                    color: renk,
+                                Text(
+                                  sigan.metin,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: sigan.stil,
+                                ),
+                                Text(
+                                  'XP',
+                                  style: yazi.labelSmall?.copyWith(
+                                    fontSize: altBoyut,
+                                    color: r.metinIkincil,
                                   ),
-                                  Text(
-                                    '$xp/$hedef',
-                                    maxLines: 1,
-                                    style: yazi.titleMedium?.copyWith(
-                                      fontSize: sayiBoyutu,
-                                    ),
-                                  ),
-                                  Text(
-                                    'XP',
-                                    style: yazi.labelSmall?.copyWith(
-                                      fontSize: altBoyut,
-                                      color: r.metinIkincil,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      ),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),

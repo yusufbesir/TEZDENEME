@@ -297,11 +297,24 @@ class _Istatistik extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (simge != null) Icon(simge, size: 20, color: simgeRengi),
-                  // Sayı gösterge: dar hücrede ölçeklenir, kesilmez.
                   Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text('$deger', style: yazi.titleLarge),
+                    child: LayoutBuilder(
+                      builder: (context, k) {
+                        // Küçültme yok: önce titleMedium, sonra "1,2k".
+                        final sigan = siganMetin(
+                          context,
+                          adaylar: ['$deger', kisaSayi(deger)],
+                          stiller: [yazi.titleLarge!, yazi.titleMedium!],
+                          genislik: k.maxWidth,
+                        );
+                        return Text(
+                          sigan.metin,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          style: sigan.stil,
+                        );
+                      },
                     ),
                   ),
                 ],

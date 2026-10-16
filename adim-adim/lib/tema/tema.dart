@@ -3,6 +3,7 @@
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Kırılma noktaları ve metin ölçeği sınırı yalnız burada tanımlanır.
+/// `kisaSayi` ve `siganMetin`: yazıyı küçültmeden sığdırma yardımcıları.
 library;
 
 import 'package:flutter/material.dart';
@@ -52,6 +53,41 @@ abstract final class Olcu {
         ? Duration.zero
         : Duration(milliseconds: kisa);
   }
+}
+
+/// Büyük sayıyı kısaltır: 999 ve altı olduğu gibi, üstü "1,2k" biçiminde.
+String kisaSayi(int n) {
+  if (n.abs() < 1000) return '$n';
+  final bin = n.abs() / 1000;
+  final metin = bin >= 100 || bin == bin.roundToDouble()
+      ? bin.round().toString()
+      : bin.toStringAsFixed(1).replaceAll('.', ',');
+  return '${n < 0 ? '-' : ''}${metin}k';
+}
+
+/// Metnin yazı boyutunu KÜÇÜLTMEDEN sığdırır: önce stiller (büyükten küçüğe),
+/// her stilde adaylar (uzundan kısaya) denenir; ilk sığan döner. Hiçbiri
+/// sığmazsa son stil + son aday döner (taşan kısım ellipsis ile kesilir).
+/// Yazı boyutu hiçbir zaman verilen stillerin en küçüğünün altına inmez.
+({String metin, TextStyle stil}) siganMetin(
+  BuildContext context, {
+  required List<String> adaylar,
+  required List<TextStyle> stiller,
+  required double genislik,
+}) {
+  final olcek = MediaQuery.textScalerOf(context);
+  for (final stil in stiller) {
+    for (final aday in adaylar) {
+      final tp = TextPainter(
+        text: TextSpan(text: aday, style: stil),
+        textDirection: TextDirection.ltr,
+        textScaler: olcek,
+        maxLines: 1,
+      )..layout();
+      if (tp.width <= genislik) return (metin: aday, stil: stil);
+    }
+  }
+  return (metin: adaylar.last, stil: stiller.last);
 }
 
 const String yaziBaslik = 'Nunito';
