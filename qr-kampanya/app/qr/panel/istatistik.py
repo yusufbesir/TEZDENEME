@@ -93,3 +93,20 @@ def gunluk(bas_tarih, bit_tarih, bas_dt, bit_dt):
 def genel_toplam(bas_dt, bit_dt):
     s = _taramalar(bas_dt, bit_dt).aggregate(insan=Count("id", filter=Q(bot=False)), bot=Count("id", filter=Q(bot=True)))
     return {"insan": s["insan"], "bot": s["bot"], "hepsi": s["insan"] + s["bot"]}
+
+
+def alan_ozeti(taramalar, alan, bot_dahil=False, sinir=20):
+    """Tarama sorgu kümesinde `alan` ("yonlendiren" veya "ulke") değerlerine göre ilk `sinir` satır.
+    Dönüş: ([{"deger", "toplam"}, ...], bilinmeyen_sayisi). Boş değer (Referer yok/kendi sitemiz/ülke bilinmiyor)
+    tabloya girmez, ayrı sayılır. Bot sayımı bot_dahil seçeneğine uyar."""
+    if alan not in ("yonlendiren", "ulke"):
+        raise ValueError("Geçersiz alan")
+    if not bot_dahil:
+        taramalar = taramalar.filter(bot=False)
+    gruplar = {
+        g[alan]: g["n"]
+        for g in taramalar.order_by().values(alan).annotate(n=Count("id"))
+    }
+    bilinmeyen = gruplar.pop("", 0)
+    satirlar = sorted(({"deger": d, "toplam": n} for d, n in gruplar.items()), key=lambda s: (-s["toplam"], s["deger"]))
+    return satirlar[:sinir], bilinmeyen

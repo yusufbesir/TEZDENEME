@@ -170,6 +170,9 @@ IP_DENEME_SINIRI = int(env("IP_DENEME_SINIRI", "20"))
 # /panel/giris ve /panel/mfa/* POST istekleri için IP başına dakikalık ucuz sınır (parola doğrulamasından önce; 0 = kapalı).
 GIRIS_HIZ_SINIRI = int(env("GIRIS_HIZ_SINIRI", "10"))
 YONLENDIRME_HIZ_SINIRI = int(env("YONLENDIRME_HIZ_SINIRI", "120"))  # IP başına dakikada
+# İsteğe bağlı ülke bilgisi: MaxMind GeoLite2-Country.mmdb dosyasının konteyner içindeki yolu (docs/KURULUM.md, docs/GUVENLIK.md).
+# Boşsa ya da dosya yoksa/okunamazsa ülke boş kalır; hata verilmez. IP yalnızca bellekte aranır, saklanmaz.
+GEOIP_VERITABANI = env("GEOIP_VERITABANI", "").strip()
 QR_OLUSTURMA_HIZ_SINIRI = int(env("QR_OLUSTURMA_HIZ_SINIRI", "30"))  # kullanıcı başına dakikada tekil QR oluşturma
 # API: anahtar başına dakikada başarılı istek; IP başına dakikada başarısız kimlik doğrulama (docs/API.md).
 API_HIZ_SINIRI = int(env("API_HIZ_SINIRI", "60"))

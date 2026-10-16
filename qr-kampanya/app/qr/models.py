@@ -335,9 +335,11 @@ class HedefGecmisi(models.Model):
 class Tarama(models.Model):
     """Bir QR taramasının (kısa adres ziyaretinin) takma adlı (pseudonymous) kaydı.
 
-    Anonim değildir. IP adresi saklanmaz. ziyaretci_ozeti, IP + tarayıcı bilgisinin günlük değişen
+    Anonim değildir. IP adresi ve User-Agent saklanmaz. ziyaretci_ozeti, IP + tarayıcı bilgisinin günlük değişen
     gizli tuzla alınmış özetidir; yalnızca aynı gün içindeki tekrarları ayırmak
     için kullanılır ve günler arasında kişiyi izlemeye izin vermez.
+    `yonlendiren` YALNIZCA Referer başlığının ana makine adıdır (yol/sorgu/port/kullanıcı bilgisi asla saklanmaz);
+    `ulke` isteğe bağlı GeoIP aramasının 2 harfli sonucudur (IP bellekte kullanılır, saklanmaz).
     """
 
     class Sonuc(models.TextChoices):
@@ -361,6 +363,8 @@ class Tarama(models.Model):
     cihaz = models.CharField(max_length=10, choices=Cihaz.choices, default=Cihaz.DIGER)
     bot = models.BooleanField(default=False)
     ziyaretci_ozeti = models.CharField(max_length=32, blank=True)
+    yonlendiren = models.CharField("yönlendiren site", max_length=253, blank=True)
+    ulke = models.CharField("ülke", max_length=2, blank=True)
 
     class Meta:
         indexes = [models.Index(fields=["qr", "zaman"]), models.Index(fields=["zaman"])]
@@ -428,6 +432,16 @@ class GenelAyarlar(models.Model):
         "otomatik kod biçimi", max_length=10, choices=KodBicimi.choices, default=KodBicimi.RASTGELE,
         help_text="Kısa kod boş bırakıldığında üretilecek kodun biçimi. Sıralı kodlar tahmin edilebilir; "
                   "yalnızca gizli olması gerekmeyen bağlantılar için kullanın.",
+    )
+    herkese_acik_istatistik = models.BooleanField(
+        "herkese açık istatistik sayfası", default=False,
+        help_text="Açıksa /k/<kod>+ ve /k/<kod>+all adresleri kimlik doğrulaması olmadan sade bir istatistik sayfası gösterir "
+                  "(toplam tarama, son 30 gün grafiği, ülke ve yönlendiren özeti). Kapalıyken yalnızca yetkili panel kullanıcısı "
+                  "panel ayrıntısına yönlendirilir; diğer herkes 404 görür.",
+    )
+    istatistikte_hedef_goster = models.BooleanField(
+        "herkese açık istatistikte hedef adresi göster", default=False,
+        help_text="Açıksa herkese açık istatistik sayfasında hedef URL de görünür. Hedef adres gizli olabilir; varsayılan kapalıdır.",
     )
     sirali_sayac = models.PositiveBigIntegerField(
         "sıralı kod sayacı", default=1296, editable=False,

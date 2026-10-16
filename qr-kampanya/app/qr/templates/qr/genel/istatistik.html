@@ -1,0 +1,42 @@
+{% extends "qr/genel/taban.html" %}
+{% block baslik %}İstatistik: {{ qr.kisa_kod }}{% if tum %} (aynı hedefli tüm kodlar){% endif %}{% if ayar.marka_adi %} - {{ ayar.marka_adi }}{% endif %}{% endblock %}
+{% block aciklama %}Tarama istatistikleri{% endblock %}
+{% block icerik %}
+<main class="kap">
+  <h1>{{ qr.kisa_kod }}{% if tum %} <small>+all</small>{% endif %}</h1>
+  {% if tum %}<p>Aynı hedefe giden {{ kod_sayisi }} kodun toplamı (arşivdeki ve çöp kutusundaki kodlar dahil değildir).</p>{% endif %}
+  {% if hedef_goster and hedef %}<p class="hedef">Hedef: <span class="kisa-url">{{ hedef }}</span></p>{% endif %}
+
+  <div class="kart">
+    <h2>Toplam tarama</h2>
+    <p class="buyuk-sayi">{{ toplam }}</p>
+    <p class="sessiz">Bot taramaları hariçtir. Son 30 günde: {{ son_30_gun }}</p>
+  </div>
+
+  <div class="kart">
+    <h2>Son 30 gün</h2>
+    <div class="grafik">{{ grafik_svg }}</div>
+  </div>
+
+  <div class="kart">
+    <h2>Yönlendiren siteler</h2>
+    {% if yonlendirenler %}
+    <table class="ozet-tablo"><tbody>
+      {% for s in yonlendirenler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% else %}<p class="sessiz">Yönlendiren site bilgisi yok.</p>{% endif %}
+    {% if yon_bilinmeyen %}<p class="sessiz">Yönlendiren bilgisi olmayan: {{ yon_bilinmeyen }}</p>{% endif %}
+  </div>
+
+  <div class="kart">
+    <h2>Ülkeler</h2>
+    {% if ulkeler %}
+    <table class="ozet-tablo"><tbody>
+      {% for s in ulkeler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% else %}<p class="sessiz">Ülke bilgisi yok.</p>{% endif %}
+    {% if ulke_bilinmeyen %}<p class="sessiz">Ülkesi bilinmeyen: {{ ulke_bilinmeyen }}</p>{% endif %}
+  </div>
+  {% if ayar.marka_adi %}<p class="alt">{{ ayar.marka_adi }}</p>{% endif %}
+</main>
+{% endblock %}

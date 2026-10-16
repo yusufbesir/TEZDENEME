@@ -12,15 +12,16 @@ from urllib.parse import parse_qsl, urlencode
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Count, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
+from .. import grafik
 from ..dogrulama import url_gecerli_mi
 from ..hiz import qr_olusturma_hiz_siniri
 from ..models import Kampanya, KampanyaSayfasi, Magaza, QRKod, Tarama, Urun
@@ -93,6 +94,11 @@ def _tam_sayi(deger):
     return int(deger) if deger.isascii() and deger.isdigit() and len(deger) <= 9 else None
 
 
+def _secili_idler(request):
+    """POST `secili` değerlerinden geçerli kimlikler: yalnızca ASCII rakamlar (Unicode rakam/aşırı uzun değer yok sayılır)."""
+    return {n for n in (_tam_sayi(x) for x in request.POST.getlist("secili")) if n is not None}
+
+
 def _gun_basi(tarih):
     return timezone.make_aware(datetime.combine(tarih, time.min), timezone.get_current_timezone())
 
@@ -127,10 +133,10 @@ def qr_sorgusu(get):
         sorgu = sorgu.filter(durum=get["durum"])
     else:
         sorgu = sorgu.exclude(durum=QRKod.Durum.COP)
-    if (get.get("kampanya") or "").isdigit():
-        sorgu = sorgu.filter(kampanya_id=int(get["kampanya"]))
-    if (get.get("magaza") or "").isdigit():
-        sorgu = sorgu.filter(magaza_id=int(get["magaza"]))
+    if _tam_sayi(get.get("kampanya")) is not None:
+        sorgu = sorgu.filter(kampanya_id=_tam_sayi(get["kampanya"]))
+    if _tam_sayi(get.get("magaza")) is not None:
+        sorgu = sorgu.filter(magaza_id=_tam_sayi(get["magaza"]))
     if _tam_sayi(get.get("urun")) is not None:
         sorgu = sorgu.filter(urun_id=_tam_sayi(get["urun"]))
     en_az, en_cok = _tam_sayi(get.get("tarama_min")), _tam_sayi(get.get("tarama_max"))
@@ -211,12 +217,33 @@ def qr_disa_aktar(request):
     return tablo_yaniti(bicim, "qr-kodlar", "QR kodlar", basliklar, satirlar)
 
 
-def _formu_kaydet(request, form, not_metni=""):
-    """Form geçerliyse QR'ı servis üzerinden kaydeder. Başarılıysa nesneyi, değilse None döndürür."""
+def _kilitli_getir(pk):
+    """Satırı select_for_update ile kilitleyip TAZE okur (atomic blok içinde çağrılmalı). Yoksa 404."""
+    try:
+        return QRKod.objects.select_for_update().get(pk=pk)
+    except QRKod.DoesNotExist:
+        raise Http404 from None
+
+
+def _anlik(qr):
+    return {f.attname: getattr(qr, f.attname) for f in QRKod._meta.concrete_fields}
+
+
+def _degisen_alanlar(onceki, qr):
+    """Form uygulanmadan önceki anlık görüntüye göre değişen model alanları (yalnız bunlar yazılır)."""
+    return [
+        f.name for f in QRKod._meta.concrete_fields
+        if not f.primary_key and getattr(qr, f.attname) != onceki[f.attname]
+    ]
+
+
+def _formu_kaydet(request, form, not_metni="", alanlar=None):
+    """Form geçerliyse QR'ı servis üzerinden kaydeder. Başarılıysa nesneyi, değilse None döndürür.
+    `alanlar` verilirse (düzenleme) yalnızca bu alanlar yazılır."""
     qr = form.save(commit=False)
     try:
         qr.full_clean()
-        qr_kaydet(qr, request, not_metni=not_metni)
+        qr_kaydet(qr, request, not_metni=not_metni, alanlar=alanlar)
     except ValidationError as hata:
         form.add_error(None, hata)
     except IntegrityError:
@@ -243,17 +270,31 @@ def qr_olustur(request):
 @yetki("qr.change_qrkod")
 @require_http_methods(["GET", "POST"])
 def qr_duzenle(request, pk):
+    if request.method == "POST":
+        # Kayıt anında satır kilitlenir ve durum TAZE okunur: eşzamanlı çöpe taşıma ezilmez, yalnızca değişen alanlar yazılır.
+        with transaction.atomic():
+            qr = _kilitli_getir(pk)
+            if qr.durum == QRKod.Durum.COP:
+                messages.error(request, "Çöp kutusundaki kod düzenlenemez; önce geri yükleyin.")
+                return redirect("panel:qr_detay", pk=qr.pk)
+            onceki = _anlik(qr)
+            form = QRKodForm(request.POST, instance=qr)
+            if form.is_valid():
+                kayit = _formu_kaydet(
+                    request, form, form.cleaned_data.get("degisiklik_notu", ""), alanlar=_degisen_alanlar(onceki, form.instance)
+                )
+                if kayit:
+                    messages.success(request, "QR kod güncellendi.")
+                    form.uyarilari_goster(request)
+                    return redirect("panel:qr_detay", pk=qr.pk)
+            return render(request, "qr/panel/form.html", {
+                "form": form, "baslik": f"QR kodu düzenle: {qr.kisa_kod}", "geri": "panel:qr_detay", "geri_pk": qr.pk,
+            })
     qr = get_object_or_404(QRKod, pk=pk)
     if qr.durum == QRKod.Durum.COP:
         messages.error(request, "Çöp kutusundaki kod düzenlenemez; önce geri yükleyin.")
         return redirect("panel:qr_detay", pk=qr.pk)
-    form = QRKodForm(request.POST or None, instance=qr)
-    if request.method == "POST" and form.is_valid():
-        kayit = _formu_kaydet(request, form, form.cleaned_data.get("degisiklik_notu", ""))
-        if kayit:
-            messages.success(request, "QR kod güncellendi.")
-            form.uyarilari_goster(request)
-            return redirect("panel:qr_detay", pk=qr.pk)
+    form = QRKodForm(instance=qr)
     return render(request, "qr/panel/form.html", {
         "form": form, "baslik": f"QR kodu düzenle: {qr.kisa_kod}", "geri": "panel:qr_detay", "geri_pk": qr.pk,
     })
@@ -286,21 +327,26 @@ def qr_hizli_duzenle(request, pk):
     """Listeden satır içi düzenleme: yalnızca ad, başlık ve (harici hedefli QR için) hedef URL.
     Doğrulama ve kayıt normal düzenlemeyle aynı yoldan geçer (HizliDuzenleForm -> full_clean -> servisler.qr_kaydet);
     hedef değişirse hedef geçmişi ve denetim kaydı yazılır. Arşiv/çöp durumundaki kayıt değiştirilemez."""
-    qr = get_object_or_404(QRKod, pk=pk)
-    if qr.durum in (QRKod.Durum.ARSIV, QRKod.Durum.COP):
-        return _hizli_hata(request, {"__all__": ["Arşivdeki veya çöp kutusundaki kod düzenlenemez."]}, 409)
-    form = HizliDuzenleForm(request.POST, instance=qr)
-    if form.is_valid():
-        degisti = form.has_changed()
-        if degisti:
-            kayit = form.save(commit=False)
-            try:
-                kayit.full_clean()
-                qr_kaydet(kayit, request, not_metni="Listeden hızlı düzenleme")
-            except ValidationError as hata:
-                form.add_error(None, hata.messages)
-            else:
-                qr = kayit
+    # Satır kilitlenir ve durum TAZE okunur (eşzamanlı çöpe taşıma/arşivleme ezilmez); yalnızca değişen alanlar yazılır.
+    with transaction.atomic():
+        qr = _kilitli_getir(pk)
+        if qr.durum in (QRKod.Durum.ARSIV, QRKod.Durum.COP):
+            return _hizli_hata(request, {"__all__": ["Arşivdeki veya çöp kutusundaki kod düzenlenemez."]}, 409)
+        onceki = _anlik(qr)
+        form = HizliDuzenleForm(request.POST, instance=qr)
+        degisti = False
+        if form.is_valid():
+            degisen = _degisen_alanlar(onceki, form.instance)
+            degisti = bool(degisen)
+            if degisti:
+                kayit = form.save(commit=False)
+                try:
+                    kayit.full_clean()
+                    qr_kaydet(kayit, request, not_metni="Listeden hızlı düzenleme", alanlar=degisen)
+                except ValidationError as hata:
+                    form.add_error(None, hata.messages)
+                else:
+                    qr = kayit
     if form.errors:
         hatalar = {alan: [str(h) for h in liste] for alan, liste in form.errors.items()}
         return _hizli_hata(request, hatalar, 400)
@@ -331,9 +377,15 @@ def qr_detay(request, pk):
         test_url = qr.hedef_url
     elif qr.hedef_turu == QRKod.HedefTuru.SAYFA and qr.sayfa_id and qr.sayfa.durum == KampanyaSayfasi.Durum.YAYINDA:
         test_url = f"/s/{qr.sayfa.slug}"
+    bot_dahil = request.GET.get("bot_dahil") == "1"
+    secili_aralik = grafik.aralik_secimi(request.GET.get("aralik"))
+    seri = grafik.seri(Tarama.objects.filter(qr=qr), secili_aralik, bot_dahil)
     return render(request, "qr/panel/qr_detay.html", {
         "qr": qr,
         "tarama": tarama,
+        "bot_dahil": bot_dahil, "secili_aralik": secili_aralik, "grafik_seri": seri,
+        "grafik_svg": grafik.svg_cubuk_grafik(seri, qr.kisa_kod, bot_dahil),
+        "aralik_baglantilari": grafik.aralik_baglantilari(request.GET, secili_aralik),
         "test_url": test_url,
         "zaman_durumu": qr.zaman_durumu(),
         "paylasim": paylasim_baglantilari(qr.kisa_url, qr.baslik or qr.ad),
@@ -398,7 +450,7 @@ def _zip_yaniti(request, qrler):
 @require_POST
 def qr_toplu(request):
     islem = request.POST.get("islem", "")
-    idler = {int(x) for x in request.POST.getlist("secili") if x.isdigit()}
+    idler = _secili_idler(request)
     donus = request.POST.get("donus") or ""
     hedef = redirect("panel:qr_liste")
     if islem not in (*ISLEMLER, "zip", "cope"):
@@ -430,8 +482,8 @@ def qr_toplu(request):
             return render(request, "qr/panel/qr_cop_onay.html", {"qrler": qrler, "donus": donus})
         sayi = qr_cope_tasi(qrler, request)
         messages.success(request, f"{sayi} QR kod çöp kutusuna taşındı.")
-        if donus.isdigit():
-            return redirect("panel:qr_detay", pk=int(donus))
+        if _tam_sayi(donus) is not None:
+            return redirect("panel:qr_detay", pk=_tam_sayi(donus))
         return hedef
 
     yeni_durum, fiil = ISLEMLER[islem]
@@ -463,8 +515,8 @@ def qr_toplu(request):
     messages.success(request, f"{sayi} QR kod {fiil}.")
     if atlanan:
         messages.warning(request, "Hedef bilgisi eksik olduğu için atlandı: " + ", ".join(atlanan))
-    if donus.isdigit():
-        return redirect("panel:qr_detay", pk=int(donus))
+    if _tam_sayi(donus) is not None:
+        return redirect("panel:qr_detay", pk=_tam_sayi(donus))
     return hedef
 
 
@@ -483,7 +535,7 @@ def cop_kutusu(request):
 @require_POST
 def cop_geri_yukle(request):
     """Tekil veya toplu geri yükleme (`secili` listesi). Kod, çöpe atılmadan önceki durumuna döner."""
-    idler = {int(x) for x in request.POST.getlist("secili") if x.isdigit()}
+    idler = _secili_idler(request)
     donus = redirect("panel:cop_kutusu")
     if not idler:
         messages.error(request, "Önce en az bir QR kod seçin.")

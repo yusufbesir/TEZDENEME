@@ -4,8 +4,9 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_safe
 
+from .. import grafik
 from ..dogrulama import url_gecerli_mi
-from ..models import KampanyaSayfasi, QRKod
+from ..models import KampanyaSayfasi, QRKod, Tarama
 from ..servisler import denetim_yaz
 from . import istatistik
 from .yardimci import etkin_bitis_ekle, qr_bitis_q, tablo_yaniti, tarih_araligi, yetki
@@ -45,7 +46,18 @@ def istatistik_raporu(request):
         (ad, istatistik.BOYUTLAR[ad][1], tablolar[ad][:EKRANDA_EN_FAZLA], len(tablolar[ad]) > EKRANDA_EN_FAZLA)
         for ad in istatistik.BOYUTLAR
     ]
+    # Yönlendiren siteler ve ülkeler: seçili tarih aralığı + bot seçeneği.
+    aralikta = Tarama.objects.filter(zaman__gte=bas_dt, zaman__lt=bit_dt)
+    yonlendirenler, yon_bilinmeyen = istatistik.alan_ozeti(aralikta, "yonlendiren", bot_dahil, EN_COK_SAYISI)
+    ulkeler, ulke_bilinmeyen = istatistik.alan_ozeti(aralikta, "ulke", bot_dahil, EN_COK_SAYISI)
+    # Zaman grafiği: hazır aralıklar (tüm QR'lar), tarih aralığı formundan bağımsız.
+    secili_aralik = grafik.aralik_secimi(request.GET.get("aralik"))
+    seri = grafik.seri(Tarama.objects.all(), secili_aralik, bot_dahil)
     return render(request, "qr/panel/istatistik.html", {
+        "yonlendirenler": yonlendirenler, "yon_bilinmeyen": yon_bilinmeyen,
+        "ulkeler": ulkeler, "ulke_bilinmeyen": ulke_bilinmeyen,
+        "grafik_svg": grafik.svg_cubuk_grafik(seri, "Tüm QR kodlar", bot_dahil), "grafik_seri": seri,
+        "aralik_baglantilari": grafik.aralik_baglantilari(request.GET, secili_aralik), "secili_aralik": secili_aralik,
         "baslangic": bas, "bitis": bit, "uyarilar": uyarilar, "bot_dahil": bot_dahil,
         "en_cok": en_cok, "bolumler": bolumler, "tekil_uyarisi": istatistik.TEKIL_UYARISI,
         "ekran_siniri": EKRANDA_EN_FAZLA,

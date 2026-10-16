@@ -361,7 +361,7 @@ class GenelAyarlarForm(TemelForm):
         fields = [
             "marka_adi", "pasif_mesaj", "baslamadi_mesaj", "baslamadi_url", "bitti_mesaj", "bitti_url",
             "bulunamadi_mesaj", "yaklasan_bitis_gun", "ayrilmis_kodlar", "ayni_hedef_uyarisi",
-            "baslik_otomatik_cek", "kod_uretim_bicimi",
+            "baslik_otomatik_cek", "kod_uretim_bicimi", "herkese_acik_istatistik", "istatistikte_hedef_goster",
         ]
         widgets = {k: forms.Textarea(attrs={"rows": 2}) for k in ("pasif_mesaj", "baslamadi_mesaj", "bitti_mesaj", "bulunamadi_mesaj")}
         widgets["ayrilmis_kodlar"] = forms.Textarea(attrs={"rows": 3})

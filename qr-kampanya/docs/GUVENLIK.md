@@ -101,3 +101,10 @@ Her maddeyi işaretlemeden canlı kullanıma geçmeyin.
 ## Not: ziyaretçi özeti anonim değil, takma adlıdır
 
 `qr_tarama.ziyaretci_ozeti` günlük değişen tuzlu bir özettir; IP saklanmaz ancak aynı gün aynı IP+UA aynı değeri verir ve `SECRET_KEY` sahibi bilinen bir IP/UA çiftini doğrulayabilir. Bu nedenle veri **takma adlı (pseudonymous)** kabul edilmeli, KVKK saklama süresi (`TARAMA_SAKLAMA_GUN`) uygulanmalıdır.
+
+## Gizlilik: yönlendiren, ülke ve herkese açık istatistik
+
+- **Yönlendiren (Referer)**: yalnızca ana makine adı saklanır; yol ve sorgu (oturum belirteci, e-posta, arama sözcüğü gibi kişisel olabilecek bölümler) **asla** saklanmaz. Kendi alan adımız, IP adresleri ve bozuk değerler boş kalır. Bu yine de takma adlı veri kapsamındadır ve `TARAMA_SAKLAMA_GUN` ile birlikte silinir. Not: Caddy erişim günlüğü istek başlıklarını (Referer ve User-Agent dahil) kaydedebilir; bu günlükler uygulama veritabanından ayrıdır, saklama süresini ayrıca yönetin.
+- **Ülke (GeoIP)**: varsayılan kapalıdır. Açıksa IP yalnızca MaxMind veritabanında aranır ve hemen atılır; veritabanında yalnızca 2 harfli ülke kodu kalır. IP ve User-Agent hiçbir zaman saklanmaz. GeoLite2 dosyası yerel, salt okunur bağlanır; uygulama internete çıkıp veritabanı indirmez. GeoLite2 lisans koşullarına uymak (atıf dahil) sizin sorumluluğunuzdadır.
+- **Herkese açık istatistik** (`/k/<kod>+`, `/k/<kod>+all`): varsayılan **KAPALI**. Kapalıyken yetkisiz kullanıcıya kodun var olup olmadığı belli edilmez (aynı 404). Açıkken yalnızca toplamlar, grafik, yönlendiren alan adları ve ülke kodları görünür; hedef URL ayrı bir ayarla (varsayılan kapalı) gösterilir. Arşiv/çöp kodları 404'tür, sayfa `noindex` ve `no-store` olarak sunulur, yönlendirmeyle aynı IP başına hız sınırı uygulanır ve bu istekler tarama sayılmaz. Açmak, kısa kodu bilen herkesin sayıları görmesi demektir; kısa kodlar tahmin edilmesi zor olsa da gizli değildir (basılıdır).
+- **Grafikler**: sunucuda üretilen SVG'dir; harici betik, satır içi betik veya satır içi stil yoktur (CSP `script-src 'self'; style-src 'self'` ile uyumlu). Kullanıcı kaynaklı metinler kaçırılır.

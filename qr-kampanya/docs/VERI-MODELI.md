@@ -23,9 +23,9 @@
 | `qr_denemesayaci` | Giriş/MFA başarısız deneme sayaçları (anahtar bir özettir; süresi dolunca yeniden kullanılır) | — | anahtar (unique), bitis | Süresi dolanlar otomatik sıfırlanır/temizlenir |
 | `qr_apianahtari` | API anahtarları (kullanıcı, ad, önek, HMAC özeti; düz anahtar saklanmaz) | kullanıcı (PROTECT) | onek (unique) | Silinmez; iptal = `iptal_zamani` dolar |
 | `qr_kullaniciapiayari` | Kullanıcı başına API ayarı (`parola_girisi`, varsayılan kapalı) | kullanıcı (CASCADE, 1-1) | kullanici (unique) | Kullanıcı panelden değiştirir |
-| `qr_tarama` | Takma adlı (pseudonymous) tarama olayları | — | (qr, zaman), zaman | Saklama süresi sonunda temizlenir (`TARAMA_SAKLAMA_GUN`) |
+| `qr_tarama` | Takma adlı (pseudonymous) tarama olayları (zaman, sonuç, cihaz, bot, özet, `yonlendiren` alan adı, `ulke` kodu) | — | (qr, zaman), zaman | Saklama süresi sonunda temizlenir (`TARAMA_SAKLAMA_GUN`) |
 | `qr_denetimkaydi` | Yönetici işlemleri | — | zaman, eylem | Değiştirilemez ve silinemez (model düzeyinde) |
-| `qr_genelayarlar` | Varsayılan yönlendirme davranışları, marka | tek satır (id=1) | — | — |
+| `qr_genelayarlar` | Varsayılan yönlendirme davranışları, marka, herkese açık istatistik anahtarları (`herkese_acik_istatistik`, `istatistikte_hedef_goster`; ikisi de varsayılan kapalı) | tek satır (id=1) | — | — |
 | `qr_mfacihazi` | Kullanıcının doğrulama uygulaması anahtarı | kullanıcı | — | Kullanıcıyla birlikte |
 | `onbellek` | Giriş denemesi sayaçları | — | — | Geçici veri |
 
@@ -66,5 +66,8 @@ QR'ın kendi başlangıç/bitiş tarihi varsa o kullanılır; yoksa bağlı kamp
 
 - `qr_tarama` IP adresi **saklamaz**. Yalnızca zaman, sonuç, cihaz türü, bot işareti ve `ziyaretci_ozeti` tutulur.
 - `ziyaretci_ozeti`: IP + tarayıcı bilgisinin, **her gün değişen** gizli bir tuzla alınmış özetinin ilk 32 karakteri. Aynı gün içindeki tekrar taramaları ayırmaya yarar; IP geri elde edilemez ve farklı günler eşleştirilemez. Özet anonim değil, takma adlıdır (pseudonymous): aynı gün aynı IP+UA aynı değeri verir ve `SECRET_KEY` sahibi bilinen bir IP/UA çiftini doğrulayabilir. Gün, Europe/Istanbul yerel günüdür.
+- `qr_tarama.yonlendiren` (CharField 253): Referer başlığının **yalnızca ana makine adı** (küçük harf, port yok, `www.` olduğu gibi kalır). Yol, sorgu, parça ve kullanıcı bilgisi hiçbir zaman saklanmaz; kendi alan adımız, IP adresli, tek etiketli (`localhost`) ve geçersiz Referer'lar boş kalır. IDN alan adları punycode saklanır.
+- `qr_tarama.ulke` (CharField 2): isteğe bağlı GeoIP (`GEOIP_VERITABANI`) sonucu ISO ülke kodu; ayar boşsa ya da dosya yoksa boş. IP yalnızca bellekte aranır, saklanmaz. User-Agent de saklanmaz (yalnızca ondan türetilen cihaz türü ve bot işareti).
+- Migrasyon `0011_yourls_ozellikleri_4`: iki Tarama alanı ve iki GenelAyarlar anahtarı eklenir (eski satırlarda boş/kapalı; veri kaybı yok).
 - Denetim kaydında IP'nin yalnızca maskelenmiş hâli (IPv4 /24) tutulur.
 - Çerez yalnızca panel oturumu için kullanılır; halka açık sayfalar çerez veya izleme kodu kullanmaz.

@@ -28,6 +28,7 @@ x-uygulama-ayarlari: &uygulama-ayarlari
   IP_DENEME_SINIRI:
   GIRIS_HIZ_SINIRI:
   YONLENDIRME_HIZ_SINIRI:
+  GEOIP_VERITABANI:
   QR_OLUSTURMA_HIZ_SINIRI:
   API_HIZ_SINIRI:
   API_BASARISIZ_HIZ_SINIRI:
@@ -115,6 +116,9 @@ services:
     volumes:
       - medya:/veri/medya
       - yedek-durum:/yedek-durum:ro
+      # İsteğe bağlı ülke bilgisi (GeoIP): MaxMind GeoLite2-Country.mmdb dosyasını kendiniz indirip salt okunur bağlayın
+      # ve .env içinde GEOIP_VERITABANI=/geoip/GeoLite2-Country.mmdb verin (docs/KULLANIM.md "GeoIP"). Dosyayı bu proje indirmez.
+      # - ./geoip/GeoLite2-Country.mmdb:/geoip/GeoLite2-Country.mmdb:ro
     networks: [ic, web]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/saglik', headers={'Host': 'localhost'}), timeout=5).status == 200 else 1)"]

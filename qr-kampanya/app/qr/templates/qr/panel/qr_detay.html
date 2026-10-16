@@ -57,6 +57,19 @@
   </div>
 </div>
 
+<h2>Tarama grafiği</h2>
+<div class="aralik-secici" role="group" aria-label="Grafik aralığı">
+  {% for a in aralik_baglantilari %}<a class="dugme ikincil kucuk{% if a.secili %} secili{% endif %}" href="{{ a.adres }}"{% if a.secili %} aria-current="true"{% endif %}>{{ a.etiket }}</a>{% endfor %}
+  <form method="get" class="eylemler">
+    <input type="hidden" name="aralik" value="{{ secili_aralik }}">
+    <span class="alan onay"><input type="checkbox" id="bot_dahil" name="bot_dahil" value="1"{% if bot_dahil %} checked{% endif %}> <label for="bot_dahil">Botları dahil et</label></span>
+    <button type="submit" class="dugme ikincil kucuk">Uygula</button>
+  </form>
+</div>
+<div class="kart grafik">{{ grafik_svg }}</div>
+<p class="sessiz">Europe/Istanbul saat dilimi; seçili aralık: {{ grafik_seri.toplam }} tarama{% if bot_dahil %} (bot dahil){% else %} (bot hariç){% endif %}, bot: {{ grafik_seri.bot_toplam }}.
+  {% if qr.durum != "arsiv" and qr.durum != "cop" %}Herkese açık istatistik adresi (ayar açıksa): <span class="kisa-url">{{ qr.kisa_url }}+</span>{% endif %}</p>
+
 <h2>Hedef geçmişi</h2>
 <div class="tablo-kap"><table>
   <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Eski hedef</th><th>Yeni hedef</th><th>Not</th></tr></thead>

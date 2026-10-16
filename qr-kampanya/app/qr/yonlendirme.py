@@ -22,6 +22,7 @@ from .dogrulama import url_gecerli_mi
 from .hiz import hiz_sinirlayici
 from .middleware import ip_anahtari, istemci_ip
 from .models import GenelAyarlar, KampanyaSayfasi, QRKod, SayfaGorseli, Tarama
+from .tarama_bilgisi import ulke_kodu, yonlendiren_alan_adi
 
 log = logging.getLogger(__name__)
 
@@ -82,6 +83,9 @@ def _tarama_kaydet(request, qr, sonuc):
             cihaz=cihaz,
             bot=cihaz == Tarama.Cihaz.BOT,
             ziyaretci_ozeti=ziyaretci_ozeti(istemci_ip(request), ua),
+            # Yalnızca Referer'ın ana makine adı (yol/sorgu atılır) ve isteğe bağlı GeoIP ülkesi; IP ve UA saklanmaz.
+            yonlendiren=yonlendiren_alan_adi(request.META.get("HTTP_REFERER", ""), request),
+            ulke=ulke_kodu(istemci_ip(request)),
         )
     except Exception:  # İstatistik hatası yönlendirmeyi asla engellememeli.
         log.exception("Tarama kaydı yazılamadı (kod=%s)", qr.kisa_kod)

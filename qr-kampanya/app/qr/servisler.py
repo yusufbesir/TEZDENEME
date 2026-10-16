@@ -55,10 +55,11 @@ def _hedef(qr):
 
 
 @transaction.atomic
-def qr_kaydet(qr, request, not_metni="", kaynak=""):
+def qr_kaydet(qr, request, not_metni="", kaynak="", alanlar=None):
     """QR kodu oluşturur veya günceller. Hedef değiştiyse geçmişe yazar.
     Çağıran taraf full_clean() yapmış olmalıdır. `kaynak` (örn. "API, anahtar qrk_ab12…") yalnızca
-    yeni kayıtta denetim kaydının özetine eklenir."""
+    yeni kayıtta denetim kaydının özetine eklenir. `alanlar` (yalnızca güncellemede) verilirse SADECE bu alanlar
+    (+ değiştiren/güncelleme) yazılır: eski (stale) bir nesnenin, eşzamanlı değişmiş diğer alanları (örn. durum) ezmesi önlenir."""
     kullanici = request.user if request and request.user.is_authenticated else None
     yeni = qr.pk is None
     eski = None
@@ -67,7 +68,10 @@ def qr_kaydet(qr, request, not_metni="", kaynak=""):
     if yeni:
         qr.olusturan = kullanici
     qr.degistiren = kullanici
-    qr.save()
+    if alanlar is not None and not yeni:
+        qr.save(update_fields=sorted(set(alanlar) | {"degistiren", "guncelleme"}))
+    else:
+        qr.save()
 
     if yeni:
         HedefGecmisi.objects.create(

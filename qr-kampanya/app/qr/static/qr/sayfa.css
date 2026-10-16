@@ -26,3 +26,14 @@ h1 { font-size: 1.7rem; line-height: 1.25; margin: .25rem 0 .5rem; color: var(--
 .hata-kodu { font-size: 4rem; font-weight: 800; color: var(--vurgu); margin: 0; }
 a { color: var(--vurgu); }
 @media (min-width: 640px) { .galeri { grid-template-columns: repeat(3, 1fr); } h1 { font-size: 2.1rem; } }
+/* İstatistik sayfası (/k/<kod>+) ve SVG grafik: renkler CSS sınıflarıyla (satır içi stil yok) */
+.buyuk-sayi { font-size: 2.4rem; font-weight: 800; margin: 0; color: var(--vurgu); }
+.sessiz { opacity: .75; font-size: .9rem; margin: .25rem 0 0; }
+.grafik svg { width: 100%; height: auto; display: block; }
+.grafik-cubuk { fill: var(--vurgu); }
+.grafik-eksen { stroke: var(--cizgi); stroke-width: 1; }
+.grafik-yazi { fill: var(--kart-yazi); font-size: 11px; font-family: inherit; }
+.ozet-tablo { width: 100%; border-collapse: collapse; }
+.ozet-tablo td { padding: .3rem .2rem; border-bottom: 1px solid var(--cizgi); overflow-wrap: anywhere; }
+.ozet-tablo td.sayi { text-align: right; white-space: nowrap; }
+.kisa-url { overflow-wrap: anywhere; font-family: ui-monospace, monospace; }

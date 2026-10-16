@@ -57,6 +57,7 @@
 				request>headers>X-Forwarded-For delete
 				request>headers>Cookie delete
 				request>headers>Authorization delete
+				request>headers>Referer delete
 			}
 		}
 	}

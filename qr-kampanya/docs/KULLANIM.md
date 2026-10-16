@@ -128,6 +128,38 @@ Satırdaki **Düzenle** bağlantısı, JavaScript açıksa satırın altında k�
 - **Toplam tarama**: bütün açılışlar (botlar hariç).
 - **Tahmini tekil ziyaret**: aynı gün içindeki tekrarlar ayıklanmış tahmin. **Kesin kişi sayısı değildir**: aynı kişi farklı günlerde veya farklı cihazlarla birden çok sayılabilir.
 - **Bot**: bağlantı önizleyicileri ve otomatik tarayıcılar ayrı gösterilir.
+- **Zaman grafiği, yönlendiren siteler ve ülkeler**: aşağıdaki 9a-9c bölümleri.
+
+### 9a. Zaman grafikleri
+
+**QR kod ayrıntısı** ve **İstatistik raporu** sayfalarında hazır aralıklar vardır: **Son 24 saat** (saatlik), **7 gün**, **30 gün** (günlük) ve **Tüm zamanlar** (günlük; ilk taramadan bu yana 180 günden uzunsa haftalık, haftalar pazartesi başlar). Saat dilimi Europe/Istanbul'dur; günler yerel gece yarısında başlar. Grafik sunucuda üretilen basit bir SVG'dir (harici betik yok). **Botları dahil et** işaretlenirse çubuklara bot taramaları da eklenir; varsayılan bot hariçtir. Raporda grafik tüm QR kodları kapsar ve yukarıdaki tarih aralığı formundan bağımsızdır.
+
+### 9b. Yönlendiren siteler ve ülkeler
+
+İstatistik raporunda seçili tarih aralığı için iki tablo vardır (ilk 20, “bot dahil” seçeneğine uyar):
+
+- **Yönlendiren siteler**: taramayı getiren bağlantının **yalnızca alan adı** (ör. `www.ornek.com`). Yol ve sorgu parametreleri hiçbir zaman saklanmaz. Kendi sitemizden gelenler, geçersiz ve IP adresli Referer'lar kaydedilmez. QR kodu okutma çoğunlukla Referer göndermez; “yönlendiren bilgisi olmayan” sayısı tablonun altında ayrıca gösterilir.
+- **Ülkeler**: 2 harfli ülke kodu. Yalnızca GeoIP etkinse dolar (aşağıya bakın).
+
+### 9c. GeoIP ile ülke bilgisi (isteğe bağlı)
+
+Varsayılan olarak ülke tutulmaz. Açmak için MaxMind'ın ücretsiz **GeoLite2 Country** veritabanını **kendiniz** indirirsiniz; bu proje dosyayı indirmez ve dağıtmaz.
+
+1. https://www.maxmind.com adresinden ücretsiz bir GeoLite2 hesabı açın ve lisans koşullarını (GeoLite2 EULA / lisans sözleşmesi; atıf ve kullanım şartları dahil) okuyup kabul edin.
+2. Hesabınızın **Download Files** sayfasından **GeoLite2 Country** (`GeoLite2-Country.mmdb`, `.tar.gz` içinde) dosyasını indirip çıkarın. Otomatik güncelleme için MaxMind'ın `geoipupdate` aracını kendi hesap anahtarınızla çalıştırabilirsiniz; hesap numarasını ve lisans anahtarını `.env`'ye veya depoya **yazmayın**.
+3. Dosyayı sunucuya koyun (ör. `./geoip/GeoLite2-Country.mmdb`) ve `docker-compose.yml` içindeki yorum satırını açın: `- ./geoip/GeoLite2-Country.mmdb:/geoip/GeoLite2-Country.mmdb:ro` (salt okunur).
+4. `.env` içinde `GEOIP_VERITABANI=/geoip/GeoLite2-Country.mmdb` yazıp uygulamayı yeniden başlatın.
+
+Dosya yoksa, okunamazsa ya da ayar boşsa ülke boş kalır; yönlendirme ve diğer işlevler etkilenmez. Veritabanı süreç başına bir kez açılır; dosyayı güncelledikten sonra uygulamayı yeniden başlatın. IP adresi yalnızca arama sırasında bellekte kullanılır, saklanmaz. GeoLite2 yaklaşık bir doğruluk verir; kesin konum değildir.
+
+### 9d. Herkese açık istatistik sayfası: `/k/<kod>+`
+
+YOURLS uyumlu: kısa adresin sonuna `+` eklenirse (`https://alan.adiniz/k/ABC123+`; `%2B` de çalışır) istatistik sayfası açılır, `+all` ise **aynı hedef adrese** giden tüm kodların toplamını gösterir (arşivdeki ve çöp kutusundaki kodlar toplama girmez).
+
+- **Genel ayarlar → herkese açık istatistik sayfası** (varsayılan **KAPALI**). Kapalıyken: giriş yapmış ve `QR kod görüntüleme` yetkisi olan kullanıcı panelde ilgili QR ayrıntısına yönlendirilir (grafikler orada); diğer herkes, kod var olsa bile, “bulunamadı” (404) görür.
+- Açıkken sayfa kimlik doğrulaması gerektirmez ve şunları gösterir: kod, toplam tarama (bot hariç), son 30 gün grafiği, en çok yönlendiren siteler ve ülkeler. **Hedef adres gösterilmez**; göstermek için **herkese açık istatistikte hedef adresi göster** ayarını açın (hedef gizli olabilir).
+- Arşivdeki ve çöp kutusundaki kodlar için 404 verilir. Sayfa arama motorlarına kapalıdır (`noindex`), önbelleğe alınmaz ve yönlendirmeyle aynı IP başına hız sınırına tabidir. Bu istekler **tarama olarak sayılmaz**.
+- Açmadan önce: kısa kodu bilen herkes o kodun tarama sayılarını görebilir. Kısa kodlar basılı olduğundan bunu bilinçli bir tercih olarak ele alın.
 
 ## 10. Hatalı ve mükerrer kayıtlar
 
