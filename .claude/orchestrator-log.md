@@ -34,3 +34,6 @@
 2026-10-16 | 1.1.5 arayüz doğrulama | verifier/sonnet-5-5 | ~46k token | Geçti
 2026-10-16 | TAARKOD adı + logo entegrasyonu | implementer/sonnet-5-5 | ~72k token | 125+40 test geçti
 2026-10-16 | TAARKOD 1.1.5 doğrulama | verifier/sonnet-5-5 | ~46k token | Geçti; exe D:\YusufII\Projeler\Barkod-Siralama\Guncel\ teslim, SHA-256 cihazda eşleşti
+2026-10-16 | Exe/kısayol/kurulum simgesi (afterPack+resedit) | implementer/sonnet-5-5 | ~49k token | testler geçti
+2026-10-16 | "Kuralları saklayın" bölümü yeniden tasarım | implementer/sonnet-5-5 | ~44k token | 126 test geçti
+2026-10-16 | Simge + kurallar bölümü doğrulama | verifier/sonnet-5-5 | ~?k token | Geçti; yeni exe cikti/1.1.5; cihaz aracı kopuk, teslim bekliyor
