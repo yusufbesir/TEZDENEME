@@ -1,5 +1,7 @@
 /// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
 /// Profil) ile kabuk dışı rotalar (ayarlar, ders, mikro ders, alan seçimi).
+/// `/mikro` rotası `mod=zayif` (zayıf noktalar) ve `mod=karisik&ders=<id>`
+/// (ünite sonu serpiştirilmiş tekrar) parametrelerini alır.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -81,7 +83,15 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
-      GoRoute(path: '/mikro', builder: (c, s) => const MikroDersEkrani()),
+      GoRoute(
+        path: '/mikro',
+        // mod=zayif: hata defterinden zayıf noktalar dersi;
+        // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar.
+        builder: (c, s) => MikroDersEkrani(
+          mod: s.uri.queryParameters['mod'],
+          dersId: s.uri.queryParameters['ders'],
+        ),
+      ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],
   );

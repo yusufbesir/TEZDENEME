@@ -124,11 +124,11 @@ Alan+seviye başına: oynanan, kazanılan, en iyi puan, kategori başına doğru
 - Yarışma soru ekranı: zemin nötr (mevcut), kategori rengi yalnızca üst bant ve çark diliminde. Kırmızı zemin yok (Elliot 2007). Süre çubuğu petrol; son 5 saniyede hardala döner (sıcak renk = dikkat; Dzulkifli & Mustafar 2013).
 
 ## 8. Gelecek özellik önerileri (araştırma temelli, bu turda yapılmaz)
-1. **Yarı ömür regresyonu** ile kart aralığı (Settles & Meeder 2016): Leitner yerine kişisel unutma eğrisi.
+1. **Yarı ömür regresyonu (yapıldı, 2026-10-16)** ile kart aralığı (Settles & Meeder 2016): Leitner yerine kişisel unutma eğrisi.
 2. **Açıklayıcı sorgulama kartı**: Tekrar sırasında "Neden?" sorusu; öğrenci kısa açıklama yazar, model cevapla karşılaştırır (d=0,56).
-3. **Hata defteri**: Yanlış bilinen yarışma soruları ve alıştırmalar tek listede; haftalık "zayıf noktalar" mikro dersi.
-4. **Serpiştirilmiş ünite tekrarı**: Ünite sonunda önceki ünitelerden karışık 5 soru (interleaving).
-5. **Haftalık hedef + esnek seri**: Seri dondurma yerine "haftada 5 gün" hedefi (dış ödül baskısını azaltır, iç motivasyonu korur).
+3. **Hata defteri (yapıldı, 2026-10-16)**: Yanlış bilinen yarışma soruları ve alıştırmalar tek listede; haftalık "zayıf noktalar" mikro dersi.
+4. **Serpiştirilmiş ünite tekrarı (yapıldı, 2026-10-16)**: Ünite sonunda önceki ünitelerden karışık 5 soru (interleaving).
+5. **Haftalık hedef + esnek seri (yapıldı, 2026-10-16)**: Seri dondurma yerine "haftada 5 gün" hedefi (dış ödül baskısını azaltır, iç motivasyonu korur).
 6. **Sesli okuma zorunlu dinleme oranı**: A1'de her derste en az 2 dinleme alıştırması (çift kodlama).
 7. **Konuşma alıştırması**: Cihaz STT ile telaffuz; cihazda özel kalır.
 8. **Çevrimdışı A2 ve "Günlük hayat" ünitesi**: içerik genişlemesi; yarışma A2 soruları birlikte gelir. **A2 yapıldı (2026-10-16)**: 12 ders ve 36 yarışma sorusu eklendi; "Günlük hayat" ünitesi ayrıca yapılmadı.
@@ -139,6 +139,13 @@ Alan+seviye başına: oynanan, kazanılan, en iyi puan, kategori başına doğru
 - Oyun ekranı lobiden tam ekran Navigator ile açılır; ayrı go_router rotası yok.
 - Çark durduktan sonra kategori adı 700 ms görünür, sonra soru gelir; hareketi azalt açıkken bekleme yok.
 - Tekrar sekmesi de yalnızca seçili alanın kartlarını gösterir; diğer alanın kartları silinmez, alan değişince görünür.
+
+### 8a-2. Öğrenme motoru turu (2026-10-16): madde 1, 3, 4, 5
+- **Yarı ömür (madde 1):** `Kart` artık `yariOmurGun` (varsayılan 1,0) ve `sonCevap` (bool?, son cevap doğru muydu) taşır. `Motor.kartIsle`: doğruda yarı ömür ×2 (en çok 180 gün), yanlışta ÷2 (en az 0,5 gün); sonraki tekrar = bugün + yarı ömür (tam sayıya yuvarlanır, en az 1 gün). Eski `kutu` alanı kalır ve yarı ömürden türetilir (<2 gün 1, <4 gün 2, <8 gün 3, <16 gün 4, ötesi 5). Eski kayıtta `yariOmurGun` yoksa kutunun eski aralığı (1, 2, 4, 8, 16 gün) başlangıç yarı ömrü olur; böylece mevcut ilerleme geri düşmez. Not: bu, Settles & Meeder'in öğrenilmiş regresyonu değil, onun ×2/÷2 biçiminde basitleştirilmiş kuralıdır.
+- **Hata defteri (madde 3):** `HataKaydi` (tür 'kart' | 'yarisma', kimlik, kategori, seviye, gün) `OgrenciDurumu.hatalar` listesinde tutulur; en çok 200, en eskisi düşer, aynı tür+kimlik tekrar yanlışsa tek kayıt kalır (yenisi sona). Kart yanlışları `Motor.kartIsle` içinde (ders, mikro ders ve Tekrar oturumları hepsi bu yoldan geçer), yarışma yanlışları `Motor.yarismaBitir(..., yanlisSorular:)` ile (oyun ekranı `YarismaOyunu.sonuc.yanlisBilinenler` verir) yazılır. Tekrar sekmesinde "Hata defteri" bölümü (en yeni 20 satır, kategori rengi `KategoriRenkleri` ile + simge + ad) ve "Zayıf noktalar dersi" düğmesi (`/mikro?mod=zayif`) vardır. Zayıf noktalar dersi son 7 günün (bugün dahil) kart hatalarını `Motor.mikroSec(oncelikliKartlar:)` ile önce sorar, kalan yeri normal mikro ders gibi doldurur. Yarışma soruları Alıştırma olmadığından bu derse girmez; yalnız listede görünür.
+- **Serpiştirilmiş ünite tekrarı (madde 4):** Ders kimliğindeki `uN` parçası `Motor.uniteNo` ile çözülür (`ingilizce-1.u1.d1` ve `html-1-u1-d1` biçimleri; `Motor.kursKimligi` kurs kısmını verir). Bir ünitenin son dersi bitince `Motor.serpistirmeSec` aynı kursun önceki ünitelerinden 5 alıştırma seçer (az kullanılan tür önce, ardışık aynı tür yok, `Random(tohum)`); ders özetinde "Karışık tekrar (5 soru)" düğmesi çıkar (`/mikro?mod=karisik&ders=<id>`). İlk ünitede önerilmez. Bitişte `mikroBitir` (XP = `mikroXp`) çalışır.
+- **Haftalık hedef + esnek seri (madde 5):** `OgrenciDurumu.haftalikHedefGun` (3-7, varsayılan 5; Ayarlar'da kaydırıcı). Bu haftaki gün sayısı ayrıca saklanmaz, `gunlukXp`ten hesaplanır (`Motor.haftaGunSayisi`, hafta Pazartesi başlar). Seri kuralı: ardışık gün eskisi gibi +1; arada 1 günden uzun ara varsa seri yalnızca son çalışılan haftada hedef gün sayısı tutulmuşsa ve bugün aynı ya da hemen sonraki haftadaysa kopmaz (+1 ile sürer), aksi halde 1'e düşer. Yol sayfasında seri göstergesinin altında "Bu hafta 3/5 gün" satırı görünür. Günlük XP hedefi aynen kalır.
+- **Veri uyumu:** Yeni alanlar (`yariOmurGun`, `sonCevap`, `hatalar`, `haftalikHedefGun`) yoksa varsayılan değer alınır; bozuk değer sessizce varsayılana döner; `fromJson` fırlatmaz. `test/hata_defteri_test.dart` ve `test/motor_test.dart` eski biçimli JSON'u sınar.
 
 ## 8b. Esnek yerleşim (2026-10-16)
 Düzen kararları kullanılabilir genişliğe göre (LayoutBuilder) verilir; sabitler `Olcu` içinde tek yerdedir (`lib/tema/tema.dart`).

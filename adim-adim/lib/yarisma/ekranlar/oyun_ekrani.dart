@@ -5,7 +5,8 @@
 /// Kurallar `YarismaMotoru`ndadır (bu dosya yalnızca gösterir ve yönlendirir).
 /// Tüm animasyonlar `Olcu.sure` ile ≤250 ms; tek istisna çark (1.200 ms).
 /// Oyun bitince sonuç bir kez kaydedilir: `yarismaKayitProvider.oyunuIsle` ve
-/// `durumProvider.yarismaBitir`. Çıkışta (X) puan kaydedilmez.
+/// `durumProvider.yarismaBitir` (yanlış bilinen sorular hata defterine gider).
+/// Çıkışta (X) puan kaydedilmez.
 /// Yerleşim esnektir: taç ızgarası en çok 240 px'lik hücrelerle akar, kategori
 /// adı iki satıra kadar sarılır.
 library;
@@ -261,7 +262,10 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
       } catch (_) {}
       try {
         await durumHazir;
-        await durum.yarismaBitir(oyun.puan);
+        await durum.yarismaBitir(
+          oyun.puan,
+          yanlisSorular: oyun.sonuc.yanlisBilinenler,
+        );
       } catch (_) {}
     }());
   }

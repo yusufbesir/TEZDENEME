@@ -1,4 +1,5 @@
-/// Öğrenme motoru: XP, seviye, seri, aralıklı tekrar (Leitner) ve cevap kontrolü.
+/// Öğrenme motoru: XP, seviye, esnek seri ve haftalık hedef, yarı ömür tabanlı
+/// aralıklı tekrar, hata defteri, serpiştirilmiş ünite tekrarı ve cevap kontrolü.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
@@ -7,6 +8,7 @@ import 'dart:math' as math;
 
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../yarisma/model.dart';
 
 /// Seviye bilgisi.
 class Seviye {
@@ -31,9 +33,6 @@ class Seviye {
 }
 
 abstract final class Motor {
-  /// Leitner kutularının gün aralıkları (kutu 1..5).
-  static const List<int> _araliklar = [1, 2, 4, 8, 16];
-
   /// Seviye hesabında taşmayı önlemek için XP üst sınırı.
   static const int _xpUst = 1 << 50;
 
@@ -110,9 +109,42 @@ abstract final class Motor {
   static int gosterilenSeri(OgrenciDurumu d, [String? bugun]) {
     final sonGun = d.sonGun;
     if (sonGun == null) return 0;
-    final fark = gunFarki(sonGun, bugun ?? Motor.bugun());
-    if (fark < 0 || fark > 1) return 0;
-    return d.seri;
+    final b = bugun ?? Motor.bugun();
+    final fark = gunFarki(sonGun, b);
+    if (fark < 0) return 0;
+    if (fark <= 1) return d.seri;
+    return _seriKopmadi(d, sonGun, b) ? d.seri : 0;
+  }
+
+  /// Günün haftasının Pazartesi'si 'YYYY-MM-DD'; geçersiz günde aynı metin.
+  static String haftaBaslangici(String gun) {
+    final t = _gunCoz(gun);
+    if (t == null) return gun;
+    final r = t.subtract(Duration(days: t.weekday - DateTime.monday));
+    return _bicim(r.year, r.month, r.day);
+  }
+
+  /// [bugun] gününün haftasında (Pazartesi başlangıç) XP kazanılan gün sayısı.
+  /// Ayrı sayaç tutulmaz; `gunlukXp`ten hesaplanır, bu yüzden eski kayıtlarda da çalışır.
+  static int haftaGunSayisi(OgrenciDurumu d, String bugun) {
+    if (!OgrenciDurumu.gunGecerli(bugun)) return 0;
+    final pzt = haftaBaslangici(bugun);
+    var n = 0;
+    for (final e in d.gunlukXp.entries) {
+      if (e.value <= 0) continue;
+      final f = gunFarki(pzt, e.key);
+      if (f >= 0 && f <= 6) n++;
+    }
+    return n;
+  }
+
+  /// Esnek seri: [sonGun] ile [bugun] arasında 1 günden uzun ara varsa seri
+  /// yalnızca son çalışılan haftada hedef gün sayısı tutulmuşsa ve bugün aynı
+  /// ya da hemen sonraki haftadaysa kopmaz (araya tam boş hafta girmemiş olur).
+  static bool _seriKopmadi(OgrenciDurumu d, String sonGun, String bugun) {
+    if (haftaGunSayisi(d, sonGun) < d.haftalikHedefGun) return false;
+    final hafta = gunFarki(haftaBaslangici(sonGun), haftaBaslangici(bugun));
+    return hafta == 0 || hafta == 7;
   }
 
   /// XP kazancını işler: toplam XP, günlük XP, seri, en iyi seri ve son gün.
@@ -124,6 +156,10 @@ abstract final class Motor {
       yeniSeri = d.seri;
     } else if (son != null && gunFarki(son, bugun) == 1) {
       yeniSeri = d.seri + 1;
+    } else if (son != null &&
+        gunFarki(son, bugun) > 1 &&
+        _seriKopmadi(d, son, bugun)) {
+      yeniSeri = d.seri + 1; // haftalık hedef tutuldu: günlük ara seriyi bozmaz
     } else {
       yeniSeri = 1;
     }
@@ -169,11 +205,71 @@ abstract final class Motor {
 
   /// Yarışma bitişi: XP = max(5, puan ~/ 5); negatif puan 0 sayılır.
   /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez.
-  static OgrenciDurumu yarismaBitir(OgrenciDurumu d, int puan, String bugun) {
+  /// [yanlisSorular]: oyunda yanlış bilinen sorular; hata defterine işlenir.
+  static OgrenciDurumu yarismaBitir(
+    OgrenciDurumu d,
+    int puan,
+    String bugun, {
+    List<YarismaSorusu> yanlisSorular = const [],
+  }) {
     final p = puan < 0 ? 0 : puan;
     final kazanc = p ~/ 5 < 5 ? 5 : p ~/ 5;
-    return _kazancIsle(d, kazanc, bugun);
+    var yeni = _kazancIsle(d, kazanc, bugun);
+    for (final s in yanlisSorular) {
+      yeni = hataEkle(
+        yeni,
+        HataKaydi(
+          tur: HataKaydi.turYarisma,
+          id: s.id,
+          kategori: s.kategori.kimlik,
+          seviye: s.seviyeKursId,
+          gun: bugun,
+        ),
+      );
+    }
+    return yeni;
   }
+
+  /// Hata defterine kayıt ekler. Aynı tür+kimlik varsa eskisi düşer (yenisi
+  /// sona gelir); liste en çok [HataKaydi.enCok] kayıt tutar, en eskisi düşer.
+  static OgrenciDurumu hataEkle(OgrenciDurumu d, HataKaydi h) {
+    final liste = [
+      for (final e in d.hatalar)
+        if (!(e.tur == h.tur && e.id == h.id)) e,
+      h,
+    ];
+    final kes = liste.length > HataKaydi.enCok
+        ? liste.sublist(liste.length - HataKaydi.enCok)
+        : liste;
+    return d.copyWith(hatalar: List.unmodifiable(kes));
+  }
+
+  /// Son 7 günün (bugün dahil) kart hatalarının kart kimlikleri, en yeni
+  /// hata önce, tekrarsız. "Zayıf noktalar" mikro dersinin öncelikli kartları.
+  static List<String> zayifKartlar(OgrenciDurumu d, String bugun) {
+    final sonuc = <String>[];
+    for (final h in d.hatalar.reversed) {
+      if (h.tur != HataKaydi.turKart) continue;
+      final fark = gunFarki(h.gun, bugun);
+      if (fark < 0 || fark > 6) continue;
+      if (!sonuc.contains(h.id)) sonuc.add(h.id);
+    }
+    return sonuc;
+  }
+
+  static final _dersKimligi = RegExp(r'^(.+?)[.\-]u(\d+)[.\-]d(\d+)$');
+
+  /// Ders kimliğindeki ünite numarası: 'ingilizce-1.u2.d1' ve 'html-1-u2-d1'
+  /// için 2; tanınmayan biçimde null.
+  static int? uniteNo(String dersId) {
+    final m = _dersKimligi.firstMatch(dersId);
+    return m == null ? null : int.tryParse(m.group(2)!);
+  }
+
+  /// Ders kimliğindeki kurs kimliği ('ingilizce-1.u1.d1' -> 'ingilizce-1');
+  /// tanınmayan biçimde null.
+  static String? kursKimligi(String dersId) =>
+      _dersKimligi.firstMatch(dersId)?.group(1);
 
   /// Seçilen alana ait kurslar: 'dil' → dil, 'kod' → kod, diğer → boş.
   static List<Kurs> alanKurslari(List<Kurs> kurslar, String? alan) {
@@ -212,16 +308,24 @@ abstract final class Motor {
   /// kalan yerler sıradaki dersten ve tamamlanmış derslerden doldurulur.
   /// Dolgu karışıktır; mümkünse aynı türden ardışık iki alıştırma gelmez.
   /// Aynı kart iki kez gelmez. [tohum] aynıysa sonuç aynıdır.
+  /// [oncelikliKartlar] (ör. hata defterindeki zayıf noktalar) verilirse bu
+  /// kartlar, çözülebiliyorsa, zamanı gelen kartlardan bile önce gelir.
   static List<({String kartId, Alistirma alistirma})> mikroSec(
     OgrenciDurumu d,
     List<Kurs> kurslar,
     String bugun, {
     int adet = 5,
     int tohum = 0,
+    List<String> oncelikliKartlar = const [],
   }) {
     final sonuc = <({String kartId, Alistirma alistirma})>[];
     if (adet <= 0) return sonuc;
     final alinan = <String>{};
+    for (final id in oncelikliKartlar) {
+      if (sonuc.length >= adet) return sonuc;
+      final a = kartCoz(kurslar, id);
+      if (a != null && alinan.add(id)) sonuc.add((kartId: id, alistirma: a));
+    }
     for (final id in tekrarBekleyen(d, bugun)) {
       if (sonuc.length >= adet) return sonuc;
       final a = kartCoz(kurslar, id);
@@ -258,23 +362,110 @@ abstract final class Motor {
     return sonuc;
   }
 
-  /// Leitner: doğru → kutu+1 (en çok 5), yanlış → kutu 1.
-  /// Kart henüz yoksa kutu 1 kabul edilir.
+  /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2
+  /// (en çok 180 gün), yanlışta /2 (en az 0,5 gün). Sonraki tekrar = bugün +
+  /// yarı ömür (tam sayıya yuvarlanır, en az 1 gün). Kart henüz yoksa yarı ömür
+  /// 1 gün kabul edilir. `kutu` yarı ömürden türetilen 1..5 göstergedir.
+  /// Yanlış cevap ayrıca hata defterine yazılır.
   static OgrenciDurumu kartIsle(
     OgrenciDurumu d,
     String kartId,
     bool dogruMu,
     String bugun,
   ) {
-    final mevcut = d.kartlar[kartId]?.kutu ?? 1;
-    final kutu = dogruMu ? (mevcut + 1 > 5 ? 5 : mevcut + 1) : 1;
-    final sonraki = _gunEkle(bugun, _araliklar[kutu - 1]);
-    return d.copyWith(
+    final mevcut = d.kartlar[kartId]?.yariOmurGun ?? 1.0;
+    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
+    final yariOmur = ham < Kart.enAzYariOmur
+        ? Kart.enAzYariOmur
+        : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
+    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
+    final yeni = d.copyWith(
       kartlar: {
         ...d.kartlar,
-        kartId: Kart(kutu: kutu, sonraki: sonraki),
+        kartId: Kart(
+          kutu: Kart.kutuHesapla(yariOmur),
+          sonraki: _gunEkle(bugun, aralik),
+          yariOmurGun: yariOmur,
+          sonCevap: dogruMu,
+        ),
       },
     );
+    if (dogruMu) return yeni;
+    final ayrac = kartId.lastIndexOf('#');
+    final dersId = ayrac > 0 ? kartId.substring(0, ayrac) : kartId;
+    return hataEkle(
+      yeni,
+      HataKaydi(
+        tur: HataKaydi.turKart,
+        id: kartId,
+        seviye: kursKimligi(dersId) ?? '',
+        gun: bugun,
+      ),
+    );
+  }
+
+  /// Serpiştirilmiş ünite tekrarı: [dersId] kendi ünitesinin son dersiyse ve
+  /// aynı kursta önceki üniteler varsa, onlardan karışık [adet] alıştırma
+  /// seçer; aksi halde boş liste. Seçimde türler serpiştirilir (az kullanılan
+  /// tür önce, ardışık aynı tür yok) ve sıra [tohum]'a bağlıdır.
+  static List<({String kartId, Alistirma alistirma})> serpistirmeSec(
+    List<Kurs> kurslar,
+    String dersId, {
+    int adet = 5,
+    int tohum = 0,
+  }) {
+    final sonuc = <({String kartId, Alistirma alistirma})>[];
+    if (adet <= 0) return sonuc;
+    for (final kurs in kurslar) {
+      final n = kurs.uniteler.indexWhere(
+        (u) => u.dersler.isNotEmpty && u.dersler.last.id == dersId,
+      );
+      if (n < 0) continue;
+      // Önceki üniteler: ders kimliğinden okunan ünite numarası küçük olanlar;
+      // numara okunamazsa sıra indeksine düşülür.
+      final no = uniteNo(dersId) ?? (n + 1);
+      final havuz = <({String kartId, Alistirma alistirma})>[];
+      for (var i = 0; i < kurs.uniteler.length; i++) {
+        final u = kurs.uniteler[i];
+        final uNo = u.dersler.isEmpty ? null : uniteNo(u.dersler.first.id);
+        final onceki = uNo != null ? uNo < no : i < n;
+        if (!onceki) continue;
+        for (final ders in u.dersler) {
+          for (var k = 0; k < ders.alistirmalar.length; k++) {
+            havuz.add((
+              kartId: ders.kartKimligi(k),
+              alistirma: ders.alistirmalar[k],
+            ));
+          }
+        }
+      }
+      havuz.shuffle(math.Random(tohum));
+      final turSayisi = <String, int>{};
+      while (sonuc.length < adet && havuz.isNotEmpty) {
+        final onceki = sonuc.isEmpty ? null : sonuc.last.alistirma.tur;
+        var en = -1;
+        var enAz = 1 << 30;
+        for (var i = 0; i < havuz.length; i++) {
+          final tur = havuz[i].alistirma.tur;
+          if (tur == onceki) continue;
+          final c = turSayisi[tur] ?? 0;
+          if (c < enAz) {
+            enAz = c;
+            en = i;
+          }
+        }
+        if (en < 0) en = 0; // yalnız aynı tür kaldı
+        final secilen = havuz.removeAt(en);
+        turSayisi.update(
+          secilen.alistirma.tur,
+          (c) => c + 1,
+          ifAbsent: () => 1,
+        );
+        sonuc.add(secilen);
+      }
+      return sonuc;
+    }
+    return sonuc;
   }
 
   /// Zamanı gelen kartlar: önce en eski tarih, eşitse kimliğe göre.
