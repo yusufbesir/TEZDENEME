@@ -29,6 +29,7 @@ Panel: `https://ALAN-ADINIZ/panel/` (yerel denemede `http://localhost/panel/`).
 | [docs/MIMARI.md](docs/MIMARI.md) | Mimari karşılaştırma (YOURLS vs özel uygulama), seçim gerekçesi, akışlar |
 | [docs/KURULUM.md](docs/KURULUM.md) | Alan adı, DNS, VPS hazırlığı, Docker, kurulum |
 | [docs/KULLANIM.md](docs/KULLANIM.md) | Panel kullanım kılavuzu |
+| [docs/REHBER.md](docs/REHBER.md) | Yusuf için ayrıntılı, adım adım kullanım rehberi (teknik olmayan okuyucu) |
 | [docs/API.md](docs/API.md) | Kimlik doğrulamalı JSON/XML API (`/api/v1/`), anahtarlar, curl örnekleri |
 | [docs/VERI-MODELI.md](docs/VERI-MODELI.md) | Veritabanı tabloları, ilişkiler, KVKK notları |
 | [docs/GUVENLIK.md](docs/GUVENLIK.md) | Güvenlik önlemleri ve **üretim öncesi kontrol listesi** |

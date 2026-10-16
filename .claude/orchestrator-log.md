@@ -81,3 +81,5 @@
 | 2026-10-16 | Yeniden doğrulama: 5. parça | verifier / claude-sonnet-5-5 | tahmini girdi ~40k, çıktı ~5k | Geçti: docker build geçti, CMD JSON; 24 girdi doğru; 762 (aralıklı SIGHUP tek başına 21/21 OK) |
 | 2026-10-16 | YOURLS 6. parça: eklenti kancaları, sistem bilgisi, surum-denetimi.sh, yönetim IP kısıtı, aralıklı sinyal testinin kök neden düzeltmesi | implementer / claude-sonnet-5-5 | tahmini girdi ~320k, çıktı ~45k | Tamamlandı: 59 yeni test, tam takım 821 OK; yük altında 100/100 |
 | 2026-10-16 | Doğrulama: YOURLS 6. parça | verifier / claude-sonnet-5-5 | tahmini girdi ~150k, çıktı ~12k | Geçti: 821 OK; yük altında sinyal sınıfı 10/10; shellcheck temiz; IP kısıtı atlatma denemeleri geçti |
+| 2026-10-16 | docs/REHBER.md rehberi (14 bölüm, 696 satır) + README bağlantısı | implementer / claude-sonnet-5-5 | tahmini toplam ~194k (37 araç çağrısı) | Tamamlandı, doğrulamaya gidiyor |
+| 2026-10-16 | Doğrulama: docs/REHBER.md | verifier / claude-sonnet-5-5 | tahmini toplam ~71k (11 araç çağrısı) | Geçti; 1 Orta (parola kurtarma yanıltıcı) + 1 Düşük (örnek IP notu) Opus tarafından düzeltildi: changepassword komutu  ile doğrulandı |
