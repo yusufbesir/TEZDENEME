@@ -48,3 +48,6 @@
 - 2026-10-15 | Siber Güvenlik düşük öneriler: storeFile mutlak yol zorunlu, *.p12 gitignore | ana oturum (Fable 5.1) | - | tamam
 - 2026-10-16 | Alan alanı, mikroSec/mikroBitir/yarismaBitir/alanKurslari motor işlevleri, notifier metotları | implementer (claude-sonnet-5-5) | ~50.7K token | tamam (17 test eklendi, 138 geçti)
 - 2026-10-16 | Alan + mikro ders motorunu doğrula | verifier (claude-sonnet-5-5) | ~32.4K token | Geçti (analyze kapsamda temiz, 111 test)
+- 2026-10-16 | Yarışma paketi: model, 108 soru, motor, depo, sağlayıcılar, 45 test | implementer (claude-sonnet-5-5) | ~106K token | tamam
+- 2026-10-16 | Yarışma paketi ve soru olgularını doğrula | verifier (claude-sonnet-5-5) | ~80K token | Geçti (1 dil bilgisi düzeltmesi: neden→nereden, ana oturum uyguladı)
+- 2026-10-16 | Sade arayüz, alan seçimi, 4 sekme, mikro ders ekranı, animasyonlar, 13 arayüz testi | implementer (claude-sonnet-5-5) | ~90K token | tamam (189 test)
