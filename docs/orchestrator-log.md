@@ -78,3 +78,5 @@
 | 2026-10-16 | original-fs düzeltmesi doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~25k | Geçti. 126 test; tüm fs erişimi seçilen fs üzerinden. |
 | 2026-10-16 | VC++ DLL'lerini MSI'daki amd64 sürümlerinden alma, mimari denetimi, 1.0.3 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 44068 | Tamamlandı, 130 test geçti; vendor DLL'leri x64 ile değiştirildi |
 | 2026-10-16 | VC++ DLL x64 düzeltmesi doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. 130 test; gerçek MSI'dan 10 DLL 0x8664; vendor denetimi exit 0. |
+| 2026-10-16 | Bilinen Python kalıntılarını hash'li listeyle temizleme, 1.0.4 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 55229 | Tamamlandı, 137 test; 1373 girdi |
+| 2026-10-16 | Kalıntı temizliği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~35k | Geçti. 137 test; 20 örnek hash eşleşti; güvenlik zinciri korunuyor. |
