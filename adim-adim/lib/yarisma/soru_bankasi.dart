@@ -4,6 +4,7 @@ library;
 
 import 'model.dart';
 import 'sorular/ingilizce_a1.dart';
+import 'sorular/ingilizce_a2.dart';
 import 'sorular/programlama_1.dart';
 import 'sorular/programlama_2.dart';
 import 'sorular/programlama_3.dart';
@@ -11,6 +12,7 @@ import 'sorular/programlama_3.dart';
 /// Tüm sorular (değiştirilemez liste).
 final List<YarismaSorusu> tumSorular = List.unmodifiable([
   ...ingilizceA1Sorulari,
+  ...ingilizceA2Sorulari,
   ...programlama1Sorulari,
   ...programlama2Sorulari,
   ...programlama3Sorulari,
@@ -24,7 +26,10 @@ List<YarismaSorusu> sorulariBul(String alan, String kursId) => [
 
 /// Alanın seviyeleri; bilinmeyen alan için boş liste.
 List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
-  'dil' => const [YarismaSeviye(kursId: 'ingilizce-1', etiket: 'A1')],
+  'dil' => const [
+    YarismaSeviye(kursId: 'ingilizce-1', etiket: 'A1'),
+    YarismaSeviye(kursId: 'ingilizce-2', etiket: 'A2'),
+  ],
   'kod' => const [
     YarismaSeviye(kursId: 'html-1', etiket: 'HTML'),
     YarismaSeviye(kursId: 'css-1', etiket: 'CSS'),

@@ -131,7 +131,7 @@ Alan+seviye başına: oynanan, kazanılan, en iyi puan, kategori başına doğru
 5. **Haftalık hedef + esnek seri**: Seri dondurma yerine "haftada 5 gün" hedefi (dış ödül baskısını azaltır, iç motivasyonu korur).
 6. **Sesli okuma zorunlu dinleme oranı**: A1'de her derste en az 2 dinleme alıştırması (çift kodlama).
 7. **Konuşma alıştırması**: Cihaz STT ile telaffuz; cihazda özel kalır.
-8. **Çevrimdışı A2 ve "Günlük hayat" ünitesi**: içerik genişlemesi; yarışma A2 soruları birlikte gelir.
+8. **Çevrimdışı A2 ve "Günlük hayat" ünitesi**: içerik genişlemesi; yarışma A2 soruları birlikte gelir. **A2 yapıldı (2026-10-16)**: 12 ders ve 36 yarışma sorusu eklendi; "Günlük hayat" ünitesi ayrıca yapılmadı.
 
 ## 8a. Uygulama notları (2026-10-16, ilk sürüm)
 - Değişti: `/alan-sec` yönlendirmesi yalnız alan boşken çalışır; Profil'deki "Değiştir" alan doluyken de bu ekranı açar.
