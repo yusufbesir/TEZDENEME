@@ -63,3 +63,4 @@
 - 2026-10-16 | Esnek yerleşimi doğrula | verifier (claude-sonnet-5-5) | ~56K token | Kaldı → FittedBox 11 px alt sınırını deliyor (hedef_halkasi, yarisma istatistik, profil çubuk); implementer'a geri verildi
 - 2026-10-16 | Esnek yerleşim düzeltme turu: siganMetin/kisaSayi, FittedBox kaldırıldı, 11 px alt sınır testleri | implementer (claude-sonnet-5-5) | ~35K token | tamam (237 test; birleştirme ve verifier bekliyor)
 - 2026-10-16 | İngilizce B1 kursu (12 ders, 120 alıştırma) + 36 B1 yarışma sorusu | implementer (claude-sonnet-5-5) | ~110K token | tamam (224 test; birleştirme ve verifier bekliyor)
+- 2026-10-16 | Motor dalı birleştirme çakışmaları (4 dosya) | implementer (claude-sonnet-5-5) | ~50K token | tamam (315 test, analyze temiz)
