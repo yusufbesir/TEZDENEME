@@ -447,7 +447,7 @@ def analiz_et(ia, kalici=False):
         for i in range(0, len(urller), 1000):
             for url, kod in (
                 QRKod.objects.filter(hedef_turu=QRKod.HedefTuru.HARICI, hedef_url__in=urller[i:i + 1000])
-                .exclude(durum=QRKod.Durum.ARSIV).order_by("kod_anahtari").values_list("hedef_url", "kisa_kod")
+                .exclude(durum__in=[QRKod.Durum.ARSIV, QRKod.Durum.COP]).order_by("kod_anahtari").values_list("hedef_url", "kisa_kod")
             ):
                 ayni_hedef.setdefault(url, []).append(kod)
 
@@ -495,6 +495,8 @@ def _satir_coz(no, d, kod_satirlari, mevcut, sayfalar, iliskili_mevcut, iliskili
             r.hata("kod", ayrilmis_hata)
     if eski is not None and eski.durum == QRKod.Durum.ARSIV:
         r.hata("kod", "Kod arşivde; arşivdeki kodlar içe aktarmayla güncellenemez.")
+    if eski is not None and eski.durum == QRKod.Durum.COP:
+        r.hata("kod", "Kod çöp kutusunda; çöpteki kodlar içe aktarmayla güncellenemez (önce geri yükleyin).")
 
     # Tür
     tur = None

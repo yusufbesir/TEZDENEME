@@ -4,7 +4,9 @@ böylece hedef geçmişi ve denetim kaydı her zaman tutulur."""
 import io
 
 import segno
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
 
 from .middleware import ip_maskele, istemci_ip
 from .models import DenetimKaydi, GenelAyarlar, HedefGecmisi, QRKod, otomatik_kisa_kod
@@ -95,6 +97,8 @@ def qr_durum_degistir(qr_listesi, yeni_durum, request):
     """Toplu aktif/pasif/arşiv. Silme yoktur."""
     if yeni_durum not in QRKod.Durum.values:
         raise ValueError("Geçersiz durum")
+    if yeni_durum == QRKod.Durum.COP:
+        raise ValueError("Çöp kutusuna taşıma için qr_cope_tasi kullanılır")
     # Değişiklik, önceden okunmuş (eski olabilen) nesne üzerinde değil, kilitli TAZE satır üzerinde yapılır;
     # böylece eşzamanlı bir hedef değişikliği ezilmez. Kilitler pk sırasıyla alınır (kilitlenme riski azalır).
     idler = sorted({qr.pk for qr in qr_listesi})
@@ -102,11 +106,63 @@ def qr_durum_degistir(qr_listesi, yeni_durum, request):
     sayi = 0
     for pk in idler:
         qr = taze.get(pk)
-        if qr is not None and qr.durum != yeni_durum:
+        # Çöpteki kod durum işlemiyle değiştirilemez; yalnızca qr_copten_geri_yukle ile çıkar.
+        if qr is not None and qr.durum != yeni_durum and qr.durum != QRKod.Durum.COP:
             qr.durum = yeni_durum
             qr_kaydet(qr, request)
             sayi += 1
     return sayi
+
+
+@transaction.atomic
+def qr_cope_tasi(qr_listesi, request):
+    """Kodları çöp kutusuna TAŞIR (kalıcı silme yoktur). Önceki durum saklanır; kısa kod başkasına verilmez.
+    Taşınan kod sayısını döndürür. Her taşıma denetim kaydına yazılır."""
+    kullanici = request.user if request and request.user.is_authenticated else None
+    idler = sorted({qr.pk for qr in qr_listesi})
+    taze = {q.pk: q for q in QRKod.objects.select_for_update().filter(pk__in=idler).order_by("pk")}
+    sayi = 0
+    for pk in idler:
+        qr = taze.get(pk)
+        if qr is None or qr.durum == QRKod.Durum.COP:
+            continue
+        onceki = qr.durum
+        qr.onceki_durum = onceki
+        qr.durum = QRKod.Durum.COP
+        qr.cope_atilma = timezone.now()
+        qr.degistiren = kullanici
+        qr.save()
+        denetim_yaz(request, "qr_cope_tasi", qr, f"{qr.kisa_kod}: {onceki} → çöp kutusu")
+        sayi += 1
+    return sayi
+
+
+@transaction.atomic
+def qr_copten_geri_yukle(qr_listesi, request):
+    """Çöpteki kodları `onceki_durum`a döndürür (kayıt yoksa/geçersizse güvenli tarafta kalıp pasif).
+    (geri_yuklenen_sayi, atlanan_kisa_kodlar) döndürür; hedef bilgisi tutarsız olan aktif/pasif dönüşler atlanır."""
+    kullanici = request.user if request and request.user.is_authenticated else None
+    idler = sorted({qr.pk for qr in qr_listesi})
+    taze = {q.pk: q for q in QRKod.objects.select_for_update().filter(pk__in=idler).order_by("pk")}
+    sayi, atlanan = 0, []
+    for pk in idler:
+        qr = taze.get(pk)
+        if qr is None or qr.durum != QRKod.Durum.COP:
+            continue
+        hedef = qr.onceki_durum if qr.onceki_durum in (QRKod.Durum.AKTIF, QRKod.Durum.PASIF, QRKod.Durum.ARSIV) else QRKod.Durum.PASIF
+        qr.durum = hedef
+        try:
+            qr.full_clean()
+        except ValidationError:
+            atlanan.append(qr.kisa_kod)
+            continue
+        qr.onceki_durum = ""
+        qr.cope_atilma = None
+        qr.degistiren = kullanici
+        qr.save()
+        denetim_yaz(request, "qr_copten_geri_yukle", qr, f"{qr.kisa_kod}: çöp kutusu → {hedef}")
+        sayi += 1
+    return sayi, atlanan
 
 
 # --- Otomatik kısa kod üretimi ---

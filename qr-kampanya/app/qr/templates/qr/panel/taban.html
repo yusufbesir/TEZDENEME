@@ -16,7 +16,8 @@
   <nav class="menu" aria-label="Ana menü">
     {% if perms.qr.add_qrkod %}<a href="{% url 'panel:hizli_kisalt' %}">Hızlı kısalt</a>{% endif %}
     {% if perms.qr.view_qrkod %}<a href="{% url 'panel:ana' %}">Pano</a>
-    <a href="{% url 'panel:qr_liste' %}">QR kodlar</a>{% endif %}
+    <a href="{% url 'panel:qr_liste' %}">QR kodlar</a>
+    <a href="{% url 'panel:cop_kutusu' %}">Çöp kutusu</a>{% endif %}
     {% if perms.qr.add_qrkod %}<a href="{% url 'panel:ice_aktarma_liste' %}">İçe aktar</a>{% endif %}
     {% if perms.qr.view_kampanya %}<a href="{% url 'panel:kampanya_liste' %}">Kampanyalar</a>{% endif %}
     {% if perms.qr.view_kampanyasayfasi %}<a href="{% url 'panel:sayfa_liste' %}">Sayfalar</a>{% endif %}

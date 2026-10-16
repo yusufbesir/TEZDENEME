@@ -41,8 +41,12 @@ urlpatterns = [
     path("qr/ice-aktar/<uuid:pk>/zip", ice_aktarma.ice_aktarma_zip, name="ice_aktarma_zip"),
     path("qr/<int:pk>/", qrler.qr_detay, name="qr_detay"),
     path("qr/<int:pk>/duzenle", qrler.qr_duzenle, name="qr_duzenle"),
+    path("qr/<int:pk>/hizli-duzenle", qrler.qr_hizli_duzenle, name="qr_hizli_duzenle"),
     path("qr/<int:pk>/png", qrler.qr_png_gorunumu, name="qr_png"),
     path("qr/<int:pk>/svg", qrler.qr_svg_gorunumu, name="qr_svg"),
+
+    path("cop-kutusu/", qrler.cop_kutusu, name="cop_kutusu"),
+    path("cop-kutusu/geri-yukle", qrler.cop_geri_yukle, name="cop_geri_yukle"),
 
     path("rapor/hatali", rapor.hatali_kayitlar, name="hatali"),
     path("rapor/istatistik", rapor.istatistik_raporu, name="istatistik"),

@@ -162,7 +162,7 @@ class PanoTesti(TemelTest):
         self.giris(self.izleyici)
         yanit = self.client.get("/panel/")
         self.assertEqual(yanit.status_code, 200)
-        self.assertEqual(dict(yanit.context["sayilar"]), {"toplam": 5, "aktif": 3, "pasif": 1, "arsiv": 1})
+        self.assertEqual(dict(yanit.context["sayilar"]), {"toplam": 5, "aktif": 3, "pasif": 1, "arsiv": 1, "cop": 0})
         self.assertEqual(yanit.context["aktif_kampanya"], 2)  # YAKIN + UZAK
         self.assertEqual([k.kod for k in yanit.context["yaklasan_kampanya"]], ["YAKIN"])
         self.assertEqual(sorted(q.kisa_kod for q in yanit.context["yaklasan_qr"]), ["P-A1", "P-A2"])

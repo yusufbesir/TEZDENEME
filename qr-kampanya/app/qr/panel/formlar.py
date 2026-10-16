@@ -95,6 +95,9 @@ class QRKodForm(TemelForm):
         super().__init__(*args, **kwargs)
         kod = self.fields["kisa_kod"]
         kod.required = False
+        # Çöp kutusuna yalnızca “Çöp kutusuna taşı” işlemiyle (onceki_durum saklanarak) girilir; forma seçenek olarak konmaz.
+        if "durum" in self.fields:
+            self.fields["durum"].choices = [(d, e) for d, e in QRKod.Durum.choices if d != QRKod.Durum.COP]
         if self.instance.pk:
             kod.disabled = True
             kod.help_text = "Basılmış kodlar bozulmasın diye kısa kod değiştirilemez."
@@ -169,7 +172,7 @@ class QRKodForm(TemelForm):
             return
         kodlar = list(
             QRKod.objects.filter(hedef_turu=QRKod.HedefTuru.HARICI, hedef_url=url)
-            .exclude(durum=QRKod.Durum.ARSIV).order_by("kod_anahtari").values_list("kisa_kod", flat=True)[:10]
+            .exclude(durum__in=[QRKod.Durum.ARSIV, QRKod.Durum.COP]).order_by("kod_anahtari").values_list("kisa_kod", flat=True)[:10]
         )
         if not kodlar:
             return
@@ -205,6 +208,37 @@ class QRKodForm(TemelForm):
     def uyarilari_goster(self, request):
         """Kayıt başarılı olduktan sonra (yönlendirme sonrası görünür) uyarıları mesaj olarak ekler."""
         for uyari in getattr(self, "uyarilar", []):
+            messages.warning(request, uyari)
+
+
+class HizliDuzenleForm(TemelForm):
+    """Listeden satır içi düzenleme: yalnızca ad, başlık ve (harici hedefli QR'da) hedef URL. Hedef alanı doğrulaması QRKodForm
+    ile aynıdır (model doğrulayıcısı guvenli_url_dogrula: şema, özel/yerel IP, kullanıcı bilgisi; IDN uyarısı). Sayfa hedefli
+    QR'da hedef alanı yoktur; gönderilen hedef_url yok sayılır."""
+
+    class Meta:
+        model = QRKod
+        fields = ["ad", "baslik", "hedef_url"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.hedef_turu != QRKod.HedefTuru.HARICI:
+            del self.fields["hedef_url"]
+        else:
+            self.fields["hedef_url"].required = True
+        self.uyarilar = []
+
+    def clean(self):
+        veri = super().clean()
+        if idn_mi(veri.get("hedef_url")):
+            self.uyarilar.append(
+                f"{self.fields['hedef_url'].label}: alan adı uluslararası karakter (IDN/punycode) içeriyor. "
+                "Benzer görünen karakterlerle taklit edilmiş bir alan adı olabilir; adresi dikkatle kontrol edin."
+            )
+        return veri
+
+    def uyarilari_goster(self, request):
+        for uyari in self.uyarilar:
             messages.warning(request, uyari)
 
 

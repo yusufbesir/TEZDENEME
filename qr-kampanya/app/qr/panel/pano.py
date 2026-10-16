@@ -75,6 +75,7 @@ def ana(request):
         aktif=Count("id", filter=Q(durum=QRKod.Durum.AKTIF)),
         pasif=Count("id", filter=Q(durum=QRKod.Durum.PASIF)),
         arsiv=Count("id", filter=Q(durum=QRKod.Durum.ARSIV)),
+        cop=Count("id", filter=Q(durum=QRKod.Durum.COP)),
     )
     aktif_kampanya = Kampanya.objects.filter(aktif=True).filter(Q(bitis__isnull=True) | Q(bitis__gt=an)).count()
     yaklasan_kampanya = Kampanya.objects.filter(aktif=True, bitis__gt=an, bitis__lte=yaklasan_son).order_by("bitis")

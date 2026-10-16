@@ -31,9 +31,19 @@
     <p>Son 30 gün tarama: <strong>{{ tarama.insan }}</strong> (bot hariç) · bot: {{ tarama.bot }}</p>
     <div class="eylemler">
       {% if test_url %}<a class="dugme ikincil" href="{{ test_url }}" target="_blank" rel="noopener noreferrer">Hedefi test et (yeni sekme)</a>{% endif %}
-      {% if perms.qr.change_qrkod %}<a class="dugme" href="{% url 'panel:qr_duzenle' qr.pk %}">Düzenle</a>{% endif %}
+      {% if perms.qr.change_qrkod and qr.durum != "cop" %}<a class="dugme" href="{% url 'panel:qr_duzenle' qr.pk %}">Düzenle</a>{% endif %}
     </div>
+    {% if qr.durum == "cop" %}
+    <div class="uyari-kutu">Bu kod çöp kutusunda{% if qr.cope_atilma %} ({{ qr.cope_atilma|date:"d.m.Y H:i" }} tarihinde taşındı){% endif %}; taranınca "kullanımda değil" (HTTP 410) yanıtı verir.
+      {% if qr.onceki_durum_metni %}Önceki durumu: {{ qr.onceki_durum_metni }}.{% endif %}</div>
     {% if perms.qr.change_qrkod %}
+    <form method="post" action="{% url 'panel:cop_geri_yukle' %}" class="eylemler">
+      {% csrf_token %}
+      <input type="hidden" name="secili" value="{{ qr.pk }}">
+      <button type="submit" class="dugme ikincil kucuk">Çöp kutusundan geri yükle</button>
+    </form>
+    {% endif %}
+    {% elif perms.qr.change_qrkod %}
     <form method="post" action="{% url 'panel:qr_toplu' %}" class="eylemler">
       {% csrf_token %}
       <input type="hidden" name="secili" value="{{ qr.pk }}">
@@ -41,6 +51,7 @@
       {% if qr.durum != "aktif" %}<button type="submit" name="islem" value="aktif" class="dugme ikincil kucuk">Aktif yap</button>{% endif %}
       {% if qr.durum != "pasif" %}<button type="submit" name="islem" value="pasif" class="dugme ikincil kucuk">Pasif yap</button>{% endif %}
       {% if qr.durum != "arsiv" %}<button type="submit" name="islem" value="arsivle" class="dugme ikincil kucuk">Arşivle</button>{% endif %}
+      <button type="submit" name="islem" value="cope" class="dugme ikincil kucuk">Çöp kutusuna taşı</button>
     </form>
     {% endif %}
   </div>

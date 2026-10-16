@@ -5,7 +5,7 @@
 ## Özet
 
 - 11 tablo + Django'nun kullanıcı/rol tabloları.
-- **Hiçbir QR kodu veya sayfa silinmez**; arşivlenir. İlişkiler `PROTECT` ile korunur.
+- **Hiçbir QR kodu veya sayfa silinmez**; arşivlenir. QR kodlarda “silme” yalnızca **çöp kutusuna taşımadır** (kalıcı silme yoktur). İlişkiler `PROTECT` ile korunur.
 - Kısa kod büyük/küçük harf duyarsız benzersizdir ve oluşturulduktan sonra değiştirilemez.
 
 ## Tablolar
@@ -18,7 +18,7 @@
 | `qr_kampanya` | Kampanya ve tarihleri | `kod` | — | QR veya sayfaya bağlıysa silinemez |
 | `qr_kampanyasayfasi` | Sistemde yayınlanan sayfalar | `slug` (kalıcı adres) | durum | Silinemez (model hata verir), arşivlenir |
 | `qr_sayfagorseli` | Sayfadaki ürün/koleksiyon görselleri | — | — | Sayfayla birlikte (CASCADE); tek tek kaldırılabilir |
-| `qr_qrkod` | QR kod kayıtları | `kimlik` (UUID), `kod_anahtari` (kısa kodun küçük harfli hâli) | (tur, durum), bitis, durum | **Silinemez**, arşivlenir |
+| `qr_qrkod` | QR kod kayıtları | `kimlik` (UUID), `kod_anahtari` (kısa kodun küçük harfli hâli) | (tur, durum), bitis, durum | **Silinemez**, arşivlenir veya çöp kutusuna taşınır (`durum = cop`) |
 | `qr_hedefgecmisi` | Her hedef değişikliği (eski → yeni, kim, ne zaman) | — | zaman | Silinmez |
 | `qr_denemesayaci` | Giriş/MFA başarısız deneme sayaçları (anahtar bir özettir; süresi dolunca yeniden kullanılır) | — | anahtar (unique), bitis | Süresi dolanlar otomatik sıfırlanır/temizlenir |
 | `qr_apianahtari` | API anahtarları (kullanıcı, ad, önek, HMAC özeti; düz anahtar saklanmaz) | kullanıcı (PROTECT) | onek (unique) | Silinmez; iptal = `iptal_zamani` dolar |
@@ -43,7 +43,18 @@ Roller `db/init/10-roller.sh` ile kurulur (migrasyon `0005` ek yetki kısıtlar�
 
 Zorunlu olanlar yalnızca **kısa kod** (boşsa otomatik üretilir) ve **hedef** (harici URL veya sistem sayfası). Diğerleri isteğe bağlıdır: ad, **hedef başlığı** (`baslik`, en çok 300 karakter), tür, ürün, kampanya, mağaza, başlangıç/bitiş, bitiş sonrası adres, durum, açıklama, etiketler. Oluşturan/değiştiren kullanıcı ve tarihler otomatik tutulur.
 
-Veritabanı kısıtlaması `qr_hedef_tutarli`: arşivde olmayan her kodun geçerli bir hedefi olmalıdır (harici ise URL dolu, sayfa ise sayfa seçili).
+Veritabanı kısıtlaması `qr_hedef_tutarli`: arşivde (`arsiv`) veya çöp kutusunda (`cop`) olmayan her kodun geçerli bir hedefi olmalıdır (harici ise URL dolu, sayfa ise sayfa seçili). Kısıt migration `0010` ile `cop` için de muaf tutulacak biçimde güncellendi.
+
+**Durum değerleri (`QRKod.durum`):** `aktif`, `pasif`, `arsiv`, `cop` (“Çöp kutusunda”). Tarama sonucu (`Tarama.sonuc`) için yeni değer `cop` (“Çöp kutusundaki kod”); `/k/<kod>` çöpteki kod için arşivdeki gibi HTTP 410 bilgi sayfası verir.
+
+**Çöp kutusu alanları (migration `0010_yourls_ozellikleri_3b`):**
+
+| Alan | Tür | Anlam |
+|---|---|---|
+| `cope_atilma` | DateTime, boş olabilir | Çöp kutusuna taşınma zamanı; geri yüklenince boşalır |
+| `onceki_durum` | Metin (en çok 10), boş olabilir | Çöpe atılmadan önceki durum (`aktif`/`pasif`/`arsiv`); geri yüklemede durum buna döner (kayıt yoksa/geçersizse güvenli tarafta `pasif`). Geri yüklenince boşalır |
+
+Çöpteki kodun kısa kodu (`kod_anahtari` benzersizliği sürer) başka bir kayda verilemez. Taşıma ve geri yükleme `servisler.qr_cope_tasi` / `qr_copten_geri_yukle` ile yapılır ve denetim kaydına (`qr_cope_tasi`, `qr_copten_geri_yukle`) yazılır. `QRKod.delete()` engeli aynen sürer; kalıcı silme ucu/düğmesi yoktur. Normal QR formu `cop` durumunu seçenek olarak sunmaz; çöpteki kod normal formla ya da hızlı düzenlemeyle değiştirilemez.
 
 **Genel ayarlar (ek alanlar, migration 0007):** `ayrilmis_kodlar` (satır veya virgülle ayrılmış ek ayrılmış kelimeler) ve `ayni_hedef_uyarisi` (varsayılan açık). Koddaki varsayılan ayrılmış liste: admin, panel, api, k, s, saglik, static, media, giris, cikis, robots, favicon. Ayrılmış kelime denetimi yalnızca yeni kodlarda (panel formu ve toplu içe aktarma) çalışır; mevcut kayıtlar etkilenmez.
 

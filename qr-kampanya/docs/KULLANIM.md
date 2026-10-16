@@ -91,7 +91,35 @@ Tarih biçimleri: `2026-10-01`, `01.10.2026`, `2026-10-01 14:30`. Yalnızca tari
 
 ## 8. Toplu işlemler ve dışa aktarma
 
-QR listesinde kutuları işaretleyip **Aktif yap**, **Pasif yap**, **Arşivle** veya **ZIP indir** seçin (en fazla 1.000 kod). Liste CSV veya Excel olarak dışa aktarılabilir. CSV dosyaları Türkçe Excel ile uyumlu olması için `;` ile ayrılır.
+QR listesinde kutuları işaretleyip **Aktif yap**, **Pasif yap**, **Arşivle**, **Çöp kutusuna taşı** veya **ZIP indir** seçin (en fazla 1.000 kod). Arşivleme ve çöp kutusuna taşıma önce bir onay sayfası gösterir. Liste CSV veya Excel olarak dışa aktarılabilir. CSV dosyaları Türkçe Excel ile uyumlu olması için `;` ile ayrılır.
+
+### 8a. Liste: sıralama, filtreler ve sayfa boyutu
+
+- **Sıralama:** sütun başlıklarına (Kısa kod, Ad, Başlık, Hedef, Tarama, Oluşturulma) tıklayın; aynı başlığa tekrar tıklamak yönü çevirir. Adres parametreleri: `sirala` (`kod`, `ad`, `baslik`, `hedef`, `olusturma`, `tarama`) ve `yon` (`artan`, `azalan`). Varsayılan: oluşturulma, azalan. Listede olmayan/geçersiz değer varsayılana düşer (değer hiçbir zaman olduğu gibi sorguya gitmez).
+- **Tarama sütunu:** botlar hariç toplam tarama sayısı (tüm zamanlar).
+- **Filtreler:** arama kutusu + **arama alanı** (hepsi, kısa kod, ad, başlık, hedef URL; “hepsi” ürün, kampanya ve etiketi de arar), tür, durum, kampanya, mağaza, **ürün**, **tarama sayısı en az / en çok** (bot hariç), **oluşturma tarihi** için “bu tarihten sonra” ve/veya “bu tarihten önce” (ikisi birlikte = arası; her iki gün de dahildir; tarihler `YYYY-AA-GG`, yerel saat).
+- **Sayfa boyutu:** 25, 50, 100 veya 200 (başka değer = 50).
+- Tüm filtreler, sıralama ve sayfa boyutu sayfa bağlantılarında ve **CSV / Excel indir** bağlantılarında korunur; dışa aktarma aynı filtre ve sıralamayla çalışır (sayfa boyutundan bağımsız olarak tüm eşleşen kayıtlar iner).
+- Çöp kutusundaki kodlar listede varsayılan olarak görünmez; **durum = Çöp kutusunda** filtresiyle görülür (ayrıca bkz. 8c).
+
+### 8b. Listeden hızlı düzenleme
+
+Satırdaki **Düzenle** bağlantısı, JavaScript açıksa satırın altında küçük bir form açar (**ad**, **başlık** ve harici hedefli kodlarda **hedef URL**). **Kaydet** sayfayı yenilemeden satırı günceller; hata olursa mesaj formun yanında görünür. JavaScript yoksa bağlantı normal düzenleme sayfasına gider; form JavaScript'siz gönderilirse sayfa listeye (filtreleriniz korunarak) döner ve sonuç mesajı gösterilir. Kayıt `POST /panel/qr/<id>/hizli-duzenle` ile (CSRF korumalı, yetki: QR değiştirme) yapılır.
+
+- Doğrulama normal düzenlemeyle aynıdır (yalnızca http/https; özel/yerel IP ve kullanıcı bilgisi reddedilir; IDN uyarısı).
+- Hedef değişirse **hedef geçmişine** ve **denetim kaydına** yazılır (normal düzenlemeyle aynı kayıt yolu).
+- Sayfa (sistem sayfası) hedefli kodlarda hedef alanı yoktur; hedef bu yolla değiştirilemez.
+- **Arşivdeki ve çöp kutusundaki** kodlar hızlı düzenlenemez (409).
+
+### 8c. Çöp kutusu
+
+**Kalıcı silme yoktur.** “Sil” yalnızca kodu çöp kutusuna taşımaktır; kısa kod hiçbir zaman başka bir kayda verilmez.
+
+- **Taşıma:** QR detay sayfasındaki veya listedeki (toplu) **Çöp kutusuna taşı** düğmesi; onay sayfası gösterilir. Kodun o anki durumu (aktif/pasif/arşiv) saklanır.
+- **Çöpteki kod:** taranınca arşivdeki gibi “kullanımda değil” bilgi sayfası (HTTP 410) gösterilir; tarama kaydının sonucu `cop` olur. Düzenlenemez, durum işlemleri (aktif/pasif/arşiv) ve içe aktarma güncellemesi uygulanmaz; önce geri yüklenmelidir.
+- **Çöp kutusu sayfası** (menü → Çöp kutusu, `/panel/cop-kutusu/`): çöpteki kodlar, taşınma zamanı ve önceki durumla listelenir. **Geri yükle** (tekil) veya **Seçilenleri geri yükle** (toplu, en fazla 1.000) kodu çöpe atılmadan önceki durumuna döndürür.
+- Çöpe taşıma ve geri yükleme **denetim kaydına** yazılır (`qr_cope_tasi`, `qr_copten_geri_yukle`). Pano “Çöp kutusundaki QR kod” sayısını gösterir.
+- API'de `expand`, `url-stats` ve `stats` çıktılarındaki `durum` alanı çöpteki kod için `cop` değerini taşır.
 
 ## 9. İstatistikler
 

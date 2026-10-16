@@ -104,6 +104,9 @@ def qr_yonlendir(request, kod):
     if qr.durum == QRKod.Durum.ARSIV:
         _tarama_kaydet(request, qr, Tarama.Sonuc.ARSIV)
         return _bilgi_sayfasi(request, "Kullanımda değil", ayar.pasif_mesaj, durum=410)
+    if qr.durum == QRKod.Durum.COP:  # çöp kutusu: arşivle aynı davranış (410), tarama sonucu "cop"
+        _tarama_kaydet(request, qr, Tarama.Sonuc.COP)
+        return _bilgi_sayfasi(request, "Kullanımda değil", ayar.pasif_mesaj, durum=410)
     if qr.durum == QRKod.Durum.PASIF:
         _tarama_kaydet(request, qr, Tarama.Sonuc.PASIF)
         return _bilgi_sayfasi(request, "Kullanımda değil", ayar.pasif_mesaj)

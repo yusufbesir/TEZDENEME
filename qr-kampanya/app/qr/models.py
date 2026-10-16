@@ -1,7 +1,7 @@
 """Veri modeli. Ayrıntılı açıklama: docs/VERI-MODELI.md
 
 Temel ilke: Basılmış bir QR kodun kısa kodu hiçbir zaman değişmez, silinmez ve
-başka bir kayda verilmez. Silme yerine arşivleme kullanılır.
+başka bir kayda verilmez. Silme yerine arşivleme kullanılır; "silme" yalnızca çöp kutusuna taşımadır.
 """
 import hashlib
 import hmac
@@ -210,6 +210,7 @@ class QRKod(ZamanDamgali):
         AKTIF = "aktif", "Aktif"
         PASIF = "pasif", "Pasif"
         ARSIV = "arsiv", "Arşiv"
+        COP = "cop", "Çöp kutusunda"
 
     kimlik = models.UUIDField("sistem kimliği", default=uuid.uuid4, unique=True, editable=False)
     kisa_kod = models.CharField("kısa kod", max_length=64, validators=[kisa_kod_dogrula])
@@ -231,6 +232,9 @@ class QRKod(ZamanDamgali):
         help_text="Boş bırakılırsa genel ayarlardaki bitiş davranışı uygulanır.",
     )
     durum = models.CharField("durum", max_length=10, choices=Durum.choices, default=Durum.AKTIF, db_index=True)
+    # Çöp kutusu: silme yoktur, yalnızca taşıma. onceki_durum geri yüklemede durumu eski haline getirir.
+    cope_atilma = models.DateTimeField("çöpe taşınma zamanı", null=True, blank=True)
+    onceki_durum = models.CharField("çöpe atılmadan önceki durum", max_length=10, blank=True)
     aciklama = models.TextField("açıklama", blank=True)
     etiketler = models.CharField("etiketler", max_length=500, blank=True, help_text="Virgülle ayırın.")
     olusturan = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
@@ -246,7 +250,7 @@ class QRKod(ZamanDamgali):
                 name="qr_hedef_tutarli",
                 condition=(models.Q(hedef_turu="harici") & ~models.Q(hedef_url=""))
                 | (models.Q(hedef_turu="sayfa") & models.Q(sayfa__isnull=False))
-                | models.Q(durum="arsiv"),
+                | models.Q(durum__in=["arsiv", "cop"]),
             ),
         ]
 
@@ -256,6 +260,10 @@ class QRKod(ZamanDamgali):
     @staticmethod
     def anahtar(kod):
         return (kod or "").strip().lower()
+
+    @property
+    def onceki_durum_metni(self):
+        return dict(self.Durum.choices).get(self.onceki_durum, "")
 
     @property
     def kisa_url(self):
@@ -338,6 +346,7 @@ class Tarama(models.Model):
         BASLAMADI = "baslamadi", "Henüz başlamadı"
         BITTI = "bitti", "Süresi doldu"
         ARSIV = "arsiv", "Arşivlenmiş kod"
+        COP = "cop", "Çöp kutusundaki kod"
 
     class Cihaz(models.TextChoices):
         MOBIL = "mobil", "Mobil"
