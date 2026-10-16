@@ -38,3 +38,15 @@
 | 2026-10-15 | Jev cihaz kökünde otomatik keşfi kaldır, jev_cagri.py için SHA-256 pini ve sembolik bağ reddi [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 44.890 toplam | Tamam: 65 test geçti |
 | 2026-10-15 | Skill kilidine sha256 içerik özeti ve skill-etkinlestir.sh kilit doğrulaması [İP:Jev'i projeye bağlama#TMGrRs] | implementer / claude-sonnet-5-5 | 53.703 toplam | Tamam: 69 Python, 35 kabuk testi geçti |
 | 2026-10-15 | Denetmenlerin ikinci tur düzeltmelerini doğrula [İP:Jev'i projeye bağlama#TMGrRs] | verifier / claude-sonnet-5-5 | 39.797 toplam | Geçti |
+| 2026-10-16 | Pırıl yerel asistan: çekirdek (niyet + 17 beceri) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 102.682 toplam | Tamam: 32 test geçti |
+| 2026-10-16 | Pırıl: şifreli protokol ve sunucu [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 68.869 toplam | Tamam: 19 test geçti |
+| 2026-10-16 | Pırıl: Windows PC uygulaması, kurulum, temizlik [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 125.957 toplam | Tamam: 42 test geçti |
+| 2026-10-16 | Pırıl: ortak arayüz ve Android yapılandırması [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 92.461 toplam | Tamam: 24 test geçti |
+| 2026-10-16 | Pırıl: ilk doğrulama [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | 67.702 toplam | Kaldı: telefona ilerleme iletilmiyordu, düzeltildi |
+| 2026-10-16 | Pırıl: bağımsız güvenlik incelemesi [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-opus-5-5 | 127.901 toplam | Kaldı: 2 engelleyici + 10 bulgu |
+| 2026-10-16 | Pırıl: protokol güvenlik düzeltmeleri (ECDH, DoS, sayaç) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 93.461 toplam | Tamam: 35 test geçti |
+| 2026-10-16 | Pırıl: PC, çekirdek, arayüz güvenlik düzeltmeleri [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 163.457 toplam | Tamam: 170 test geçti |
+| 2026-10-16 | Pırıl: düzeltme sonrası doğrulama [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | tahmini 60.000 toplam | Geçti: 170/170 |
+| 2026-10-16 | Pırıl: Denetmen bulguları PRL-4 (ws özel API) ve PRL-5 (Başlat menüsü kısayolu) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 66.859 toplam | Tamam: 174 test geçti |
+| 2026-10-16 | Pırıl: PRL-2 package-lock dosyaları (pc, android) ve npm ci [İP:Bluey projesi incelemesi#Tazzd6] | orchestrator (kendim) / claude-sonnet-5-5 | tahmini 5.000 toplam | Tamam |
+| 2026-10-16 | Pırıl: PRL-4/5 doğrulaması [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | tahmini 50.000 toplam | Geçti: 174/174 |

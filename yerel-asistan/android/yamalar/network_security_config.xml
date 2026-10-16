@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pırıl: açık metin (cleartext) trafik varsayılan olarak KAPALI.
+  Yalnızca aşağıdaki yerel adreslere ws:// ile bağlanılabilir.
+  Android bu dosyada IP aralığı (CIDR) desteklemez; bilgisayarınızın adresini
+  `node scripts/yamala.js --ip 192.168.1.20` ile ekleyin (README'ye bakın).
+  Sistem CA'ları dışında güven noktası yoktur; kullanıcı CA'ları güvenilmez.
+-->
+<network-security-config>
+  <base-config cleartextTrafficPermitted="false">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">localhost</domain>
+    <domain includeSubdomains="false">10.0.2.2</domain>
+    <domain includeSubdomains="true">local</domain>
+    <!-- PIRIL-IP-BASLANGIC -->
+    <!-- PIRIL-IP-BITIS -->
+  </domain-config>
+</network-security-config>
