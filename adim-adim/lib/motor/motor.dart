@@ -1,5 +1,6 @@
 /// Öğrenme motoru: XP, seviye, seri, aralıklı tekrar (Leitner) ve cevap kontrolü.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
+/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
 import 'dart:math' as math;
@@ -114,14 +115,9 @@ abstract final class Motor {
     return d.seri;
   }
 
-  static OgrenciDurumu dersBitir(
-    OgrenciDurumu d,
-    String dersId,
-    int dogru,
-    int toplam,
-    String bugun,
-  ) {
-    final kazanc = dersXp(dogru, toplam);
+  /// XP kazancını işler: toplam XP, günlük XP, seri, en iyi seri ve son gün.
+  /// `tamamlanan` ve kartlara dokunmaz. dersBitir, mikroBitir ve yarismaBitir paylaşır.
+  static OgrenciDurumu _kazancIsle(OgrenciDurumu d, int kazanc, String bugun) {
     int yeniSeri;
     final son = d.sonGun;
     if (son == bugun) {
@@ -138,8 +134,128 @@ abstract final class Motor {
       enSeri: enSeri,
       sonGun: bugun,
       gunlukXp: {...d.gunlukXp, bugun: (d.gunlukXp[bugun] ?? 0) + kazanc},
+    );
+  }
+
+  static OgrenciDurumu dersBitir(
+    OgrenciDurumu d,
+    String dersId,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) {
+    final yeni = _kazancIsle(d, dersXp(dogru, toplam), bugun);
+    return yeni.copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
     );
+  }
+
+  /// Mikro dersin kazandıracağı XP: 5 + doğru*2 (+3 tam puan).
+  /// Sınırlar dersXp ile aynıdır; toplam 0 ise tam puan bonusu yok.
+  static int mikroXp(int dogru, int toplam) {
+    final t = toplam < 0 ? 0 : toplam;
+    final d = dogru < 0 ? 0 : (dogru > t ? t : dogru);
+    final bonus = (t > 0 && d == t) ? 3 : 0;
+    return 5 + d * 2 + bonus;
+  }
+
+  /// Mikro ders bitişi: XP, seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  static OgrenciDurumu mikroBitir(
+    OgrenciDurumu d,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) => _kazancIsle(d, mikroXp(dogru, toplam), bugun);
+
+  /// Yarışma bitişi: XP = max(5, puan ~/ 5); negatif puan 0 sayılır.
+  /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  static OgrenciDurumu yarismaBitir(OgrenciDurumu d, int puan, String bugun) {
+    final p = puan < 0 ? 0 : puan;
+    final kazanc = p ~/ 5 < 5 ? 5 : p ~/ 5;
+    return _kazancIsle(d, kazanc, bugun);
+  }
+
+  /// Seçilen alana ait kurslar: 'dil' → dil, 'kod' → kod, diğer → boş.
+  static List<Kurs> alanKurslari(List<Kurs> kurslar, String? alan) {
+    final KursAlani hedef;
+    switch (alan) {
+      case 'dil':
+        hedef = KursAlani.dil;
+      case 'kod':
+        hedef = KursAlani.kod;
+      default:
+        return const [];
+    }
+    return [
+      for (final k in kurslar)
+        if (k.alan == hedef) k,
+    ];
+  }
+
+  /// Kart kimliğinden (dersId#indeks) alıştırmayı bulur; bulunamazsa null.
+  static Alistirma? kartCoz(List<Kurs> kurslar, String kartId) {
+    final ayrac = kartId.lastIndexOf('#');
+    if (ayrac <= 0) return null;
+    final dersId = kartId.substring(0, ayrac);
+    final indeks = int.tryParse(kartId.substring(ayrac + 1));
+    if (indeks == null || indeks < 0) return null;
+    for (final k in kurslar) {
+      final d = k.dersBul(dersId);
+      if (d != null) {
+        return indeks < d.alistirmalar.length ? d.alistirmalar[indeks] : null;
+      }
+    }
+    return null;
+  }
+
+  /// Mikro ders seçimi (en çok [adet]): önce zamanı gelen tekrar kartları,
+  /// kalan yerler sıradaki dersten ve tamamlanmış derslerden doldurulur.
+  /// Dolgu karışıktır; mümkünse aynı türden ardışık iki alıştırma gelmez.
+  /// Aynı kart iki kez gelmez. [tohum] aynıysa sonuç aynıdır.
+  static List<({String kartId, Alistirma alistirma})> mikroSec(
+    OgrenciDurumu d,
+    List<Kurs> kurslar,
+    String bugun, {
+    int adet = 5,
+    int tohum = 0,
+  }) {
+    final sonuc = <({String kartId, Alistirma alistirma})>[];
+    if (adet <= 0) return sonuc;
+    final alinan = <String>{};
+    for (final id in tekrarBekleyen(d, bugun)) {
+      if (sonuc.length >= adet) return sonuc;
+      final a = kartCoz(kurslar, id);
+      if (a != null && alinan.add(id)) sonuc.add((kartId: id, alistirma: a));
+    }
+
+    // Dolgu havuzu: kurslar sırasında ilk tamamlanmamış ders + tamamlanmışlar.
+    final havuz = <({String kartId, Alistirma alistirma})>[];
+    var siradakiBulundu = false;
+    for (final k in kurslar) {
+      for (final ders in k.tumDersler) {
+        final bitti = (d.tamamlanan[ders.id] ?? 0) > 0;
+        final al = bitti || !siradakiBulundu;
+        if (!bitti) siradakiBulundu = true;
+        if (!al) continue;
+        for (var i = 0; i < ders.alistirmalar.length; i++) {
+          final id = ders.kartKimligi(i);
+          if (!alinan.contains(id)) {
+            havuz.add((kartId: id, alistirma: ders.alistirmalar[i]));
+          }
+        }
+      }
+    }
+    havuz.shuffle(math.Random(tohum));
+
+    while (sonuc.length < adet && havuz.isNotEmpty) {
+      final onceki = sonuc.isEmpty ? null : sonuc.last.alistirma.runtimeType;
+      var i = havuz.indexWhere((h) => h.alistirma.runtimeType != onceki);
+      if (i < 0) i = 0;
+      final secilen = havuz.removeAt(i);
+      alinan.add(secilen.kartId);
+      sonuc.add(secilen);
+    }
+    return sonuc;
   }
 
   /// Leitner: doğru → kutu+1 (en çok 5), yanlış → kutu 1.

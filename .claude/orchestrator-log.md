@@ -46,3 +46,5 @@
 - 2026-10-15 | Siber Güvenlik notu: release imza koruması varsayılan açık (gradle.properties dagitim=true, taskGraph denetimi) | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
 - 2026-10-15 | Siber Güvenlik: key.properties yalnız %USERPROFILE%\.anahtar'dan okunur, depo içi geri dönüş kaldırıldı | ana oturum (Fable 5.1) | - | tamam; Gradle bu ortamda çalıştırılamadı
 - 2026-10-15 | Siber Güvenlik düşük öneriler: storeFile mutlak yol zorunlu, *.p12 gitignore | ana oturum (Fable 5.1) | - | tamam
+- 2026-10-16 | Alan alanı, mikroSec/mikroBitir/yarismaBitir/alanKurslari motor işlevleri, notifier metotları | implementer (claude-sonnet-5-5) | ~50.7K token | tamam (17 test eklendi, 138 geçti)
+- 2026-10-16 | Alan + mikro ders motorunu doğrula | verifier (claude-sonnet-5-5) | ~32.4K token | Geçti (analyze kapsamda temiz, 111 test)

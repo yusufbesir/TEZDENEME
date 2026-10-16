@@ -523,4 +523,219 @@ void main() {
       expect(Motor.cevapDogruMu(a, 'Its five oclock'), isFalse);
     });
   });
+
+  group('mikroSec', () {
+    Secim sec(String s) =>
+        Secim(soru: s, secenekler: const ['a', 'b'], dogru: 0);
+    Yaz yaz(String s) => Yaz(soru: s, cevaplar: const ['x']);
+
+    Kurs kurs(String id, KursAlani alan, List<List<Alistirma>> dersler) {
+      return Kurs(
+        id: id,
+        ad: id,
+        aciklama: '',
+        alan: alan,
+        uniteler: [
+          Unite(
+            id: '$id.u1',
+            ad: 'u',
+            dersler: [
+              for (var i = 0; i < dersler.length; i++)
+                Ders(id: '$id.u1.d${i + 1}', ad: 'd', alistirmalar: dersler[i]),
+            ],
+          ),
+        ],
+      );
+    }
+
+    final k = kurs('k1', KursAlani.dil, [
+      [sec('a'), sec('b'), sec('c'), yaz('d'), yaz('e'), yaz('f')],
+      [sec('g'), yaz('h')],
+    ]);
+
+    test('tekrar kartları önce gelir', () {
+      final d = OgrenciDurumu(
+        kartlar: const {
+          'k1.u1.d1#2': Kart(kutu: 1, sonraki: '2025-01-01'),
+          'k1.u1.d1#0': Kart(kutu: 1, sonraki: '2025-01-02'),
+          'yok.d#0': Kart(kutu: 1, sonraki: '2025-01-01'),
+          'k1.u1.d1#1': Kart(kutu: 1, sonraki: '2030-01-01'),
+        },
+      );
+      final r = Motor.mikroSec(d, [k], '2025-06-01');
+      expect(r[0].kartId, 'k1.u1.d1#2');
+      expect(r[1].kartId, 'k1.u1.d1#0');
+      expect(r.map((e) => e.kartId).toSet().length, r.length);
+    });
+
+    test('adet sınırını aşmaz ve aynı kart iki kez gelmez', () {
+      final r = Motor.mikroSec(const OgrenciDurumu(), [k], '2025-06-01');
+      expect(r.length, 5);
+      expect(r.map((e) => e.kartId).toSet().length, 5);
+      expect(
+        Motor.mikroSec(
+          const OgrenciDurumu(),
+          [k],
+          '2025-06-01',
+          adet: 3,
+        ).length,
+        3,
+      );
+    });
+
+    test('yalnızca sıradaki ders havuzdadır; tamamlanmışlar eklenir', () {
+      final r = Motor.mikroSec(
+        const OgrenciDurumu(),
+        [k],
+        '2025-06-01',
+        adet: 20,
+      );
+      expect(r.length, 6); // yalnızca ders 1
+      final d = const OgrenciDurumu(tamamlanan: {'k1.u1.d1': 1});
+      final r2 = Motor.mikroSec(d, [k], '2025-06-01', adet: 20);
+      expect(r2.length, 8); // tamamlanan ders 1 + sıradaki ders 2
+    });
+
+    test('türler serpiştirilir', () {
+      for (var tohum = 0; tohum < 10; tohum++) {
+        final r = Motor.mikroSec(
+          const OgrenciDurumu(),
+          [k],
+          '2025-06-01',
+          adet: 6,
+          tohum: tohum,
+        );
+        for (var i = 1; i < r.length; i++) {
+          expect(
+            r[i].alistirma.runtimeType,
+            isNot(r[i - 1].alistirma.runtimeType),
+            reason: 'tohum $tohum, sıra $i',
+          );
+        }
+      }
+    });
+
+    test('aynı tohum aynı sonucu verir', () {
+      List<String> ids(int t) => Motor.mikroSec(
+        const OgrenciDurumu(),
+        [k],
+        '2025-06-01',
+        tohum: t,
+      ).map((e) => e.kartId).toList();
+      expect(ids(7), ids(7));
+    });
+
+    test('boş kurs listesi ya da alıştırmasız kurs boş döner', () {
+      expect(Motor.mikroSec(const OgrenciDurumu(), [], '2025-06-01'), isEmpty);
+      final bos = kurs('b', KursAlani.kod, [[]]);
+      expect(
+        Motor.mikroSec(const OgrenciDurumu(), [bos], '2025-06-01'),
+        isEmpty,
+      );
+    });
+  });
+
+  group('mikroXp', () {
+    test('5 + 2*doğru, tam puanda +3', () {
+      expect(Motor.mikroXp(0, 5), 5);
+      expect(Motor.mikroXp(3, 5), 11);
+      expect(Motor.mikroXp(5, 5), 18);
+    });
+
+    test('sınırlar: toplam 0 bonus yok, taşan ve negatif doğru kırpılır', () {
+      expect(Motor.mikroXp(0, 0), 5);
+      expect(Motor.mikroXp(9, 5), 18);
+      expect(Motor.mikroXp(-2, 5), 5);
+      expect(Motor.mikroXp(3, -1), 5);
+    });
+  });
+
+  group('mikroBitir', () {
+    test('tamamlanan değişmez, XP ve günlük XP artar', () {
+      const d = OgrenciDurumu(tamamlanan: {'x.d1': 2});
+      final y = Motor.mikroBitir(d, 5, 5, '2025-06-01');
+      expect(y.tamamlanan, {'x.d1': 2});
+      expect(y.xp, 18);
+      expect(y.gunlukXp['2025-06-01'], 18);
+      expect(y.seri, 1);
+    });
+
+    test('ardışık günde seri artar, aynı günde artmaz', () {
+      var d = Motor.mikroBitir(const OgrenciDurumu(), 1, 5, '2025-06-01');
+      d = Motor.mikroBitir(d, 1, 5, '2025-06-01');
+      expect(d.seri, 1);
+      d = Motor.mikroBitir(d, 1, 5, '2025-06-02');
+      expect(d.seri, 2);
+      expect(d.enSeri, 2);
+      expect(d.sonGun, '2025-06-02');
+    });
+  });
+
+  group('yarismaBitir', () {
+    test('XP = puan ~/ 5, en az 5', () {
+      expect(
+        Motor.yarismaBitir(const OgrenciDurumu(), 200, '2025-06-01').xp,
+        40,
+      );
+      expect(Motor.yarismaBitir(const OgrenciDurumu(), 10, '2025-06-01').xp, 5);
+      expect(Motor.yarismaBitir(const OgrenciDurumu(), 0, '2025-06-01').xp, 5);
+    });
+
+    test('negatif puan 0 sayılır; seri güncellenir, tamamlanan değişmez', () {
+      const d = OgrenciDurumu(
+        tamamlanan: {'x.d1': 1},
+        sonGun: '2025-05-31',
+        seri: 3,
+      );
+      final y = Motor.yarismaBitir(d, -50, '2025-06-01');
+      expect(y.xp, 5);
+      expect(y.seri, 4);
+      expect(y.gunlukXp['2025-06-01'], 5);
+      expect(y.tamamlanan, {'x.d1': 1});
+    });
+  });
+
+  group('alanKurslari', () {
+    Kurs kurs(String id, KursAlani alan) =>
+        Kurs(id: id, ad: id, aciklama: '', alan: alan, uniteler: const []);
+    final liste = [
+      kurs('en', KursAlani.dil),
+      kurs('html', KursAlani.kod),
+      kurs('de', KursAlani.dil),
+    ];
+
+    test('alana göre süzer', () {
+      expect(Motor.alanKurslari(liste, 'dil').map((k) => k.id), ['en', 'de']);
+      expect(Motor.alanKurslari(liste, 'kod').map((k) => k.id), ['html']);
+    });
+
+    test('null ve bilinmeyen alan boş döner', () {
+      expect(Motor.alanKurslari(liste, null), isEmpty);
+      expect(Motor.alanKurslari(liste, 'x'), isEmpty);
+    });
+  });
+
+  group('OgrenciDurumu alan', () {
+    test('JSON gidiş-dönüş korunur', () {
+      for (final a in ['dil', 'kod']) {
+        final d = OgrenciDurumu(alan: a);
+        expect(OgrenciDurumu.fromJson(d.toJson()).alan, a);
+      }
+      expect(
+        OgrenciDurumu.fromJson(const OgrenciDurumu().toJson()).alan,
+        isNull,
+      );
+    });
+
+    test('geçersiz değer null olur', () {
+      expect(OgrenciDurumu.fromJson({'alan': 'müzik'}).alan, isNull);
+      expect(OgrenciDurumu.fromJson({'alan': 5}).alan, isNull);
+    });
+
+    test('copyWith alanı değiştirir, vermezse korur', () {
+      final d = const OgrenciDurumu().copyWith(alan: 'kod');
+      expect(d.alan, 'kod');
+      expect(d.copyWith(xp: 3).alan, 'kod');
+    });
+  });
 }
