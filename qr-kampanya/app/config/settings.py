@@ -171,6 +171,11 @@ IP_DENEME_SINIRI = int(env("IP_DENEME_SINIRI", "20"))
 GIRIS_HIZ_SINIRI = int(env("GIRIS_HIZ_SINIRI", "10"))
 YONLENDIRME_HIZ_SINIRI = int(env("YONLENDIRME_HIZ_SINIRI", "120"))  # IP başına dakikada
 QR_OLUSTURMA_HIZ_SINIRI = int(env("QR_OLUSTURMA_HIZ_SINIRI", "30"))  # kullanıcı başına dakikada tekil QR oluşturma
+# API: anahtar başına dakikada başarılı istek; IP başına dakikada başarısız kimlik doğrulama (docs/API.md).
+API_HIZ_SINIRI = int(env("API_HIZ_SINIRI", "60"))
+API_BASARISIZ_HIZ_SINIRI = int(env("API_BASARISIZ_HIZ_SINIRI", "10"))
+# API için CORS'a izinli kökenler (virgülle ayrılmış, örn. https://uygulama.ornek.com). Boş = CORS başlığı yok. Yıldız kabul edilmez.
+API_CORS_KOKENLERI = tuple(k.strip().rstrip("/") for k in env("API_CORS_KOKENLERI", "").split(",") if k.strip() and k.strip() != "*")
 MFA_ZORUNLU = env_bool("MFA_ZORUNLU", not DEBUG)
 
 # MFA (TOTP) gizli anahtarlarının veritabanında şifrelenmesi için Fernet anahtarı (urlsafe base64, 32 bayt).

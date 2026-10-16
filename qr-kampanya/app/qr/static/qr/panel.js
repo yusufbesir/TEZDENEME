@@ -28,6 +28,25 @@
     sayac.textContent = document.querySelectorAll('input[type="checkbox"][name="' + ad + '"]:checked').length;
   }
 
+  // Kopyala düğmesi: data-kopyala="<kopyalanacak girdinin id değeri>"
+  document.querySelectorAll("[data-kopyala]").forEach(function (dugme) {
+    dugme.addEventListener("click", function () {
+      var girdi = document.getElementById(dugme.getAttribute("data-kopyala"));
+      if (!girdi) { return; }
+      girdi.select();
+      var bildir = function () {
+        var not = document.querySelector("[data-kopyalandi]");
+        if (not) { not.hidden = false; }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(girdi.value).then(bildir, function () { document.execCommand("copy"); bildir(); });
+      } else {
+        document.execCommand("copy");
+        bildir();
+      }
+    });
+  });
+
   // Toplu işlem düğmeleri bir kod seçilmeden gönderilmesin.
   document.querySelectorAll("form[data-toplu]").forEach(function (form) {
     form.addEventListener("submit", function (olay) {

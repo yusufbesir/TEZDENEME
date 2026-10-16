@@ -53,9 +53,10 @@ def _hedef(qr):
 
 
 @transaction.atomic
-def qr_kaydet(qr, request, not_metni=""):
+def qr_kaydet(qr, request, not_metni="", kaynak=""):
     """QR kodu oluşturur veya günceller. Hedef değiştiyse geçmişe yazar.
-    Çağıran taraf full_clean() yapmış olmalıdır."""
+    Çağıran taraf full_clean() yapmış olmalıdır. `kaynak` (örn. "API, anahtar qrk_ab12…") yalnızca
+    yeni kayıtta denetim kaydının özetine eklenir."""
     kullanici = request.user if request and request.user.is_authenticated else None
     yeni = qr.pk is None
     eski = None
@@ -71,7 +72,7 @@ def qr_kaydet(qr, request, not_metni=""):
             qr=qr, kullanici=kullanici, yeni_hedef_turu=qr.hedef_turu,
             yeni_hedef_url=qr.hedef_url or "", yeni_sayfa_id=qr.sayfa_id, not_metni=not_metni or "İlk hedef",
         )
-        denetim_yaz(request, "qr_olustur", qr, f"{qr.kisa_kod} oluşturuldu")
+        denetim_yaz(request, "qr_olustur", qr, f"{qr.kisa_kod} oluşturuldu" + (f" (kaynak: {kaynak})" if kaynak else ""))
         return qr
 
     if _hedef(eski) != _hedef(qr):

@@ -3,6 +3,8 @@
 Temel ilke: Basılmış bir QR kodun kısa kodu hiçbir zaman değişmez, silinmez ve
 başka bir kayda verilmez. Silme yerine arşivleme kullanılır.
 """
+import hashlib
+import hmac
 import re
 import secrets
 import uuid
@@ -473,3 +475,80 @@ class IceAktarma(models.Model):
 
     def __str__(self):
         return f"{self.dosya_adi} ({self.get_durum_display()})"
+
+
+class ApiAnahtari(models.Model):
+    """Kimlik doğrulamalı API için kullanıcıya bağlı erişim anahtarı (docs/API.md).
+
+    Anahtar biçimi: `qrk_<onek>_<gizli>`. Düz anahtar ASLA saklanmaz; yalnızca SECRET_KEY'li HMAC-SHA256 özeti
+    tutulur ve anahtar oluşturulduğunda bir kez gösterilir. Silinmez; iptal = iptal_zamani doldurulur.
+    Anahtarın yetkisi sahibinin Django izinleridir."""
+
+    BICIM_ONEKI = "qrk_"
+
+    kullanici = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="sahibi", on_delete=models.PROTECT, related_name="api_anahtarlari")
+    ad = models.CharField("ad", max_length=100, help_text="Anahtarı tanımak için kendi verdiğiniz etiket.")
+    onek = models.CharField("önek", max_length=12, unique=True)
+    ozet = models.CharField("özet", max_length=64, editable=False)
+    olusturma = models.DateTimeField("oluşturulma", default=timezone.now)
+    son_kullanim = models.DateTimeField("son kullanım", null=True, blank=True)
+    iptal_zamani = models.DateTimeField("iptal zamanı", null=True, blank=True)
+
+    class Meta:
+        ordering = ["-olusturma", "-id"]
+        verbose_name = "API anahtarı"
+        verbose_name_plural = "API anahtarları"
+
+    def __str__(self):
+        return f"{self.ad} ({self.BICIM_ONEKI}{self.onek}…)"
+
+    @staticmethod
+    def ozet_hesapla(anahtar):
+        return hmac.new(settings.SECRET_KEY.encode(), b"apianahtari|" + anahtar.encode(), hashlib.sha256).hexdigest()
+
+    @classmethod
+    def uret(cls, kullanici, ad):
+        """(kayıt, düz_anahtar) döndürür. Düz anahtar yalnızca bu dönüşte bulunur."""
+        for _ in range(5):
+            onek = secrets.token_hex(6)
+            if not cls.objects.filter(onek=onek).exists():
+                break
+        duz = f"{cls.BICIM_ONEKI}{onek}_{secrets.token_urlsafe(32)}"
+        kayit = cls.objects.create(kullanici=kullanici, ad=ad, onek=onek, ozet=cls.ozet_hesapla(duz))
+        return kayit, duz
+
+    @classmethod
+    def dogrula(cls, anahtar):
+        """Geçerli (iptal edilmemiş, sahibi aktif) kaydı döndürür; aksi halde None. Özet sabit zamanlı karşılaştırılır."""
+        parcalar = (anahtar or "").split("_", 2)
+        if len(parcalar) != 3 or parcalar[0] + "_" != cls.BICIM_ONEKI or len(parcalar[1]) != 12 or not parcalar[2]:
+            return None
+        kayit = cls.objects.select_related("kullanici").filter(onek=parcalar[1]).first()
+        # Kayıt yoksa da karşılaştırma yapılır (zamanlama farkı onek varlığını sızdırmasın).
+        beklenen = kayit.ozet if kayit else "0" * 64
+        eslesti = hmac.compare_digest(beklenen, cls.ozet_hesapla(anahtar))
+        if kayit is None or not eslesti or not kayit.aktif_mi:
+            return None
+        return kayit
+
+    @property
+    def aktif_mi(self):
+        return self.iptal_zamani is None and self.kullanici.is_active
+
+    @property
+    def durum_metni(self):
+        if self.iptal_zamani is not None:
+            return "İptal edildi"
+        return "Aktif" if self.kullanici.is_active else "Sahibi pasif"
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("API anahtarları silinmez, iptal edilir.")
+
+
+class KullaniciApiAyari(models.Model):
+    """Kullanıcıya bağlı API ayarı. `parola_girisi` (varsayılan KAPALI): kullanıcı adı + parola (+ MFA etkinse totp)
+    ile API kimlik doğrulamasına izin verir. Kullanıcı kendisi, panelde mevcut parolasını girerek açıp kapatır."""
+
+    kullanici = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="api_ayari")
+    parola_girisi = models.BooleanField("API'de parola girişi", default=False)
+    guncelleme = models.DateTimeField(auto_now=True)

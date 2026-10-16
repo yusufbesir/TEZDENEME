@@ -73,7 +73,14 @@ class XmlGuvenligiTesti(SimpleTestCase):
         for yol in kok.rglob("*.py"):
             if "tests" in yol.parts or "migrations" in yol.parts:
                 continue
+            if yol.name == "api.py":
+                continue  # API yalnızca XML ÜRETİR (ElementTree ile, kullanıcı verisi ayrıştırılmaz); aşağıda ayrıca denetlenir.
             self.assertIsNone(yasak.search(yol.read_text(encoding="utf-8")), f"{yol}: doğrudan xml ayrıştırıcısı; defusedxml kullanın")
+
+    def test_api_xml_ayristirmaz_yalnizca_uretir(self):
+        metin = (Path(settings.BASE_DIR) / "qr" / "api.py").read_text(encoding="utf-8")
+        for yasak in ("fromstring", "ET.parse", "ET.XML", "iterparse", "XMLParser", "minidom", "lxml"):
+            self.assertNotIn(yasak, metin)
 
     def test_saglam_xlsx_hala_okunur(self):
         basliklar, satirlar = modul.dosya_oku("a.xlsx", temel_xlsx())

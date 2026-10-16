@@ -96,3 +96,16 @@ QR listesinde kutuları işaretleyip **Aktif yap**, **Pasif yap**, **Arşivle** 
 ## 11. Denetim kayıtları
 
 **Denetim** sayfası kimin, ne zaman, ne yaptığını gösterir (giriş, oluşturma, hedef değişikliği, içe aktarma vb.). Bu kayıtlar değiştirilemez ve silinemez.
+
+## 12. API anahtarları
+
+Betiklerle kısa bağlantı oluşturmak veya sorgulamak için **API anahtarlarım** menüsünü kullanın.
+
+- **Yeni API anahtarı:** bir ad verin; anahtar **yalnızca bir kez** gösterilir, **Kopyala** düğmesiyle alıp güvenli bir yere kaydedin. Sayfadan ayrılınca tekrar görülemez.
+- **Liste:** ad, önek, oluşturulma, son kullanım ve durum görünür. Düz anahtar hiçbir zaman listelenmez.
+- **İptal et:** onay sayfasında onaylayın. İptal geri alınamaz; o anahtarı kullanan programlar hemen erişimini kaybeder. Yönetici tüm kullanıcıların anahtarlarını görüp iptal edebilir; diğer roller yalnızca kendilerininkini.
+- Anahtar sizin yetkilerinizle çalışır: İzleyici rolündeki bir anahtar okuyabilir ama kısa bağlantı oluşturamaz (403).
+
+- **API’de parola girişi** (varsayılan kapalı): aynı sayfadaki kutudan, mevcut parolanızı girerek açıp kapatırsınız. MFA’nız etkinse API çağrılarında doğrulama kodu da gerekir. Anahtar kullanmak daha güvenlidir.
+
+Kullanım örnekleri ve eylemler: [API.md](API.md).

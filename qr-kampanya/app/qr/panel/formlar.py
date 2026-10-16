@@ -132,6 +132,7 @@ class QRKodForm(TemelForm):
         elif tur == QRKod.HedefTuru.HARICI:
             veri["sayfa"] = None
         self.uyarilar = []
+        self.ayni_hedef_kodlari = []
         self._ayni_hedef_kontrol(veri)
         for alan in ("hedef_url", "bitis_sonrasi_url"):
             if idn_mi(veri.get(alan)):
@@ -158,6 +159,7 @@ class QRKodForm(TemelForm):
         if onaylandi:
             return
         self.fields["ayni_hedef_onay"] = self.ayni_hedef_onay_alani
+        self.ayni_hedef_kodlari = kodlar  # API 409 yanıtı için
         self.add_error(None, f"Bu hedef zaten şu kodlarda kullanılıyor: {', '.join(kodlar)}. "
                              "Yine de kaydetmek için “Yine de kaydet” kutusunu işaretleyip tekrar gönderin.")
 

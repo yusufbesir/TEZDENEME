@@ -26,6 +26,7 @@
     {% if perms.qr.view_denetimkaydi %}<a href="{% url 'panel:denetim' %}">Denetim</a>{% endif %}
     {% if perms.qr.change_genelayarlar %}<a href="{% url 'panel:ayarlar' %}">Ayarlar</a>{% endif %}
     {% if perms.auth.change_user %}<a href="{% url 'panel:kullanici_liste' %}">Kullanıcılar</a>{% endif %}
+    {% if perms.qr.view_qrkod %}<a href="{% url 'panel:api_anahtarlari' %}">API anahtarlarım</a>{% endif %}
     <a href="{% url 'panel:hesap' %}">Hesabım</a>
     <form method="post" action="{% url 'panel:cikis' %}">{% csrf_token %}<button type="submit" class="menu-cikis">Çıkış ({{ user.get_username }})</button></form>
   </nav>

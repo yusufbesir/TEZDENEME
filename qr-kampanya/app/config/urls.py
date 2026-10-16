@@ -3,7 +3,7 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 from django.views.static import serve
 
-from qr import yonlendirme
+from qr import api, yonlendirme
 
 urlpatterns = [
     path("k/<str:kod>", yonlendirme.qr_yonlendir, name="qr_yonlendir"),
@@ -11,6 +11,7 @@ urlpatterns = [
     path("robots.txt", yonlendirme.robots_txt, name="robots_txt"),
     path("saglik", yonlendirme.saglik, name="saglik"),
     path("ic/medya-yetki", yonlendirme.medya_yetki, name="medya_yetki"),
+    path("api/v1/", api.api_v1, name="api_v1"),
     path("panel/", include("qr.panel_urls")),
     path("", RedirectView.as_view(pattern_name="panel:ana", permanent=False)),
 ]

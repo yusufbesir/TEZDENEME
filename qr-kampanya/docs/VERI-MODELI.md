@@ -21,6 +21,8 @@
 | `qr_qrkod` | QR kod kayıtları | `kimlik` (UUID), `kod_anahtari` (kısa kodun küçük harfli hâli) | (tur, durum), bitis, durum | **Silinemez**, arşivlenir |
 | `qr_hedefgecmisi` | Her hedef değişikliği (eski → yeni, kim, ne zaman) | — | zaman | Silinmez |
 | `qr_denemesayaci` | Giriş/MFA başarısız deneme sayaçları (anahtar bir özettir; süresi dolunca yeniden kullanılır) | — | anahtar (unique), bitis | Süresi dolanlar otomatik sıfırlanır/temizlenir |
+| `qr_apianahtari` | API anahtarları (kullanıcı, ad, önek, HMAC özeti; düz anahtar saklanmaz) | kullanıcı (PROTECT) | onek (unique) | Silinmez; iptal = `iptal_zamani` dolar |
+| `qr_kullaniciapiayari` | Kullanıcı başına API ayarı (`parola_girisi`, varsayılan kapalı) | kullanıcı (CASCADE, 1-1) | kullanici (unique) | Kullanıcı panelden değiştirir |
 | `qr_tarama` | Takma adlı (pseudonymous) tarama olayları | — | (qr, zaman), zaman | Saklama süresi sonunda temizlenir (`TARAMA_SAKLAMA_GUN`) |
 | `qr_denetimkaydi` | Yönetici işlemleri | — | zaman, eylem | Değiştirilemez ve silinemez (model düzeyinde) |
 | `qr_genelayarlar` | Varsayılan yönlendirme davranışları, marka | tek satır (id=1) | — | — |
