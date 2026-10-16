@@ -11,7 +11,7 @@ Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtı
 - Mimari, güvenlik ve veri bütünlüğü kararları sende kalır.
 - Yalnızca `scout`, `implementer` ve `verifier` ajanlarını kullan.
 - `verifier` Geçti deyince commit'le.
-- Her ajan çalışmasından sonra `.claude/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
+- Her ajan çalışmasından sonra `docs/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
 - Bilmediğin şeyi tahmin etme, sor.
 - Mevcut bir dosyanın üzerine yazmadan önce sor.
 
