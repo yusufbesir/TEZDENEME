@@ -104,9 +104,22 @@ done
 docker compose up -d --force-recreate --no-deps caddy
 docker compose ps
 
-if [ "$(docker compose exec -T app python manage.py shell -c 'from django.contrib.auth import get_user_model;print(get_user_model().objects.filter(is_superuser=True).count())')" = "0" ]; then
-  echo "İlk yönetici hesabını oluşturun (parola en az 12 karakter):"
+# İlk yönetici: yalnızca hiç süper kullanıcı yoksa, yalnızca etkileşimli terminalde (tty) ve createsuperuser ile sorulur.
+# Varsayılan parola, ortam değişkeniyle parola ve etkileşimsiz (noinput) kip YOKTUR; parolayı kurulumu yapan kişi kendisi yazar.
+# Sayım: `shell` bu Django sürümünde (5.2) stdout'a "N objects imported automatically" başlığı basar; bu yüzden
+# --no-imports verilir VE yalnızca son boş olmayan satır alınıp sayı olduğu doğrulanır (başlık/uyarı karşılaştırmayı bozmaz).
+YONETICI_KOMUTU="docker compose exec app python manage.py yonetici_olustur"
+SUPER_SAYISI="$(docker compose exec -T app python manage.py shell --no-imports -c 'from django.contrib.auth import get_user_model;print(get_user_model().objects.filter(is_superuser=True).count())' 2>/dev/null | tr -d '\r' | awk 'NF{son=$0} END{print son}' || true)"
+if ! [[ "$SUPER_SAYISI" =~ ^[0-9]+$ ]]; then
+  echo "UYARI: Yönetici sayısı okunamadı; hesap oluşturulmadı. Yönetici yoksa şunu çalıştırın: $YONETICI_KOMUTU"
+elif [ "$SUPER_SAYISI" -gt 0 ]; then
+  echo "Yönetici hesabı zaten var; yeniden sorulmadı."
+elif [ -t 0 ] && [ -t 1 ]; then
+  echo "İlk yönetici hesabını oluşturun (parola en az 12 karakter; ilk girişte MFA kurulumu zorunludur):"
   docker compose exec app python manage.py yonetici_olustur
+else
+  echo "BİLGİ: Etkileşimli terminal (tty) yok; yönetici hesabı oluşturulmadı. Bir terminalde şunu çalıştırın:"
+  echo "       $YONETICI_KOMUTU"
 fi
 echo "BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca"
 echo "       YEDEK_UZAK_ONAYLI_HEDEF=uzakadi (':' öncesi ad) ile hedefin gerçekten başka bir makine/bulut olduğunu onaylayın (docs/YEDEKLEME.md)."

@@ -81,7 +81,7 @@ cd /opt/qr-kampanya
 bash scripts/kurulum.sh
 ```
 
-Betik sırasıyla: alan adınızı ve e-postanızı sorar (alan adı girdiyseniz e-posta **zorunludur**; alan adı boşsa yerel deneme yer tutucusu yazılır), `.env` dosyasını güçlü rastgele parolalarla oluşturur, konteynerleri derleyip başlatır, **yedek şifreleme anahtarını üretir** ve ilk yönetici hesabını oluşturmanızı ister.
+Betik sırasıyla: alan adınızı ve e-postanızı sorar (alan adı girdiyseniz e-posta **zorunludur**; alan adı boşsa yerel deneme yer tutucusu yazılır), `.env` dosyasını güçlü rastgele parolalarla oluşturur, konteynerleri derleyip başlatır, **yedek şifreleme anahtarını üretir** ve (yönetici yoksa ve terminal etkileşimliyse) ilk yönetici hesabını oluşturmanızı ister: parolayı siz yazarsınız (varsayılan/ortam değişkeni parolası yoktur), ilk girişte MFA kurulumu zorunludur. Terminal etkileşimli değilse (otomasyon) hesap oluşturulmaz; betik çalıştırılacak komutu yazdırır: `docker compose exec app python manage.py yonetici_olustur`.
 
 **Veritabanı parolaları (üç tane, hepsini betik üretir):** `POSTGRES_PASSWORD` yalnızca bakım için olan en yetkili hesaptır; `POSTGRES_SAHIP_PAROLA` veritabanının sahibi `qr_sahip` hesabıdır (güncelleme ve yedek bunu kullanır); `POSTGRES_UYGULAMA_PAROLA` web uygulamasının kısıtlı `qr_uygulama` hesabıdır. Uygulama yalnızca kayıt okuyup ekleyebilir; tabloları silemez, koruma kurallarını kapatamaz. `.env` dosyasını yedeklediğiniz yeri güvenli tutun ve kimseyle paylaşmayın.
 

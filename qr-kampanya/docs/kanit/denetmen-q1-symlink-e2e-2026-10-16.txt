@@ -1,0 +1,221 @@
+E2E12 ham çıktı (proje qre2e12, HTTP 8094, HTTPS 8454)
+
+==========================================================================================
+## 0) kopya
+==========================================================================================
+$ bash -c diff -rq /home/claude/TEZDENEME/qr-kampanya . -x .env -x yedekler -x gizli -x __pycache__ -x staticfiles | head -5; echo diff-bitti   [pty=hayır]
+diff-bitti
+(çıkış kodu: 0)
+
+==========================================================================================
+## 1) kurulum #1 (tty'siz stdin, pty çıktı)
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=evet]
+.env oluşturuldu (izinler 600). Bu dosyayı kimseyle paylaşmayın, Git'e eklemeyin.
+BİLGİ: .env dosyasının SONUNA MFA_SIFRELEME_ANAHTARI eklendi (MFA gizli anahtarlarını şifreler; diğer satırlar değiştirilmedi).
+       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md).
+ Image qr-kampanya-yedek:e2e12 Building 
+#2 [yedek internal] load build definition from Dockerfile
+#4 [yedek] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#9 [yedek internal] load .dockerignore
+#11 [yedek stage-0 1/3] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#13 [yedek internal] load build context
+#14 [yedek stage-0 2/3] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#15 [yedek stage-0 3/3] RUN addgroup -g 10002 -S yedek     && adduser -S -D -H -u 10002 -G yedek -s /sbin/nologin yedek     && mkdir -p /yedekler /yedek-durum     && chown yedek:yedek /yedekler && chmod 700 /yedekler     && chown 10002:10001 /yedek-durum && chmod 2750 /yedek-durum
+#24 [yedek] exporting to image
+#24 naming to docker.io/library/qr-kampanya-yedek:e2e12 done
+#24 unpacking to docker.io/library/qr-kampanya-yedek:e2e12 0.0s done
+#26 [yedek] resolving provenance for metadata file
+ Image qr-kampanya-yedek:e2e12 Built 
+ Volume qre2e12_yedek-durum Creating 
+ Volume qre2e12_yedek-durum Creating 
+ Volume qre2e12_yedek-durum Created 
+ Volume qre2e12_yedek-durum Created 
+ Container qre2e12-yedek-run-c24dfb499202 Creating 
+ Container qre2e12-yedek-run-c24dfb499202 Created 
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:10001 kip 2750, app yalnızca okur).
+Yedek şifreleme anahtarı üretiliyor (yalnızca bellek dosya sisteminde)...
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+Özel anahtar bellekten SİLİNDİ (kullanıcı onayıyla); kalıcı diske HİÇ yazılmadı. Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+ Container qre2e12-yedek-1 Creating 
+ Container qre2e12-yedek-1 Created 
+ Container qre2e12-yedek-1 Starting 
+ Container qre2e12-yedek-1 Started 
+qre2e12-yedek-1   qr-kampanya-yedek:e2e12                                                                        "/bin/sh /betikler/y…"   yedek     13 seconds ago   Up 12 seconds             5432/tcp
+BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca
+(çıkış kodu: 0)
+[GEÇTİ] kurulum #1 rc 0 rc=0
+[GEÇTİ] age anahtarı yakalandı 
+
+==========================================================================================
+## 2) YEDEK_DIZINI -> sembolik bağlantı
+==========================================================================================
+$ bash -c set -e
+mkdir /var/tmp/qre2e12-gercek
+mv yedekler/* /var/tmp/qre2e12-gercek/ 2>/dev/null || true
+rmdir yedekler 2>/dev/null || true
+chown 10002:10002 /var/tmp/qre2e12-gercek; chmod 700 /var/tmp/qre2e12-gercek
+ln -s /var/tmp/qre2e12-gercek yedekler-baglanti
+sed -i 's|^YEDEK_DIZINI=.*|YEDEK_DIZINI=./yedekler-baglanti|' .env
+grep -n '^YEDEK_DIZINI' .env
+ls -ln . | grep -E 'yedek'   [pty=hayır]
+63:YEDEK_DIZINI=./yedekler-baglanti
+drwxr-xr-x 3 0 0 4096 Oct 15 19:20 yedek
+lrwxrwxrwx 1 0 0   23 Oct 16 00:28 yedekler-baglanti -> /var/tmp/qre2e12-gercek
+(çıkış kodu: 0)
+$ bash scripts/kurulum.sh   [pty=evet]
+.env zaten var; dokunulmadı.
+ Image qr-kampanya-yedek:e2e12 Building 
+#2 [yedek internal] load build definition from Dockerfile
+#8 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#9 [yedek internal] load .dockerignore
+#18 [yedek stage-0 1/3] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#19 [yedek internal] load build context
+#20 [yedek stage-0 2/3] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#21 [yedek stage-0 3/3] RUN addgroup -g 10002 -S yedek     && adduser -S -D -H -u 10002 -G yedek -s /sbin/nologin yedek     && mkdir -p /yedekler /yedek-durum     && chown yedek:yedek /yedekler && chmod 700 /yedekler     && chown 10002:10001 /yedek-durum && chmod 2750 /yedek-durum
+#24 [yedek] exporting to image
+#24 naming to docker.io/library/qr-kampanya-yedek:e2e12 done
+#24 unpacking to docker.io/library/qr-kampanya-yedek:e2e12 0.0s done
+#25 [yedek] resolving provenance for metadata file
+ Image qr-kampanya-yedek:e2e12 Built 
+ Container qre2e12-yedek-run-7824c0d90bae Creating 
+ Container qre2e12-yedek-run-7824c0d90bae Created 
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:10001 kip 2750, app yalnızca okur).
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+ Container qre2e12-yedek-1 Recreate 
+ Container qre2e12-yedek-1 Recreated 
+ Container qre2e12-yedek-1 Starting 
+ Container qre2e12-yedek-1 Started 
+qre2e12-yedek-1   qr-kampanya-yedek:e2e12                                                                        "/bin/sh /betikler/y…"   yedek     22 seconds ago   Up 11 seconds             5432/tcp
+BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca
+(çıkış kodu: 0)
+[GEÇTİ] kurulum #2 (sembolik bağlantılı YEDEK_DIZINI) rc 0 rc=0
+$ bash -c docker inspect -f '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}' $(docker compose ps -q yedek); ls -lnd /var/tmp/qre2e12-gercek; docker compose ps -a --format '{{.Service}} {{.State}} {{.Health}}'   [pty=hayır]
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12/qr-kampanya/scripts -> /betikler
+/var/lib/docker/volumes/qre2e12_yedek-durum/_data -> /yedek-durum
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12/qr-kampanya/yedekler-baglanti -> /yedekler
+/var/lib/docker/volumes/qre2e12_medya/_data -> /veri/medya
+/var/lib/docker/volumes/e4be94abeb6cb0ac11fca5e3289f65761562ec3cb40fc5d320c34ad53e83c7c2/_data -> /var/lib/postgresql/data
+
+drwx------ 2 10002 10002 4096 Oct 16 00:28 /var/tmp/qre2e12-gercek
+app running healthy
+caddy running 
+db running healthy
+hazirlik exited 
+yedek running
+(çıkış kodu: 0)
+[GEÇTİ] gercek-yedekler 10002 700 
+$ bash -c docker compose exec -T yedek sh /betikler/yedek-al.sh; echo RC=$?; ls -ln /var/tmp/qre2e12-gercek   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-032841.dump.age
+RC=0
+total 104
+-rw------- 1 10002 10002 92060 Oct 16 00:28 db-20261016-032841.dump.age
+-rw------- 1 10002 10002   301 Oct 16 00:28 medya-20261016-032841.tar.gz.age
+-rw------- 1 10002 10002   193 Oct 16 00:28 sha256-20261016-032841.txt
+-rw------- 1 10002 10002   107 Oct 16 00:28 yedek-gunlugu.log
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al rc 0 
+
+==========================================================================================
+## 3) (b) sembolik bağlantı saldırısı + disari-kopyala + geri yükleme testi
+==========================================================================================
+$ bash -c docker compose exec -T yedek sh -c 'cd /yedekler && rm -f yedek-gunlugu.log uzak-dogrulama.json && for a in yedek-gunlugu.log uzak-dogrulama.json; do ln -s /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-korunan.txt $a; done'; ls -ln /var/tmp/qre2e12-gercek | grep -E 'gunlugu|dogrulama'   [pty=hayır]
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:28 uzak-dogrulama.json -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-korunan.txt
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:28 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-korunan.txt
+(çıkış kodu: 0)
+[GEÇTİ] iki bağlantı kondu lrwxrwxrwx 1 10002 10002   102 Oct 16 00:28 uzak-dogrulama.json -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-korunan.txt
+lrwxrwxrwx 1 10002 10002   102
+$ bash scripts/disari-kopyala.sh   [pty=hayır]
+################################################################################
+ UYARI: YEDEK_YEREL_HEDEF_IZIN=yerel KULLANILDI
+ Yerel/belirsiz bir hedef SUNUCU DIŞI gibi işlenecek; eski yerel yedekler SİLİNEBİLİR.
+ Neden yerel sayıldığı: rclone local türü
+ Bu YALNIZCA DENEME içindir; üretimde KULLANMAYIN. Hedef gerçekten başka makinede değilse yedek kaybedebilirsiniz.
+################################################################################
+2026-10-16T00:28:42+00:00 YEREL HEDEF İZNİ KULLANILDI: yerel
+tee: /var/tmp/qre2e12-gercek/yedek-gunlugu.log: Permission denied
+UYARI: günlüğe yazılamadı: /var/tmp/qre2e12-gercek/yedek-gunlugu.log
+2026/10/16 00:28:42 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-hedef: 0 differences found
+2026/10/16 00:28:42 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-hedef: 3 matching files
+2026-10-16T00:28:42+00:00 dışarı kopyalama: 3 dosya uzakta doğrulandı (ozet) → yerel
+tee: /var/tmp/qre2e12-gercek/yedek-gunlugu.log: Permission denied
+UYARI: günlüğe yazılamadı: /var/tmp/qre2e12-gercek/yedek-gunlugu.log
+2026-10-16T00:28:42+00:00 tamam: 0 yerel dosya silindi.
+(çıkış kodu: 0)
+[GEÇTİ] disari-kopyala rc 0 rc=0
+[GEÇTİ] korunan değişmedi (içerik) 
+[GEÇTİ] korunan sahibi/kipi/mtime aynı 
+[GEÇTİ] uzak-dogrulama.json düzenli dosya 
+[GEÇTİ] uzak-dogrulama.json 10002 600 10002 0o600
+$ bash -c head -8 /var/tmp/qre2e12-gercek/uzak-dogrulama.json; ls -ln /var/tmp/qre2e12-gercek | grep -E 'gunlugu|dogrulama'; ls -a /var/tmp/qre2e12-gercek | grep -E 'dogrulama.json\.' || echo tmp-yok   [pty=hayır]
+{
+  "zaman": "2026-10-16T00:28:42+00:00",
+  "son_deneme": "2026-10-16T00:28:42+00:00",
+  "hedef": "yerel",
+  "yontem": "ozet",
+  "not": "",
+  "dogrulanan": ["db-20261016-032841.dump.age", "medya-20261016-032841.tar.gz.age", "sha256-20261016-032841.txt"]
+}
+-rw------- 1 10002 10002   256 Oct 16 00:28 uzak-dogrulama.json
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:28 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-korunan.txt
+tmp-yok
+(çıkış kodu: 0)
+[GEÇTİ] tmp kalıntı yok 
+[GEÇTİ] dışarı kopya hedefte yedek var ['db-20261016-032841.dump.age', 'medya-20261016-032841.tar.gz.age', 'sha256-20261016-032841.txt']
+geri-yukleme bağlantı sayısı: 152
+$ bash scripts/geri-yukleme-testi.sh /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12-age.key   [pty=hayır]
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+(çıkış kodu: 1)
+[KALDI] geri yükleme testi GEÇTİ rc=1
+UYARI satırları: []
+[GEÇTİ] korunan hâlâ değişmedi 
+$ bash -c ls -ln /var/tmp/qre2e12-gercek | grep -E 'geri-yukleme' | awk '{print $1,$3,$9,$10,$11}' | grep -v -- '->' | head   [pty=hayır]
+
+(çıkış kodu: 0)
+bağlantı olmayan geri-yukleme günlükleri: (yok)
+### c) root 0777
+f1ea5f16d0adf61c7972a4e503b5ef4f  -
+9
+HATA: yedek dizini (/var/tmp/qre2e12-0777) root'a ait ama grup ya da diğer kullanıcılara yazılabilir; yedek konteyneri (UID 10002) oraya sembolik bağlantı bırakabilir.
+      Hiçbir şey yazılmadı ve HİÇBİR yerel yedek silinmedi. Düzeltmek için: sudo bash scripts/yedek-dizini-hazirla.sh (ya da sudo chmod go-w '/var/tmp/qre2e12-0777').
+rc=1
+f1ea5f16d0adf61c7972a4e503b5ef4f  -
+9
+db-20200101-000000.dump.age
+db-20200102-000000.dump.age
+medya-20200101-000000.tar.gz.age
+medya-20200102-000000.tar.gz.age
+sha256-20200101-000000.txt
+sha256-20200102-000000.txt
+### d) sahte crontab
+158
+3
+rc=1 stdout_bytes=0 stderr_bytes=0
+158
+3
+db-20261016-032841.dump.age
+medya-20261016-032841.tar.gz.age
+sha256-20261016-032841.txt
+uzak-dogrulama.json
+yedek-gunlugu.log
+No journal files were found.
+-- No entries --
+### guncelle.sh
+guncelle rc=0
+Valid configuration
+ Container qre2e12-caddy-1 Recreate 
+ Container qre2e12-caddy-1 Recreated 
+ Container qre2e12-caddy-1 Starting 
+ Container qre2e12-caddy-1 Started 
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0).
+################################################################################
+ UYARI: root crontab'ında disari-kopyala.sh çıktısını yedek dizinine yönlendiren eski bir satır var:
+   30 4 * * * cd /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12/qr-kampanya && bash scripts/disari-kopyala.sh >> yedekler/disari-kopya.log 2>&1
+ Yedek dizini yedek konteynerine yazılabilir; root kabuğu oradaki sembolik bağlantıyı izleyip başka dosyaya yazabilir.
+ disari-kopyala.sh bu satır düzeltilene kadar HİÇBİR ŞEY yapmadan çıkar (kopyalama/silme yok). Düzeltilmiş satır (sudo crontab -e):
+   30 4 * * * cd /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e12/qr-kampanya && bash scripts/disari-kopyala.sh >> /var/log/qr-disari-kopya.log 2>&1
+################################################################################
+Güncelleme tamamlandı.
+saglik 200
+kok 302
