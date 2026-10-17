@@ -94,6 +94,8 @@ Sıralama güncellemesi: 16 ve 17 küçük olduğu için 1'in hemen ardından; 1
 
 Amaç: örnek uygulamaların ekran akışını ve özellik yapısını REA (cihazda, D:\YusufII\Programlar\rea) ile çıkarıp Adım Adım'daki karşılığını tasarlamak. Sınırlar: yalnız yapı ve akış; kod, görsel, ses ve metin kopyalanmaz; yalnız cihazda zaten bulunan ya da Yusuf'un kendi hesabıyla resmi mağazadan aldığı APK'lar incelenir; sonuç `adim-adim/docs/REA-ozellik-haritasi-<tarih>.md` dosyasına yazılır ve bu belgeye bağlanır. Mağaza yorumlarından "en faydalı özellik" sayımı aynı raporda.
 
+Durum (06:15 UTC): rapor hazır, `docs/REA-ozellik-haritasi-2026-10-17.md`. Cihazda örnek uygulama APK'sı bulunmadığından REA doğrulaması yapılmadı; rapor mağaza açıklamaları ve yorum özetlerine dayanır ve 10 uyarlanabilir özellik listeler (bunların çoğu bu belgedeki 1, 4, 7, 14, 16–19 ile örtüşür; yeni olanlar: okuma pasajı alıştırma türü, çevrimdışı rozet, temalı kısa kelime turu, yazı boyutu ayarı ve yüksek karşıtlık). APK kaynağı Yusuf'un kararını bekliyor.
+
 ## 6. Kaynaklar
 
 - https://support.chess.com/en/articles/8609703-how-do-lessons-work-on-chess-com
