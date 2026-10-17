@@ -385,3 +385,44 @@ Notlar:
 - Yapılmaması istenenler bu tabloya "Yusuf: yapılmasın" notuyla eklenir; satır silinmez.
 
 Birlikte çalışılanlar: Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; kaynak: bu belgedeki Trivia Crack 2 ve Busuu apktool bulguları. Token (tahmini): girdi ~20K, çıktı ~4K.
+
+## Duolingo (apktool, 2026-10-17)
+
+### Kimlik
+- Dosya: `com.duolingo_6.101.1-2475_4arch_6dpi_…_apkmirror.com.apkm` (164,4 MB, APKMirror paketi: base.apk + 10 parça), paket `com.duolingo`, sürüm 6.101.1, minSdk 32, targetSdk 36. SHA256 `41F7DE0C86CA9545B5FDABDE0945DEEC14EF7CBDAC275A1962C9C883EA945A0A`.
+- Yöntem: base.apk apktool 3.0.3 (`d --no-src -s`); manifest etkinlik adları ve 1.603 `res/layout` dosya adı (yapı). Kod, metin, görsel alınmadı. Yerel Android (Compose) + gömülü Unity (Duo World, müzik), Rive ve Lottie animasyonları. 489 etkinlik (461 kendi; bunların yaklaşık 230'u uygulama simgesi varyantı ve hata ayıklama ekranı).
+
+### Akış ve modüller (ekran ve layout adlarından)
+- **Yol**: Bölüm → ünite → seviye düğümleri (`view_path_level_*`, alfabe kapısı, sandık düğümü). Ünite rehberi (Guidebook, SkillTip, `explanations_cefr_table`, `explanations_dialogue`), ünite tekrarı ve ünite testi (UnitReviewExplained, UnitTestExplained), **bölüm atlama testi** (SectionTestExplained), **efsanevi zor tekrar** (LegendaryIntro, LegendaryFailure), yerleştirme (`fragment_basics_placement_splash`, PlacementFallback).
+- **Ders oturumu**: SessionActivity (yatay sürüm dâhil), ders koçu (`fragment_lesson_coach`), **kolay derse geçiş önerisi** (`fragment_easier_lesson_nudge_dialog`), ders başarısızlık ekranı.
+- **Pratik**: hatalar koleksiyonu (MistakesPractice, `mistakes_collection`), **Eşleştirme çılgınlığı** (zamana karşı eşleştirme, `fragment_match_madness_*`), **Ramp Up** (süreli artan zorluk), kartlar (flashcards, çoktan seçmeli kartlar), dinle ve konuş türleri (`fragment_listen_isolation`, `fragment_partial_listen`, `fragment_speak_recall`).
+- **Hikâyeler** (StoriesSession, StoriesOnboarding, `view_stories_freeform_writing`): diyaloglu okuma, anlama soruları, serbest yazma.
+- **Radyo** (DuoRadioSession: dinle-eşleştir, dinle-tanı, sırala).
+- **Satranç**: günlük bulmaca (ChessDailyPuzzleHome/Session), mini maç (ChessMiniMatch), maç, **oyun incelemesi** (ChessGameReview), serbest tahta (ChessSandbox).
+- **Matematik ve müzik**: matematik oturumu, bilimsel hesap makinesi, notalı müzik alıştırmaları.
+- **Alışkanlık**: seri (dondurma, onarım, **geri kazanma** StreakEarnback, seri alarmı, widget), günlük görevler (`daily_quest`), **aylık meydan okuma**, yan görevler (Sidequest), başarımlar ve kişisel rekorlar (`achievements_v4_personal_best`), XP artışı, **Yılın özeti** (YearInReview), Duolingo Puanı (Score; seviye göstergesi).
+
+### Adım Adım'daki karşılığı
+- Var: ders yolu, hata defteri, mikro ders, seri, haftalık hedef, sözlük, eşleştirme/dinleme türleri, yarışma.
+- Kısmen: yerleştirme (öneri 18), okuma hikâyeleri (öneri 31, bulutta), ünite özeti (B5), satranç (öneri 4).
+- Yok: rehber kitapçık, efsanevi zor tekrar, zamana karşı eşleştirme, radyo/dinleme bölümleri, seri geri kazanma, aylık meydan okuma, yılın özeti, seviye puanı.
+
+### Önerilmedi
+Lig ve sıralama, arkadaş serisi ve arkadaş görevleri, kulüp/okul, aile planı, Super/Max abonelik, enerji/kalp sistemi ve enerji satın alma, mücevher dükkânı, reklamlar (ByteDance, Moloco, Vungle), çevrim içi görüntülü yapay zekâ görüşmesi ve rol oyunu (VideoCall, Roleplay), canlı etkinlik ödül yolu, sandık açma (rastgele ödül), oyuncak simge varyantları, sosyal paylaşım kartları, LinkedIn eşitlemesi.
+
+### Adım Adım'a uyarlanabilir (Duolingo)
+| # | Özellik | Nasıl | Tahmini iş |
+|---|---|---|---|
+| D1 | Ünite rehber kitapçığı | Her ünitenin başında açılabilen kısa rehber: anahtar kalıplar, örnek diyalog, CEFR seviyesi; B5 ünite özetiyle birleşir | Küçük-orta (içerik) |
+| D2 | Efsanevi zor tekrar | Biten bir üniteyi ipucusuz ve süreli tekrar; geçince ünite "altın" olur. Başarısızlıkta ceza yok | Küçük |
+| D3 | Pratik merkezi | Tek ekranda: hatalarım (var), zamana karşı eşleştirme, süreli artan zorluk turu, kelime kartları | Orta |
+| D4 | Hikâyeler doğrulaması | Öneri 31'in yapısı: diyaloglu okuma + anlama soruları + serbest yazma; kolay/orta/zor, yalnız dil alanında | Bulutta |
+| D5 | Dinleme radyosu | Kısa sesli bölümler (cihaz TTS ile çevrimdışı): dinle-eşleştir, dinle-tanı, sırala | Orta |
+| D6 | Satranç modülünün iskeleti | Günlük bulmaca + mini maç (hazır konumdan kısa oyun) + oyun incelemesi + serbest tahta; öneri 4'ü doğrular | Altyapı (öneri 4) |
+| D7 | Seri geri kazanma | Seri kırılırsa 3 gün üst üste hedefi tamamlayınca seri geri gelir (ücretsiz; Ü6 ile) | Küçük |
+| D8 | Aylık meydan okuma, yan görevler ve kişisel rekorlar | Ayın tek büyük hedefi (ör. 30 ders), haftalık yan görev, en uzun seri / en çok XP gibi kişisel rekorlar | Küçük-orta |
+| D9 | Kolaylaştırma önerisi | Üst üste iki başarısız denemede daha kolay ders ya da tekrar önerilir | Küçük |
+| D10 | Yılın (ve ayın) özeti | Çevrimdışı rapor: öğrenilen kelime, bitirilen ders, en iyi gün, en güçlü konu | Küçük |
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~50K, çıktı ~9K.
