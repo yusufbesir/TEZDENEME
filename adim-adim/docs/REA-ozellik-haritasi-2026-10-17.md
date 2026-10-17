@@ -487,3 +487,36 @@ Canlı oyun ve çevrim içi eşleşme, yazışmalı günlük oyun, bulmaca sava�
 
 ### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~60K, çıktı ~10K.
+
+## Mondly (apktool, 2026-10-17)
+
+### Kimlik
+- Dosya: `com.atistudios.mondly.languages_10.41.5-83888_4arch_7dpi_…_apkmirror.com.apkm` (179,2 MB, APKMirror paketi), paket `com.atistudios.mondly.languages`, sürüm 10.41.5, minSdk 29, targetSdk 35. SHA256 `056071F8E1CD675FF423A9BE36D19CB74FF5C515D3449C763AD5180D3B4879FB`.
+- Yöntem: base.apk apktool 3.0.3; manifest etkinlik adları ve 502 layout adı. Yerel Android; içerik `assets/db` altında **SQLCipher ile şifreli yerel veritabanı** (`libsqlcipher.so`), indirilebilir içerik paketleri (DownloadContent). 81 etkinlik (69 kendi).
+
+### Akış ve modüller
+- Onboarding → hedef seçimi (`fragment_pick_goal`, `view_goal_picker`) → **seviye değerlendirmesi** (placement IntroActivity → AssessmentResult) → öğrenme planı (`fragment_learning_plan`).
+- **Kategoriler**: CategoryDetails → öğrenme birimleri (learning unit) → Quiz (34 quiz düzeni, quiz tercihleri, başarısız quiz ekranı, quiz videosu).
+- **Ders sonu tekrarı**: LessonReview üç liste: kelimeler, kalıplar (phrases), fiiller (`item_lesson_review_words/phrases/verb_adapter`); **Hızlı tekrar** (QuickReview); tekrar koleksiyonu tamamlama ekranı.
+- **Kelime bilgisi**: Vocabulary + kelime quizi, **kelime bulutu** (`view_word_cloud`).
+- **Sözlük**: isim sözlüğü (DictionaryNoun) ve **fiil çekim sayfaları** (`dialog_dictionary_verb`, `item_dictionary_verb_page`).
+- **Periyodik dersler**: PeriodicLesson (günün, haftanın, ayın dersi; `view_periodic_unit`, `view_periodic_challenge_bar`), ana ekran günlük ders widget'ı.
+- **Konuşma**: ConversationActivity (iki taraflı sohbet balonları, konuşma tercihleri, konuşma tamamlama), ChatbotActivity (sohbet botu dersleri), konuşma tanıma hata ayıklama ekranı (SpeechRecognitionDebug).
+- **Eller serbest mod** (HandsfreeActivity): ekrana bakmadan sesli öğrenme.
+- **İlerleme**: seviye atlama (LevelUp), rozetler (BadgeList, BadgeDetails, BadgeAchievement), seri ayrıntısı ve seri başarımı, ilerleme göstergeleri (yıldız, puan, "beyin").
+
+### Adım Adım'a uyarlanabilir (Mondly, öneri 61–66)
+| # | Özellik | Nasıl | Tahmini iş |
+|---|---|---|---|
+| 61 | Fiil çekim sözlüğü | Sözlükte fiil maddesine dokununca zamanlara göre çekim tablosu; B3 tablo tamamlama alıştırmasının kaynağı | Orta (içerik) |
+| 62 | Ders sonu tekrar ekranı (kelime / kalıp / fiil) | Ders bitince o dersin öğelerini üç sekmede listeler, tek dokunuşla sesli okutur ve kartlara ekler; B5/42 ile birleşir | Küçük |
+| 63 | Günün / haftanın / ayın dersi | Takvime bağlı, karışık içerikli özel dersler; ana sayfada kart. Günlük ders Windows bildirimiyle hatırlatılır | Küçük-orta |
+| 64 | Eller serbest sesli mod | Ekrana bakmadan: TTS kelimeyi ve cümleyi okur, kullanıcı tekrar eder, konuşma tanıma kontrol eder (Yusuf onayladı) | Orta |
+| 65 | Senaryolu konuşma | Önceden yazılmış, dallanan iki taraflı sohbet (balonlu); kullanıcı seçerek, yazarak ya da konuşarak cevap verir; çevrimdışı | Orta |
+| 66 | Kelime bulutu ve öğrenme göstergesi | Öğrenilen kelimelerin güce göre büyüyen bulutu; profilde "öğrendiğin kelime sayısı" göstergesi | Küçük |
+
+### Önerilmedi (Mondly)
+Ülkeye göre sosyal sıralama ve arkadaşlar, arkadaş daveti, premium ve aile planı, hediye abonelik, mevsimsel kampanya, iş/kurum içerikleri ve canlı dil eğitmeni (LanguageTutoring, Digital Learning Tutor), çevrim içi sohbet botu (ağ gerektiren yapay zekâ), harici sertifikalı sınav (Pearson quiz).
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~35K, çıktı ~7K.
