@@ -356,3 +356,32 @@ Topluluk ve arkadaşlar (social, community_post, friends, düzeltme isteği, dü
 
 ### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~40K, çıktı ~7K.
+
+## Ücretli mekaniklerin ücretsiz karşılıkları (2026-10-17, Yusuf'un isteği)
+
+İlke: Adım Adım'da para, reklam, jeton satın alma ve şans (kumar benzeri rastgele ödül) yok. Ücretli uygulamalardaki mekanikler **yalnız öğrenme davranışıyla** (doğru cevap, tekrar, seri, hedef) kazanılan karşılıklarla sunulur. Hangilerinin yapılmayacağına Yusuf karar verir.
+
+| # | Ücretli mekanik (kaynak) | Ücretsiz karşılığı (Adım Adım) | Kazanma yolu | Tahmini iş |
+|---|---|---|---|---|
+| Ü1 | Can satın alma / can dolumu (Trivia OutOfLives, CostToRefillLives) | Can sınırı yok; yarışmada 3 can yalnız o oyun için. Biten oyun hemen yeniden başlatılabilir | — | Yok (zaten böyle) |
+| Ü2 | Jokerler jetonla (Trivia PowerUp, Bomb, AnotherChance) | Jokerler (öneri 32) | Günlük hedefi tamamla: +1 joker; 7 günlük seri: +3; günde en çok 5 | Küçük-orta |
+| Ü3 | Şans çarkı / premium çark (Trivia LuckySpin) | **Ödül çarkı yerine sabit ödül yolu**: her 5 dersi bitirince önceden bilinen ödül (joker, tema rengi, rozet). Rastgelelik yok | Ders sayısı | Küçük |
+| Ü4 | Sandık / kart paketi (Trivia Chest, CardsChest) | **Koleksiyon kartları**: her ünite bitince o ünitenin "kelime kartı"nı açar; albümde toplanır, kart = o ünitenin özeti | Ünite tamamlama | Orta |
+| Ü5 | Sezon / altın geçiş (Trivia Season, GoldenPass, VipPass) | **Aylık öğrenme yolu**: ayın 20 basamaklı ödül çizelgesi; XP ile ilerler, ödüller tema, çerçeve, rozet, joker | XP | Orta |
+| Ü6 | Seri dondurma satın alma (Duolingo türü, Busuu Streaks) | **Seri koruması**: haftada 1 kez otomatik "dinlenme günü" (esnek seri zaten var; görünür hâle getirilir) | Otomatik | Küçük |
+| Ü7 | Tekrar dene, altınla (Trivia GetRetryGoldCost) | Yanlış sorudan sonra "bir daha dene" her zaman ücretsiz; puan yarıya iner, soru tekrar destesine eklenir | — | Küçük |
+| Ü8 | Hızlandırıcı / çift XP süresi (Trivia Booster, BonusTime) | **Odak saati**: kullanıcı günde 1 kez 15 dk'lık "odak" başlatır; bu sürede tekrar soruları 1,5 kat XP | Kullanıcı başlatır | Küçük |
+| Ü9 | Premium akıllı tekrar (Busuu SmartReviewUpgrade) | Akıllı tekrar kutuları herkese açık (B4) | — | Küçük |
+| Ü10 | Premium sertifika (Busuu CertificateReward) | Seviye sertifikası ücretsiz (B2); çevrimdışı ekran ve PDF | Seviye sınavını geçmek | Orta |
+| Ü11 | Premium çevrimdışı indirme (Busuu dialog_unit_download) | Tüm içerik zaten uygulamanın içinde ve çevrimdışı | — | Yok (zaten böyle) |
+| Ü12 | Premium çalışma planı (Busuu StudyPlan upsell) | Çalışma planı ücretsiz (B1) | — | Orta |
+| Ü13 | Yapay zekâ konuşma koçu / canlı ders (Busuu AiConversation, Live) | **Çevrimdışı senaryo diyalogları**: önceden yazılmış dallanan diyaloglarda kullanıcı cevap seçer ya da yazar; konuşma tanıma eklenirse sesli (öneri 8.7 onayına bağlı) | — | Orta-büyük |
+| Ü14 | Premium temalar / avatar çerçevesi (Trivia Frame, Avatar) | Tema renkleri ve profil çerçeveleri başarımlarla açılır | Rozet ve seri | Küçük |
+| Ü15 | Reklamsız sürüm | Reklam hiç yok | — | Yok (zaten böyle) |
+
+Notlar:
+- Ü3 ve Ü4'te bilinçli olarak **rastgele ödül yok**; kutu açma ve çark, kumar benzeri alışkanlık yarattığı için yerine önceden bilinen ödüller öneriliyor.
+- Ü2, Ü5, Ü8 birbirine bağlıdır (joker ve XP ekonomisi); birlikte ya da hiç yapılmaları önerilir.
+- Yapılmaması istenenler bu tabloya "Yusuf: yapılmasın" notuyla eklenir; satır silinmez.
+
+Birlikte çalışılanlar: Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; kaynak: bu belgedeki Trivia Crack 2 ve Busuu apktool bulguları. Token (tahmini): girdi ~20K, çıktı ~4K.
