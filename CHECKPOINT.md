@@ -25,6 +25,7 @@
   - Çarşamba 2026-10-21 06:30Z: emülatör kurulumu (Yusuf onayı), Khan/Encode/Drops akışları, TTS ses kontrolü, yeni öneriler.
   - REA: .claude.json yolları D:\Programlar'a çevrildi (Yusuf izni, 2026-10-17 14:21); Yusuf /mcp → rea → Reconnect yapınca test edilecek. Sonraki APK taramaları REA+JADX ile.
   - Model kuralı (Yusuf 2026-10-17 15:17): Fable kullanım limiti dolunca Adım Adım oturumu ve alt ajanları limit yenilenene kadar Sonnet'e (basit işte Haiku) devredilir; yenilenince Fable'a dönülür; devir tek satırla bildirilir.
+  - DURAKLAMA (Yusuf 2026-10-17 15:36): Fable limiti doldu; limit yenilenince kendiliğinden devam. İLK VE EN ÖNEMLİ GÖREV: REA. Son durum: .claude.json REA yolları D:\Programlar'a çevrildi (14:21); eski cihaz oturumu eski env ile çalışıyordu, kapatılıp yeni RC oturumu açıldı (15:06, cse_01TFn1Vtzpn4dvkj7tQesGFP) ve REA sağlık testi + düzeltme + küçük APK ile uçtan uca doğrulama görevi verildi; 15:36 itibarıyla rapor gelmedi. Devamda: cihaz oturumundan rapor al (gelmediyse yeni RC oturumu başlat ve inspect_apktool_client ile başla); REA çalışınca Yusuf'a kanıtla bildir; sonra 24, 28, 29, 31, 8.7, 67 sırası. PR #29 birleşti (main 438447e0); dal main ile eşit. Windows sürümü D:\Programlar\Adim-Adim (88be06a, 460 test).
   - Son çalışır sürüm: cihazda `flutter build windows --release` → D:\Programlar\Adim-Adim\ (SURUM.txt ile). PR #29 Yusuf'un birleştirme onayını bekliyor.
 
 ## Tamamlandı
