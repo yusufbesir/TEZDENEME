@@ -129,6 +129,11 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final o in _liste) o.alistirma],
+                // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+                notGetir: (i) => ref
+                    .read(durumProvider)
+                    .value
+                    ?.kelimeNotlari[_liste[i].kartId],
                 onSonuc: (i, dogru) => ref
                     .read(durumProvider.notifier)
                     .kartIsle(_liste[i].kartId, dogru),

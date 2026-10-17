@@ -1,6 +1,6 @@
 /// Riverpod sağlayıcıları: depo, bugün, kurslar, öğrenci durumu ve alan kursları.
 /// Durum yazımları (ders, mikro ders, yarışma, tekrar oturumu, kart, ayarlar;
-/// hata defteri, öğrenme günlüğü ve haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
+/// hata defteri, öğrenme günlüğü, kelime notu ve haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -169,6 +169,10 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartEkle(d, kartId, bugun));
   }
+
+  /// Kelimeye kişisel not yazar; boş/null metin notu siler.
+  Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
+      _uygula((d) => Motor.notYaz(d, kartId, metin));
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat. Hatırlatma açılırken bildirim izni

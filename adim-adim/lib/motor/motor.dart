@@ -1,6 +1,6 @@
 /// Öğrenme motoru: XP, seviye, esnek seri ve haftalık hedef, yarı ömür tabanlı
 /// aralıklı tekrar, hata defteri, öğrenme günlüğü, serpiştirilmiş ünite
-/// tekrarı ve cevap kontrolü.
+/// tekrarı, kelime notları, kademeli ipucu ve cevap kontrolü.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
@@ -493,6 +493,118 @@ abstract final class Motor {
         ),
       },
     );
+  }
+
+  /// Kelimeye kişisel not yazar. [metin] null ya da (kırpılmış) boşsa not
+  /// silinir; uzun metin [OgrenciDurumu.notEnCokKarakter] karaktere kısaltılır.
+  /// Yeni not eklenirken toplam [OgrenciDurumu.notEnCok] aşılacaksa durum
+  /// değişmeden döner (mevcut notu güncellemek her zaman serbesttir).
+  static OgrenciDurumu notYaz(OgrenciDurumu d, String kartId, String? metin) {
+    final kirpik = metin?.trim() ?? '';
+    if (kirpik.isEmpty) {
+      if (!d.kelimeNotlari.containsKey(kartId)) return d;
+      final kalan = {...d.kelimeNotlari}..remove(kartId);
+      return d.copyWith(kelimeNotlari: Map.unmodifiable(kalan));
+    }
+    if (!d.kelimeNotlari.containsKey(kartId) &&
+        d.kelimeNotlari.length >= OgrenciDurumu.notEnCok) {
+      return d;
+    }
+    final kisa = kirpik.length > OgrenciDurumu.notEnCokKarakter
+        ? kirpik.substring(0, OgrenciDurumu.notEnCokKarakter).trimRight()
+        : kirpik;
+    return d.copyWith(
+      kelimeNotlari: Map.unmodifiable({...d.kelimeNotlari, kartId: kisa}),
+    );
+  }
+
+  /// Kademeli ipucu sayısı: genel, hataya özel, çözüm.
+  static const int ipucuAdimSayisi = 3;
+
+  /// Kademeli ipucu. [adim] 0: genel ipucu (açıklamanın ilk cümlesi, yoksa
+  /// türe göre sabit metin); 1: hataya özel (uzunluk, ilk/son harf, bir yanlış
+  /// seçeneği eleme, ilk kelime); 2 ve üstü: çözüm (doğru cevap).
+  /// [Alistirma.ipuclari] doluysa önce onlar sırayla verilir, sonra çözüm.
+  static String ipucuUret(Alistirma a, int adim) {
+    final n = adim < 0 ? 0 : adim;
+    final ozel = a.ipuclari;
+    if (ozel.isNotEmpty) {
+      if (n < ozel.length && n < ipucuAdimSayisi - 1) return ozel[n];
+      return 'Çözüm: ${dogruCevapMetni(a)}';
+    }
+    switch (n) {
+      case 0:
+        return _genelIpucu(a);
+      case 1:
+        return _ozelIpucu(a);
+      default:
+        return 'Çözüm: ${dogruCevapMetni(a)}';
+    }
+  }
+
+  /// Yanlış cevapta gösterilecek doğru cevap metni (alıştırma türüne göre).
+  static String dogruCevapMetni(Alistirma a) => switch (a) {
+    Secim() => a.secenekler[a.dogru],
+    Bosluk() => a.secenekler[a.dogru],
+    Dinle() => a.secenekler[a.dogru],
+    Kod() => a.secenekler[a.dogru],
+    Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
+    Sirala() => a.dogru.join(' '),
+    Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
+  };
+
+  /// Adım 0: açıklamanın ilk cümlesi; yoksa türe göre sabit metin.
+  static String _genelIpucu(Alistirma a) {
+    final aciklama = a.aciklama?.trim();
+    if (aciklama != null && aciklama.isNotEmpty) {
+      final m = RegExp(r'^.*?[.!?](?=\s|$)').firstMatch(aciklama);
+      return m?.group(0) ?? aciklama;
+    }
+    return switch (a) {
+      Secim() => 'Seçenekleri ele: açıkça yanlış olanları çıkar',
+      Bosluk() => 'Boşluğun önündeki ve sonrasındaki kelimeye bak',
+      Yaz() =>
+        a.cevaplar.isEmpty || a.cevaplar.first.isEmpty
+            ? 'Cevabı yazmayı dene'
+            : 'İlk harfi: ${a.cevaplar.first[0]}',
+      Sirala() => 'Cümle büyük harfle başlar, noktalama ile biter',
+      Eslestir() => 'Bildiklerini önce eşle',
+      Dinle() => 'Bir kez daha dinle, sonra yaz',
+      Kod() => 'Söz dizimini kontrol et',
+    };
+  }
+
+  /// Adım 1: hataya özel ipucu.
+  static String _ozelIpucu(Alistirma a) {
+    String uzunlukVeHarf(String c) {
+      if (c.isEmpty) return 'Cevabı yazmayı dene';
+      if (c.length == 1) return 'Tek harf: $c';
+      return '${c.length} harf, "${c[0]}" ile başlar, '
+          '"${c[c.length - 1]}" ile biter';
+    }
+
+    String yanlisEle(List<String> secenekler, int dogru) {
+      for (var i = 0; i < secenekler.length; i++) {
+        if (i != dogru) return '"${secenekler[i]}" değil';
+      }
+      return 'Tek seçenek doğru';
+    }
+
+    return switch (a) {
+      Yaz() => uzunlukVeHarf(a.cevaplar.isEmpty ? '' : a.cevaplar.first),
+      Bosluk() => uzunlukVeHarf(a.secenekler[a.dogru]),
+      Secim() => yanlisEle(a.secenekler, a.dogru),
+      Dinle() => yanlisEle(a.secenekler, a.dogru),
+      Kod() => yanlisEle(a.secenekler, a.dogru),
+      Sirala() =>
+        a.dogru.isEmpty
+            ? 'Cümle büyük harfle başlar, noktalama ile biter'
+            : 'İlk kelime: ${a.dogru.first}',
+      Eslestir() =>
+        a.ciftler.isEmpty
+            ? 'Bildiklerini önce eşle'
+            : 'Bir çift: ${a.ciftler.first.sol} = ${a.ciftler.first.sag}',
+    };
   }
 
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2

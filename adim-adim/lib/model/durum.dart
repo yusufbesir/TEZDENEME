@@ -1,9 +1,10 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
-/// haftalık hedef, tamamlanan dersler, son açılan ders ve öğrenme günlüğü.
+/// haftalık hedef, tamamlanan dersler, son açılan ders, öğrenme günlüğü ve
+/// kelime notları (kişisel mnemonikler).
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
-/// haftalık hedef 5, son ders yok, günlük boş).
+/// haftalık hedef 5, son ders yok, günlük boş, not yok).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -229,7 +230,13 @@ class OgrenciDurumu {
     this.haftalikHedefGun = varsayilanHaftalikHedef,
     this.sonDersId,
     this.gunluk = const [],
+    this.kelimeNotlari = const {},
   });
+
+  /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
+  /// toplam en çok [notEnCok] not (eski JSON'da fazlası atlanır).
+  static const int notEnCokKarakter = 200;
+  static const int notEnCok = 500;
 
   /// Haftalık hedef (haftada çalışılacak gün) sınırları ve varsayılanı.
   static const int enAzHaftalikHedef = 3;
@@ -262,6 +269,10 @@ class OgrenciDurumu {
 
   /// Öğrenme günlüğü, eskiden yeniye; en çok [GunlukKayit.enCok] kayıt.
   final List<GunlukKayit> gunluk;
+
+  /// Kelimeye kişisel not (mnemonik): kart kimliği ('dersId#i') -> not metni
+  /// (en çok [notEnCokKarakter] karakter). Eski kayıtlarda boş.
+  final Map<String, String> kelimeNotlari;
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
@@ -305,6 +316,7 @@ class OgrenciDurumu {
     int? haftalikHedefGun,
     String? sonDersId,
     List<GunlukKayit>? gunluk,
+    Map<String, String>? kelimeNotlari,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -326,6 +338,7 @@ class OgrenciDurumu {
       haftalikHedefGun: haftalikHedefGun ?? this.haftalikHedefGun,
       sonDersId: sonDersId ?? this.sonDersId,
       gunluk: gunluk ?? this.gunluk,
+      kelimeNotlari: kelimeNotlari ?? this.kelimeNotlari,
     );
   }
 
@@ -348,6 +361,7 @@ class OgrenciDurumu {
     'haftalikHedefGun': haftalikHedefGun,
     'sonDersId': sonDersId,
     'gunluk': [for (final g in gunluk) g.toJson()],
+    'kelimeNotlari': kelimeNotlari,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -411,6 +425,24 @@ class OgrenciDurumu {
         ? gunluk.sublist(gunluk.length - GunlukKayit.enCok)
         : gunluk;
     final sonDers = j['sonDersId'];
+    // Kelime notları: anahtar kart kimliği ('#' içerir), değer boş olmayan
+    // metin (en çok notEnCokKarakter); fazlası ve bozuk girdiler atlanır.
+    final notlar = <String, String>{};
+    final hamNot = j['kelimeNotlari'];
+    if (hamNot is Map) {
+      for (final e in hamNot.entries) {
+        if (notlar.length >= notEnCok) break;
+        final k = e.key;
+        final v = e.value;
+        if (k is! String || k.isEmpty || k.length > 120 || !k.contains('#')) {
+          continue;
+        }
+        if (v is! String) continue;
+        final metin = v.trim();
+        if (metin.isEmpty || metin.length > notEnCokKarakter) continue;
+        notlar[k] = metin;
+      }
+    }
     return OgrenciDurumu(
       xp: tamsayi(j['xp'], 0),
       seri: tamsayi(j['seri'], 0, max: 100000),
@@ -442,6 +474,7 @@ class OgrenciDurumu {
           ? sonDers
           : null,
       gunluk: List.unmodifiable(sonGunluk),
+      kelimeNotlari: Map.unmodifiable(notlar),
     );
   }
 }

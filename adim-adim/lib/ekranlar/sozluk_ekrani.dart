@@ -1,7 +1,9 @@
 /// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod),
 /// yatay kayan ünite paket çipleri (seçilen paket listeyi süzer) ve sonuç
 /// listesi (kelime kalın, anlam altta, sağda kurs kısa adı ve "Kartlara ekle"
-/// düğmesi; kart eklenmişse pasif "Kartlarda" onayı). İngilizce maddede
+/// düğmesi; kart eklenmişse pasif "Kartlarda" onayı). Her maddede "Not"
+/// düğmesi kişisel not (mnemonik, en çok 200 karakter) yazdırır; not varsa
+/// anlamın altında italik tek satır "Not: ..." görünür. İngilizce maddede
 /// sıklık rozeti ("Çok sık" ≤100, "Sık" ≤300) ve kök farklıysa "kök: go"
 /// bilgisi görünür. İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile
 /// okur; kod maddelerinde ses yok. Dar pencerede (480) taşmaz.
@@ -17,6 +19,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../sozluk/sozluk.dart';
 import '../tema/tema.dart';
 
@@ -221,6 +224,9 @@ class _MaddeSatiri extends ConsumerWidget {
         (d) => d.value?.kartlar.containsKey(kartId) ?? false,
       ),
     );
+    final not = ref.watch(
+      durumProvider.select((d) => d.value?.kelimeNotlari[kartId]),
+    );
     return ListTile(
       dense: false,
       leading: ingilizce
@@ -244,6 +250,16 @@ class _MaddeSatiri extends ConsumerWidget {
               'kök: ${madde.kok}',
               style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
             ),
+          if (not != null)
+            Text(
+              'Not: $not',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: yazi.bodySmall?.copyWith(
+                color: r.metinIkincil,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
         ],
       ),
       // Sağ taraf sıkı Row: kurs kısa adı + kart düğmesi. Yatay tutulur;
@@ -258,6 +274,15 @@ class _MaddeSatiri extends ConsumerWidget {
           Text(
             _SozlukDurumu.kursKisaAd(madde.kursId),
             style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+          ),
+          IconButton(
+            icon: Icon(
+              not == null ? Icons.sticky_note_2_outlined : Icons.sticky_note_2,
+              color: not == null ? null : r.ana,
+            ),
+            tooltip: not == null ? 'Not' : 'Notu düzenle',
+            visualDensity: VisualDensity.compact,
+            onPressed: () => notDuzenle(context, ref, kartId, not),
           ),
           kartlarda
               ? IconButton(
@@ -285,6 +310,76 @@ class _MaddeSatiri extends ConsumerWidget {
                 ),
         ],
       ),
+    );
+  }
+}
+
+/// Kişisel not penceresini açar ve sonucu yazar: null → Vazgeç (dokunma),
+/// '' → Sil, metin → Kaydet (boş metinle Kaydet de notu siler).
+Future<void> notDuzenle(
+  BuildContext context,
+  WidgetRef ref,
+  String kartId,
+  String? mevcut,
+) async {
+  final sonuc = await showDialog<String?>(
+    context: context,
+    builder: (_) => NotPenceresi(mevcut: mevcut),
+  );
+  if (sonuc == null) return;
+  await ref.read(durumProvider.notifier).notYaz(kartId, sonuc);
+}
+
+/// Kişisel not penceresi: TextField (en çok 200 karakter), Vazgeç, (not
+/// varsa) Sil ve Kaydet. Denetleyici pencereyle birlikte yaşar; kapanış
+/// animasyonu sırasında kullanılmaya devam edebilir, bu yüzden burada tutulur.
+class NotPenceresi extends StatefulWidget {
+  const NotPenceresi({super.key, this.mevcut});
+  final String? mevcut;
+
+  @override
+  State<NotPenceresi> createState() => _NotPenceresiDurumu();
+}
+
+class _NotPenceresiDurumu extends State<NotPenceresi> {
+  late final _denetleyici = TextEditingController(text: widget.mevcut ?? '');
+
+  @override
+  void dispose() {
+    _denetleyici.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Kişisel not'),
+      content: TextField(
+        key: const Key('not-metni'),
+        controller: _denetleyici,
+        autofocus: true,
+        maxLength: OgrenciDurumu.notEnCokKarakter,
+        maxLines: 3,
+        minLines: 1,
+        decoration: const InputDecoration(
+          hintText: 'Hatırlatıcı, benzetme ya da örnek cümle',
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Vazgeç'),
+        ),
+        if (widget.mevcut != null)
+          TextButton(
+            onPressed: () => Navigator.pop(context, ''),
+            child: const Text('Sil'),
+          ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _denetleyici.text),
+          child: const Text('Kaydet'),
+        ),
+      ],
     );
   }
 }

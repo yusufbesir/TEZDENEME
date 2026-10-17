@@ -60,6 +60,9 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
       return SafeArea(
         child: AlistirmaOturumu(
           alistirmalar: [for (final o in oturum) o.alistirma],
+          // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+          notGetir: (i) =>
+              ref.read(durumProvider).value?.kelimeNotlari[oturum[i].kartId],
           onSonuc: (i, dogru) => ref
               .read(durumProvider.notifier)
               .kartIsle(oturum[i].kartId, dogru),
