@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Adım Adım">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA63D"/><stop offset="1" stop-color="#F26B1D"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/>
+<path d="M96 408V344h96V280h96V216h96V152h40v256z" fill="#fff"/>
+<path d="M96 344h96v-16H96z M192 280h96v-16h-96z M288 216h96v-16h-96z" fill="#FFD9B0"/>
+<path d="M376 152V84" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+<path d="M384 88l60 24-60 24z" fill="#1E6B52"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dosya Dönüştürücü">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F7BF5"/><stop offset="1" stop-color="#1747A8"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/>
+<path d="M104 120a24 24 0 0 1 24-24h104l56 56v112H104z" fill="#fff"/>
+<path d="M232 96l56 56h-56z" fill="#B9D2FB"/>
+<rect x="136" y="200" width="104" height="14" rx="7" fill="#2F7BF5"/><rect x="136" y="232" width="72" height="14" rx="7" fill="#9FC0F8"/>
+<path d="M408 392a24 24 0 0 1-24 24H280l-56-56V248h184z" fill="#FFB020"/>
+<path d="M280 416l-56-56h56z" fill="#C97F00"/>
+<g fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"><path d="M296 304h60m-24-24 24 24-24 24"/></g>
+</svg>
