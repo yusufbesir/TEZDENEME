@@ -8,7 +8,8 @@
 
 ## Bekleyen kullanıcı kararları
 - Adım Adım: 20 yeni içerik önerisinden (adim-adim/docs/ONERILER-2026-10-17-YENI-ICERIK.md) hangileri ve hangi sırayla yapılsın? Önerilen ilk üç: sözlük, Python 3 düzey, HTML/CSS/JS orta-ileri.
-- Adım Adım: Öneri 1 (gömülü sözlük) PR #28 dalında uygulandı (2026-10-17, 348 test geçti); PR #28 birleştirme onayı bekliyor.
+- Adım Adım özellik planı (Yusuf 2026-10-17 13:13): toplam ~35 özellik, lig/topluluk/sosyal HARİÇ, tek kişilik ve yayınlanmayacak uygulama. 1–20 ONERILER-2026-10-17-YENI-ICERIK.md, 21–30 REA-ozellik-haritasi "REA incelemesi", 31 okuma hikâyeleri (yalnız dil kurslarında; kolay/orta/zor; kelime bilgisi ölçümü + okuma egzersizi), 32–35 Trivia Crack taramasından oyun mekanikleri (cihaz yazıyor). Yapılan: 1 (sözlük, PR #28 birleşti dc1aeabe). Uygulama sırası: 17, 16, 21, 22, 23, 26, 14, 24, 28, 29, 31, 25, 18, sonra 2, 3, 4, 5... Haftalık limit dolunca yapılmayanlar burada "Bekliyor" olarak kalır, limit yenilenince devam.
+- Adım Adım çarşamba 2026-10-21 işi: okunamayan APK'ları (uptodown kopyaları yeniden indirilince) BlueStacks benzeri emülatörde kurup deneme, sonra yeni öneriler. Kurulum Yusuf onayıyla cihazda.
 - `.claude/skills` altındaki kullanılmayan skill'ler `skill-kutuphanesi` altına alınsın mı?
 - Jev ayrıntısı `docs/jev/` altında kalıp CLAUDE.md'de yalnız bağ mı bırakılsın?
 - Archify haritası cihaz oturumunda mı çıkarılsın?
