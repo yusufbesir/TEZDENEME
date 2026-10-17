@@ -136,3 +136,8 @@ Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-202
 57. Iqra ? (com.mmmoussa.iqra)
 ## Not
 - Trivia Crack 2 (com.etermax.trivia.preguntados2) — APKMirror 1.169.2, yanlışlıkla taşınan dosya
+
+## Üçüncü taşıma (2026-10-17 13:37): Trivia Crack 2, tarama sonrası
+- Karar: Yusuf, "tarama yaptıktan sonra silebilirsin" (13:27). Tarama 4980ab3 ile belgelendi, ardından **yalnız bu dosya adıyla** taşındı; klasördeki başka dosyaya dokunulmadı.
+- Dosya: `D:\Programlar\apk\com.etermax.trivia.preguntados2_1.191.4-405_minAPI22(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk`, 167,9 MB, SHA256 `257529B2EC4AB4A4C54BF6CDD32154CBFB71DE60F3333F085F51B366E4528782` (taşımadan önce eşleşti).
+- Taşıma sonrası Geri Dönüşüm Kutusu'nda görüldü (1 öğe). Not: Çöp kutusu daha önce dışarıdan boşaltıldığı için kalıcılığı garanti değil.
