@@ -146,3 +146,8 @@ Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-202
 - Tarama 303b2b9 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
 - Dosya: `D:\Programlar\apk\com.busuu.android.enc_32.49.1(1783745)-1783745_4arch_7dpi_069d30e563faa95e4bb1888fb8574e6f_apkmirror.com.apkm`, 71.7 MB, SHA256 `DDEC20877BE1B1A230EFD6B4075DC5ACF3914875EDD282B105F5E6C9D35BD152` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
 
+
+## Beşinci taşıma (2026-10-17 13:40): Duolingo, tarama sonrası
+- Tarama cc4c720 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
+- Dosya: `D:\Programlar\apk\com.duolingo_6.101.1-2475_4arch_6dpi_63fb3322e92449b34c6dfc6d1899def1_apkmirror.com.apkm`, 164.4 MB, SHA256 `41F7DE0C86CA9545B5FDABDE0945DEEC14EF7CBDAC275A1962C9C883EA945A0A` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
+

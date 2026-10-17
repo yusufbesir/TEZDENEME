@@ -426,3 +426,6 @@ Lig ve sıralama, arkadaş serisi ve arkadaş görevleri, kulüp/okul, aile plan
 
 ### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~50K, çıktı ~9K.
+
+> Numaralama notu (koordinatör, 2026-10-17): Duolingo önerileri birleşik listede **D1=42, D2=43, D3=44, D4=45, D5=46, D6=47, D7=48, D8=49, D9=50, D10=51** olarak sürer.
+
