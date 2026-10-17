@@ -1,6 +1,6 @@
 /// Riverpod sağlayıcıları: depo, bugün, kurslar, öğrenci durumu ve alan kursları.
-/// Durum yazımları (ders, mikro ders, yarışma, kart, ayarlar; hata defteri ve
-/// haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
+/// Durum yazımları (ders, mikro ders, yarışma, tekrar oturumu, kart, ayarlar;
+/// hata defteri, öğrenme günlüğü ve haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -133,14 +133,30 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   }
 
   /// [yanlisSorular]: oyunda yanlış bilinen sorular (hata defterine yazılır).
+  /// [dogru]/[toplam]: öğrenme günlüğüne yazılan cevap sayıları.
   Future<OgrenciDurumu> yarismaBitir(
     int puan, {
     List<YarismaSorusu> yanlisSorular = const [],
+    int dogru = 0,
+    int toplam = 0,
   }) {
     final bugun = ref.read(bugunProvider);
     return _uygula(
-      (d) => Motor.yarismaBitir(d, puan, bugun, yanlisSorular: yanlisSorular),
+      (d) => Motor.yarismaBitir(
+        d,
+        puan,
+        bugun,
+        yanlisSorular: yanlisSorular,
+        dogru: dogru,
+        toplam: toplam,
+      ),
     );
+  }
+
+  /// Tekrar oturumu bitişi: öğrenme günlüğüne tek 'tekrar' kaydı.
+  Future<OgrenciDurumu> tekrarBitir(int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.tekrarBitir(d, dogru, toplam, bugun));
   }
 
   Future<OgrenciDurumu> kartIsle(String kartId, bool dogruMu) {

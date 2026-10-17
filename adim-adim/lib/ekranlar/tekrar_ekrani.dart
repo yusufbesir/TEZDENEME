@@ -1,7 +1,7 @@
 /// Tekrar sekmesi: seçili alanın zamanı gelen (yarı ömür tabanlı) kartlarını
 /// sorar; altında "Kelime sağlığı" panosu (Zayıf/Orta/Güçlü) ve "Hata defteri"
 /// bölümü (yanlış kart ve yarışma soruları, "Zayıf noktalar dersi" düğmesi)
-/// bulunur.
+/// bulunur. Oturum bitince öğrenme günlüğüne tek 'tekrar' kaydı yazılır.
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
@@ -63,7 +63,11 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
           onSonuc: (i, dogru) => ref
               .read(durumProvider.notifier)
               .kartIsle(oturum[i].kartId, dogru),
-          onBitti: (d, t) => setState(() => _sonuc = (dogru: d, toplam: t)),
+          onBitti: (d, t) {
+            // Oturum sonu: öğrenme günlüğüne tek 'tekrar' kaydı.
+            ref.read(durumProvider.notifier).tekrarBitir(d, t);
+            setState(() => _sonuc = (dogru: d, toplam: t));
+          },
           onKapat: () => setState(() => _oturum = null),
         ),
       );

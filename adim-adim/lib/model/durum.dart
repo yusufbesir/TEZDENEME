@@ -1,9 +1,9 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
-/// haftalık hedef, tamamlanan dersler.
+/// haftalık hedef, tamamlanan dersler, son açılan ders ve öğrenme günlüğü.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
-/// haftalık hedef 5).
+/// haftalık hedef 5, son ders yok, günlük boş).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -141,6 +141,75 @@ class HataKaydi {
   }
 }
 
+/// Öğrenme günlüğü kaydı: bitirilen bir ders, mikro ders, tekrar oturumu ya da
+/// yarışma. Günlük, en çok [enCok] kayıt tutar; en eskisi düşer.
+class GunlukKayit {
+  const GunlukKayit({
+    required this.gun,
+    required this.tur,
+    this.id,
+    this.dogru = 0,
+    this.toplam = 0,
+    this.xp = 0,
+  });
+
+  static const String turDers = 'ders';
+  static const String turMikro = 'mikro';
+  static const String turTekrar = 'tekrar';
+  static const String turYarisma = 'yarisma';
+  static const List<String> turler = [turDers, turMikro, turTekrar, turYarisma];
+
+  /// En çok saklanan kayıt sayısı; en eskisi düşer.
+  static const int enCok = 200;
+
+  /// Sayaçların üst sınırı (bozuk kayıtlara karşı).
+  static const int _enCokSayi = 1 << 30;
+
+  /// Kaydın günü 'YYYY-MM-DD'.
+  final String gun;
+
+  /// 'ders' | 'mikro' | 'tekrar' | 'yarisma'.
+  final String tur;
+
+  /// Ders kimliği (ders) ya da kategori (yarışma); diğerlerinde null.
+  final String? id;
+
+  /// Doğru cevap sayısı ve toplam soru; yarışmada bilinmiyorsa 0/0.
+  final int dogru;
+  final int toplam;
+
+  /// O kayıtla kazanılan XP.
+  final int xp;
+
+  Map<String, Object?> toJson() => {
+    'gun': gun,
+    'tur': tur,
+    'id': id,
+    'dogru': dogru,
+    'toplam': toplam,
+    'xp': xp,
+  };
+
+  /// Bozuk kaydı null döndürür (atlanır); eksik sayaçlar 0 sayılır.
+  static GunlukKayit? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final gun = j['gun'];
+    final tur = j['tur'];
+    final id = j['id'];
+    if (gun is! String || !OgrenciDurumu.gunGecerli(gun)) return null;
+    if (tur is! String || !turler.contains(tur)) return null;
+    int sayi(Object? v) => (v is int && v >= 0 && v <= _enCokSayi) ? v : 0;
+    return GunlukKayit(
+      gun: gun,
+      tur: tur,
+      id: (id is String && id.isNotEmpty && id.length <= 120) ? id : null,
+      dogru: sayi(j['dogru']),
+      toplam: sayi(j['toplam']),
+      xp: sayi(j['xp']),
+    );
+  }
+}
+
 class OgrenciDurumu {
   const OgrenciDurumu({
     this.xp = 0,
@@ -158,6 +227,8 @@ class OgrenciDurumu {
     this.alan,
     this.hatalar = const [],
     this.haftalikHedefGun = varsayilanHaftalikHedef,
+    this.sonDersId,
+    this.gunluk = const [],
   });
 
   /// Haftalık hedef (haftada çalışılacak gün) sınırları ve varsayılanı.
@@ -185,6 +256,12 @@ class OgrenciDurumu {
   /// Haftada kaç gün çalışılacak (3..7, varsayılan 5). Haftalık ilerleme
   /// ayrıca saklanmaz; `gunlukXp`ten hesaplanır (Motor.haftaGunSayisi).
   final int haftalikHedefGun;
+
+  /// En son açılan/bitirilen dersin kimliği; "Kaldığın yerden devam" kartı.
+  final String? sonDersId;
+
+  /// Öğrenme günlüğü, eskiden yeniye; en çok [GunlukKayit.enCok] kayıt.
+  final List<GunlukKayit> gunluk;
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
@@ -226,6 +303,8 @@ class OgrenciDurumu {
     String? alan,
     List<HataKaydi>? hatalar,
     int? haftalikHedefGun,
+    String? sonDersId,
+    List<GunlukKayit>? gunluk,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -245,6 +324,8 @@ class OgrenciDurumu {
       alan: alan ?? this.alan,
       hatalar: hatalar ?? this.hatalar,
       haftalikHedefGun: haftalikHedefGun ?? this.haftalikHedefGun,
+      sonDersId: sonDersId ?? this.sonDersId,
+      gunluk: gunluk ?? this.gunluk,
     );
   }
 
@@ -265,6 +346,8 @@ class OgrenciDurumu {
     'alan': alan,
     'hatalar': [for (final h in hatalar) h.toJson()],
     'haftalikHedefGun': haftalikHedefGun,
+    'sonDersId': sonDersId,
+    'gunluk': [for (final g in gunluk) g.toJson()],
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -316,6 +399,18 @@ class OgrenciDurumu {
     final sonHatalar = hatalar.length > HataKaydi.enCok
         ? hatalar.sublist(hatalar.length - HataKaydi.enCok)
         : hatalar;
+    final hamGunluk = j['gunluk'];
+    final gunluk = <GunlukKayit>[];
+    if (hamGunluk is List) {
+      for (final e in hamGunluk) {
+        final g = GunlukKayit.fromJson(e);
+        if (g != null) gunluk.add(g);
+      }
+    }
+    final sonGunluk = gunluk.length > GunlukKayit.enCok
+        ? gunluk.sublist(gunluk.length - GunlukKayit.enCok)
+        : gunluk;
+    final sonDers = j['sonDersId'];
     return OgrenciDurumu(
       xp: tamsayi(j['xp'], 0),
       seri: tamsayi(j['seri'], 0, max: 100000),
@@ -339,6 +434,14 @@ class OgrenciDurumu {
         min: enAzHaftalikHedef,
         max: enCokHaftalikHedef,
       ),
+      sonDersId:
+          (sonDers is String &&
+              sonDers.isNotEmpty &&
+              sonDers.length <= 120 &&
+              !sonDers.contains('#'))
+          ? sonDers
+          : null,
+      gunluk: List.unmodifiable(sonGunluk),
     );
   }
 }

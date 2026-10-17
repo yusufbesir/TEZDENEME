@@ -265,6 +265,8 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
         await durum.yarismaBitir(
           oyun.puan,
           yanlisSorular: oyun.sonuc.yanlisBilinenler,
+          dogru: oyun.cevapGecmisi.where((c) => c.dogru).length,
+          toplam: oyun.cevapGecmisi.length,
         );
       } catch (_) {}
     }());

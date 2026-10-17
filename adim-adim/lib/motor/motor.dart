@@ -1,5 +1,6 @@
 /// Öğrenme motoru: XP, seviye, esnek seri ve haftalık hedef, yarı ömür tabanlı
-/// aralıklı tekrar, hata defteri, serpiştirilmiş ünite tekrarı ve cevap kontrolü.
+/// aralıklı tekrar, hata defteri, öğrenme günlüğü, serpiştirilmiş ünite
+/// tekrarı ve cevap kontrolü.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
@@ -173,6 +174,7 @@ abstract final class Motor {
     );
   }
 
+  /// Ders bitişi: XP/seri, `tamamlanan`, `sonDersId` ve günlüğe 'ders' kaydı.
   static OgrenciDurumu dersBitir(
     OgrenciDurumu d,
     String dersId,
@@ -180,9 +182,73 @@ abstract final class Motor {
     int toplam,
     String bugun,
   ) {
-    final yeni = _kazancIsle(d, dersXp(dogru, toplam), bugun);
-    return yeni.copyWith(
+    final xp = dersXp(dogru, toplam);
+    final yeni = _kazancIsle(d, xp, bugun).copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
+      sonDersId: dersId,
+    );
+    return gunlukEkle(
+      yeni,
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turDers,
+        id: dersId,
+        dogru: dogru,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
+  /// Günlüğe kayıt ekler; liste en çok [GunlukKayit.enCok] kayıt tutar, en
+  /// eskisi düşer. Günü geçersiz kayıt eklenmez (durum değişmeden döner).
+  static OgrenciDurumu gunlukEkle(OgrenciDurumu d, GunlukKayit k) {
+    if (!OgrenciDurumu.gunGecerli(k.gun)) return d;
+    final liste = [...d.gunluk, k];
+    final kes = liste.length > GunlukKayit.enCok
+        ? liste.sublist(liste.length - GunlukKayit.enCok)
+        : liste;
+    return d.copyWith(gunluk: List.unmodifiable(kes));
+  }
+
+  /// Verilen günün günlük özeti: kayıt sayısı (ders + mikro + tekrar +
+  /// yarışma), doğru/toplam ve XP toplamları. Kayıt yoksa sıfırlar.
+  static ({int dersler, int dogru, int toplam, int xp}) gunlukOzeti(
+    OgrenciDurumu d,
+    String gun,
+  ) {
+    var dersler = 0, dogru = 0, toplam = 0, xp = 0;
+    for (final k in d.gunluk) {
+      if (k.gun != gun) continue;
+      dersler++;
+      dogru += k.dogru;
+      toplam += k.toplam;
+      xp += k.xp;
+    }
+    return (dersler: dersler, dogru: dogru, toplam: toplam, xp: xp);
+  }
+
+  /// Günlükte kayıt bulunan günler, en yeni önce, tekrarsız.
+  static List<String> gunlukGunleri(OgrenciDurumu d) {
+    final gunler = <String>{for (final k in d.gunluk) k.gun}.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return gunler;
+  }
+
+  /// Tekrar oturumu bitişi: XP değişmez (kartlar kartIsle ile işlenir);
+  /// günlüğe tek 'tekrar' kaydı eklenir. Toplam 0 ise kayıt eklenmez.
+  static OgrenciDurumu tekrarBitir(
+    OgrenciDurumu d,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) {
+    if (toplam <= 0) return d;
+    final t = toplam;
+    final dg = dogru < 0 ? 0 : (dogru > t ? t : dogru);
+    return gunlukEkle(
+      d,
+      GunlukKayit(gun: bugun, tur: GunlukKayit.turTekrar, dogru: dg, toplam: t),
     );
   }
 
@@ -195,26 +261,53 @@ abstract final class Motor {
     return 5 + d * 2 + bonus;
   }
 
-  /// Mikro ders bitişi: XP, seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  /// Mikro ders bitişi: XP, seri ve günlük XP güncellenir; `tamamlanan`
+  /// değişmez. Günlüğe 'mikro' kaydı eklenir.
   static OgrenciDurumu mikroBitir(
     OgrenciDurumu d,
     int dogru,
     int toplam,
     String bugun,
-  ) => _kazancIsle(d, mikroXp(dogru, toplam), bugun);
+  ) {
+    final xp = mikroXp(dogru, toplam);
+    return gunlukEkle(
+      _kazancIsle(d, xp, bugun),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turMikro,
+        dogru: dogru,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
 
   /// Yarışma bitişi: XP = max(5, puan ~/ 5); negatif puan 0 sayılır.
-  /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez. Günlüğe 'yarisma'
+  /// kaydı eklenir ([dogru]/[toplam] verilmezse 0/0, [kategori] varsa id).
   /// [yanlisSorular]: oyunda yanlış bilinen sorular; hata defterine işlenir.
   static OgrenciDurumu yarismaBitir(
     OgrenciDurumu d,
     int puan,
     String bugun, {
     List<YarismaSorusu> yanlisSorular = const [],
+    int dogru = 0,
+    int toplam = 0,
+    String? kategori,
   }) {
     final p = puan < 0 ? 0 : puan;
     final kazanc = p ~/ 5 < 5 ? 5 : p ~/ 5;
-    var yeni = _kazancIsle(d, kazanc, bugun);
+    var yeni = gunlukEkle(
+      _kazancIsle(d, kazanc, bugun),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turYarisma,
+        id: kategori,
+        dogru: dogru < 0 ? 0 : dogru,
+        toplam: toplam < 0 ? 0 : toplam,
+        xp: kazanc,
+      ),
+    );
     for (final s in yanlisSorular) {
       yeni = hataEkle(
         yeni,

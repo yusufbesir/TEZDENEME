@@ -1,5 +1,5 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
-/// ders" düğmesi, dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
+/// ders" düğmesi, "Kaldığın yerden devam" kartı (DevamKarti), dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
 /// ses, "Kartlara ekle"; kaydırılabilir alanda) ve alan kurslarının tek
 /// doğrusal basamak yolu. Seri göstergesinin altında "Bu hafta 3/5 gün"
 /// haftalık hedef satırı bulunur.
@@ -18,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/basamak.dart';
+import '../bilesenler/devam_karti.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/profil_karti.dart';
 import '../durum/saglayicilar.dart';
@@ -270,6 +271,12 @@ class _YolListesi extends StatelessWidget {
         ),
       ),
       const SizedBox(height: Olcu.b3),
+      // Kaldığın yerden devam: Günün kelimesinin üstünde; gösterilecek ders
+      // yoksa kendisi boş çizer.
+      if (DevamKarti.hedefSec(durum, kurslar) != null) ...[
+        DevamKarti(durum: durum, kurslar: kurslar),
+        const SizedBox(height: Olcu.b3),
+      ],
       // Günün kelimesi yalnız dil alanında; kaydırılabilir listenin içinde
       // durur, böylece dar/kısa pencerede yol taşmaz.
       if (durum.alan == 'dil') ...[
