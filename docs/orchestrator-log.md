@@ -74,3 +74,5 @@
 - 2026-10-17 | Yazılım dili eğitimi uygulamaları, müfredatlar, kod çalıştırma seçenekleri araştırması (web) | araştırma ajanı (claude-haiku-5-5) | ~149K token | tamam (Go Tour/Swift Book başlıkları doğrulanamadı)
 - 2026-10-17 | Yeni dil kursları, Türkiye talebi, gömülü sözlük verisi ve lisansları araştırması (web) | araştırma ajanı (claude-haiku-5-5) | ~140K token | tamam (Mondly, Oxford lisansı doğrulanamadı)
 - 2026-10-17 | Örnek uygulama özellik haritası (cihaz RC oturumu; mağaza bilgisi + yorumlar, REA doğrulaması APK olmadığı için yapılmadı) | cihaz oturumu (Opus) + 2 Haiku araştırma ajanı | ~380K token | tamam (adim-adim/docs/REA-ozellik-haritasi-2026-10-17.md, PR #28 dalına ekleniyor)
+- 2026-10-17 | Gömülü sözlük (öneri 1): Sozluk servisi, /sozluk ekranı, Yol şeridine giriş düğmesi, 11 test (295 madde) | implementer / claude-fable-5-1 | ~73K token | tamam (analyze 0 uyarı, 348 test geçti)
+- 2026-10-17 | Gömülü sözlük değişikliğini doğrula | verifier / claude-fable-5-1 | ~44K token | Geçti (348 test, kabuk ve mevcut testler değişmedi, silinen dosya yok)
