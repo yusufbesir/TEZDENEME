@@ -141,3 +141,8 @@ Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-202
 - Karar: Yusuf, "tarama yaptıktan sonra silebilirsin" (13:27). Tarama 4980ab3 ile belgelendi, ardından **yalnız bu dosya adıyla** taşındı; klasördeki başka dosyaya dokunulmadı.
 - Dosya: `D:\Programlar\apk\com.etermax.trivia.preguntados2_1.191.4-405_minAPI22(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk`, 167,9 MB, SHA256 `257529B2EC4AB4A4C54BF6CDD32154CBFB71DE60F3333F085F51B366E4528782` (taşımadan önce eşleşti).
 - Taşıma sonrası Geri Dönüşüm Kutusu'nda görüldü (1 öğe). Not: Çöp kutusu daha önce dışarıdan boşaltıldığı için kalıcılığı garanti değil.
+
+## Dördüncü taşıma (2026-10-17 13:45): Busuu, tarama sonrası
+- Tarama 303b2b9 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
+- Dosya: `D:\Programlar\apk\com.busuu.android.enc_32.49.1(1783745)-1783745_4arch_7dpi_069d30e563faa95e4bb1888fb8574e6f_apkmirror.com.apkm`, 71.7 MB, SHA256 `DDEC20877BE1B1A230EFD6B4075DC5ACF3914875EDD282B105F5E6C9D35BD152` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
+
