@@ -229,3 +229,55 @@ Bilinçli olarak önerilmeyenler: jeton, ödül kutusu, check-in, lotarya ve rek
 ### Birlikte çalışılanlar ve token
 - İnceleme: Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz], apktool 3.0.3 (REA'nın aracı). Alt ajan kullanılmadı.
 - Token (tahmini): girdi ~90K, çıktı ~15K.
+
+## Trivia Crack oyun yapısı (2026-10-17)
+
+### Durum
+- `D:\Programlar\apk\uptodown-com.etermax.preguntados.lite.apk` dosyası da diğer 57 "uptodown-" dosyasıyla birebir aynı (SHA256 başı DC885921FC2D141A, paket `com.uptodown`). Yani **Trivia Crack APK'sı incelenemedi**; yapı aşağıda oyunun herkesçe bilinen, mağaza tanımındaki genel düzeninden yazıldı ve **APK ile doğrulanmadı**. Gerçek APK (Uptodown sayfasındaki "APK indir" bağlantısıyla) gelince bu bölüme ekleme yapılacak.
+
+### Oyun döngüsü (genel, doğrulanmadı)
+- Tur: kategori çarkı çevrilir → çıkan kategoriden süreli, 4 şıklı soru → doğru cevapta ilerleme çubuğu dolar → çubuk dolunca "taç" turu: oyuncu kategoriyi kendisi seçer ve o kategorinin karakterini/rozetini kazanır.
+- 6 kategori; hedef her kategorinin rozetini toplamak.
+- Süre sınırı ve süre çubuğu; jokerler (yanlış şıkları eleme, ikinci şans, ek süre, soruyu geçme).
+- Tek kişilik modlar ve günlük görev/meydan okuma bulunur; ilerleme seviye ve ödüllerle gösterilir.
+
+### Adım Adım'daki karşılığı
+- Var: kategori çarkı, 6 kategori, taç turu, 3 can, soru süresi (`lib/yarisma/*`).
+- Yok: jokerler (tasarım belgesinde kural olarak yazılı, kodda yok), tek kişilik ek modlar, kategori ustalık ölçümü, harita/macera ilerlemesi.
+
+### Önerilmedi
+- Çevrim içi rakip ve düello, lig, topluluk, sohbet, arkadaş daveti, reklam, jeton/can satın alma, soru gönderme ve oylama (sosyal içerik üretimi). Uygulama tek kişilik ve yayınlanmayacak.
+
+### Adım Adım'a uyarlanabilir oyun özellikleri (öneri 32–35)
+| # | Özellik | Nasıl | Mevcut durum | Tahmini iş |
+|---|---|---|---|---|
+| 32 | Jokerler (yanlış iki şıkkı ele, ikinci şans, +10 sn, soruyu geç) | Her oyunda sınırlı sayıda; satın alma yok, yalnız XP veya günlük hedefle kazanılır; joker kullanılan soru tekrar destesine "zayıf" olarak düşer | Belgede var, kodda yok | Küçük-orta |
+| 33 | Tek kişilik meydan okuma modları | Günlük meydan okuma (her gün aynı 10 soru, kişisel rekor); zamana karşı (60 sn'de en çok doğru); hatasız seri (ilk yanlışta biter) | Yok (yalnız klasik mod) | Orta |
+| 34 | Kategori ustalık haritası ve uyarlanabilir çark | Her kategori için doğruluk yüzdesi ve bronz/gümüş/altın ustalık; çark zayıf kategorilere biraz daha sık düşer; tekrar destesine bağlanır | Yok | Küçük-orta |
+| 35 | Ders bağlantılı macera haritası | Yol ekranındaki ünitelere bağlı duraklar; her durak 5 soru ve 3 yıldız; yalnız bitirilen derslerin soruları açılır (öğrenilmeyen konu sorulmaz) | Yok | Orta |
+
+Ek (numarasız): Soruya "hatalı/emin değilim" işareti: tek kullanıcı için içerik kalitesi notu; işaretlenen sorular raporda listelenir, puanı etkilemez.
+
+## Emülatör ile deneme hazırlığı (Çarşamba 2026-10-21, haftalık limit yenilenince)
+
+### Amaç
+APK'sı okunamayan ya da akışı tek ekran/Compose/Flutter/React Native içinde gizli kalan uygulamaları bir Android emülatöründe kurup ekran akışını gözle görmek. Yalnız gözlem ve ekran akışı notu; içerik, görsel ya da metin kopyalama yok; hesap açma ve satın alma yok.
+
+### Cihaz durumu (2026-10-17, salt-okunur kontrol)
+- Windows 10 Pro, AMD Ryzen 7 170, 14 GB RAM; boş alan C: 103 GB, D: 158 GB.
+- Hyper-V hipervizörü etkin ("A hypervisor has been detected").
+- Android SDK var: `D:\YusufII\Araclar\android-sdk`; **emulator paketi ve sistem imajı yok**.
+
+### Seçenekler (karar Yusuf'ta; kurulum Çarşamba)
+1. **Önerilen: Resmi Android Emulator.** Mevcut SDK'ya `sdkmanager` ile `emulator` ve bir `system-images;android-35;google_apis;x86_64` imajı eklenir. Hyper-V açıkken Windows Hypervisor Platform (WHPX) ile çalışır. Ek program yok, reklam yok, aracın ikinci kopyası kurulmaz (Yusuf'un kuralı).
+2. BlueStacks 5 (Hyper-V uyumlu sürüm): Kolay ama reklam ve ek yazılım içerir; ayrı program kurulumu; `D:\Programlar\BlueStacks` altına.
+- Gerekli olabilir: "Windows Hypervisor Platform" Windows özelliğinin açılması (yönetici yetkisi, yeniden başlatma). Sistem ayarı olduğu için Yusuf'un onayı ve kendisinin yapması gerekir.
+
+### Denenecek APK'lar (öncelik)
+1. Uptodown kopyaları yeniden indirildikten sonra: Duolingo, Busuu, Trivia Crack, Chess.com, Mimo, Sololearn, Drops, Quizlet, Khan Academy, Tureng, WordReference, Oxford Dictionary.
+2. Akışı manifestten çıkmayanlar: Grasshopper (Flutter), Cake ve Kotlin Language (React Native), Lichess 8.0, English Pronunciation, U-Dictionary.
+3. Bozuk dosya: `english-dictionary-offline` (yeniden indirilmeli).
+- Her uygulama için 10-15 dk; giriş gerektirenlerde misafir modu yoksa yalnız açılış akışı not edilir.
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; alt ajan yok. Token (tahmini): girdi ~30K, çıktı ~5K.
