@@ -1,5 +1,6 @@
 /// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
-/// Profil) ile kabuk dışı rotalar (ayarlar, ders, mikro ders, alan seçimi).
+/// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
+/// seçimi).
 /// `/mikro` rotası `mod=zayif` (zayıf noktalar) ve `mod=karisik&ders=<id>`
 /// (ünite sonu serpiştirilmiş tekrar) parametrelerini alır.
 ///
@@ -22,6 +23,7 @@ import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
+import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
 import 'tema/tema.dart';
@@ -79,6 +81,7 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),

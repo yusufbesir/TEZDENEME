@@ -179,6 +179,10 @@ Kaynak: Haiku araştırma turu (Duolingo blog: yol ekranı, Duolingo Score 0–1
 
 Not: 8.7 (konuşma/telaffuz) ertelendi: Windows'ta konuşma tanıma paketi desteği zayıf, mikrofon izni gerekir; Yusuf kararıyla ayrı iş.
 
+## 8d. Yeni içerik önerileri (2026-10-17, üçüncü tur)
+
+Yusuf'un isteğiyle (oyunlar, yazılım dilleri, yeni diller, orta/ileri düzeyler, gömülü sözlük) 20 öneri ayrı belgede: `docs/ONERILER-2026-10-17-YENI-ICERIK.md`. Karar Yusuf'ta; bu turda uygulama yapılmadı.
+
 ## 9. Kaynaklar
 - Duolingo blog, "New Duolingo home screen design" (blog.duolingo.com/new-duolingo-home-screen-design)
 - 925 Studios, "Duolingo UX Breakdown" (925studios.co/blog/duolingo-design-breakdown)

@@ -233,6 +233,13 @@ class _YolListesi extends StatelessWidget {
             nabiz: durum.sonGun == bugun && seri > 0,
             renk: r.vurgu,
           ),
+          // Sözlük girişi: ana sayfanın ayrı bir AppBar'ı olmadığı için üst
+          // şeritte durur; kabuk dışı '/sozluk' rotasına gider.
+          IconButton(
+            icon: const Icon(Icons.menu_book_outlined),
+            tooltip: 'Sözlük',
+            onPressed: () => context.push('/sozluk'),
+          ),
           if (seritteHalka) ...[
             const SizedBox(width: Olcu.b2),
             HedefHalkasi(xp: bugunXp, hedef: durum.gunlukHedef, boyut: 56),

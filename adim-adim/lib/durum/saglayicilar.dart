@@ -16,6 +16,7 @@ import '../model/icerik.dart';
 import '../motor/motor.dart';
 import '../servis/bildirim.dart';
 import '../servis/ses.dart';
+import '../sozluk/sozluk.dart';
 import '../yarisma/model.dart';
 
 /// Kalıcı depo. Uygulama başlarken (main) ya da testte override edilir.
@@ -41,6 +42,11 @@ final kayitHatasiProvider = NotifierProvider<KayitHatasi, String?>(
 );
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
+
+/// Gömülü sözlük: kurs listesinden (varsayılan tumKurslar) bir kez üretilir.
+final sozlukProvider = Provider<Sozluk>(
+  (ref) => Sozluk.kurslardan(ref.watch(kurslarProvider)),
+);
 
 /// Bugünün günü 'YYYY-MM-DD'. Testte sabitlenebilir.
 final bugunProvider = Provider<String>((ref) {
