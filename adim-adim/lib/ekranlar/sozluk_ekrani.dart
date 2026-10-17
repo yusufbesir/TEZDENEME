@@ -1,8 +1,10 @@
-/// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod)
-/// ve sonuç listesi (kelime kalın, anlam altta, sağda kurs kısa adı ve
-/// "Kartlara ekle" düğmesi; kart eklenmişse pasif "Kartlarda" onayı).
-/// İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile okur; kod
-/// maddelerinde ses yok. Dar pencerede (480) taşmaz.
+/// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod),
+/// yatay kayan ünite paket çipleri (seçilen paket listeyi süzer) ve sonuç
+/// listesi (kelime kalın, anlam altta, sağda kurs kısa adı ve "Kartlara ekle"
+/// düğmesi; kart eklenmişse pasif "Kartlarda" onayı). İngilizce maddede
+/// sıklık rozeti ("Çok sık" ≤100, "Sık" ≤300) ve kök farklıysa "kök: go"
+/// bilgisi görünür. İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile
+/// okur; kod maddelerinde ses yok. Dar pencerede (480) taşmaz.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -30,6 +32,9 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
 
   /// null: Tümü; 'en': İngilizce; 'kod': Kod.
   String? _dil;
+
+  /// Seçili kelime paketinin ünite kimliği (null: paket süzgeci yok).
+  String? _paketId;
 
   @override
   void initState() {
@@ -65,7 +70,15 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   @override
   Widget build(BuildContext context) {
     final sozluk = ref.watch(sozlukProvider);
-    final sonuclar = sozluk.ara(_sorgu.text, dil: _dil);
+    final paketler = sozluk.paketler(ref.watch(kurslarProvider));
+    final secili = _paketId == null
+        ? null
+        : paketler.where((p) => p.uniteId == _paketId).firstOrNull;
+    var sonuclar = sozluk.ara(_sorgu.text, dil: _dil);
+    if (secili != null) {
+      final kume = Set<SozlukMaddesi>.identity()..addAll(secili.maddeler);
+      sonuclar = sonuclar.where(kume.contains).toList();
+    }
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
 
@@ -126,6 +139,37 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                   ],
                 ),
               ),
+              if (paketler.isNotEmpty)
+                // Paketler: yatay kayan ünite çipleri; dar ekranda taşmaz.
+                SizedBox(
+                  height: Olcu.hedef,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.fromLTRB(
+                      Olcu.b3,
+                      Olcu.b1,
+                      Olcu.b3,
+                      0,
+                    ),
+                    itemCount: paketler.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: Olcu.b1),
+                    itemBuilder: (context, i) {
+                      final p = paketler[i];
+                      return Center(
+                        child: FilterChip(
+                          avatar: const Icon(Icons.inventory_2_outlined),
+                          label: Text(p.ad),
+                          tooltip:
+                              '${kursKisaAd(p.kursId)} paketi, '
+                              '${p.maddeler.length} madde',
+                          selected: _paketId == p.uniteId,
+                          onSelected: (sec) =>
+                              setState(() => _paketId = sec ? p.uniteId : null),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   Olcu.b3,
@@ -134,7 +178,9 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                   0,
                 ),
                 child: Text(
-                  '${sonuclar.length} madde',
+                  secili == null
+                      ? '${sonuclar.length} madde'
+                      : '${sonuclar.length} madde · ${secili.ad}',
                   style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
                 ),
               ),
@@ -188,12 +234,27 @@ class _MaddeSatiri extends ConsumerWidget {
         madde.kelime,
         style: yazi.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(madde.anlam),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(madde.anlam),
+          if (ingilizce && madde.kokFarkli)
+            Text(
+              'kök: ${madde.kok}',
+              style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+            ),
+        ],
+      ),
       // Sağ taraf sıkı Row: kurs kısa adı + kart düğmesi. Yatay tutulur;
       // dikey Column büyük metin ölçeğinde ListTile yüksekliğini aşıyor.
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (ingilizce && siklikEtiketi(madde.siklik) != null) ...[
+            SiklikRozeti(etiket: siklikEtiketi(madde.siklik)!),
+            const SizedBox(width: Olcu.b1),
+          ],
           Text(
             _SozlukDurumu.kursKisaAd(madde.kursId),
             style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
@@ -223,6 +284,36 @@ class _MaddeSatiri extends ConsumerWidget {
                   },
                 ),
         ],
+      ),
+    );
+  }
+}
+
+/// Sıklık sırasından rozet metni: ≤100 "Çok sık", ≤300 "Sık", yoksa null.
+String? siklikEtiketi(int? siklik) {
+  if (siklik == null) return null;
+  if (siklik <= 100) return 'Çok sık';
+  if (siklik <= 300) return 'Sık';
+  return null;
+}
+
+/// Küçük sıklık etiketi (ana renkte ince çerçeve). Badge değildir.
+class SiklikRozeti extends StatelessWidget {
+  const SiklikRozeti({super.key, required this.etiket});
+  final String etiket;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Olcu.b1, vertical: 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: r.ana),
+        borderRadius: BorderRadius.circular(Olcu.kose),
+      ),
+      child: Text(
+        etiket,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: r.ana),
       ),
     );
   }

@@ -1,6 +1,8 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
-/// ders" düğmesi ve alan kurslarının tek doğrusal basamak yolu. Seri
-/// göstergesinin altında "Bu hafta 3/5 gün" haftalık hedef satırı bulunur.
+/// ders" düğmesi, dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
+/// ses, "Kartlara ekle"; kaydırılabilir alanda) ve alan kurslarının tek
+/// doğrusal basamak yolu. Seri göstergesinin altında "Bu hafta 3/5 gün"
+/// haftalık hedef satırı bulunur.
 /// Yerleşim kullanılabilir genişliğe göre seçilir (LayoutBuilder): yan panel
 /// (Öğrenci kartı + günlük hedef) yalnız panele en az Olcu.panelMin kalıyorsa
 /// ve pencere geniş (>= 900) ise yanda durur; yoksa tek sütundur.
@@ -268,6 +270,12 @@ class _YolListesi extends StatelessWidget {
         ),
       ),
       const SizedBox(height: Olcu.b3),
+      // Günün kelimesi yalnız dil alanında; kaydırılabilir listenin içinde
+      // durur, böylece dar/kısa pencerede yol taşmaz.
+      if (durum.alan == 'dil') ...[
+        GununKelimesiKarti(bugun: bugun),
+        const SizedBox(height: Olcu.b3),
+      ],
     ];
 
     var dersNo = 0;
@@ -455,6 +463,84 @@ class _SeriAlevi extends StatelessWidget {
               )
             else
               alev,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Günün kelimesi kartı: tarihten deterministik seçilen İngilizce madde;
+/// kelime, anlam, ses düğmesi ve "Kartlara ekle" (eklenmişse pasif
+/// "Kartlarda"). İngilizce madde yoksa hiçbir şey çizmez.
+class GununKelimesiKarti extends ConsumerWidget {
+  const GununKelimesiKarti({super.key, required this.bugun});
+  final String bugun;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final madde = ref.watch(sozlukProvider).gununKelimesi(bugun);
+    if (madde == null) return const SizedBox.shrink();
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    final kartId = madde.kartKimligi;
+    final kartlarda = ref.watch(
+      durumProvider.select(
+        (d) => d.value?.kartlar.containsKey(kartId) ?? false,
+      ),
+    );
+    return Card(
+      key: const ValueKey('gunun-kelimesi'),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Olcu.b3, Olcu.b2, Olcu.b1, Olcu.b2),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Günün kelimesi',
+                    style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+                  ),
+                  Text(
+                    madde.kelime,
+                    style: yazi.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(madde.anlam, style: yazi.bodyMedium),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.volume_up_outlined),
+              tooltip: 'Oku',
+              onPressed: () => ref.read(sesProvider).oku(madde.kelime),
+            ),
+            kartlarda
+                ? IconButton(
+                    icon: Icon(Icons.check_circle, color: r.dogru),
+                    tooltip: 'Kartlarda',
+                    onPressed: null,
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.add_card),
+                    tooltip: 'Kartlara ekle',
+                    onPressed: () async {
+                      final mesajci = ScaffoldMessenger.of(context);
+                      await ref.read(durumProvider.notifier).kartEkle(kartId);
+                      mesajci
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          const SnackBar(
+                            content: Text('Tekrar kartı eklendi'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                    },
+                  ),
           ],
         ),
       ),
