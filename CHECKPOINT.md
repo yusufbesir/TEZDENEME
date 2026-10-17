@@ -24,6 +24,7 @@
   - Yapılmayacak: lig/topluluk/sosyal, Ü1–Ü15 ücretli karşılıkları, çevrim içi yapay zekâ.
   - Çarşamba 2026-10-21 06:30Z: emülatör kurulumu (Yusuf onayı), Khan/Encode/Drops akışları, TTS ses kontrolü, yeni öneriler.
   - REA: .claude.json yolları D:\Programlar'a çevrildi (Yusuf izni, 2026-10-17 14:21); Yusuf /mcp → rea → Reconnect yapınca test edilecek. Sonraki APK taramaları REA+JADX ile.
+  - Model kuralı (Yusuf 2026-10-17 15:17): Fable kullanım limiti dolunca Adım Adım oturumu ve alt ajanları limit yenilenene kadar Sonnet'e (basit işte Haiku) devredilir; yenilenince Fable'a dönülür; devir tek satırla bildirilir.
   - Son çalışır sürüm: cihazda `flutter build windows --release` → D:\Programlar\Adim-Adim\ (SURUM.txt ile). PR #29 Yusuf'un birleştirme onayını bekliyor.
 
 ## Tamamlandı
