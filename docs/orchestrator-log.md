@@ -73,3 +73,4 @@
 - 2026-10-17 | Oyun eğitimi (satranç/go) uygulamaları ve Dart paketleri araştırması (web) | araştırma ajanı (claude-haiku-5-5, general-purpose; scout web erişimi olmadığı için) | ~142K token | tamam (bulgular docs/ONERILER-2026-10-17-YENI-ICERIK.md bölüm 5)
 - 2026-10-17 | Yazılım dili eğitimi uygulamaları, müfredatlar, kod çalıştırma seçenekleri araştırması (web) | araştırma ajanı (claude-haiku-5-5) | ~149K token | tamam (Go Tour/Swift Book başlıkları doğrulanamadı)
 - 2026-10-17 | Yeni dil kursları, Türkiye talebi, gömülü sözlük verisi ve lisansları araştırması (web) | araştırma ajanı (claude-haiku-5-5) | ~140K token | tamam (Mondly, Oxford lisansı doğrulanamadı)
+- 2026-10-17 | Örnek uygulama özellik haritası (cihaz RC oturumu; mağaza bilgisi + yorumlar, REA doğrulaması APK olmadığı için yapılmadı) | cihaz oturumu (Opus) + 2 Haiku araştırma ajanı | ~380K token | tamam (adim-adim/docs/REA-ozellik-haritasi-2026-10-17.md, PR #28 dalına ekleniyor)
