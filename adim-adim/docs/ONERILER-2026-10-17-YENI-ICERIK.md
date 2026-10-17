@@ -5,7 +5,7 @@ yazan: "[Claude#bulut] İP:Adım Adım öğrenme uygulaması#Dwv81f"
 degistirme: Öneri belgesidir; karar Yusuf'undur. Madde silinmez; kabul/ret durumu maddenin başına yazılır, yeni öneriler sona eklenir.
 ---
 
-# Yeni içerik ve özellik önerileri (2026-10-17)
+# Yeni içerik ve özellik önerileri (2026-10-17): 20 öneri
 
 Kaynak: Yusuf'un 17 Ekim isteği ("satranç, go gibi oyunlar; PHP, Python, Go, Django, Swift; mevcut eğitimlerin orta ve ileri düzeyleri; yeni diller; gömülü sözlük; en az 10 öneri"). Araştırma üç Haiku ajanıyla yapıldı (oyun eğitimi, yazılım dili eğitimi, yeni diller ve sözlük verisi); bulgu özetleri bölüm 5'te, kaynaklar bölüm 6'da. Koordinatörün esin notu (Brilliant "önce dene, sonra kural", yanlış cevapta ipucu, haftalık özet) 3. bölüme işlendi.
 
@@ -65,6 +65,34 @@ Her kursta 6 ünite × 2 ders × 10 alıştırma ve 36 yarışma sorusu düzeni 
 **Yazılım dilleri.** Mimo: kısa dersler + bölüm sonu proje; Sololearn 48 kurs, derleyici, Pro sertifika; Codecademy Python 20 ders/9 proje/9 quiz, AI ipucu; Exercism ücretsiz track + mentor; freeCodeCamp CFSD 513 ders/83 lab; Swift Playgrounds yalnız Apple; Codewars 8 kyu→8 dan; Grasshopper kapandı (2023). Müfredat: python.org 16 bölüm; php.net Language Reference; MDN Curriculum Core/Extensions (Ekim 2025). Go Tour ve Swift Book başlıkları çekilemedi (model belleği, doğrulanmadı).
 
 **Diller ve sözlük.** Duolingo 2025 küresel sıra: İng, İsp, Fr, Jap, Alm, Kor; Türkiye'de en hızlı büyüyen Çince. e-YDS 2026: Alm 500, Ar 400, Fr 300, Rus 200 kontenjan (ikincil kaynak). Busuu A1–B2 (C1 yalnız İng), Babbel A1–C1, Drops 5 dk oyun + Review Dojo, LingQ tıkla-kaydet. Veri: kaikki Wiktionary JSONL CC BY-SA 4.0 (tanımlar İngilizce; Türkçe tanım için tr.wiktionary); FreeDict tur-eng ~1026 madde (dar); Tatoeba CC BY 2.0 FR; Goethe Wortliste telifli (gömülemez); Oxford 3000 lisansı belirsiz. flutter_tts 4.2.5 Windows (UWP sesleri). Doğrulanamayan: Mondly, Oxford lisansı, Tatoeba Türkçe cümle sayısı.
+
+## 7. Kullanıcıların en faydalı bulduğu özellikler (koordinatör taraması, 2026-10-17)
+
+Kaynak: koordinatör oturumunun herkese açık web taraması (çoğu blog ve satıcı sayfası, doğrulanmadı; mağaza yorumları cihazdan okunursa güvenilirlik artar). Bu bulgular 1. bölümdeki listeye 16–20 numaralı önerileri ekler.
+
+- **Aralıklı tekrar görünürlüğü**: Memrise'da hata yapılan kelime sık gelir; Busuu'da kelimeler zayıf/orta/güçlü diye ayrı bir gözden geçirme sekmesinde görünür. Adım Adım'da yarı ömür ve hata defteri var, görünür bir "kelime sağlığı" panosu yok.
+- **Alışkanlık mekaniği**: seri, XP, lig, 5 dakikalık ders. Uyarı (koordinatör ve bölüm 3): oyunlaştırma öğrenmenin önüne geçebilir; seri esnekliği zaten var.
+- **Konuşma**: telaffuz geri bildirimi, ana dili konuşan videoları, Busuu tarzı konuşma pratiği (8.7 ertelenmişti; Windows'ta konuşma tanıma zayıf).
+- **Yapı**: Busuu'nun yapılandırılmış müfredat + ayrı gözden geçirme bölümü; Mimo küçük adımlı ve proje odaklı ama kısa ders formatı derinliği sınırlıyor.
+- **Satranç/Go**: Chess.com ve Lichess ders + bulmaca; Chessable aralıklı tekrarlı açılış/son oyun; BadukPop 4.000+ tsumego, derecelendirmeli modda hata sonrası kolaylaşma; KaTrain (KataGo) her hamlenin kaybını gösterip hatadan sonra yeniden deniyor.
+- **Sözlük**: Readlang'de tek dokunuşla çeviri ve kelimenin otomatik karta dönüşmesi en çok övülen özellik; LingQ kalabalık ekran ve yavaş sözlük yüzünden terk ediliyor; Language Reactor çift altyazı.
+- **Orta/ileri**: Busuu seviye atlama yapısı, Chessable derinleşen kurs zincirleri, Mimo projeye dayalı ilerleme; kontrollü etki çalışması bulunamadı.
+
+Eklenen öneriler:
+
+| # | Öneri | Alan | Kapsam | Maliyet | Dayanak |
+|---|---|---|---|---|---|
+| 16 | **Kelime sağlığı panosu** | ortak | Tekrar sekmesinde kartları zayıf/orta/güçlü (yarı ömür eşikleri) sayı ve listeyle göster; zayıflardan 5'lik ders başlat | Küçük (motor verisi hazır) | Busuu Vocabulary Review, Memrise |
+| 17 | **Tek dokunuşla kart** | ortak | Sözlük kartında (öneri 1) "Kartlara ekle" tek düğme; bağlamdaki cümle kartla birlikte saklanır; sade kart, kalabalık ekran yok | Küçük (1'e bağlı) | Readlang; LingQ'nun terk nedeni |
+| 18 | **Seviye atlama sınavı** | dil, kod | Kursa girişte 20 soruluk yerleştirme; geçilen üniteler "atlandı" işaretlenir; puan 8c-1 seviye puanına yazılır | Orta | Busuu seviye yapısı, Duolingo yerleştirme |
+| 19 | **Mini proje adımları (orta/ileri kod)** | kod | Her orta/ileri ünitenin son dersi 5 adımlı proje (Mimo tarzı), kod inceleme alıştırması ("hatayı bul") | İçerik kuralı, altyapı yok | Mimo, freeCodeCamp lab |
+| 20 | **Hatadan sonra yeniden dene (oyun)** | oyun | Yanlış hamlede kayıp miktarı gösterilir, aynı konum bir kez daha sorulur; derecelendirmeli modda hata sonrası kolaylaşma | 4/7 ile birlikte | KaTrain, BadukPop |
+
+Sıralama güncellemesi: 16 ve 17 küçük olduğu için 1'in hemen ardından; 18 Python/Almanca kursları yazılınca.
+
+## 8. REA ile geliştirme koordinasyonu (Yusuf'un 17 Ekim isteği)
+
+Amaç: örnek uygulamaların ekran akışını ve özellik yapısını REA (cihazda, D:\YusufII\Programlar\rea) ile çıkarıp Adım Adım'daki karşılığını tasarlamak. Sınırlar: yalnız yapı ve akış; kod, görsel, ses ve metin kopyalanmaz; yalnız cihazda zaten bulunan ya da Yusuf'un kendi hesabıyla resmi mağazadan aldığı APK'lar incelenir; sonuç `adim-adim/docs/REA-ozellik-haritasi-<tarih>.md` dosyasına yazılır ve bu belgeye bağlanır. Mağaza yorumlarından "en faydalı özellik" sayımı aynı raporda.
 
 ## 6. Kaynaklar
 

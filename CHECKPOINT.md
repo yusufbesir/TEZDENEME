@@ -7,7 +7,7 @@
 - Sıradaki: tekrarlanan prosedürlerin skill'e çevrilmesi (ayrı PR).
 
 ## Bekleyen kullanıcı kararları
-- Adım Adım: 15 yeni içerik önerisinden (adim-adim/docs/ONERILER-2026-10-17-YENI-ICERIK.md) hangileri ve hangi sırayla yapılsın? Önerilen ilk üç: sözlük, Python 3 düzey, HTML/CSS/JS orta-ileri.
+- Adım Adım: 20 yeni içerik önerisinden (adim-adim/docs/ONERILER-2026-10-17-YENI-ICERIK.md) hangileri ve hangi sırayla yapılsın? Önerilen ilk üç: sözlük, Python 3 düzey, HTML/CSS/JS orta-ileri.
 - `.claude/skills` altındaki kullanılmayan skill'ler `skill-kutuphanesi` altına alınsın mı?
 - Jev ayrıntısı `docs/jev/` altında kalıp CLAUDE.md'de yalnız bağ mı bırakılsın?
 - Archify haritası cihaz oturumunda mı çıkarılsın?
