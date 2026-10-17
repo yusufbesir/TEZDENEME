@@ -1,6 +1,7 @@
 /// Tekrar sekmesi: seçili alanın zamanı gelen (yarı ömür tabanlı) kartlarını
-/// sorar; altında "Hata defteri" bölümü (yanlış kart ve yarışma soruları,
-/// "Zayıf noktalar dersi" düğmesi) bulunur.
+/// sorar; altında "Kelime sağlığı" panosu (Zayıf/Orta/Güçlü) ve "Hata defteri"
+/// bölümü (yanlış kart ve yarışma soruları, "Zayıf noktalar dersi" düğmesi)
+/// bulunur. Oturum bitince öğrenme günlüğüne tek 'tekrar' kaydı yazılır.
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
@@ -10,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
+import '../bilesenler/kelime_sagligi_panosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -58,10 +60,17 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
       return SafeArea(
         child: AlistirmaOturumu(
           alistirmalar: [for (final o in oturum) o.alistirma],
+          // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+          notGetir: (i) =>
+              ref.read(durumProvider).value?.kelimeNotlari[oturum[i].kartId],
           onSonuc: (i, dogru) => ref
               .read(durumProvider.notifier)
               .kartIsle(oturum[i].kartId, dogru),
-          onBitti: (d, t) => setState(() => _sonuc = (dogru: d, toplam: t)),
+          onBitti: (d, t) {
+            // Oturum sonu: öğrenme günlüğüne tek 'tekrar' kaydı.
+            ref.read(durumProvider.notifier).tekrarBitir(d, t);
+            setState(() => _sonuc = (dogru: d, toplam: t));
+          },
           onKapat: () => setState(() => _oturum = null),
         ),
       );
@@ -123,6 +132,13 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                                     _sonuc = null;
                                   }),
                                 ),
+                        ),
+                        const SizedBox(height: Olcu.b4),
+                        KelimeSagligiPanosu(
+                          durum:
+                              ref.read(durumProvider).value ??
+                              const OgrenciDurumu(),
+                          kurslar: ref.read(alanKurslariProvider),
                         ),
                         const SizedBox(height: Olcu.b4),
                         _HataDefteri(

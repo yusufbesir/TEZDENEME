@@ -109,6 +109,11 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
               )
             : AlistirmaOturumu(
                 alistirmalar: ders.alistirmalar,
+                // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+                notGetir: (i) => ref
+                    .read(durumProvider)
+                    .value
+                    ?.kelimeNotlari[ders.kartKimligi(i)],
                 onSonuc: (i, dogru) => ref
                     .read(durumProvider.notifier)
                     .kartIsle(ders.kartKimligi(i), dogru),

@@ -1,4 +1,5 @@
-/// Profil sekmesi: alan satırı, istatistikler, son 7 gün XP grafiği; Ayarlar
+/// Profil sekmesi: alan satırı, istatistikler, son 7 gün XP grafiği ve
+/// "Öğrenme günlüğü" bölümü (son 7 gün, "Tümü" ile tam liste); Ayarlar
 /// sağ üstteki dişliyle açılır.
 /// Grafik yüksekliği metin ölçeğiyle büyür; gün etiketleri tek satırdır.
 ///
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/ogrenme_gunlugu.dart';
 import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
@@ -156,6 +158,8 @@ class ProfilEkrani extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: Olcu.b3),
+            OgrenmeGunlugu(durum: durum, bugun: bugun),
           ],
         ),
       ),

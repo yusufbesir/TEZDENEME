@@ -1,7 +1,12 @@
-/// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod)
-/// ve sonuç listesi (kelime kalın, anlam altta, sağda kurs kısa adı).
-/// İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile okur; kod
-/// maddelerinde ses yok. Dar pencerede (480) taşmaz.
+/// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod),
+/// yatay kayan ünite paket çipleri (seçilen paket listeyi süzer) ve sonuç
+/// listesi (kelime kalın, anlam altta, sağda kurs kısa adı ve "Kartlara ekle"
+/// düğmesi; kart eklenmişse pasif "Kartlarda" onayı). Her maddede "Not"
+/// düğmesi kişisel not (mnemonik, en çok 200 karakter) yazdırır; not varsa
+/// anlamın altında italik tek satır "Not: ..." görünür. İngilizce maddede
+/// sıklık rozeti ("Çok sık" ≤100, "Sık" ≤300) ve kök farklıysa "kök: go"
+/// bilgisi görünür. İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile
+/// okur; kod maddelerinde ses yok. Dar pencerede (480) taşmaz.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -14,6 +19,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../sozluk/sozluk.dart';
 import '../tema/tema.dart';
 
@@ -29,6 +35,9 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
 
   /// null: Tümü; 'en': İngilizce; 'kod': Kod.
   String? _dil;
+
+  /// Seçili kelime paketinin ünite kimliği (null: paket süzgeci yok).
+  String? _paketId;
 
   @override
   void initState() {
@@ -64,7 +73,15 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   @override
   Widget build(BuildContext context) {
     final sozluk = ref.watch(sozlukProvider);
-    final sonuclar = sozluk.ara(_sorgu.text, dil: _dil);
+    final paketler = sozluk.paketler(ref.watch(kurslarProvider));
+    final secili = _paketId == null
+        ? null
+        : paketler.where((p) => p.uniteId == _paketId).firstOrNull;
+    var sonuclar = sozluk.ara(_sorgu.text, dil: _dil);
+    if (secili != null) {
+      final kume = Set<SozlukMaddesi>.identity()..addAll(secili.maddeler);
+      sonuclar = sonuclar.where(kume.contains).toList();
+    }
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
 
@@ -125,6 +142,37 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                   ],
                 ),
               ),
+              if (paketler.isNotEmpty)
+                // Paketler: yatay kayan ünite çipleri; dar ekranda taşmaz.
+                SizedBox(
+                  height: Olcu.hedef,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.fromLTRB(
+                      Olcu.b3,
+                      Olcu.b1,
+                      Olcu.b3,
+                      0,
+                    ),
+                    itemCount: paketler.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: Olcu.b1),
+                    itemBuilder: (context, i) {
+                      final p = paketler[i];
+                      return Center(
+                        child: FilterChip(
+                          avatar: const Icon(Icons.inventory_2_outlined),
+                          label: Text(p.ad),
+                          tooltip:
+                              '${kursKisaAd(p.kursId)} paketi, '
+                              '${p.maddeler.length} madde',
+                          selected: _paketId == p.uniteId,
+                          onSelected: (sec) =>
+                              setState(() => _paketId = sec ? p.uniteId : null),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   Olcu.b3,
@@ -133,7 +181,9 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                   0,
                 ),
                 child: Text(
-                  '${sonuclar.length} madde',
+                  secili == null
+                      ? '${sonuclar.length} madde'
+                      : '${sonuclar.length} madde · ${secili.ad}',
                   style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
                 ),
               ),
@@ -168,6 +218,15 @@ class _MaddeSatiri extends ConsumerWidget {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
     final ingilizce = madde.dil == 'en';
+    final kartId = madde.kartKimligi;
+    final kartlarda = ref.watch(
+      durumProvider.select(
+        (d) => d.value?.kartlar.containsKey(kartId) ?? false,
+      ),
+    );
+    final not = ref.watch(
+      durumProvider.select((d) => d.value?.kelimeNotlari[kartId]),
+    );
     return ListTile(
       dense: false,
       leading: ingilizce
@@ -181,10 +240,175 @@ class _MaddeSatiri extends ConsumerWidget {
         madde.kelime,
         style: yazi.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(madde.anlam),
-      trailing: Text(
-        _SozlukDurumu.kursKisaAd(madde.kursId),
-        style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(madde.anlam),
+          if (ingilizce && madde.kokFarkli)
+            Text(
+              'kök: ${madde.kok}',
+              style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+            ),
+          if (not != null)
+            Text(
+              'Not: $not',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: yazi.bodySmall?.copyWith(
+                color: r.metinIkincil,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+        ],
+      ),
+      // Sağ taraf sıkı Row: kurs kısa adı + kart düğmesi. Yatay tutulur;
+      // dikey Column büyük metin ölçeğinde ListTile yüksekliğini aşıyor.
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (ingilizce && siklikEtiketi(madde.siklik) != null) ...[
+            SiklikRozeti(etiket: siklikEtiketi(madde.siklik)!),
+            const SizedBox(width: Olcu.b1),
+          ],
+          Text(
+            _SozlukDurumu.kursKisaAd(madde.kursId),
+            style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+          ),
+          IconButton(
+            icon: Icon(
+              not == null ? Icons.sticky_note_2_outlined : Icons.sticky_note_2,
+              color: not == null ? null : r.ana,
+            ),
+            tooltip: not == null ? 'Not' : 'Notu düzenle',
+            visualDensity: VisualDensity.compact,
+            onPressed: () => notDuzenle(context, ref, kartId, not),
+          ),
+          kartlarda
+              ? IconButton(
+                  icon: Icon(Icons.check_circle, color: r.dogru),
+                  tooltip: 'Kartlarda',
+                  onPressed: null,
+                  visualDensity: VisualDensity.compact,
+                )
+              : IconButton(
+                  icon: const Icon(Icons.add_card),
+                  tooltip: 'Kartlara ekle',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () async {
+                    final mesajci = ScaffoldMessenger.of(context);
+                    await ref.read(durumProvider.notifier).kartEkle(kartId);
+                    mesajci
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Text('Tekrar kartı eklendi'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kişisel not penceresini açar ve sonucu yazar: null → Vazgeç (dokunma),
+/// '' → Sil, metin → Kaydet (boş metinle Kaydet de notu siler).
+Future<void> notDuzenle(
+  BuildContext context,
+  WidgetRef ref,
+  String kartId,
+  String? mevcut,
+) async {
+  final sonuc = await showDialog<String?>(
+    context: context,
+    builder: (_) => NotPenceresi(mevcut: mevcut),
+  );
+  if (sonuc == null) return;
+  await ref.read(durumProvider.notifier).notYaz(kartId, sonuc);
+}
+
+/// Kişisel not penceresi: TextField (en çok 200 karakter), Vazgeç, (not
+/// varsa) Sil ve Kaydet. Denetleyici pencereyle birlikte yaşar; kapanış
+/// animasyonu sırasında kullanılmaya devam edebilir, bu yüzden burada tutulur.
+class NotPenceresi extends StatefulWidget {
+  const NotPenceresi({super.key, this.mevcut});
+  final String? mevcut;
+
+  @override
+  State<NotPenceresi> createState() => _NotPenceresiDurumu();
+}
+
+class _NotPenceresiDurumu extends State<NotPenceresi> {
+  late final _denetleyici = TextEditingController(text: widget.mevcut ?? '');
+
+  @override
+  void dispose() {
+    _denetleyici.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Kişisel not'),
+      content: TextField(
+        key: const Key('not-metni'),
+        controller: _denetleyici,
+        autofocus: true,
+        maxLength: OgrenciDurumu.notEnCokKarakter,
+        maxLines: 3,
+        minLines: 1,
+        decoration: const InputDecoration(
+          hintText: 'Hatırlatıcı, benzetme ya da örnek cümle',
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Vazgeç'),
+        ),
+        if (widget.mevcut != null)
+          TextButton(
+            onPressed: () => Navigator.pop(context, ''),
+            child: const Text('Sil'),
+          ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _denetleyici.text),
+          child: const Text('Kaydet'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Sıklık sırasından rozet metni: ≤100 "Çok sık", ≤300 "Sık", yoksa null.
+String? siklikEtiketi(int? siklik) {
+  if (siklik == null) return null;
+  if (siklik <= 100) return 'Çok sık';
+  if (siklik <= 300) return 'Sık';
+  return null;
+}
+
+/// Küçük sıklık etiketi (ana renkte ince çerçeve). Badge değildir.
+class SiklikRozeti extends StatelessWidget {
+  const SiklikRozeti({super.key, required this.etiket});
+  final String etiket;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Olcu.b1, vertical: 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: r.ana),
+        borderRadius: BorderRadius.circular(Olcu.kose),
+      ),
+      child: Text(
+        etiket,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: r.ana),
       ),
     );
   }

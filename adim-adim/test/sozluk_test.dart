@@ -106,4 +106,54 @@ void main() {
     expect(s.ara('kedi').map((m) => m.kelime).toList(), ['cat', 'black cat']);
     expect(s.ara('yok'), isEmpty);
   });
+
+  test('alıştırma indeksi ve kartKimligi doğru; birleştirmede ilk kalır', () {
+    final kurs = Kurs(
+      id: 'test-2',
+      ad: 'Test',
+      aciklama: '',
+      alan: KursAlani.dil,
+      uniteler: [
+        Unite(
+          id: 'test-2.u1',
+          ad: 'Ü',
+          dersler: [
+            Ders(
+              id: 'test-2.u1.d1',
+              ad: 'D',
+              alistirmalar: const [
+                Yaz(soru: 'Yaz.', cevaplar: ['x']),
+                Secim(
+                  soru: '"Hello" ne demektir?',
+                  secenekler: ['Merhaba', 'Güle güle'],
+                  dogru: 0,
+                ),
+                Eslestir(
+                  soru: 'Eşleştir.',
+                  ciftler: [
+                    (sol: 'cat', sag: 'kedi'),
+                    (sol: 'hello', sag: 'merhaba'),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+    final s = Sozluk.kurslardan([kurs]);
+    final hello = s.maddeler.singleWhere((m) => m.kelime == 'Hello');
+    expect(hello.alistirmaIndeksi, 1);
+    expect(hello.kartKimligi, 'test-2.u1.d1#1');
+    final cat = s.maddeler.singleWhere((m) => m.kelime == 'cat');
+    expect(cat.alistirmaIndeksi, 2);
+    expect(cat.kartKimligi, 'test-2.u1.d1#2');
+    // hello/merhaba tekrarı birleşti; ilk görülen (Secim, indeks 1) kaldı.
+    expect(
+      s.maddeler.where((m) => m.anlam.toLowerCase() == 'merhaba').length,
+      1,
+    );
+    // Ders.kartKimligi ile aynı biçim.
+    expect(kurs.tumDersler.first.kartKimligi(1), hello.kartKimligi);
+  });
 }

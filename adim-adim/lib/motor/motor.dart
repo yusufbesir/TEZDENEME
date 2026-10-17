@@ -1,5 +1,6 @@
 /// Öğrenme motoru: XP, seviye, esnek seri ve haftalık hedef, yarı ömür tabanlı
-/// aralıklı tekrar, hata defteri, serpiştirilmiş ünite tekrarı ve cevap kontrolü.
+/// aralıklı tekrar, hata defteri, öğrenme günlüğü, serpiştirilmiş ünite
+/// tekrarı, kelime notları, kademeli ipucu ve cevap kontrolü.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
@@ -173,6 +174,7 @@ abstract final class Motor {
     );
   }
 
+  /// Ders bitişi: XP/seri, `tamamlanan`, `sonDersId` ve günlüğe 'ders' kaydı.
   static OgrenciDurumu dersBitir(
     OgrenciDurumu d,
     String dersId,
@@ -180,9 +182,73 @@ abstract final class Motor {
     int toplam,
     String bugun,
   ) {
-    final yeni = _kazancIsle(d, dersXp(dogru, toplam), bugun);
-    return yeni.copyWith(
+    final xp = dersXp(dogru, toplam);
+    final yeni = _kazancIsle(d, xp, bugun).copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
+      sonDersId: dersId,
+    );
+    return gunlukEkle(
+      yeni,
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turDers,
+        id: dersId,
+        dogru: dogru,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
+  /// Günlüğe kayıt ekler; liste en çok [GunlukKayit.enCok] kayıt tutar, en
+  /// eskisi düşer. Günü geçersiz kayıt eklenmez (durum değişmeden döner).
+  static OgrenciDurumu gunlukEkle(OgrenciDurumu d, GunlukKayit k) {
+    if (!OgrenciDurumu.gunGecerli(k.gun)) return d;
+    final liste = [...d.gunluk, k];
+    final kes = liste.length > GunlukKayit.enCok
+        ? liste.sublist(liste.length - GunlukKayit.enCok)
+        : liste;
+    return d.copyWith(gunluk: List.unmodifiable(kes));
+  }
+
+  /// Verilen günün günlük özeti: kayıt sayısı (ders + mikro + tekrar +
+  /// yarışma), doğru/toplam ve XP toplamları. Kayıt yoksa sıfırlar.
+  static ({int dersler, int dogru, int toplam, int xp}) gunlukOzeti(
+    OgrenciDurumu d,
+    String gun,
+  ) {
+    var dersler = 0, dogru = 0, toplam = 0, xp = 0;
+    for (final k in d.gunluk) {
+      if (k.gun != gun) continue;
+      dersler++;
+      dogru += k.dogru;
+      toplam += k.toplam;
+      xp += k.xp;
+    }
+    return (dersler: dersler, dogru: dogru, toplam: toplam, xp: xp);
+  }
+
+  /// Günlükte kayıt bulunan günler, en yeni önce, tekrarsız.
+  static List<String> gunlukGunleri(OgrenciDurumu d) {
+    final gunler = <String>{for (final k in d.gunluk) k.gun}.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return gunler;
+  }
+
+  /// Tekrar oturumu bitişi: XP değişmez (kartlar kartIsle ile işlenir);
+  /// günlüğe tek 'tekrar' kaydı eklenir. Toplam 0 ise kayıt eklenmez.
+  static OgrenciDurumu tekrarBitir(
+    OgrenciDurumu d,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) {
+    if (toplam <= 0) return d;
+    final t = toplam;
+    final dg = dogru < 0 ? 0 : (dogru > t ? t : dogru);
+    return gunlukEkle(
+      d,
+      GunlukKayit(gun: bugun, tur: GunlukKayit.turTekrar, dogru: dg, toplam: t),
     );
   }
 
@@ -195,26 +261,53 @@ abstract final class Motor {
     return 5 + d * 2 + bonus;
   }
 
-  /// Mikro ders bitişi: XP, seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  /// Mikro ders bitişi: XP, seri ve günlük XP güncellenir; `tamamlanan`
+  /// değişmez. Günlüğe 'mikro' kaydı eklenir.
   static OgrenciDurumu mikroBitir(
     OgrenciDurumu d,
     int dogru,
     int toplam,
     String bugun,
-  ) => _kazancIsle(d, mikroXp(dogru, toplam), bugun);
+  ) {
+    final xp = mikroXp(dogru, toplam);
+    return gunlukEkle(
+      _kazancIsle(d, xp, bugun),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turMikro,
+        dogru: dogru,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
 
   /// Yarışma bitişi: XP = max(5, puan ~/ 5); negatif puan 0 sayılır.
-  /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez.
+  /// Seri ve günlük XP güncellenir; `tamamlanan` değişmez. Günlüğe 'yarisma'
+  /// kaydı eklenir ([dogru]/[toplam] verilmezse 0/0, [kategori] varsa id).
   /// [yanlisSorular]: oyunda yanlış bilinen sorular; hata defterine işlenir.
   static OgrenciDurumu yarismaBitir(
     OgrenciDurumu d,
     int puan,
     String bugun, {
     List<YarismaSorusu> yanlisSorular = const [],
+    int dogru = 0,
+    int toplam = 0,
+    String? kategori,
   }) {
     final p = puan < 0 ? 0 : puan;
     final kazanc = p ~/ 5 < 5 ? 5 : p ~/ 5;
-    var yeni = _kazancIsle(d, kazanc, bugun);
+    var yeni = gunlukEkle(
+      _kazancIsle(d, kazanc, bugun),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turYarisma,
+        id: kategori,
+        dogru: dogru < 0 ? 0 : dogru,
+        toplam: toplam < 0 ? 0 : toplam,
+        xp: kazanc,
+      ),
+    );
     for (final s in yanlisSorular) {
       yeni = hataEkle(
         yeni,
@@ -255,6 +348,29 @@ abstract final class Motor {
       if (!sonuc.contains(h.id)) sonuc.add(h.id);
     }
     return sonuc;
+  }
+
+  /// Kelime sağlığı: yalnız verilen kursların kartları, yarı ömre göre üç
+  /// küme. Zayıf: < [Kart.ortaEsik]; orta: [Kart.ortaEsik]..[Kart.gucluEsik]
+  /// (sınırlar dahil); güçlü: > [Kart.gucluEsik]. Her küme kimliğe göre sıralı.
+  static ({List<String> zayif, List<String> orta, List<String> guclu})
+  kelimeSagligi(OgrenciDurumu d, List<Kurs> kurslar) {
+    final zayif = <String>[];
+    final orta = <String>[];
+    final guclu = <String>[];
+    final anahtarlar = d.kartlar.keys.toList()..sort();
+    for (final id in anahtarlar) {
+      if (kartCoz(kurslar, id) == null) continue;
+      final yo = d.kartlar[id]!.yariOmurGun;
+      if (yo < Kart.ortaEsik) {
+        zayif.add(id);
+      } else if (yo <= Kart.gucluEsik) {
+        orta.add(id);
+      } else {
+        guclu.add(id);
+      }
+    }
+    return (zayif: zayif, orta: orta, guclu: guclu);
   }
 
   static final _dersKimligi = RegExp(r'^(.+?)[.\-]u(\d+)[.\-]d(\d+)$');
@@ -360,6 +476,135 @@ abstract final class Motor {
       sonuc.add(secilen);
     }
     return sonuc;
+  }
+
+  /// Kartı elle tekrar kümesine ekler (ör. sözlükten "Kartlara ekle"):
+  /// yarı ömür en az değerde, sonraki tekrar bugün; böylece hemen sorulur.
+  /// Kart zaten varsa durum değişmeden döner.
+  static OgrenciDurumu kartEkle(OgrenciDurumu d, String kartId, String bugun) {
+    if (d.kartlar.containsKey(kartId)) return d;
+    return d.copyWith(
+      kartlar: {
+        ...d.kartlar,
+        kartId: Kart(
+          kutu: Kart.kutuHesapla(Kart.enAzYariOmur),
+          sonraki: bugun,
+          yariOmurGun: Kart.enAzYariOmur,
+        ),
+      },
+    );
+  }
+
+  /// Kelimeye kişisel not yazar. [metin] null ya da (kırpılmış) boşsa not
+  /// silinir; uzun metin [OgrenciDurumu.notEnCokKarakter] karaktere kısaltılır.
+  /// Yeni not eklenirken toplam [OgrenciDurumu.notEnCok] aşılacaksa durum
+  /// değişmeden döner (mevcut notu güncellemek her zaman serbesttir).
+  static OgrenciDurumu notYaz(OgrenciDurumu d, String kartId, String? metin) {
+    final kirpik = metin?.trim() ?? '';
+    if (kirpik.isEmpty) {
+      if (!d.kelimeNotlari.containsKey(kartId)) return d;
+      final kalan = {...d.kelimeNotlari}..remove(kartId);
+      return d.copyWith(kelimeNotlari: Map.unmodifiable(kalan));
+    }
+    if (!d.kelimeNotlari.containsKey(kartId) &&
+        d.kelimeNotlari.length >= OgrenciDurumu.notEnCok) {
+      return d;
+    }
+    final kisa = kirpik.length > OgrenciDurumu.notEnCokKarakter
+        ? kirpik.substring(0, OgrenciDurumu.notEnCokKarakter).trimRight()
+        : kirpik;
+    return d.copyWith(
+      kelimeNotlari: Map.unmodifiable({...d.kelimeNotlari, kartId: kisa}),
+    );
+  }
+
+  /// Kademeli ipucu sayısı: genel, hataya özel, çözüm.
+  static const int ipucuAdimSayisi = 3;
+
+  /// Kademeli ipucu. [adim] 0: genel ipucu (açıklamanın ilk cümlesi, yoksa
+  /// türe göre sabit metin); 1: hataya özel (uzunluk, ilk/son harf, bir yanlış
+  /// seçeneği eleme, ilk kelime); 2 ve üstü: çözüm (doğru cevap).
+  /// [Alistirma.ipuclari] doluysa önce onlar sırayla verilir, sonra çözüm.
+  static String ipucuUret(Alistirma a, int adim) {
+    final n = adim < 0 ? 0 : adim;
+    final ozel = a.ipuclari;
+    if (ozel.isNotEmpty) {
+      if (n < ozel.length && n < ipucuAdimSayisi - 1) return ozel[n];
+      return 'Çözüm: ${dogruCevapMetni(a)}';
+    }
+    switch (n) {
+      case 0:
+        return _genelIpucu(a);
+      case 1:
+        return _ozelIpucu(a);
+      default:
+        return 'Çözüm: ${dogruCevapMetni(a)}';
+    }
+  }
+
+  /// Yanlış cevapta gösterilecek doğru cevap metni (alıştırma türüne göre).
+  static String dogruCevapMetni(Alistirma a) => switch (a) {
+    Secim() => a.secenekler[a.dogru],
+    Bosluk() => a.secenekler[a.dogru],
+    Dinle() => a.secenekler[a.dogru],
+    Kod() => a.secenekler[a.dogru],
+    Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
+    Sirala() => a.dogru.join(' '),
+    Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
+  };
+
+  /// Adım 0: açıklamanın ilk cümlesi; yoksa türe göre sabit metin.
+  static String _genelIpucu(Alistirma a) {
+    final aciklama = a.aciklama?.trim();
+    if (aciklama != null && aciklama.isNotEmpty) {
+      final m = RegExp(r'^.*?[.!?](?=\s|$)').firstMatch(aciklama);
+      return m?.group(0) ?? aciklama;
+    }
+    return switch (a) {
+      Secim() => 'Seçenekleri ele: açıkça yanlış olanları çıkar',
+      Bosluk() => 'Boşluğun önündeki ve sonrasındaki kelimeye bak',
+      Yaz() =>
+        a.cevaplar.isEmpty || a.cevaplar.first.isEmpty
+            ? 'Cevabı yazmayı dene'
+            : 'İlk harfi: ${a.cevaplar.first[0]}',
+      Sirala() => 'Cümle büyük harfle başlar, noktalama ile biter',
+      Eslestir() => 'Bildiklerini önce eşle',
+      Dinle() => 'Bir kez daha dinle, sonra yaz',
+      Kod() => 'Söz dizimini kontrol et',
+    };
+  }
+
+  /// Adım 1: hataya özel ipucu.
+  static String _ozelIpucu(Alistirma a) {
+    String uzunlukVeHarf(String c) {
+      if (c.isEmpty) return 'Cevabı yazmayı dene';
+      if (c.length == 1) return 'Tek harf: $c';
+      return '${c.length} harf, "${c[0]}" ile başlar, '
+          '"${c[c.length - 1]}" ile biter';
+    }
+
+    String yanlisEle(List<String> secenekler, int dogru) {
+      for (var i = 0; i < secenekler.length; i++) {
+        if (i != dogru) return '"${secenekler[i]}" değil';
+      }
+      return 'Tek seçenek doğru';
+    }
+
+    return switch (a) {
+      Yaz() => uzunlukVeHarf(a.cevaplar.isEmpty ? '' : a.cevaplar.first),
+      Bosluk() => uzunlukVeHarf(a.secenekler[a.dogru]),
+      Secim() => yanlisEle(a.secenekler, a.dogru),
+      Dinle() => yanlisEle(a.secenekler, a.dogru),
+      Kod() => yanlisEle(a.secenekler, a.dogru),
+      Sirala() =>
+        a.dogru.isEmpty
+            ? 'Cümle büyük harfle başlar, noktalama ile biter'
+            : 'İlk kelime: ${a.dogru.first}',
+      Eslestir() =>
+        a.ciftler.isEmpty
+            ? 'Bildiklerini önce eşle'
+            : 'Bir çift: ${a.ciftler.first.sol} = ${a.ciftler.first.sag}',
+    };
   }
 
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2

@@ -6,13 +6,21 @@
 library;
 
 sealed class Alistirma {
-  const Alistirma({required this.soru, this.aciklama});
+  const Alistirma({
+    required this.soru,
+    this.aciklama,
+    this.ipuclari = const [],
+  });
 
   /// Soru metni. Boşluk türünde `___` yer tutucu bulunur.
   final String soru;
 
   /// Yanlış cevapta gösterilen kısa açıklama.
   final String? aciklama;
+
+  /// Kademeli ipuçları (isteğe bağlı, sırayla). Boşsa Motor.ipucuUret türe
+  /// göre otomatik türetir.
+  final List<String> ipuclari;
 
   String get tur;
 
@@ -24,6 +32,10 @@ sealed class Alistirma {
     final aciklama = j['aciklama'] as String?;
     List<String> metinler(String k) =>
         (j[k] as List).map((e) => e as String).toList();
+    final hamIpucu = j['ipuclari'];
+    final ipuclari = hamIpucu is List
+        ? hamIpucu.whereType<String>().toList()
+        : const <String>[];
     switch (tur) {
       case 'secim':
         return Secim(
@@ -31,6 +43,7 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'bosluk':
         return Bosluk(
@@ -38,12 +51,14 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'yaz':
         return Yaz(
           soru: soru,
           cevaplar: metinler('cevaplar'),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'sirala':
         return Sirala(
@@ -51,6 +66,7 @@ sealed class Alistirma {
           kelimeler: metinler('kelimeler'),
           dogru: metinler('dogru'),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'eslestir':
         return Eslestir(
@@ -59,6 +75,7 @@ sealed class Alistirma {
               .map((c) => (sol: (c as List)[0] as String, sag: c[1] as String))
               .toList(),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'dinle':
         return Dinle(
@@ -67,6 +84,7 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'kod':
         return Kod(
@@ -76,6 +94,7 @@ sealed class Alistirma {
           dogru: j['dogru'] as int,
           dil: j['dil'] as String? ?? 'html',
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       default:
         throw FormatException('Bilinmeyen alıştırma türü: $tur');
@@ -90,6 +109,7 @@ class Secim extends Alistirma {
     required this.secenekler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> secenekler;
   final int dogru;
@@ -102,6 +122,7 @@ class Secim extends Alistirma {
     'secenekler': secenekler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -112,6 +133,7 @@ class Bosluk extends Alistirma {
     required this.secenekler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> secenekler;
   final int dogru;
@@ -124,12 +146,18 @@ class Bosluk extends Alistirma {
     'secenekler': secenekler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
 /// Serbest yazma: kabul edilen cevap listesi.
 class Yaz extends Alistirma {
-  const Yaz({required super.soru, required this.cevaplar, super.aciklama});
+  const Yaz({
+    required super.soru,
+    required this.cevaplar,
+    super.aciklama,
+    super.ipuclari,
+  });
   final List<String> cevaplar;
   @override
   String get tur => 'yaz';
@@ -139,6 +167,7 @@ class Yaz extends Alistirma {
     'soru': soru,
     'cevaplar': cevaplar,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -149,6 +178,7 @@ class Sirala extends Alistirma {
     required this.kelimeler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> kelimeler; // karışık
   final List<String> dogru; // doğru sıra
@@ -161,12 +191,18 @@ class Sirala extends Alistirma {
     'kelimeler': kelimeler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
 /// Eşleştirme: 3-5 çift.
 class Eslestir extends Alistirma {
-  const Eslestir({required super.soru, required this.ciftler, super.aciklama});
+  const Eslestir({
+    required super.soru,
+    required this.ciftler,
+    super.aciklama,
+    super.ipuclari,
+  });
   final List<({String sol, String sag})> ciftler;
   @override
   String get tur => 'eslestir';
@@ -176,6 +212,7 @@ class Eslestir extends Alistirma {
     'soru': soru,
     'ciftler': ciftler.map((c) => [c.sol, c.sag]).toList(),
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -187,6 +224,7 @@ class Dinle extends Alistirma {
     required this.secenekler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final String okunacak;
   final List<String> secenekler;
@@ -201,6 +239,7 @@ class Dinle extends Alistirma {
     'secenekler': secenekler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -213,6 +252,7 @@ class Kod extends Alistirma {
     required this.dogru,
     this.dil = 'html',
     super.aciklama,
+    super.ipuclari,
   });
   final String kod;
   final List<String> secenekler;
@@ -229,6 +269,7 @@ class Kod extends Alistirma {
     'dogru': dogru,
     'dil': dil,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
