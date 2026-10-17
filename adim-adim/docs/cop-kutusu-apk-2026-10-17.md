@@ -56,3 +56,83 @@ degistirme: Bu liste silinmez; geri yükleme ya da yeni taşıma tarihli bölüm
 | 86F0D199681A72D2 | 15.7 | kitap ve çizgi roman\z-lib-1-11-4.apk |
 
 Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-2026-10-17.txt` (depoya alınmadı).
+
+## İkinci taşıma ve yeniden indirilecek uygulamalar (2026-10-17 13:22)
+
+### İkinci taşıma
+- Karar: Yusuf, "onları da at" (13:22). Taşınan: **61 dosya, yaklaşık 1.042 MB**; 57 `uptodown-*` kopyası, bozuk `english-dictionary-offline-10-0-1-1q61p.apk`, yinelenen `cplusplus-programming-1-0-5 (1).apk` ve **yanlışlıkla** `com.etermax.trivia.preguntados2_1.169.2-359…_apkmirror.com.apk` (gerçek Trivia Crack 2; listeleme ile taşıma arasında indirilmiş, tüm klasör taşındığı için gitti).
+- Taşıma sonrası klasörde dosya kalmadı; klasör silinmedi.
+
+### Olay notu
+- 13:20 ve 13:23'te taşınan 37 + 61 dosyanın Geri Dönüşüm Kutusu'nda olduğu doğrulandı. Trivia dosyasını geri yüklemek için bakıldığında (yaklaşık 13:30) **çöp kutusu tamamen boştu** (D:\$Recycle.Bin içinde yalnız desktop.ini). Claude çöp kutusunu boşaltmadı; boşaltan bilinmiyor (kullanıcı, başka bir oturum ya da Windows Depolama Algısı olabilir). 98 dosya geri yüklenemez.
+- Ders: Bundan sonra taşıma yalnız önceden çıkarılmış ad listesindeki dosyalara yapılır; klasörün tamamı toplu taşınmaz.
+- Öneri (Yusuf'a): Depolama Algısı'nın çöp kutusunu otomatik boşaltma ayarı kontrol edilsin; ayara dokunulmadı.
+
+### Yeniden indirilecek uygulamalar
+Önerilen kaynak: APKMirror (imza doğrulamalı); açık kaynaklar için F-Droid ya da GitHub sürümleri (Pocket Code: GitHub/F-Droid). Uptodown kullanılırsa "Older versions" altından; 14,8 MB'lık dosya yine yanlıştır. "?" işaretli adlar paket adından tahmindir. Aynı liste cihazda: `D:\Programlar\apk\INDIRILECEK-UYGULAMALAR-2026-10-17.md`.
+
+## Dil öğrenme (17)
+1. Duolingo (com.duolingo)
+2. Busuu (com.busuu.android.enc)
+3. Drops (com.languagedrops.drops.international)
+4. Drops Korece (com.languagedrops.drops.learn…korean.hangul.words)
+5. Mondly (com.atistudios.mondly.languages)
+6. EWA (com.ewa.ewaapp)
+7. HelloTalk (com.hellotalk)
+8. Praktika (ai.praktika.android)
+9. Pingo AI (com.oversea.pingo)
+10. Pingo Learn ? (com.pingolearn.languages)
+11. Simpler (ru.zengalt.simpler)
+12. Beelinguapp (com.david.android.languageswitch)
+13. Catch It Korean (com.catchitplay.catchitkorean)
+14. Seyahat için Korece ? (com.breboucas.coreanoparaviajar)
+15. Issen ? (com.issen.app)
+16. Shaguf Bites ? (com.shaguf.shaguf_bites)
+17. Zatpat ? (com.zatpatmobile)
+## Sözlük ve çeviri (8)
+18. Tureng (com.tureng.sozluk)
+19. WordReference (com.wordreference)
+20. Oxford Dictionary of English (com.mobisystems.msdict…oxford.dictionaryofenglish)
+21. Naver Dictionary (com.nhn.android.naverdic)
+22. DeepL (com.deepl.mobiletranslator)
+23. iTranslate (at.nk.tools.iTranslate)
+24. Sesli çevirmen ? (translate.speech.text.translation.voicetranslator)
+25. English Dictionary Offline (dosya bozuk inmişti: english-dictionary-offline-10-0-1)
+## Kodlama (12)
+26. Mimo (com.getmimo)
+27. Sololearn (com.sololearn)
+28. Learn Java – Programming Hub ? (com.freeit.java)
+29. Java Programming ? (ab.java.programming)
+30. Encode (com.upskew.encode)
+31. Mammoth Coding (com.mammotheducation.mammothcoding)
+32. AI Tutor – Codeway (com.codeway.aitutor)
+33. Master Learn AI ? (com.master.learn.ai)
+34. Acad AI ? (com.mycompany.acadai)
+35. Mobile Game Engine ? (com.mikeytronix.mobilegameengine)
+36. Pocket Code (org.catrobat.catroid)
+37. Scratch ? (org.scratch)
+38. Arduino Projeler ve Dersler (com.caneryildirim.arduinoprojelervedersler)
+## Genel eğitim (8)
+39. Khan Academy (org.khanacademy.android)
+40. Udemy (com.udemy.android)
+41. Quizlet (com.quizlet.quizletandroid)
+42. StudySmarter (com.studysmarter)
+43. Flashcards ? (flashcards.study.tool)
+44. Derslig (com.derslig.app)
+45. Anatomy Learning 3D (com.AnatomyLearning.Anatomy3DViewer3)
+46. SkyView Lite (com.t11.skyviewfree)
+## Oyun (3)
+47. Chess.com (com.chess)
+48. Trivia Crack Lite (com.etermax.preguntados.lite)
+49. Checkmate ? (com.splendapps.checkmate; satranç değil, yapılacaklar uygulaması olabilir)
+## Okuma, sesli kitap, çizgi roman (8)
+50. Moon+ Reader (com.flyersoft.moonreader)
+51. Nextory (com.gtl.nextory)
+52. Storytel (grit.storytel.app)
+53. Lezhin Comics (com.lezhin.comics)
+54. Ktoon ? (com.manga.ktoon)
+55. MANGA Plus (jp.co.shueisha.mangaplus)
+56. MangaToon Novel – Portekizce (mobi.mangatoon.novel.portuguese)
+57. Iqra ? (com.mmmoussa.iqra)
+## Not
+- Trivia Crack 2 (com.etermax.trivia.preguntados2) — APKMirror 1.169.2, yanlışlıkla taşınan dosya
