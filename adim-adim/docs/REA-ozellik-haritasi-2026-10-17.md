@@ -137,3 +137,95 @@ tarih: 2026-10-17
 - Araştırma: general-purpose (claude-haiku-5-5), mağaza yorumları ve Lichess sayfaları.
 - Envanter: Explore (claude-haiku-5-5), Adım Adım main dalı.
 - Derleme: Claude Opus 5.5 (cihaz oturumu), koordinatör: bulut oturumu (session_01Fhdfgc8mgRphzbVxDwv81f).
+
+## REA incelemesi (2026-10-17, D:\Programlar\apk)
+
+### Özet
+- Klasörde 96 APK var. Bunların 57'si ("uptodown-" ile başlayanlar) birebir aynı dosya: paket `com.uptodown` 7.41. Yani Duolingo, Busuu, Chess.com, Mimo, Sololearn, Drops, Quizlet, Khan Academy, Udemy, HelloTalk, Mondly, DeepL, Tureng vb. **incelenemedi**; Uptodown'ın kendi mağaza uygulaması indirilmiş. Bir dosya (`cplusplus-programming-1-0-5 (1).apk`) yinelenen kopya, bir dosya (`english-dictionary-offline-10-0-1-1q61p.apk`) geçerli bir zip değil (bozuk ya da yarım indirme).
+- İncelenen gerçek uygulama: 37. Yöntem: REA'nın APK için kullandığı **apktool 3.0.3** doğrudan çalıştırıldı (`d --no-src -s`, kaynak ve smali yok). REA'nın kendi ayar yolu (REA_APKTOOL_COMMAND, REA_JADX_MCP_JAR) Programlar klasörü `D:\Programlar`'a taşındığı için bozuk; düzeltme Yusuf'un onayını bekliyor. Bu nedenle bölüm "REA üzerinden değil, REA'nın aracıyla" yapıldı; JADX düzeyinde (sınıf/akış) inceleme yapılmadı.
+- Yalnız yapı alındı: paket adı, sürüm, ekran (activity) adları, izin adları, yerel kütüphane adlarından çatı ipucu, assets klasör adları. Kod, metin, görsel, ses ya da veri kopyalanmadı; çözülen dosyalar Claude'un geçici klasöründe kaldı, depoya girmedi.
+- Not: Modern uygulamaların çoğu tek etkinlik + Compose/Flutter/React Native kullandığı için ekran listesi az görünür (ör. Lichess, Kotlin, Grasshopper); bu uygulamalarda akış manifestten tam çıkmaz.
+
+### Dil öğrenme
+- **Memrise 2.9** (`com.memrise.android.memrisecompanion`, çok eski sürüm, minSdk 16): Ekranlar kurs → seviye → öğrenme modu akışını gösteriyor (CourseDetails, CourseDetailsLevel, LearningMode, LoadingMode, ModuleSelection, Topic, Thing, MemCreation, Mission, MemriseScience, ProUpsell). "Mem" (kullanıcının kendi hatırlatıcı ipucu) ve "Mission" (senaryo görevi) ayrı ekran. 107 dil klasörü.
+  - Adım Adım'a uyarlanabilir: kelimeye kişisel hatırlatıcı not (mnemonik) ekleme; öğrenme modunu (öğren / tekrar / hız turu) dersten ayrı seçme.
+- **BBC Learning English 1.5** (`uk.co.bbc.learningenglish`): Program → ders listesi → ders → quiz → quiz sonucu; ayrıca Riddle (bilmece) ve Audio ekranları, ön plan servisiyle arka planda ses.
+  - Uyarlanabilir: ders sonu kısa quiz ve sonuç ekranı (Adım Adım'da ders sonu özeti var); "günün bilmecesi" gibi tek soruluk günlük içerik.
+- **Cake 6.9** (`me.mycake`, React Native): Yalnız giriş ve ana etkinlik görünüyor (akış JS içinde). Mikrofon izni var (konuşma pratiği).
+  - Uyarlanabilir: — (akış manifestten çıkmıyor).
+- **English Pronunciation 3.3** (`com.androidbull.mypronounce`): assets içinde 20 ders klasörü (Lesson1…Lesson20), mikrofon izni; ekranlar kod içinde.
+  - Uyarlanabilir: sabit sayıda (20) telaffuz dersi yapısı; öneri 8.7 (konuşma) onaylanırsa referans.
+- **Buddy.ai 6.31** (Unity, 268 MB): Unity içinde çalışan sesli karakterli çocuk İngilizcesi; mikrofon izni.
+  - Uyarlanabilir: — (Adım Adım'ın hafif yapısına uymaz; boyut ve motor maliyeti yüksek).
+- **DualReads 0.2** (`com.bookreader`, 121 MB): assets klasörleri çok öğretici: `books`, `dictionaries`, `frequencies`, `lemmatizations`. Yani kitaplar, sözlükler, kelime sıklık listeleri ve kök bulma (lemma) tabloları uygulamaya gömülü, tamamen çevrimdışı.
+  - Uyarlanabilir: **sözlükte kök bulma (lemmatization)**: "went" arayan "go" maddesine gitsin; **sıklık listesiyle zorluk** gösterimi; okuma pasajı + dokun-anlam (öneri 1/2 ile birleşir).
+
+### Sözlük ve çeviri
+- **U-Dictionary 6.7** (`com.youdao.hindict`, 90 kendi ekranı): Definition, DictCardDetail, Grammar, DailyQuotes, ClipboardTrans (panodan çeviri), Camera (kamerayla çeviri), DownloadedWordPackage (indirilen kelime paketleri), LockScreen (kilit ekranında kelime), FishGame (kelime oyunu), AnswerSheet. assets: `dict_simple`, `word_packages`.
+  - Uyarlanabilir: **konuya göre kelime paketleri** (öneri 9 ile aynı); **günün sözü/kelimesi**; sözlük maddesinden dilbilgisi notuna geçiş.
+- **İngilizce-Türkçe Sözlük 3.10** (`com.movinapp.dict.entr.free`): Splash → Main → Preferences; tek ekranlı arama sözlüğü.
+  - Uyarlanabilir: tek ekranlı hızlı arama (PR #28'deki sözlük ekranı bu yapıda).
+- **SayHi 5.0** (`com.sayhi.android.sayhitranslate`): Onboarding adımları ayrı ekranlar (ana dil, mikrofon izni, bildirim, koşullar); `OfflineHelp`; assets'te Google ML Kit OCR modeli (çevrimdışı metin tanıma).
+  - Uyarlanabilir: **ilk açılışta adım adım izin ve tercih akışı** (ana dil, bildirim); çevrimdışı yardım sayfası.
+- **Google Translate 10.39**: Ekranlar kod içinde (0 görünür); mikrofon izni.
+
+### Kodlama öğrenme
+- **Grasshopper 3.03** (`com.area120.grasshopper`, Google, **Flutter**): Tek WebView ekranı + Flutter; Adım Adım ile aynı çatı. Akış Dart içinde (JADX/Dart AOT incelemesi gerekir).
+  - Uyarlanabilir: Flutter ile kodlama öğretiminin üretimde mümkün olduğunun örneği; bulmaca tarzı kod alıştırması.
+- **Learn C Programming 2.1** (`com.nsk.cprogramming`): Index → TopicDetail; ProgramsList → ProgramDetail; TestActivity. assets'te numaralı (0…12) konu klasörleri.
+  - Uyarlanabilir: **"örnek programlar" kütüphanesi** (konudan bağımsız, çalışan örnek listesi) ve ayrı test ekranı.
+- **C++ Programming 1.0** (`com.infoland.c_plus_plus_programming`): Chapter → Topic → Detail (üç katmanlı içerik).
+- **Kotlin Language 0.1** (React Native): tek ekran; assets `dist`.
+- **Pydroid 3 8.6** (`ru.iiec.pydroid3`): Gerçek Python çalıştırıcı: Term (terminal), RunScript, Samples (örnekler), Libs (paket yöneticisi), Qt. Gömülü yorumlayıcı.
+  - Uyarlanabilir: öneri 11 (gerçek kod çalıştırma) için **örnek programlar + çalıştır** düzeni; Python gömmenin boyut maliyetinin (64,7 MB) somut örneği.
+- **QPython3 3.0**: Ted (kod düzenleyici), Term, PyApi, PyLib; düzenleyici + terminal.
+- **ScratchJr 1.5** (`org.scratchjr.android`): Tek etkinlik, tüm uygulama assets/HTML5 içinde (web tabanlı, çevrimdışı). Kamera ve mikrofon izni (kendi karakterini çizme, ses kaydı).
+  - Uyarlanabilir: blok tabanlı görsel programlama (çocuklar için ayrı alan fikri; düşük öncelik).
+- **Tinkercad 4**: TWA (web sitesi kabuğu, 0,2 MB); incelenecek yapı yok.
+
+### Satranç
+- **Lichess 8.0** (`org.lichess.mobileapp`): Eski web tabanlı mobil uygulama (assets `public`, tek MainActivity), yeni Flutter sürümü değil. Yerel kütüphanelerde **Stockfish ve Stockfish-variants** gömülü: çevrimdışı motor analizi var. 83 dil klasörü.
+  - Uyarlanabilir: satranç modülünde (öneri 4) motor olmadan elle yazılmış bulmaca ilk adım; motor istenirse Stockfish GPL-3.0 olduğu için Adım Adım'ın lisansını etkiler (karar Yusuf'ta).
+
+### Genel öğrenme
+- **Socratic 1.3** (Google): Kamera ile soru çözme; assets `katex` (matematik dizgisi). Ekranlar kod içinde.
+- **edX 6.4**: AppActivity tek giriş; `js_injection` (web içerik); çevrimiçi kurs platformu.
+- **AnkiDroid 2.25** (`com.ichi2.anki`, GPL-3.0): DeckPicker (deste seçimi) → StudyOptions → Reviewer (tekrar) → CardBrowser (kart tarayıcı) → NoteEditor / CardTemplateEditor; CardAnalysisWidget, DeckPickerWidget (ana ekran widget'ları), SharedDecks (paylaşılan desteler), ManageNotetypes. assets `mathjax`, `backend` (Rust tabanlı Anki çekirdeği).
+  - Uyarlanabilir: **kart tarayıcı** (tüm tekrar kartlarını listele, ara, düzenle); **ana ekran widget'ı** (bugünkü tekrar sayısı); kart şablonu (ön/arka yüz) mantığı. Öneri 16 (kelime sağlığı panosu) ile birleşir.
+- **Learn Drawing 7.5**: Her çizim dersi ayrı etkinlik (270 ekran: anime1…, eimo1…); adım adım çizim. Çizim alanı için örnek, Adım Adım'a doğrudan uymaz.
+- **Old Maps 1.1** (`com.klokantech.oldmaps`): tek etkinlik + assets `www` (web görünümü).
+
+### Okuma, sesli kitap ve çizgi roman (kitap ve çizgi roman klasörü)
+- **Audible 26.41**: PlayerPager, Library, ListeningLog (dinleme günlüğü), ListenHistory, EditBookmark, AddOrEditClipsNotes (alıntı/not), SavedAnnotations, PdfReader, BookQA. Uyarlanabilir: **dinleme/öğrenme günlüğü** ve **yer imi + not** (okuma pasajlarında).
+- **GoodNovel, Webcomics, Manhuaren, Manga Rock, Bilibili**: Ağırlıkla mağaza, jeton, ödül kutusu, check-in, abonelik ve reklam ekranları (Coins, Gems, CheckIn, LimitBox, Lottery, Ad*). Uyarlanabilir: **yok**; bunlar "ödeme duvarı ve reklam" şikâyetlerinin kaynağı, bilinçli olarak alınmamalı.
+- **Mihon / Tachiyomi / Tachiyomi J2K** (açık kaynak okuyucular, Apache-2.0): Main → Reader; ExtensionInstall (eklenti), Track (ilerleme takibi), Biometric/Unlock (uygulama kilidi).
+  - Uyarlanabilir: **okuma ilerlemesi takibi**; isteğe bağlı uygulama kilidi (paylaşılan bilgisayarda).
+- **VIZ Manga, Manga Master, Comics (comiXology), Z-Library**: okuyucu + mağaza/indirme; ContinueReading (kaldığın yerden devam) ve Theme (tema) ekranları dikkat çekici.
+  - Uyarlanabilir: **"kaldığın yerden devam" kartı** ana sayfada.
+
+### İncelenemeyenler
+| Dosya | Neden |
+|---|---|
+| 57 adet `uptodown-*.apk` | Hepsi aynı dosya: Uptodown mağaza uygulaması (`com.uptodown` 7.41), hedef uygulama değil |
+| `cplusplus-programming-1-0-5 (1).apk` | Yinelenen kopya (aynı SHA256) |
+| `english-dictionary-offline-10-0-1-1q61p.apk` | Geçerli zip değil (bozuk ya da yarım indirme) |
+
+### Sonraki eklemeler için öneriler (APK bulgularına göre)
+| # | Öneri | Kaynak (yapı) | Adım Adım'daki karşılığı | Tahmini iş |
+|---|---|---|---|---|
+| 1 | Sözlükte kök bulma (went → go) ve kelime sıklık bilgisi | DualReads (lemmatizations, frequencies) | Sözlük var (PR #28), kök bulma yok | Küçük-orta |
+| 2 | Kart tarayıcı: tüm tekrar kartlarını listele, ara, zayıfları filtrele | AnkiDroid (CardBrowser) | Yok (öneri 16 ile birleşir) | Küçük |
+| 3 | Konuya göre kelime paketleri ve "günün kelimesi" | U-Dictionary (word_packages, DailyQuotes) | Yok | Küçük |
+| 4 | Kelimeye kişisel hatırlatıcı not (mnemonik) | Memrise (MemCreation) | Yok | Küçük |
+| 5 | Örnek programlar kütüphanesi (konudan bağımsız, açıklamalı) | Learn C (ProgramsList), Pydroid (Samples) | Yok | Orta (içerik) |
+| 6 | Kaldığın yerden devam kartı ve öğrenme günlüğü | VIZ (ContinueReading), Audible (ListeningLog) | Kısmen (sıradaki ders vurgulu) | Küçük |
+| 7 | Ders sonu kısa quiz ve günlük tek soruluk bilmece | BBC Learning English (Quiz, Riddle) | Kısmen (ders özeti, yarışma var) | Küçük |
+| 8 | İlk açılışta adım adım tercih akışı (hedef, bildirim izni) | SayHi (Onboarding*) | Kısmen (alan seçimi var) | Küçük |
+| 9 | Ana ekran/masaüstü bildirim kutusu: bugünkü tekrar sayısı | AnkiDroid (widget) | Yok (Windows'ta bildirim var) | Orta |
+| 10 | Okuma pasajında yer imi ve not | Audible, Mihon (Reader, Annotations) | Yok (öneri: okuma pasajı ile) | Orta |
+
+Bilinçli olarak önerilmeyenler: jeton, ödül kutusu, check-in, lotarya ve reklam ekranları (GoodNovel, Webcomics, Manhuaren); Unity gibi ağır motorlar (Buddy.ai).
+
+### Birlikte çalışılanlar ve token
+- İnceleme: Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz], apktool 3.0.3 (REA'nın aracı). Alt ajan kullanılmadı.
+- Token (tahmini): girdi ~90K, çıktı ~15K.
