@@ -362,6 +362,23 @@ abstract final class Motor {
     return sonuc;
   }
 
+  /// Kartı elle tekrar kümesine ekler (ör. sözlükten "Kartlara ekle"):
+  /// yarı ömür en az değerde, sonraki tekrar bugün; böylece hemen sorulur.
+  /// Kart zaten varsa durum değişmeden döner.
+  static OgrenciDurumu kartEkle(OgrenciDurumu d, String kartId, String bugun) {
+    if (d.kartlar.containsKey(kartId)) return d;
+    return d.copyWith(
+      kartlar: {
+        ...d.kartlar,
+        kartId: Kart(
+          kutu: Kart.kutuHesapla(Kart.enAzYariOmur),
+          sonraki: bugun,
+          yariOmurGun: Kart.enAzYariOmur,
+        ),
+      },
+    );
+  }
+
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2
   /// (en çok 180 gün), yanlışta /2 (en az 0,5 gün). Sonraki tekrar = bugün +
   /// yarı ömür (tam sayıya yuvarlanır, en az 1 gün). Kart henüz yoksa yarı ömür

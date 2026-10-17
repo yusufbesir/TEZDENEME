@@ -148,6 +148,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
   }
 
+  /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
+  Future<OgrenciDurumu> kartEkle(String kartId) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.kartEkle(d, kartId, bugun));
+  }
+
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat. Hatırlatma açılırken bildirim izni
   /// verilmezse hatırlatma geri kapatılır ve false döner.

@@ -18,6 +18,7 @@ class SozlukMaddesi {
     required this.dil,
     required this.kursId,
     required this.dersId,
+    required this.alistirmaIndeksi,
   });
 
   final String kelime;
@@ -25,6 +26,13 @@ class SozlukMaddesi {
   final String dil;
   final String kursId;
   final String dersId;
+
+  /// Maddenin kaynağı olan alıştırmanın ders içindeki sırası (0 tabanlı).
+  final int alistirmaIndeksi;
+
+  /// Kaynak alıştırmanın aralıklı tekrar kart kimliği
+  /// (`Ders.kartKimligi` ile aynı biçim: 'dersId#indeks').
+  String get kartKimligi => '$dersId#$alistirmaIndeksi';
 
   @override
   String toString() => '$kelime: $anlam ($dil, $dersId)';
@@ -45,7 +53,7 @@ class Sozluk {
 
   /// Tüm kurslardaki Eslestir çiftlerini ve "X ne demektir?" seçim
   /// sorularını tarar. Aynı kelime+anlam (normalize) tekrarı birleştirilir;
-  /// ilk görülen ders kalır.
+  /// ilk görülen ders (ve alıştırma indeksi) kalır.
   factory Sozluk.kurslardan(List<Kurs> kurslar) {
     final gorulen = <String>{};
     final sonuc = <SozlukMaddesi>[];
@@ -62,6 +70,7 @@ class Sozluk {
           dil: m.dil,
           kursId: m.kursId,
           dersId: m.dersId,
+          alistirmaIndeksi: m.alistirmaIndeksi,
         ),
       );
     }
@@ -69,7 +78,8 @@ class Sozluk {
     for (final kurs in kurslar) {
       final dil = kurs.alan == KursAlani.kod ? 'kod' : 'en';
       for (final ders in kurs.tumDersler) {
-        for (final a in ders.alistirmalar) {
+        for (var i = 0; i < ders.alistirmalar.length; i++) {
+          final a = ders.alistirmalar[i];
           switch (a) {
             case Eslestir(:final ciftler):
               for (final c in ciftler) {
@@ -80,6 +90,7 @@ class Sozluk {
                     dil: dil,
                     kursId: kurs.id,
                     dersId: ders.id,
+                    alistirmaIndeksi: i,
                   ),
                 );
               }
@@ -93,6 +104,7 @@ class Sozluk {
                     dil: dil,
                     kursId: kurs.id,
                     dersId: ders.id,
+                    alistirmaIndeksi: i,
                   ),
                 );
               }

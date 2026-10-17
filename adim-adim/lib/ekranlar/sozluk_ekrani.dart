@@ -1,5 +1,6 @@
 /// Sözlük ekranı: arama kutusu, dil filtre çipleri (Tümü / İngilizce / Kod)
-/// ve sonuç listesi (kelime kalın, anlam altta, sağda kurs kısa adı).
+/// ve sonuç listesi (kelime kalın, anlam altta, sağda kurs kısa adı ve
+/// "Kartlara ekle" düğmesi; kart eklenmişse pasif "Kartlarda" onayı).
 /// İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile okur; kod
 /// maddelerinde ses yok. Dar pencerede (480) taşmaz.
 ///
@@ -168,6 +169,12 @@ class _MaddeSatiri extends ConsumerWidget {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
     final ingilizce = madde.dil == 'en';
+    final kartId = madde.kartKimligi;
+    final kartlarda = ref.watch(
+      durumProvider.select(
+        (d) => d.value?.kartlar.containsKey(kartId) ?? false,
+      ),
+    );
     return ListTile(
       dense: false,
       leading: ingilizce
@@ -182,9 +189,40 @@ class _MaddeSatiri extends ConsumerWidget {
         style: yazi.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(madde.anlam),
-      trailing: Text(
-        _SozlukDurumu.kursKisaAd(madde.kursId),
-        style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+      // Sağ taraf sıkı Row: kurs kısa adı + kart düğmesi. Yatay tutulur;
+      // dikey Column büyük metin ölçeğinde ListTile yüksekliğini aşıyor.
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _SozlukDurumu.kursKisaAd(madde.kursId),
+            style: yazi.labelMedium?.copyWith(color: r.metinIkincil),
+          ),
+          kartlarda
+              ? IconButton(
+                  icon: Icon(Icons.check_circle, color: r.dogru),
+                  tooltip: 'Kartlarda',
+                  onPressed: null,
+                  visualDensity: VisualDensity.compact,
+                )
+              : IconButton(
+                  icon: const Icon(Icons.add_card),
+                  tooltip: 'Kartlara ekle',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () async {
+                    final mesajci = ScaffoldMessenger.of(context);
+                    await ref.read(durumProvider.notifier).kartEkle(kartId);
+                    mesajci
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Text('Tekrar kartı eklendi'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                  },
+                ),
+        ],
       ),
     );
   }

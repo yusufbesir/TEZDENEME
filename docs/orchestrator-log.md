@@ -77,3 +77,6 @@
 - 2026-10-17 | Gömülü sözlük (öneri 1): Sozluk servisi, /sozluk ekranı, Yol şeridine giriş düğmesi, 11 test (295 madde) | implementer / claude-fable-5-1 | ~73K token | tamam (analyze 0 uyarı, 348 test geçti)
 - 2026-10-17 | Gömülü sözlük değişikliğini doğrula | verifier / claude-fable-5-1 | ~44K token | Geçti (348 test, kabuk ve mevcut testler değişmedi, silinen dosya yok)
 - 2026-10-17 | D:\Programlar\apk taraması ve yapı/akış incelemesi (96 dosya; 37 gerçek uygulama apktool ile, 57 uptodown mağaza kopyası, 1 yinelenen, 1 bozuk; REA yolu taşınma nedeniyle bozuk, dokunulmadı) | cihaz RC oturumu (Opus) | ~90K girdi / ~15K çıktı | tamam (commit f558ef4, REA-ozellik-haritasi bölüm "REA incelemesi", 10 ekleme önerisi)
+- 2026-10-17 | Özellik 17: sözlükten tek dokunuşla tekrar kartı (Motor.kartEkle, DurumNotifier.kartEkle, Sözlük ekranı düğmesi, 6 test) | implementer / claude-fable-5-1 | ~63K token | tamam (354 test)
+- 2026-10-17 | Özellik 17 doğrulaması | verifier / claude-fable-5-1 | ~30K token | Geçti
+- 2026-10-17 | Trivia Crack bölümü (APK uptodown kopyasıydı, genel bilgiyle), öneri 32–35, çarşamba emülatör hazırlığı; 37 taranan APK Geri Dönüşüm Kutusu'na (Yusuf kararı) | cihaz RC oturumu (Opus) | ~35K/7K + ~20K token | tamam (1e024af3, 61a801c4)
