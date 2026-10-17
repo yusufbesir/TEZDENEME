@@ -87,3 +87,4 @@
 | 2026-10-17 | 1.0.7 exe kaynak gömme doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 27259 | Geçti. Sıra doğru, hata derlemeyi düşürür, npm ls temiz, 140 test. |
 | 2026-10-17 | E-kitap menüsü ve LibreOffice ile DOCX/ODT/TXT/HTML→EPUB, 1.0.8 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 60375 | Tamamlandı; 147 test; gerçek TXT→EPUB geçerli |
 | 2026-10-17 | E-kitap/EPUB doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. Bağımsız DOCX/TXT→EPUB geçerli; izin akışı bozulmadı; 147 test. |
+| 2026-10-17 | Calibre gömme (1.0.9) başlatıldı, Yusuf'un isteğiyle durduruldu [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | kesildi | Yarım: scripts/calibre-hazirla.js, calibre-surum.json commit dışı; devam notu dosya-donusturucu/DEVAM.md (paylaşılan klasör) ve kasa Oturum Notları |
