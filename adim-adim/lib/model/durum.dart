@@ -19,6 +19,11 @@ class Kart {
   static const double enAzYariOmur = 0.5;
   static const double enCokYariOmur = 180;
 
+  /// Kelime sağlığı kümeleri (yarı ömür, gün): [ortaEsik] altı "zayıf",
+  /// [ortaEsik]..[gucluEsik] arası "orta", [gucluEsik] üstü "güçlü".
+  static const double ortaEsik = 2.0;
+  static const double gucluEsik = 7.0;
+
   /// Leitner kutusu 1..5; yarı ömürden türetilen gösterge (Tekrar rozetleri).
   final int kutu;
 

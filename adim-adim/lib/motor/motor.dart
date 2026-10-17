@@ -257,6 +257,29 @@ abstract final class Motor {
     return sonuc;
   }
 
+  /// Kelime sağlığı: yalnız verilen kursların kartları, yarı ömre göre üç
+  /// küme. Zayıf: < [Kart.ortaEsik]; orta: [Kart.ortaEsik]..[Kart.gucluEsik]
+  /// (sınırlar dahil); güçlü: > [Kart.gucluEsik]. Her küme kimliğe göre sıralı.
+  static ({List<String> zayif, List<String> orta, List<String> guclu})
+  kelimeSagligi(OgrenciDurumu d, List<Kurs> kurslar) {
+    final zayif = <String>[];
+    final orta = <String>[];
+    final guclu = <String>[];
+    final anahtarlar = d.kartlar.keys.toList()..sort();
+    for (final id in anahtarlar) {
+      if (kartCoz(kurslar, id) == null) continue;
+      final yo = d.kartlar[id]!.yariOmurGun;
+      if (yo < Kart.ortaEsik) {
+        zayif.add(id);
+      } else if (yo <= Kart.gucluEsik) {
+        orta.add(id);
+      } else {
+        guclu.add(id);
+      }
+    }
+    return (zayif: zayif, orta: orta, guclu: guclu);
+  }
+
   static final _dersKimligi = RegExp(r'^(.+?)[.\-]u(\d+)[.\-]d(\d+)$');
 
   /// Ders kimliğindeki ünite numarası: 'ingilizce-1.u2.d1' ve 'html-1-u2-d1'

@@ -80,3 +80,6 @@
 - 2026-10-17 | Özellik 17: sözlükten tek dokunuşla tekrar kartı (Motor.kartEkle, DurumNotifier.kartEkle, Sözlük ekranı düğmesi, 6 test) | implementer / claude-fable-5-1 | ~63K token | tamam (354 test)
 - 2026-10-17 | Özellik 17 doğrulaması | verifier / claude-fable-5-1 | ~30K token | Geçti
 - 2026-10-17 | Trivia Crack bölümü (APK uptodown kopyasıydı, genel bilgiyle), öneri 32–35, çarşamba emülatör hazırlığı; 37 taranan APK Geri Dönüşüm Kutusu'na (Yusuf kararı) | cihaz RC oturumu (Opus) | ~35K/7K + ~20K token | tamam (1e024af3, 61a801c4)
+- 2026-10-17 | Özellik 16: kelime sağlığı panosu (Motor.kelimeSagligi, Kart eşikleri, pano bileşeni, Tekrar ekranı, 9 test) | implementer / claude-fable-5-1 | ~65K token | tamam (363 test)
+- 2026-10-17 | Özellik 16 doğrulaması | verifier / claude-fable-5-1 | ~45K token | Geçti
+- 2026-10-17 | Trivia Crack 2 (1.191.4) ve Busuu (32.49.1) apktool taraması, öneri 36–41, dosyalar kutuya | cihaz RC oturumu (Opus) | ~30K+ token | tamam (4980ab3, 303b2b9, fffa45c, 8a17bd7)

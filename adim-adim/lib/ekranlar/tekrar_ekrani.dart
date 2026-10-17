@@ -1,6 +1,7 @@
 /// Tekrar sekmesi: seçili alanın zamanı gelen (yarı ömür tabanlı) kartlarını
-/// sorar; altında "Hata defteri" bölümü (yanlış kart ve yarışma soruları,
-/// "Zayıf noktalar dersi" düğmesi) bulunur.
+/// sorar; altında "Kelime sağlığı" panosu (Zayıf/Orta/Güçlü) ve "Hata defteri"
+/// bölümü (yanlış kart ve yarışma soruları, "Zayıf noktalar dersi" düğmesi)
+/// bulunur.
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
@@ -10,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
+import '../bilesenler/kelime_sagligi_panosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -123,6 +125,13 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                                     _sonuc = null;
                                   }),
                                 ),
+                        ),
+                        const SizedBox(height: Olcu.b4),
+                        KelimeSagligiPanosu(
+                          durum:
+                              ref.read(durumProvider).value ??
+                              const OgrenciDurumu(),
+                          kurslar: ref.read(alanKurslariProvider),
                         ),
                         const SizedBox(height: Olcu.b4),
                         _HataDefteri(
