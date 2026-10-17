@@ -1,0 +1,22 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Arşivleme onayı{% endblock %}
+{% block icerik %}
+<h1>Arşivleme onayı</h1>
+<div class="uyari-kutu">
+  Seçilen {{ qrler|length }} QR kod arşivlenecek. Arşivlenen kodlar taranınca "kullanımda değil" yanıtı verir (HTTP 410).
+  Kodlar silinmez; daha sonra tekrar aktif yapabilirsiniz.
+</div>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kısa kod</th><th>Ad</th><th>Mevcut durum</th></tr></thead>
+  <tbody>{% for q in qrler %}<tr><td>{{ q.kisa_kod }}</td><td>{{ q.ad }}</td><td>{{ q.get_durum_display }}</td></tr>{% endfor %}</tbody>
+</table></div>
+<form method="post" action="{% url 'panel:qr_toplu' %}" class="eylemler">
+  {% csrf_token %}
+  <input type="hidden" name="islem" value="arsivle">
+  <input type="hidden" name="onay" value="1">
+  <input type="hidden" name="donus" value="{{ donus }}">
+  {% for q in qrler %}<input type="hidden" name="secili" value="{{ q.pk }}">{% endfor %}
+  <button type="submit" class="dugme tehlike">Evet, arşivle</button>
+  <a class="dugme ikincil" href="{% url 'panel:qr_liste' %}">Vazgeç</a>
+</form>
+{% endblock %}

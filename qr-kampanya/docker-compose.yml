@@ -1,0 +1,216 @@
+# QR Kampanya sistemi - Docker Compose yapılandırması
+# Ayarlar .env dosyasından okunur (örnek: .env.example). Gizli değerler buraya yazılmaz.
+
+x-gunluk: &gunluk
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+# Uygulamanın (app ve hazirlik) okuduğu ayarlar. Değeri olmayan anahtarlar .env'den aynen aktarılır;
+# .env'de yoksa hiç tanımlanmaz (varsayılan uygulama kodundadır). Veritabanı parolaları
+# BİLEREK burada değil, her servisin kendi bölümünde verilir: app yalnızca qr_uygulama parolasını alır.
+x-uygulama-ayarlari: &uygulama-ayarlari
+  DJANGO_SECRET_KEY:
+  DJANGO_DEBUG:
+  DJANGO_ALLOWED_HOSTS:
+  SITE_ALAN_ADI:
+  SITE_SEMA:
+  KISA_URL_TABANI:
+  GUVENLI_CEREZ:
+  HSTS_SN:
+  OTURUM_SURESI_SN:
+  MFA_ZORUNLU:
+  MFA_SIFRELEME_ANAHTARI:
+  GIRIS_DENEME_SINIRI:
+  GIRIS_KILIT_SURESI_SN:
+  HESAP_DENEME_SINIRI:
+  IP_DENEME_SINIRI:
+  GIRIS_HIZ_SINIRI:
+  YONLENDIRME_HIZ_SINIRI:
+  GEOIP_VERITABANI:
+  QR_OLUSTURMA_HIZ_SINIRI:
+  API_HIZ_SINIRI:
+  API_BASARISIZ_HIZ_SINIRI:
+  API_KULLANICI_HIZ_SINIRI:
+  API_AZAMI_ANAHTAR:
+  API_ANAHTAR_OLUSTURMA_HIZ_SINIRI:
+  API_CORS_KOKENLERI:
+  YONETIM_IZINLI_AGLAR:
+  YONETIM_ERISIMI:
+  QR_EKLENTILER:
+  QR_IMAJ_DIGEST:
+  QR_IMAJ_ETIKETI: ${UYGULAMA_SURUMU:-yerel}
+  TARAMA_SAKLAMA_GUN:
+  YEDEK_DURUM_DOSYASI:
+  LOG_SEVIYESI:
+  POSTGRES_DB: ${POSTGRES_DB:-qrkampanya}
+  POSTGRES_HOST: db
+
+x-uygulama-sikilastirma: &uygulama-sikilastirma
+  build: ./app
+  image: qr-kampanya-app:${UYGULAMA_SURUMU:-yerel}
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  read_only: true
+  logging: *gunluk
+
+services:
+  db:
+    image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-qrkampanya}
+      POSTGRES_USER: ${POSTGRES_USER:-qrkampanya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env içinde tanımlanmalı}
+      # db/init/10-roller.sh bu parolalarla qr_sahip ve qr_uygulama rollerini kurar.
+      POSTGRES_SAHIP_PAROLA: ${POSTGRES_SAHIP_PAROLA:?POSTGRES_SAHIP_PAROLA .env içinde tanımlanmalı}
+      POSTGRES_UYGULAMA_PAROLA: ${POSTGRES_UYGULAMA_PAROLA:?POSTGRES_UYGULAMA_PAROLA .env içinde tanımlanmalı}
+    security_opt: [no-new-privileges:true]
+    # Postgres imajının giriş noktası root olarak başlar, veri dizinini hazırlar ve postgres kullanıcısına geçer:
+    # yalnızca bunun için gereken yetkiler bırakılır, gerisi kapalıdır.
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    volumes:
+      - db-veri:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks: [ic]
+    # Veritabanı portu dışarı AÇILMAZ.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging: *gunluk
+
+  # Tek seferlik hazırlık: şema değişikliklerini (migrasyon) yalnızca veritabanı sahibi qr_sahip yapar.
+  # Bu hesabın parolası app konteynerine verilmez.
+  hazirlik:
+    <<: *uygulama-sikilastirma
+    restart: "no"
+    environment:
+      <<: *uygulama-ayarlari
+      POSTGRES_USER: qr_sahip
+      POSTGRES_PASSWORD: ${POSTGRES_SAHIP_PAROLA:?POSTGRES_SAHIP_PAROLA .env içinde tanımlanmalı}
+      BASLAT_MOD: hazirlik
+    command: ["echo", "Hazırlık tamamlandı."]
+    tmpfs:
+      - /tmp
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [ic]
+
+  app:
+    <<: *uygulama-sikilastirma
+    restart: unless-stopped
+    environment:
+      <<: *uygulama-ayarlari
+      # Kısıtlı hesap: yalnızca SELECT/INSERT/UPDATE/DELETE; tablo silemez, tetikleyici kapatamaz.
+      POSTGRES_USER: qr_uygulama
+      POSTGRES_PASSWORD: ${POSTGRES_UYGULAMA_PAROLA:?POSTGRES_UYGULAMA_PAROLA .env içinde tanımlanmalı}
+      BASLAT_MOD: uygulama
+      # X-Forwarded-For yalnızca Caddy'den (web ağı) gelirse güvenilir.
+      GUVENILIR_VEKIL: "1"
+      FORWARDED_ALLOW_IPS: ${WEB_ALT_AGI:-172.28.0.0/16}
+    tmpfs:
+      - /tmp
+      - /veri/static:uid=10001,mode=0755   # collectstatic her başlangıçta buraya yazar
+    depends_on:
+      db:
+        condition: service_healthy
+      hazirlik:
+        condition: service_completed_successfully
+    volumes:
+      - medya:/veri/medya
+      - yedek-durum:/yedek-durum:ro
+      # İsteğe bağlı ülke bilgisi (GeoIP): MaxMind GeoLite2-Country.mmdb dosyasını kendiniz indirip salt okunur bağlayın
+      # ve .env içinde GEOIP_VERITABANI=/geoip/GeoLite2-Country.mmdb verin (docs/KULLANIM.md "GeoIP"). Dosyayı bu proje indirmez.
+      # - ./geoip/GeoLite2-Country.mmdb:/geoip/GeoLite2-Country.mmdb:ro
+    networks: [ic, web]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/saglik', headers={'Host': 'localhost'}), timeout=5).status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  caddy:
+    image: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+    restart: unless-stopped
+    environment:
+      SITE_ADRESI: ${SITE_ADRESI:?SITE_ADRESI .env içinde tanımlanmalı}
+      ACME_EPOSTA: ${ACME_EPOSTA:-}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-veri:/data
+      - caddy-ayar:/config
+      - medya:/srv/medya:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [web]
+    logging: *gunluk
+
+  # Yedek servisi: postgres istemcisi + age (yedek/Dockerfile). Yedekler YEDEK_ALICI (açık anahtar) ile
+  # şifrelenir. Özel anahtar (gizli/yedek-anahtari.txt) bu servise BİLEREK verilmez: sunucu ele geçirilse bile
+  # eski yedekler açılamaz. Düz döküm yalnızca /tmp (bellek tmpfs) içinde bulunur, diske yazılmaz.
+  yedek:
+    build: ./yedek
+    image: qr-kampanya-yedek:${UYGULAMA_SURUMU:-yerel}
+    restart: unless-stopped
+    environment:
+      YEDEK_ALICI: ${YEDEK_ALICI:-}
+      POSTGRES_DB: ${POSTGRES_DB:-qrkampanya}
+      # Yedek süper kullanıcıyla değil, veritabanı sahibi qr_sahip ile bağlanır.
+      POSTGRES_USER: qr_sahip
+      PGPASSWORD: ${POSTGRES_SAHIP_PAROLA:?POSTGRES_SAHIP_PAROLA .env içinde tanımlanmalı}
+      PGHOST: db
+      YEDEK_SAATI: ${YEDEK_SAATI:-03:15}
+      YEDEK_SAKLAMA_GUN: ${YEDEK_SAKLAMA_GUN:-14}
+      TARAMA_SAKLAMA_GUN: ${TARAMA_SAKLAMA_GUN:-730}
+      TZ: Europe/Istanbul
+    # Root DEĞİL (pg_dump ağ üzerinden bağlanır, root gerekmez) ve app'ten FARKLI UID (10002): konteyner kaçışında app süreci
+    # yedek dosyalarının sahibi olamaz. Medya (salt okunur) app'in grubu 10001 üzerinden okunur (app imajında "uygulama" GID'i).
+    # Yazılabilen yer yalnızca /yedekler, /yedek-durum ve /tmp (tmpfs).
+    user: "10002:10002"
+    group_add: ["10001"]
+    cap_drop: [ALL]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    entrypoint: ["/bin/sh", "/betikler/yedek-dongu.sh"]
+    tmpfs:
+      - /tmp:mode=1777,size=${YEDEK_TMP_BOYUT:-2g}
+    volumes:
+      - ./scripts:/betikler:ro
+      - ${YEDEK_DIZINI:-./yedekler}:/yedekler
+      - medya:/veri/medya:ro
+      - yedek-durum:/yedek-durum
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [ic]
+    logging: *gunluk
+
+volumes:
+  db-veri:
+  medya:
+  caddy-veri:
+  caddy-ayar:
+  yedek-durum:
+
+networks:
+  ic:
+    internal: true   # db ve yedek servisi internete çıkamaz, dışarıdan erişilemez
+  web:
+    # Sabit alt ağ: gunicorn yalnızca bu ağdan (Caddy) gelen X-Forwarded-* başlıklarına güvenir.
+    ipam:
+      config:
+        - subnet: ${WEB_ALT_AGI:-172.28.0.0/16}

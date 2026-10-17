@@ -1,0 +1,16 @@
+{% load static %}<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block baslik %}{{ ayar.marka_adi|default:"Bilgi" }}{% endblock %}</title>
+<meta name="description" content="{% block aciklama %}{{ ayar.marka_adi|default:'Bilgi' }}{% endblock %}">
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="{% static 'qr/sayfa.css' %}">
+{% block ek_bas %}{% endblock %}
+</head>
+<body class="{% block govde_sinifi %}tema-siyah-bej{% endblock %}">
+{% block icerik %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Sütun eşleştirme{% endblock %}
+{% block icerik %}
+<h1>Sütun eşleştirme</h1>
+<p><strong>{{ ia.dosya_adi }}</strong> — {{ satir_sayisi }} veri satırı. Her sütun için bir sistem alanı seçin; kullanılmayacak sütunları “(yok say)” bırakın.
+  Bir alan yalnızca bir sütuna atanabilir. Hedef için <code>hedef_url</code> veya <code>sayfa</code> eşleştirilmelidir.</p>
+<form method="post" class="kart">
+  {% csrf_token %}
+  <div class="tablo-kap"><table>
+    <thead><tr><th>Dosyadaki başlık</th><th>Örnek değerler</th><th>Sistem alanı</th></tr></thead>
+    <tbody>{% for s in sutunlar %}
+      <tr>
+        <td>{{ s.baslik|default:"(başlıksız)" }}</td>
+        <td class="sessiz">{{ s.ornek|join:" | " }}</td>
+        <td>
+          <select name="alan_{{ s.i }}" aria-label="{{ s.baslik }} sütunu için sistem alanı">
+            <option value="">(yok say)</option>
+            {% for kod, etiket in alanlar %}<option value="{{ kod }}"{% if kod == s.secili %} selected{% endif %}>{{ kod }} — {{ etiket }}</option>{% endfor %}
+          </select>
+        </td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  <div class="eylemler">
+    <button type="submit" class="dugme">Eşleştir ve doğrula</button>
+    <a class="dugme ikincil" href="{% url 'panel:ice_aktarma_liste' %}">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

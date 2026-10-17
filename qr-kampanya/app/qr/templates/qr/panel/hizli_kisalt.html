@@ -1,0 +1,32 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Hızlı kısalt{% endblock %}
+{% block icerik %}
+<h1>Hızlı kısalt</h1>
+<p class="yardim">Uzun adresi yapıştırın; kısa bağlantı ve QR kod hemen oluşturulur. Kısa kodu boş bırakırsanız otomatik üretilir; başlık boşsa ve ayar açıksa hedef sayfanın başlığı çekilmeye çalışılır.</p>
+<form method="post" class="kart">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="hata-kutu" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% for alan in form %}
+  <div class="alan{% if alan.errors %} hatali{% endif %}{% if alan.field.widget.input_type == 'checkbox' %} onay{% endif %}">
+    {% if alan.field.widget.input_type == 'checkbox' %}{{ alan }} {{ alan.label_tag }}{% else %}{{ alan.label_tag }}{{ alan }}{% endif %}
+    {% if alan.help_text %}<p class="yardim">{{ alan.help_text }}</p>{% endif %}
+    {{ alan.errors }}
+  </div>
+  {% endfor %}
+  <div class="eylemler"><button type="submit" class="dugme">Kısalt</button></div>
+</form>
+
+<h2>Yer imi düğmesi</h2>
+<div class="kart">
+  <p>Aşağıdaki düğmeyi tarayıcınızın yer imleri çubuğuna <strong>sürükleyin</strong>. Herhangi bir sayfadayken tıklarsanız o sayfanın adresi ve başlığı bu sayfaya yeni pencerede önceden doldurulmuş olarak açılır. Hiçbir şey kendiliğinden kaydedilmez: kaydetmek için bu sayfada “Kısalt”a basarsınız.</p>
+  <p><a class="dugme ikincil" href="{{ yer_imi }}" draggable="true">Kısalt (yer imi)</a></p>
+  <p class="yardim">Bu panel sayfasında düğmeye tıklamak bir şey yapmaz (içerik güvenlik politikası satır içi betiği engeller); yalnızca yer imi olarak kullanılır. Sürükleyemiyorsanız aşağıdaki kodu kopyalayıp yeni bir yer iminin adres alanına yapıştırın.</p>
+  <div class="alan">
+    <label for="yer-imi-kodu">Yer imi kodu</label>
+    <input type="text" id="yer-imi-kodu" value="{{ yer_imi }}" readonly autocomplete="off" spellcheck="false">
+  </div>
+  <div class="eylemler"><button type="button" class="dugme ikincil kucuk" data-kopyala="yer-imi-kodu">Kodu kopyala</button></div>
+  <p class="yardim" data-kopyalandi hidden>Panoya kopyalandı.</p>
+  <p class="yardim">Not: Sıkı içerik güvenlik politikası (CSP) kullanan bazı sitelerde tarayıcı yer imi betiğini çalıştırmayabilir.</p>
+</div>
+{% endblock %}
