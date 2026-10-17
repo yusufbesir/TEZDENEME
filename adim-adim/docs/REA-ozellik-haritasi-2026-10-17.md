@@ -359,6 +359,8 @@ Topluluk ve arkadaşlar (social, community_post, friends, düzeltme isteği, dü
 
 ## Ücretli mekaniklerin ücretsiz karşılıkları (2026-10-17, Yusuf'un isteği)
 
+**Karar (Yusuf, 2026-10-17 13:42): Bu bölümdeki Ü1–Ü15 karşılıkları yapılmayacak; zaten var olanlar (Ü1, Ü9, Ü11, Ü15) olduğu gibi kalır. Konuşma tanıma (öneri 8.7) onaylandı; Ü13'teki sesli diyalog fikri 8.7 kapsamında değerlendirilir.**
+
 İlke: Adım Adım'da para, reklam, jeton satın alma ve şans (kumar benzeri rastgele ödül) yok. Ücretli uygulamalardaki mekanikler **yalnız öğrenme davranışıyla** (doğru cevap, tekrar, seri, hedef) kazanılan karşılıklarla sunulur. Hangilerinin yapılmayacağına Yusuf karar verir.
 
 | # | Ücretli mekanik (kaynak) | Ücretsiz karşılığı (Adım Adım) | Kazanma yolu | Tahmini iş |
