@@ -528,3 +528,92 @@ Canlı oyun ve çevrim içi eşleşme, yazışmalı günlük oyun, bulmaca sava�
 | 67 | Korece, Japonca ve Çince A1 kursları | Yalnız başlangıç seviyesi. Her kurs yazı sistemi ünitesiyle açılır: Korece hangıl, Japonca hiragana/katakana (öneri 12 ile birleşir), Çince pinyin + en sık 50 hanzi. Sonra selamlaşma, sayılar, günlük kalıplar. Eslestir/Yaz/Dinle alıştırmaları yeter; sözlüğe `dil` değeri olarak ko/ja/zh eklenir, TTS sesi işletim sisteminde varsa kullanılır | Orta (kurs başına ~2 ünite) |
 
 Not: Drops Korece indirme listesinden Yusuf'un isteğiyle çıkarıldı; kurs içeriği kendi yazılacak, hiçbir uygulamadan metin kopyalanmaz.
+
+## Toplu tarama (2026-10-17 14:10–14:40): 22 dosya, 16 uygulama ailesi
+
+### Yöntem ve REA durumu
+- **REA çalışmadı.** Sebep: REA'nın ayar dosyasındaki apktool ve JADX yolları Programlar klasörü `D:\Programlar`'a taşındığı için geçersiz. Ayar dosyasını düzenleme isteği Claude Code güvenlik denetiminde "kendi ayarını değiştirme" olarak reddedildi. REA'yı Claude Code başlattığı için ortam değişkeniyle cihaz oturumundan yeniden başlatmak da mümkün değil. Karar Yusuf'ta (ayarı kendisi düzeltebilir).
+- Aynı derinlik REA olmadan çıkarıldı: (1) apktool 3.0.3 (`d --no-src -s`): manifest, layout adları, gezinme grafikleri; (2) DEX ad taraması: uygulamanın kendi paket ve modül haritası (sınıf sayılarıyla), Room/SQLite `CREATE TABLE` şemaları (yalnız tablo ve sütun adları), tercih dosyası adları, kütüphane izleri. **Kod, metin, görsel ve ses kopyalanmadı;** çıktılar Claude'un geçici klasöründe kaldı.
+- Tüm dosyalar APKMirror kaynaklı ve gerçek (Uptodown kopyası yok). **Dikkat:** `com.hellotalk_…apkmirror.com.apkm` (66,5 MB) adlı dosyanın içinden **Mimo 9.33 (com.getmimo)** çıktı; gerçek HelloTalk, `… (1).apkm` (147,5 MB) dosyasıdır.
+
+### Kimlik tablosu
+| Uygulama | Paket | Sürüm | Çatı | Kendi ekran / layout |
+|---|---|---|---|---|
+| Mimo (dosya adı HelloTalk) | com.getmimo | 9.33 | Yerel + Compose | 42 / 809 |
+| HelloTalk | com.hellotalk | 6.4.20 | Yerel | 455 / 3.291 |
+| Quizlet | com.quizlet.quizletandroid | 8.42.1 | Yerel + Compose | 73 / 1.102 |
+| Sololearn | com.sololearn | 4.130.11 | Yerel | 9 / 659 |
+| AnkiDroid | com.ichi2.anki | 2.25.2 | Yerel (GPL-3.0) | 34 / 370 |
+| Brilliant | org.brilliant.android | 10.15.0 | Yerel + WebView ders | 5 / 112 |
+| CodeCamp (Fibu) | com.learnprogramming.codecamp | 2.8.0 | Flutter | 1 / 45 |
+| CodeGym (JavaRush) | com.hitechrush.codegym | 1.0.82 | Compose | 39 / 270 |
+| Programming Hub ailesi | com.freeit.java (Java), cpp.programming, html.programming…, js.javascript…, python.programming…, sql.database… | 5.2.69 / 4.2.89 | Yerel (aynı motor) | 59 / 296 (altısı aynı) |
+| Khan Academy | org.khanacademy.android | 8.5.0 | React Native | 9 / 137 |
+| Encode | com.upskew.encode | 6.23.0 | Flutter | 1 / 42 |
+| Oxford Dictionary of English | com.mobisystems.msdict…oxford… | 16.5.1183 | Flutter | 2 / 160 |
+| Naver Dictionary | com.nhn.android.naverdic | 3.0.7 | Yerel + WebView | 24 / 286 |
+| WordReference | com.wordreference | 4.0.83 | Yerel | 6 / 97 |
+| English Dictionary Offline (Livio) | livio.pack.lang.en_US | 10.0.1 | Yerel | 20 / 175 |
+| Trivia Crack Lite | com.etermax.preguntados.lite | 3.391.1 | Yerel + Flutter parçaları | 145 / 1.303 |
+| e-Anatomy | net.imaios.eanatomy | 8.10.0 | Compose | 12 / 286 |
+
+### Ayrıntılı yapı (uygulama başına)
+**Mimo 9.33.** Modüller: yol haritası (`ui/path/map`, `ui/path/overview`), bölüm ve bölüm sonu ekranı (`ui/chapter/chapterendview`), **etkileşimli ders** türleri (boşluk doldurma, seçim, heceleme/yazma: `InteractiveLessonFillTheGap/Selection/Spell`), **çalıştırılabilir ders** (`ExecutableLesson`, çalıştırma sonucu, girdi konsolu), "Awesome mode" ders, projeler (`ui/projects`), kod oyun alanı (`ui/codeplayground`), pratik listesi, sertifikalar, seri hedefi (`FreeStreakGoal`). Yerel tablolar: `lesson_progress` (deneme sayısı, `is_practice_progress`, `in_queue`), `chapter_completions`, `tutorial_completions`. Önerilmedi: lider tablosu, yapay zekâ öğretmen (çevrim içi), ücretsiz deneme/ödeme duvarı, yeniden kazanım kampanyası.
+
+**Sololearn 4.130.** Yerel şema: `CodeRepoEntity` / `CodeRepoItemEntity` (derse bağlı kod deposu öğeleri, öğe başına XP), `TrackedTime` (gün başına hedef) ve `TrackedTimeSection` (bölüm başına saniye), `ProfileDashboardStatistics` (seri, en uzun seri, toplam seri), `AppUsageAction`. Önerilmedi: topluluk kodu ve oylama, gönderi ve sohbet (`Post`, `Message`, `Conversation`), kullanıcı dersleri, kod koçu dükkânı, kalp dolumu dükkânı.
+
+**Quizlet 8.42.** En büyük modül çalışma modları (`ui/studymodes`, 1.936 sınıf): kartlar, **aralıklı tekrar turu** (`FlashcardsSpacedRepetitionRoundFragment`), **bellek puanı ayrıntısı** (`MemoryScoreDetailActivity`), yazılı cevap türü (`features/questiontypes/written`), eşleştirme oyunu (`MatchFragment`), "tüm terimleri tekrar et". Ayrıca deste oluşturma, klasörler, başarımlar, ana ekran widget'ları, diyagramlar. Önerilmedi: sınıf/grup, canlı oyun (Quizlet Live), çevrim içi yapay zekâ (Q-Chat, Magic Notes, ders kitabı çözümleri), reklam, abonelik.
+
+**AnkiDroid 2.25 (GPL-3.0).** Deste seçici → çalışma seçenekleri → tekrar ekranı; kart tarayıcı ve arama; **filtreli deste** (`FilteredDeckOptions`); not türleri ve **kart şablonu düzenleyici** (ön/arka yüz); **telaffuz kontrolü** (`CheckPronunciationFragment`); TTS ses seçimi; **hatırlatma takvimi** (`ScheduleRemindersFragment`); kart analizi ve deste widget'ları. Kütüphaneler: SpeechRecognizer, TextToSpeech, WorkManager. Kod GPL olduğu için yalnız yöntem esinlenmesi.
+
+**Brilliant 10.15.** Yerel şema içerik hiyerarşisini açıkça gösteriyor: `LearningPath` → `LearningPathLevel` → `Course` (sınıf düzeyi, ders ve alıştırma sayısı, kişiselleştirilmiş pratik) → `Chapter` → `ContentPacket` (ders/pratik, `gameboardAction`). **`RecommendedExerciseEntity`**: önerilen alıştırma + `recommendationReason` (öneri gerekçesi) + `durationMessage` (tahmini süre). Dersler WebView içinde. Önerilmedi: premium kilit.
+
+**CodeCamp / Fibu 2.8 (Flutter).** Yerel şema: `universe` → `galaxy` → `planet` (bölüm; `planetType`, `gameType`) → `slide` (adım; **`slideType`, `difficulty`, `estimatedMinutes`, `isRequired`, `isCoreConcept`, `launchesGame`, `interactionType`**) → `slide_v2_block` (blok türleri). İlerleme: `planet_progress` (**`masteryScore`, `bestScore`, `totalTimeSpent`**, slayt sayıları), `slide_progress` (yarıda kalan durum `currentStateJson`). **Yer imi koleksiyonları ve not** (`bookmark_collections`, `bookmarks.note`), **çok dosyalı kod oyun alanı** (`playground_sandboxes` + `sandbox_files`), çevrimdışı olay kuyruğu, bekleyen rozet açılımları. Önerilmedi: mücevher ödülü ve kalp maliyeti (`gemReward`, `heartCost`), premium.
+
+**CodeGym (JavaRush) 1.0.82.** Kurs seçimi → seviyeler → seviyedeki dersler → ders; yer imleri; başarımlar; **gömülü QuickJS** (`libquickjs.so`: çevrimdışı JavaScript çalıştırma), sözdizimi vurgulama varlıkları. Önerilmedi: sohbet, topluluk grupları, gönderiler, tartışmalar, forum, ödeme.
+
+**Programming Hub ailesi (6 uygulama, aynı motor).** Kurs önizleme → kurs öğrenme → quiz; **derleyici ekranı** (`CompilerActivity`); **örnek programlar ve program arama** (`ProgramDetail`, `SearchProgram`); **başvuru (referans) sayfaları**; tam kurs bitirme ve sertifika; çevrimdışı dil verisi ve ses indirme işçileri; ilerleme eşitleme. Önerilmedi: uzmana sor, kazı-kazan teklif, abonelik kartları, reklam.
+
+**Khan Academy 8.5 (React Native)** ve **Encode 6.23 (Flutter):** akış derlenmiş paket içinde; Khan'da çizim/karalama alanı (`sketchview`) ve konfeti kutlaması dikkat çekiyor. Çarşamba emülatöre bırakıldı.
+
+**Oxford Dictionary of English 16.5 (Flutter).** Yerel kütüphaneler: **`libonnxruntime`, `libsherpa-onnx`** (cihaz içinde çevrimdışı konuşma tanıma / sesli okuma), `libsqlite3`, `libopustool`. **Metin seçerek sözlükte aç** (`TextProcessingActivity`: başka uygulamada seçilen kelimeyi doğrudan arar). Önerilmedi: abonelik ekranları, reklam.
+
+**Naver Dictionary 3.0.7.** **Telaffuz değerlendirme motoru** (`libnaverdic-speech-eval-lib`, `SpeechEvaluationActivity`), konuşma pratiği, **kamera ile metin tanıma** (OCR; tanınan sonuç tablosu `RecognizedResultInfo`), **kelime defteri oynatıcı** (`WordbookPlayerActivity`: kelime listesini sesli otomatik çalma), şifreli yerel sözlük (SQLCipher). Önerilmedi: Naver hesabı ve tarayıcı bölümleri.
+
+**WordReference 4.0.83.** Sözlük listesi, ipucu diyaloğu, **kelime dışa aktarma** (`WordExporter`), widget. Önerilmedi: premium abonelik.
+
+**English Dictionary Offline (Livio) 10.0.1.** Sözlük arama ve görünüm, **fiil çekimleyici** (`MainConjugator`; öneri 61'i doğrular), **notlar, yer imleri, geçmiş, kategoriler** (`EditNote`, `SelectBookmarks`, `SelectHistory`, `CategoryManager`), TTS ayarları, metin seçince arama, widget. Tamamen çevrimdışı.
+
+**HelloTalk 6.4.20.** Ağırlıkla sosyal sohbet ve canlı yayın. Öğretici tek parça: `hw_word_list` (konu ve seviyeye göre kelime listesi: `word_id`, `topic_id`, `lang`, `level`) ve `translate_history` (çeviri geçmişi, favori). Önerilmedi: sohbet, grup, an (moment), canlı yayın, hediye ve VIP, servet seviyesi, arkadaş serisi, reklam, ödeme.
+
+**Trivia Crack Lite 3.391.** Modüller: hayatta kalma v2, **halat çekme** (`tugofwar`), klasik tek oyunculu, **sanal evcil hayvan** (`pet`: çekirdek, özelleştirme), hazine madeni etkinliği, soru widget'ları, resimli düello. Önerilmedi: sıralama, düello, bonus/premium çark, gacha makineleri, mini dükkân, reklam aracılığı (xmediator, 10+ ağ), satın alma.
+
+**e-Anatomy 8.10.** Tıbbi görüntü serisi ve kesit görüntüleyici; Adım Adım'a ilgisi yok, öneri çıkarılmadı.
+
+### Adım Adım'a uyarlanabilir (öneri 68–83)
+| # | Özellik | Kaynak (yapı) | Nasıl | Tahmini iş |
+|---|---|---|---|---|
+| 68 | Kodda etkileşimli ders türleri | Mimo | Kodda boşluk doldurma, kod parçası seçme, anahtar sözcüğü yazma (heceleme) | Orta |
+| 69 | Çalıştırılabilir ders ve çevrimdışı JS motoru | Mimo, CodeGym (QuickJS) | Kullanıcının kodu cihazda çalışır, çıktı beklenenle karşılaştırılır; öneri 11'in somut yolu | Orta |
+| 70 | Bölüm sonu proje ve çok dosyalı oyun alanı | Mimo, CodeCamp | HTML+CSS+JS dosyalı küçük proje; kaydedilir, önizlenir | Orta |
+| 71 | Ders adımı meta verisi ve ustalık puanı | CodeCamp | Her adımda zorluk, tahmini dakika, "temel kavram" işareti; bölümde ustalık, en iyi puan, toplam süre | Küçük-orta |
+| 72 | Yer imi koleksiyonları ve notlar | CodeCamp, Livio, CodeGym | Ders adımlarını ve sözlük maddelerini koleksiyonlara kaydet, not ekle, geçmiş | Küçük |
+| 73 | Gerekçeli kişisel öneri | Brilliant | "Bunu öneriyoruz çünkü …" + tahmini süre; zayıf konu ve tekrar zamanına göre | Küçük |
+| 74 | Çok kurslu öğrenme yolu | Brilliant | Yol → seviye → kurs (ör. Web: HTML → CSS → JS → SQL), yüzde ilerleme | Küçük-orta |
+| 75 | Örnek programlar, arama ve başvuru sayfası | Programming Hub | Konudan bağımsız açıklamalı örnekler; dil başvuru sayfaları; arama | Orta (içerik) |
+| 76 | Çevrimdışı konuşma tanıma ve sesli okuma | Oxford (sherpa-onnx) | Onaylı konuşma tanıma için cihaz içi motor (Windows destekli, Apache-2.0); 64/65'in altyapısı | Orta |
+| 77 | Telaffuz puanı | Naver | Söylenen kelimeye 0–100 puan ve hatalı heceyi gösterme | Orta |
+| 78 | Bellek puanı ve çok modlu çalışma | Quizlet | Ünite başına "hafıza puanı" (yarı ömürden); aynı içerikle kart, yazma, eşleştirme, test modları | Orta |
+| 79 | Filtreli tekrar ve kart şablonu | AnkiDroid | "Son 7 gün yanlışlar", "yalnız fiiller" gibi geçici deste; ön/arka yüz şablonu; hatırlatma takvimi | Orta |
+| 80 | Bölüm bazında süre takibi | Sololearn | Günlük dakika hedefi ve bölüm bazında harcanan süre; 59 ve B1 ile birleşir | Küçük |
+| 81 | Metin seçerek sözlük ve dışa aktarma | Oxford, WordReference, Livio | Uygulamadaki herhangi bir metni seçip sözlükte aç; kelime defterini CSV olarak dışa aktar | Küçük |
+| 82 | Kelime defteri oynatıcı | Naver | Kelime defterini sesli, otomatik çalan liste; eller serbest moduyla (64) | Küçük |
+| 83 | Halat çekme ve çalışma arkadaşı maskot | Trivia Lite | Bilgisayara karşı çevrimdışı halat çekme bilgi yarışı; çalıştıkça gelişen maskot (satın alma yok) | Orta |
+
+Not: Livio fiil çekimleyicisi öneri 61'i, AnkiDroid ve Quizlet aralıklı tekrar ekranları öneri 16/B4'ü, CodeGym ve Programming Hub sertifikası B2'yi doğrular; yeni numara verilmedi.
+
+### Önerilmedi (toplu tarama)
+Sohbet, grup, canlı yayın, an/akış, forum, tartışma, topluluk kodu ve oylama, sınıf/grup, canlı oyun (Quizlet Live), düello ve sıralama, kalp/can ve mücevher dükkânları, gacha ve bonus çarklar, hediye, VIP ve servet seviyeleri, abonelik ve deneme ekranları, kazı-kazan teklifler, reklam ve reklam aracılığı, çevrim içi yapay zekâ (Q-Chat, Magic Notes, AI tutor), uzmana sor, Naver hesabı ve tarayıcı bölümleri, tıbbi görüntüleyici (e-Anatomy).
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3 + DEX ad taraması (geçici Python betiği); alt ajan yok. REA kullanılamadı (yukarıda). Token (tahmini): girdi ~120K, çıktı ~20K.
