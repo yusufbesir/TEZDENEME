@@ -316,3 +316,43 @@ Düello ve savaş (Battle, Duel, EloRating), lig, klan, turnuva, sıralama (Rank
 
 #### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~45K, çıktı ~8K.
+
+## Busuu (apktool, 2026-10-17)
+
+### Kimlik
+- Dosya: `com.busuu.android.enc_32.49.1(1783745)-1783745_4arch_7dpi_…_apkmirror.com.apkm` (71,7 MB, APKMirror paketi: base.apk + 11 yapılandırma parçası), paket `com.busuu.android.enc`, sürüm 32.49.1, minSdk 28, targetSdk 35. SHA256 `DDEC20877BE1B1A230EFD6B4075DC5ACF3914875EDD282B105F5E6C9D35BD152`.
+- Yöntem: base.apk apktool 3.0.3 ile (`d --no-src -s`); yalnız manifest etkinlik adları ve `res/layout` dosya adları (yapı) sayıldı. Kod, metin, görsel alınmadı. Yerel Kotlin/Android uygulaması (Flutter/RN değil); 148 etkinlik (87 kendi), 867 layout.
+
+### Akış (ekran adlarından)
+1. Açılış → OnboardingEntry → **Yerleştirme**: NewPlacementWelcomeScreen → PlacementLevelSelection (seviye seçimi) → PlacementTestDisclaimer → PlacementTest → PlacementTestResult.
+2. **Çalışma planı**: StudyPlanOnboarding → StudyPlanConfiguration (günde dakika, gün seçimi; `dialog_study_plan_minutes_per_day`, `fragment_study_plan_level_selector`) → StudyPlanSummary → StudyPlanDetails / Settings.
+3. **Kurs**: CourseOverview → kurs dersleri (`fragment_course_lessons`) → CheckpointPreLesson → Learning/Exercises → PostLesson / PostLearningActivityScreen → CheckpointResult.
+4. **Sertifika**: CertificateTestIntro → sınav → CertificateReward.
+5. **Tekrar**: kelime ekranı (`fragment_vocabulary`, kaydedilmiş kelimeler `vocab_saved_words_view`), FilteredVocabEntities (filtreli kelime listesi), ReviewSearch (tekrarda arama), **akıllı tekrar kutuları** (`view_smart_review_buckets`), dilbilgisi tekrarı (`fragment_grammar_review`, `grammar_review_tip_layout`).
+6. Alt çubuk (BottomBar), Seri (Streaks/EmptyStreaks), günlük hedef kartı, haftalık meydan okuma (`item_weekly_challenge`), istatistik (`fragment_user_stats`, dil başına).
+
+### Alıştırma türleri (layout adlarından, 51 "exercise" düzeni)
+Çoktan seçmeli, eşleştirme (sürüklenebilir), dilbilgisi: boşluk doldurma, **tablo tamamlama** (`fitg_table`, `fitg_multi_table`), yazarak dilbilgisi, **cümlede işaretleme** (`grammar_highlighter`), dilbilgisi ipucu ekranı (tek ve yığın hâlinde), **özet metin** (ShowRecapText), diyalog dinleme (`fragment_dialogue_listen`), video anlama (`fragment_comprehension_video_exercise`), yazma, ses kaydı, konuşma pratiği (SpeakingPractice), soru bildirme (ReportExercise).
+
+### Çevrimdışı
+Ünite indirme diyaloğu (`dialog_unit_download`) ve çevrimdışı ekranı (`fragment_offline`): içerik ünite ünite indirilip çevrimdışı çalışılıyor.
+
+### Adım Adım'daki karşılığı
+- Var: ders yolu, eşleştirme/boşluk/yazma/dinleme türleri, seri, haftalık hedef, hata defteri, yarı ömür tekrarı, sözlük (PR #28).
+- Kısmen: yerleştirme (öneri 18, yok), akıllı tekrar kutuları (öneri 16, yok), dilbilgisi açıklaması (alıştırma açıklaması var, ayrı ipucu ekranı yok).
+- Yok: çalışma planı, ara sınav (checkpoint), seviye sertifikası, tablo tamamlama ve cümlede işaretleme alıştırmaları, ünite özet metni.
+
+### Önerilmedi
+Topluluk ve arkadaşlar (social, community_post, friends, düzeltme isteği, düzeltme meydan okuması), davet (referral), haftanın fotoğrafı, lig rozeti, canlı ders (Live), çevrim içi yapay zekâ konuşma koçu (AiConversation, AgenticCoach), ödeme duvarı ve abonelik (Paywall, Purchasely, Upsell), reklam/pazarlama izinleri.
+
+### Adım Adım'a uyarlanabilir (Busuu)
+| # | Özellik | Nasıl | Tahmini iş |
+|---|---|---|---|
+| B1 | Çalışma planı | Hedef seviye + günde dakika + haftanın günleri → tahmini bitiş tarihi, günlük ders sayısı; ana sayfada "plan kartı"; mevcut haftalık hedefle birleşir | Orta |
+| B2 | Ara sınav ve seviye sertifikası | Her ünite sonunda 10 soruluk ara sınav (geçme eşiği %70, kalınca zayıf konular tekrar destesine); seviye (A1, A2…) sonunda sertifika sınavı ve çevrimdışı sertifika ekranı/PDF | Orta |
+| B3 | İki yeni dilbilgisi alıştırma türü | Tablo tamamlama (fiil çekimi tabloları) ve cümlede işaretleme (doğru kelimeye dokun); ders başında ayrı dilbilgisi ipucu kartı | Orta |
+| B4 | Akıllı tekrar kutuları ve kelime listesi filtresi | Öneri 16'nın doğrulanmış biçimi: zayıf/orta/güçlü kutular, kaydedilen kelimeler, ünite ve kutuya göre filtre, tekrar içinde arama | Küçük |
+| B5 | Ünite özeti | Ünite sonunda o ünitenin kelime ve kalıplarını tek sayfada toplayan özet metin; okuma hikâyeleriyle (öneri 31) bağlanır | Küçük |
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~40K, çıktı ~7K.
