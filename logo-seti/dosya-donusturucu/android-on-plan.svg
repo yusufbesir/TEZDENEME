@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="dosya-donusturucu"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7BF5"/><stop offset="1" stop-color="#1747A8"/></linearGradient></defs><g transform="translate(256 256) scale(0.72) translate(-256 -256)">
+  <path fill="#fff" fill-rule="evenodd" d="M150 96h134l84 84v212a24 24 0 0 1-24 24H150a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z
+   M170 232h110v-26l50 44-50 44v-26H170z M342 330H232v-26l-50 44 50 44v-26h110z"/>
+  <path fill="#FFB020" d="M284 96l84 84h-60a24 24 0 0 1-24-24z"/></g></svg>

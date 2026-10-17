@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="adim-adim"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA63D"/><stop offset="1" stop-color="#F26B1D"/></linearGradient></defs><rect width="512" height="512" rx="0" fill="url(#g)"/><g transform="translate(256 256) scale(1.0) translate(-256 -256)">
+  <path fill="#fff" fill-rule="evenodd" d="M96 416V352h64v-64h64v-64h64v64h64v64h64v64z M224 416v-64h64v64z"/>
+  <path fill="#fff" d="M224 224h64v-64h-64z" opacity="0"/>
+  <circle cx="256" cy="150" r="36" fill="#FFE08A"/></g></svg>
