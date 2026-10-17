@@ -85,3 +85,5 @@
 | 2026-10-17 | İkon değişikliği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 30447 | Geçti. Şema anahtarları geçerli, imza atlanıyor, appId eşleşiyor, 138 test. |
 | 2026-10-17 | İkon ve sürüm bilgisi afterPack'te manifestten önce gömülür, 1.0.7 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 43877 | Tamamlandı; 140 test; manifest 18163 dosya tutuyor; kurulum SHA d5c970f4… |
 | 2026-10-17 | 1.0.7 exe kaynak gömme doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 27259 | Geçti. Sıra doğru, hata derlemeyi düşürür, npm ls temiz, 140 test. |
+| 2026-10-17 | E-kitap menüsü ve LibreOffice ile DOCX/ODT/TXT/HTML→EPUB, 1.0.8 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 60375 | Tamamlandı; 147 test; gerçek TXT→EPUB geçerli |
+| 2026-10-17 | E-kitap/EPUB doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | ~30k | Geçti. Bağımsız DOCX/TXT→EPUB geçerli; izin akışı bozulmadı; 147 test. |
