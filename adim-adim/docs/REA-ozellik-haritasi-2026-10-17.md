@@ -431,3 +431,59 @@ Lig ve sıralama, arkadaş serisi ve arkadaş görevleri, kulüp/okul, aile plan
 
 > Numaralama notu (koordinatör, 2026-10-17): Duolingo önerileri birleşik listede **D1=42, D2=43, D3=44, D4=45, D5=46, D6=47, D7=48, D8=49, D9=50, D10=51** olarak sürer.
 
+
+## Yusuf kararları (2026-10-17 13:42)
+- **Konuşma tanıma onaylandı** (öneri 8.7 ve Ü13'ün sesli hâli): sesli alıştırmalar ve senaryo diyalogları konuşma tanımayla yapılabilir.
+- **Ücretli mekaniklerin karşılıkları eklenmeyecek** ("Ücretli mekaniklerin ücretsiz karşılıkları" tablosu, Ü1–Ü15). Not: Tabloda adı geçen ama kendi numarasıyla ayrı öneri olan özellikler (32 jokerler, B1 çalışma planı, B2 sertifika, B4 tekrar kutuları) kendi numaralarıyla değerlendirilir; Ü satırları ayrıca eklenmez.
+
+## Chess.com (apktool, 2026-10-17)
+
+### Kimlik
+- Dosya: `com.chess_4.10.20-googleplay-280085_4arch_7dpi_24lang_…_apkmirror.com.apkm` (235,5 MB, APKMirror paketi), paket `com.chess`, sürüm 4.10.20, minSdk 28, targetSdk 36. SHA256 `2D24FDAA4A988A6219E37DD907798CCC51C17B056B041A1DDF907482454E887C`.
+- Yöntem: base.apk apktool 3.0.3; manifest etkinlik adları ve 1.153 layout adı. Yerel Android + bazı bölümler React Native (Kulüpler, Kurslar, Etkinlikler). 173 etkinlik (144 kendi).
+
+### Eğitim yapısı (ekran ve layout adlarından)
+- **Dersler**: Lessons → LessonCourse (kurs) → LessonVideo + **ders meydan okumaları** (LessonChallenges, `content_lesson_challenge_board_container`), **ustalık kursu** (`fragment_mastery_course`), sonraki ders rehberi.
+- **Bulmacalar**: öğrenme bulmacaları ve bölümleri (LearningPuzzlesGame, LearningSection; tema bazlı), derecelendirmeli bulmacalar (RatedPuzzles), **Rush** (zamana karşı bulmaca, RecentRushReview ile tekrar), günlük bulmaca (NewDailyPuzzle), **yanlış bulmacaları tekrar** (ReviewPuzzles), son bulmacalar, diyagram bulmacası.
+- **Oyun sonları**: EndgamesHome → EndgameThemes (temalar) → EndgamePractice ve EndgameChallenge, EndgameSetup.
+- **Pratik ve antrenman**: PracticeSection, `fragment_practice_drill_setup` (alıştırma seti), PracticePlayGame (konumdan oyna), TrainGame, **Vision** (koordinat/tahta görme antrenörü), **Solo Chess** (tek kişilik bulmaca türü: challenge ve practice).
+- **Botlar ve koç**: BotGameSetup (bot grupları), CoachGameSetup, **GuidedCoachGame** (rehberli koç oyunu), koç seçimi.
+- **Analiz**: **motorsuz kendi analizin** (AnalysisSelfEngineless), bağımsız analiz, oyun incelemesi (GameReview v2), açılış gezgini (GameExplorer), notlar (Notes), koşullu hamleler.
+- **İlerleme**: öğrenme serisi ve meydan okuma serisi (`view_learning_streak`, `view_challenge_streak`), istatistik ve derecelendirme grafiği, ödüller (Awards), tema ayarları.
+
+### Adım Adım'a uyarlanabilir (Chess.com, öneri 52–57)
+| # | Özellik | Nasıl | Tahmini iş |
+|---|---|---|---|
+| 52 | Tema bazlı öğrenme bulmacaları + yanlışları tekrar | Çatal, şiş, mat kalıbı gibi temalarda bulmaca bölümleri; yanlış çözülenler tekrar destesine (yarı ömür) | Öneri 4 altyapısıyla orta |
+| 53 | Oyun sonu antrenörü | Temalara ayrılmış oyun sonu konumları: "pratik" (serbest) ve "meydan okuma" (en az hamlede kazan) | Orta |
+| 54 | Tahta görme (koordinat) antrenörü | 30 sn'de söylenen kareye dokun / dokunulan karenin adını yaz; satranç alanının ısınma turu | Küçük |
+| 55 | Kendi analizin, sonra çözüm | Kullanıcı konumdaki en iyi hamleyi ve gerekçesini seçer, sonra yazılı çözümle karşılaştırır (motor gerekmez) | Küçük-orta |
+| 56 | Ders sonu tahta meydan okuması ve ustalık kursu | Her satranç dersi 1–3 konumla biter; ustalık kursu bitirilen dersleri aralıklı tekrar ile yeniden sorar | Orta |
+| 57 | Tek kişilik "Solo" bulmaca türü | Her hamlede bir taş alınması gereken, tek çözümlü taş-alma bulmacaları (hesaplama ve görme alıştırması) | Küçük-orta |
+
+### Önerilmedi (Chess.com)
+Canlı oyun ve çevrim içi eşleşme, yazışmalı günlük oyun, bulmaca savaşı (oyunculara karşı), lider tablosu ve lig, kulüpler, forumlar, makale/haber yorumları, mesajlar, arkadaşlar ve kişi eşitleme, turnuvalar, Chess TV ve izleme, üyelik/ödeme duvarı ve deneme süresi, reklam araları, bahis oranları ekranı, bağlı fiziksel tahta, motorla rehberli koç oyunu (güçlü motor ve GPL lisansı gerektirir; ilk sürümde yok).
+
+## Drops (apktool, 2026-10-17)
+
+### Kimlik
+- Dosya: `com.languagedrops.drops.international_39.18-110391800_4arch_7dpi_24lang_…_apkmirror.com` (138,2 MB; adı `.apkm` uzantısı olmadan inmiş ama içerik APKMirror paketi), paket `com.languagedrops.drops.international`, sürüm 39.18, minSdk 26, targetSdk 36. SHA256 `793AAB5FA305E02820C763A5CEAB1F5AB6088FB9B9278E8E246C7677617E10C7`.
+- Yöntem: base.apk apktool 3.0.3. **React Native (Hermes)**: tek MainActivity; ekran akışı derlenmiş JS paketinin içinde ve ad düzeyinde okunamadı. Çarşamba emülatör denemesine bırakıldı.
+
+### Görülen yapı
+- `assets/wordAnimations`: 64 animasyonlu kelime çizimi (görselle kelime öğretimi).
+- `assets/binaryTranslation`: **dil başına ayrı çevrimdışı çeviri dosyaları** (`ar.dbt`, `bs.dbt`, … ; 24 arayüz dili).
+- JS adlarından: `GameTopic` (konu bazlı oyun), günlük oyun süresi sayacı (`IncrementDailySecondsSpentInGamePlayPerSession`: süre sınırlı oturum), seri widget'ı (`drops_streak_widget`), ffmpeg (ses/görüntü işleme), bildirimler.
+
+### Adım Adım'a uyarlanabilir (Drops, öneri 58–60)
+| # | Özellik | Nasıl | Tahmini iş |
+|---|---|---|---|
+| 58 | Görsel kelime kartları ve konu oyunları | Kelime + basit çizim/simge; dokun-eşleştir ve kaydır oyunları; konu kategorileri (yiyecek, seyahat, iş); öneri 23 kelime paketleriyle birleşir | Orta (görsel üretimi) |
+| 59 | Süreli kısa oturum | Kullanıcının seçtiği 5/10/15 dk'lık kelime oturumu, geri sayım ve "bugün X dakika" göstergesi; süre bitince oturum özeti | Küçük |
+| 60 | Dil başına ayrı sözlük veri paketi | Sözlük ve kelime verisini dil başına ayrı dosya olarak tutma (yeni dil eklenince yalnız o paket eklenir); öneri 1/25 altyapısı | Küçük-orta |
+
+### Önerilmedi (Drops)
+Çok oyunculu oturumlar, ödeme modu ve abonelik, süre sınırını ödemeyle kaldırma, ortaklık/marka ödülleri, reklam, dış destek sohbeti (Zendesk), sosyal giriş ve WeChat.
+
+### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~60K, çıktı ~10K.
