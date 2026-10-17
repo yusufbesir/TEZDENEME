@@ -162,3 +162,32 @@ Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-202
 - Tarama b7ea26c ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
 - `D:\Programlar\apk\com.atistudios.mondly.languages_10.41.5-83888_4arch_7dpi_1ded193401a9f79719739de8b1081529_apkmirror.com.apkm`, 179.2 MB, SHA256 `056071F8E1CD675FF423A9BE36D19CB74FF5C515D3449C763AD5180D3B4879FB` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
 
+
+## Sekizinci taşıma (2026-10-17 14:45): toplu tarama sonrası 22 dosya
+- Tarama 8a37c85 ile belgelendi; ardından yalnız bu 22 dosya adlarıyla taşındı (toplam yaklaşık 1.203 MB). Taşıma sonrası 22'si de çöp kutusunda görüldü. Tam SHA256 değerleri cihazdaki kayıt dosyasında.
+
+| SHA256 (ilk 16) | MB | Dosya |
+|---|---|---|
+| CAFB0F60CE94649B | 222.7 | com.etermax.preguntados.lite_3.391.1-4101_3arch_7dpi_24lang_be6b7d9431f49377651810bc29895a84_apkmirror.com.apkm |
+| 26E7520B004DAFB6 | 28.6 | com.freeit.java_5.2.69-369_4arch_6dpi_1lang_b48fd325064b71f46bc6b1207b2c47f8_apkmirror.com.apkm |
+| CF2A3F44F91095ED | 147.5 | com.hellotalk_6.4.20-11674_1arch_2dpi_6a916da70ee05e8ac393e6e5d543eba1_apkmirror.com (1).apkm |
+| 033917E09D179CF8 | 66.5 | com.hellotalk_6.4.20-11674_1arch_2dpi_6a916da70ee05e8ac393e6e5d543eba1_apkmirror.com.apkm |
+| 267D5AC3A75BA3F7 | 11.5 | com.hitechrush.codegym_1.0.82-100082_1arch_2dpi_340b6b07c27f13ec6a8465e15ad45c15_apkmirror.com.apkm |
+| 5661D17399EE2840 | 35.2 | com.ichi2.anki_2.25.2-122502300_minAPI24(armeabi-v7a)(nodpi)_apkmirror.com.apk |
+| 85C2576520273065 | 24.1 | com.learnprogramming.codecamp_2.8.0-417_1arch_2dpi_24lang_050fbec9d7de54c9a116010372d20fd1_apkmirror.com.apkm |
+| 849AFDEA0B0BF08B | 82.1 | com.mobisystems.msdict.embedded.wireless.oxford.dictionaryofenglish_16.5.1183-1183_3arch_7dpi_24lang_d2030f6b4228b98b55c1ea5ced23f07e_apkmirror.com.apkm |
+| 063983F6983B4EF2 | 40 | com.nhn.android.naverdic_3.0.7-307_minAPI23(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk |
+| 3B8C368FCD4DCA2E | 38.3 | com.quizlet.quizletandroid_8.42.1-2601532_minAPI26(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk |
+| F74C766761A0645E | 31.2 | com.sololearn_4.130.11-2073_1arch_2dpi_24b166ffb96ba541529ad1f9aab6396b_apkmirror.com.apkm |
+| C113A9010432AFF9 | 34.7 | com.upskew.encode_6.23.0-197_1arch_2dpi_24lang_8ce324da40b87a9cfad104abd4f4e15b_apkmirror.com.apkm |
+| D2BB16D12B5ADC7A | 11 | com.wordreference_4.0.83-4083_minAPI21(nodpi)_apkmirror.com.apk |
+| 2C4F575F172505AB | 18.1 | cpp.programming_4.2.89-189_1arch_2dpi_1lang_f03734bc1a9e51ffc3cc548300404108_apkmirror.com.apkm |
+| E31D7023181BD0F1 | 28.9 | html.programming.learn.web.html5.website.development_4.2.89-189_4arch_6dpi_1lang_31389a93bc02189f9c22047ca7eda0e7_apkmirror.com.apkm |
+| 6A90D4D4832435F1 | 18.1 | js.javascript.web.coding.programming.learn.development_4.2.89-189_1arch_2dpi_1lang_2b10411e97dd76fe3900b899edfd0cfc_apkmirror.com.apkm |
+| 5BC15FEC10B30E5B | 60.8 | livio.pack.lang.en_US_10.0.1-1q61p-1001_minAPI23(nodpi)_apkmirror.com.apk |
+| 18D728FD605B62C8 | 202.1 | net.imaios.eanatomy_8.10.0-2319_4arch_7dpi_7d0a1ded7e266291d135926a52bae5ff_apkmirror.com.apkm |
+| E0F0B280E68CA5B1 | 33.7 | org.brilliant.android_10.15.0-1080_4arch_6dpi_24lang_f227b150c0e3d543d59b44ada956dd90_apkmirror.com.apkm |
+| 41F45FE54ED14D81 | 20.6 | org.khanacademy.android_8.5.0-104773_1arch_3dpi_f101589586b7a52718c3b48e4df045ca_apkmirror.com.apkm |
+| A13B897AF8AFDBEE | 18.3 | python.programming.coding.python3.development_4.2.89-189_1arch_2dpi_1lang_a2637fde1992276d3627af3cbfe0cd1b_apkmirror.com.apkm |
+| CEF48086076EE6B9 | 29 | sql.database.programming.coding.db.dbms_4.2.89-189_4arch_6dpi_1lang_10512d3c8811e0e33d29e9b24c5c0444_apkmirror.com.apkm |
+
