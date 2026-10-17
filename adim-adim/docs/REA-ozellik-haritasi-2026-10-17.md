@@ -520,3 +520,11 @@ Canlı oyun ve çevrim içi eşleşme, yazışmalı günlük oyun, bulmaca sava�
 
 ### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~35K, çıktı ~7K.
+
+## Yusuf'un kurs isteği (2026-10-17 13:46)
+
+| # | Öneri | Açıklama | Tahmini iş |
+|---|---|---|---|
+| 67 | Korece, Japonca ve Çince A1 kursları | Yalnız başlangıç seviyesi. Her kurs yazı sistemi ünitesiyle açılır: Korece hangıl, Japonca hiragana/katakana (öneri 12 ile birleşir), Çince pinyin + en sık 50 hanzi. Sonra selamlaşma, sayılar, günlük kalıplar. Eslestir/Yaz/Dinle alıştırmaları yeter; sözlüğe `dil` değeri olarak ko/ja/zh eklenir, TTS sesi işletim sisteminde varsa kullanılır | Orta (kurs başına ~2 ünite) |
+
+Not: Drops Korece indirme listesinden Yusuf'un isteğiyle çıkarıldı; kurs içeriği kendi yazılacak, hiçbir uygulamadan metin kopyalanmaz.
