@@ -84,3 +84,4 @@
 - 2026-10-17 | Özellik 16 doğrulaması | verifier / claude-fable-5-1 | ~45K token | Geçti
 - 2026-10-17 | Trivia Crack 2 (1.191.4) ve Busuu (32.49.1) apktool taraması, öneri 36–41, dosyalar kutuya | cihaz RC oturumu (Opus) | ~30K+ token | tamam (4980ab3, 303b2b9, fffa45c, 8a17bd7)
 - 2026-10-17 | APK yapı taraması (apktool): Trivia Crack 2, Busuu, Duolingo; ücretsiz karşılıklar; tarama sonrası dosyalar adıyla çöp kutusuna [İP:Adım Adım öğrenme uygulaması#cihaz] | ana oturum (claude-opus-5-5), alt ajan yok | ~200K girdi / ~35K çıktı (tahmini) | tamam (4980ab3, 303b2b9, 08481b3, cc4c720)
+- 2026-10-17 | APK yapı taraması (apktool): Chess.com 4.10.20, Drops 39.18; öneri 52-60; dosyalar adıyla çöp kutusuna [İP:Adım Adım öğrenme uygulaması#cihaz] | ana oturum (claude-opus-5-5), alt ajan yok | ~60K girdi / ~10K çıktı (tahmini) | tamam (7f27b66)

@@ -151,3 +151,9 @@ Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-202
 - Tarama cc4c720 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
 - Dosya: `D:\Programlar\apk\com.duolingo_6.101.1-2475_4arch_6dpi_63fb3322e92449b34c6dfc6d1899def1_apkmirror.com.apkm`, 164.4 MB, SHA256 `41F7DE0C86CA9545B5FDABDE0945DEEC14EF7CBDAC275A1962C9C883EA945A0A` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
 
+
+## Altıncı taşıma (2026-10-17 13:47): Chess.com ve Drops, tarama sonrası
+- Tarama 7f27b66 ile belgelendi; ardından yalnız bu iki dosya adıyla taşındı.
+- `D:\Programlar\apk\com.chess_4.10.20-googleplay-280085_4arch_7dpi_24lang_16fe58ce79eddcd4be78b76fe31cfcc6_apkmirror.com.apkm`, 235.5 MB, SHA256 `2D24FDAA4A988A6219E37DD907798CCC51C17B056B041A1DDF907482454E887C` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
+- `D:\Programlar\apk\com.languagedrops.drops.international_39.18-110391800_4arch_7dpi_24lang_d6cd34d10f4f8e1ed5c65a6b8c9336e0_apkmirror.com`, 138.2 MB, SHA256 `793AAB5FA305E02820C763A5CEAB1F5AB6088FB9B9278E8E246C7677617E10C7` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
+
