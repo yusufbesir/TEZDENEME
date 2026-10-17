@@ -83,3 +83,5 @@
 | 2026-10-17 | Kalıntı listesini asar destekli fs ile okuma, 1.0.5 (Opus kendisi, tek dosya) [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 26703 | Geçti. 138 test; okuma node:fs, silme zinciri original-fs ile değişmedi. |
 | 2026-10-17 | Windows uygulama ikonu exe'ye gömülür (PR #26 logosu), 1.0.6 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 31785 | Tamamlandı; 138 test; 7 RT_ICON ikon.ico ile bayt bayt aynı; kurulum SHA 0a6c7caa… |
 | 2026-10-17 | İkon değişikliği doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 30447 | Geçti. Şema anahtarları geçerli, imza atlanıyor, appId eşleşiyor, 138 test. |
+| 2026-10-17 | İkon ve sürüm bilgisi afterPack'te manifestten önce gömülür, 1.0.7 [İP:Dosya dönüştürücü#eSZiVv] | implementer / claude-sonnet-5-5 | 43877 | Tamamlandı; 140 test; manifest 18163 dosya tutuyor; kurulum SHA d5c970f4… |
+| 2026-10-17 | 1.0.7 exe kaynak gömme doğrulama [İP:Dosya dönüştürücü#eSZiVv] | verifier / claude-sonnet-5-5 | 27259 | Geçti. Sıra doğru, hata derlemeyi düşürür, npm ls temiz, 140 test. |
