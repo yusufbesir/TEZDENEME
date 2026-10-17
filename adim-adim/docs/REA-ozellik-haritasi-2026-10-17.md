@@ -281,3 +281,38 @@ APK'sı okunamayan ya da akışı tek ekran/Compose/Flutter/React Native içinde
 
 ### Birlikte çalışılanlar ve token
 - Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; alt ajan yok. Token (tahmini): girdi ~30K, çıktı ~5K.
+
+### Doğrulama güncellemesi (2026-10-17 13:35): apktool ile doğrulandı, Trivia Crack 2 sürüm 1.191.4
+Bu alt bölüm, yukarıdaki "APK ile doğrulanmadı" notunun yerine geçer.
+- Dosya: `com.etermax.trivia.preguntados2_1.191.4-405_minAPI22(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk` (167,9 MB, APKMirror), paket `com.etermax.trivia.preguntados2`, minSdk 22, targetSdk 33. SHA256 `257529B2EC4AB4A4C54BF6CDD32154CBFB71DE60F3333F085F51B366E4528782`.
+- Yöntem: apktool 3.0.3 (`d --no-src -s`) ile manifest ve yerel kütüphaneler; Unity IL2CPP meta verisinden yalnız **tür/sınıf adları** (oyun modüllerinin adları) sayıldı. Kod, metin, görsel ve ses alınmadı. REA ayar yolu hâlâ bozuk olduğu için REA'nın kendisi kullanılamadı.
+- **Çatı:** Unity + IL2CPP (`libunity.so`, `libil2cpp.so`); tek Android etkinliği (`EtermaxUnityPlayerActivity`), oyunun tüm ekranları Unity içinde. Sahneler: Loader, FastAppStart, Main, ClassicModeSocialSharer. 127 etkinliğin neredeyse tamamı reklam ve aracılık kütüphanelerine ait.
+
+#### Bulunan oyun modülleri (tür adı sayıları, yaklaşık)
+| Modül | İpucu veren adlar | Tek kişilik eğitime uygun mu |
+|---|---|---|
+| Klasik mod: çark, taç çubuğu, karakter toplama | ClassicRoulette, CrownBar, AddCrowns, ClassicBoard, AddCharacter (Roulette 345, Crown 105, Classic 105) | Evet, Adım Adım'da çark ve taç zaten var |
+| Jokerler | BombPowerUp / BombAnswers (yanlışları ele), AnotherChance (ikinci şans), ClassicSkipQuestionPowerUp (geç), ExtraTime, AnswerBonusTime (PowerUp 119) | Evet (öneri 32 doğrulandı) |
+| Hayatta kalma modu | IsSurvivalModeEnabled, SurvivalRoundsRewards, LoseResultSurvival (Survival 107) | Evet (öneri 33: "hatasız seri") |
+| Seri modu | CompleteStreaksModeGame, BonusStreak, AdvanceStreak (Streak 181) | Evet (öneri 33) |
+| Kategoriye göre zorluk | ArtsDifficulty, GeographyDifficulty, HistoryDifficulty, ScienceDifficulty, SportsDifficulty, EntertainmentDifficulty | Evet (öneri 34 doğrulandı: kategori başına ayrı zorluk) |
+| Aşamalı ilerleme | CurrentStage, CanUnlockStage, AccumulatedGuessesToNextStage, CalculateStagesProgress (Stage 195) | Evet (öneri 35: aşama/macera haritası) |
+| Görevler | ClaimQuest, CompleteQuest, CheckIfEachQuestIsCompleted, BigQuestWidget (Quest 265, Mission 6) | Evet (yeni: çevrimdışı görevler) |
+| Cevap açıklaması | Explanation | Evet (Adım Adım'da açıklama var) |
+| Mini oyun türleri | BingoCard, BattleshipFleetBoard, GenerateMultiplierGrid | Kısmen (yeni: bingo kartı) |
+| Öğretici adımları | AvailableTutorialSteps, AnotherChanceTutorial (Tutorial 125) | Evet (ilk kullanımda joker öğretici) |
+| Günlük ödül | DailyBonus, DailyBadge (Daily 159) | Kısmen (yalnız seri/hedef ile, ödül mağazası olmadan) |
+
+#### Önerilmedi (bulundu ama istenmiyor)
+Düello ve savaş (Battle, Duel, EloRating), lig, klan, turnuva, sıralama (Ranking 208, League 63, Tournament 27), şans çarkı ve premium çark (LuckySpin), sandık ve kart (Chest, Cards), sezon ve altın geçiş (Season, GoldenPass, VipPass), can satın alma (OutOfLives, CostToRefillLives), dükkân ve jeton (Shop, Store, Coin, Gem), reklam (Ad 1545), soru önerme ve inceleme (UnderReview, AddQuestion; topluluk içeriği).
+
+#### Öneri 32–35'in gözden geçirilmiş hâli ve yeni iki öneri
+- **32 Jokerler:** Doğrulandı. Dört joker: yanlışları ele, ikinci şans, geç, ek süre. Adım Adım'da satın alma yok; jokerler günlük hedef ya da seriyle kazanılır. Kullanılan joker, soruyu tekrar destesine "zayıf" olarak ekler.
+- **33 Tek kişilik modlar:** Doğrulandı (Hayatta kalma, Seri). Günlük meydan okuma ile birlikte üç mod.
+- **34 Kategori ustalığı ve uyarlanabilir zorluk:** Doğrulandı. Oyunda her kategorinin ayrı zorluk değeri var. Adım Adım'da kategori başına doğruluk oranı soru zorluğunu ve çark ağırlığını ayarlar.
+- **35 Ders bağlantılı aşama haritası:** Doğrulandı (Stage, CanUnlockStage). Aşamalar Adım Adım ünitelerine bağlanır.
+- **Yeni A, çevrimdışı görevler:** "Bugün 5 dinleme alıştırması", "Bu hafta 3 kategoride taç" gibi 3 günlük ve 2 haftalık görev; ödül olarak XP ve joker; satın alma yok.
+- **Yeni B, bingo kartı mini oyunu:** 3x3 kartta her kutu bir konu ya da kategori; doğru cevap kutuyu doldurur, satır tamamlanınca bonus. Tekrar destesindeki zayıf konulardan beslenir.
+
+#### Birlikte çalışılanlar ve token
+- Claude Opus 5.5 (cihaz oturumu) [İP:Adım Adım öğrenme uygulaması#cihaz]; apktool 3.0.3; alt ajan yok. Token (tahmini): girdi ~45K, çıktı ~8K.
