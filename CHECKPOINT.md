@@ -17,6 +17,15 @@
 - Archify haritası cihaz oturumunda mı çıkarılsın?
 - `docs/orchestrator-log.md` satır biçimi (madde / tablo) tek biçime çevrilsin mi?
 
+- **Adım Adım BEKLİYOR listesi (Yusuf 2026-10-17 14:57: kullanım sınırı azaldı, son çalışır sürüm hazırlanıyor; limit yenilenince buradan devam):**
+  - Yapılan: 1 (PR #28), 17, 16, 21, 22, 23 (PR #29 dalı, 420 test). 26 + 14 kodlanıyor (verifier geçerse PR #29'a girer, geçmezse WIP olarak notlanır).
+  - Sıradaki (öncelik sırası): 24 ders sonu quiz + günlük bilmece; 28 ilk açılış tercih akışı; 29 Windows bildirimi (bugünkü tekrar sayısı); 31 okuma hikâyeleri (kolay/orta/zor, yalnız dil kursları); 8.7 konuşma tanıma/telaffuz (onaylı; öneri 76 sherpa-onnx yolu); 67 Korece/Japonca/Çince A1 (yazı sistemi ünitesiyle; CJK yazı tipi Noto Sans CJK gömülmesi gerekebilir; ja-JP/ko-KR/zh-CN TTS kontrolü çarşamba cihazda); 25, 18, 38, 39; sonra 2, 3, 4, 5...
+  - Taramalardan gelen ek öneriler 42–83 (REA-ozellik-haritasi): öncelik Yusuf'tan; önerilen sıra 62 ders sonu tekrar ekranı, 71 adım zorluk/süre/ustalık, 79 filtreli tekrar + hatırlatma takvimi, 44 pratik merkezi, 47 seri geri kazanma, 63 günün/haftanın/ayın dersi.
+  - Yapılmayacak: lig/topluluk/sosyal, Ü1–Ü15 ücretli karşılıkları, çevrim içi yapay zekâ.
+  - Çarşamba 2026-10-21 06:30Z: emülatör kurulumu (Yusuf onayı), Khan/Encode/Drops akışları, TTS ses kontrolü, yeni öneriler.
+  - REA: .claude.json yolları D:\Programlar'a çevrildi (Yusuf izni, 2026-10-17 14:21); Yusuf /mcp → rea → Reconnect yapınca test edilecek. Sonraki APK taramaları REA+JADX ile.
+  - Son çalışır sürüm: cihazda `flutter build windows --release` → D:\Programlar\Adim-Adim\ (SURUM.txt ile). PR #29 Yusuf'un birleştirme onayını bekliyor.
+
 ## Tamamlandı
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
