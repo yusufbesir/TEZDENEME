@@ -149,3 +149,4 @@
 2026-10-16 | Sekme düzeni (Doğrula/Geçmiş ayrı, Rehber→Yardım, seçici çerçevesi) | orchestrator + verifier/haiku | ~58k token | verifier Kaldı (panel yuvalama), düzeltildi, tarayıcıda 8 sekme doğrulandı, 159 test; 1.2.1
 2026-10-16 | Tek barkod geçmişi (1.2.2) | orchestrator (tek dosya, küçük) | ~60k token | 160 test, tarayıcıda 2 kayıt, kelime kaydedilmedi
 2026-10-17 | 1.3.0: çift basım, ürün profilleri, etiket tasarımcısı | implementer/sonnet ~160k + verifier/sonnet ~69k | 181+55 test, verifier Geçti; ZPL ters bölü düzeltildi | 1.2.2 Windows dosyaları D:'de doğrulandı, projeden kaldırıldı
+| 2026-10-21 | Açık PR turu: #7, #14, #18 çakışmaları iki taraf korunarak çözüldü ve #8 ile birlikte birleştirildi; #12, #19, #15, #26 Yusuf'un onayına bırakıldı [İP:Talimat düzeni#zkd4TM] | ana oturum / claude-fable-5-1 (alt ajan yok) | oturum sayacı ölçülmedi (tahmini ~60k) | Tamamlandı; boyut testleri her dalda geçti. |
