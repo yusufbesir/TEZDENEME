@@ -21,6 +21,7 @@ import '../model/durum.dart';
 import '../motor/kelime_bulutu.dart';
 import '../motor/meydan.dart';
 import '../motor/motor.dart';
+import '../motor/oneri.dart';
 import '../motor/sure.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
@@ -54,6 +55,7 @@ class ProfilEkrani extends ConsumerWidget {
     final enCok = degerler.fold<int>(0, (a, b) => a > b ? a : b);
     final bitenDers = durum.tamamlanan.values.where((v) => v > 0).length;
     final meydan = Meydan.aylik(durum, bugun);
+    final oneriler = Oneriler.uret(durum, kurslar, bugun, enCok: 1);
     final ogrenilenKelime = durum.alan == 'dil'
         ? KelimeBulutu.ogrenilenSayisi(durum, kurslar)
         : 0;
@@ -129,6 +131,46 @@ class ProfilEkrani extends ConsumerWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/sure'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-oneri'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.tips_and_updates_outlined, color: r.ana),
+              title: const Text('Sana öneri'),
+              subtitle: Text(
+                oneriler.isEmpty ? 'Şimdilik öneri yok' : oneriler.first.baslik,
+                key: const ValueKey('profil-oneri-ozet'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/oneri'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-ogrenme-yolu'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.alt_route, color: r.ana),
+              title: const Text('Öğrenme yolu'),
+              subtitle: Text(
+                'Yol, seviye ve kurs ilerlemen',
+                key: const ValueKey('profil-yol-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/ogrenme-yolu'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-yer-imleri'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.bookmarks_outlined, color: r.ana),
+              title: const Text('Yer imleri'),
+              subtitle: Text(
+                durum.yerImleri.isEmpty
+                    ? 'Adımları ve sözlük maddelerini kaydet'
+                    : '${durum.yerImleri.length} yer imi',
+                key: const ValueKey('profil-yer-imi-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/yer-imleri'),
             ),
             if (durum.alan == 'dil')
               ListTile(

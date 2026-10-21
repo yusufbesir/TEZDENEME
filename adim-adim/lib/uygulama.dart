@@ -20,6 +20,7 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_modlari_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
@@ -27,12 +28,16 @@ import 'ekranlar/eller_serbest_ekrani.dart';
 import 'ekranlar/gorsel_kelime_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
 import 'ekranlar/meydan_ekrani.dart';
+import 'ekranlar/ogrenme_yolu_ekrani.dart';
+import 'ekranlar/oneri_ekrani.dart';
 import 'ekranlar/ozet_ekrani.dart';
 import 'ekranlar/sure_ekrani.dart';
 import 'ekranlar/senaryo_ekrani.dart';
 import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
+import 'ekranlar/halat_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
@@ -43,6 +48,7 @@ import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/yer_imleri_ekrani.dart';
 import 'ekranlar/sertifika_ekrani.dart';
 import 'ekranlar/sinav_ekrani.dart';
 import 'ekranlar/unite_ozeti_ekrani.dart';
@@ -113,7 +119,41 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
       GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
-      GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
+      GoRoute(
+        path: '/sozluk',
+        // q=<metin>: arama kutusu bu metinle açılır (ÖZELLİK 81, 72).
+        builder: (c, s) =>
+            SozlukEkrani(baslangicSorgu: s.uri.queryParameters['q']),
+      ),
+      GoRoute(
+        path: '/calisma-modlari',
+        builder: (c, s) => const CalismaModlariEkrani(),
+      ),
+      GoRoute(
+        path: '/calisma-modu',
+        // kurs=<id>&unite=<indeks>: ünitenin dört modlu çalışması (ÖZELLİK 78).
+        builder: (c, s) => CalismaModuEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/kelime-oynatici',
+        builder: (c, s) => const KelimeOynaticiEkrani(),
+      ),
+      GoRoute(
+        path: '/halat',
+        // tohum=<sayı>: soru sırası ve bilgisayar cevapları sabitlenir (test).
+        builder: (c, s) => HalatEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(path: '/oneri', builder: (c, s) => const OneriEkrani()),
+      GoRoute(
+        path: '/ogrenme-yolu',
+        builder: (c, s) => const OgrenmeYoluEkrani(),
+      ),
+      GoRoute(path: '/yer-imleri', builder: (c, s) => const YerImleriEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
@@ -130,6 +170,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/ornekler',
         builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(
+        path: '/ornek-basvuru',
+        builder: (c, s) =>
+            OrnekBasvuruEkrani(dilAdi: s.uri.queryParameters['dil']),
       ),
       GoRoute(
         path: '/ornek/:id',

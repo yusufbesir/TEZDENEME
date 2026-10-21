@@ -14,19 +14,26 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/fiil_cekim_tablosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/yer_imi_dugmesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/kelime_defteri.dart';
+import '../motor/yer_imi.dart';
 import '../sozluk/dil_tanimi.dart';
 import '../sozluk/sozluk.dart';
 import '../tema/tema.dart';
 
 class SozlukEkrani extends ConsumerStatefulWidget {
-  const SozlukEkrani({super.key});
+  /// [baslangicSorgu]: arama kutusunun ilk metni (ÖZELLİK 81: metin seçerek
+  /// sözlükte aç, yer imi açılışı).
+  const SozlukEkrani({super.key, this.baslangicSorgu});
+  final String? baslangicSorgu;
 
   @override
   ConsumerState<SozlukEkrani> createState() => _SozlukDurumu();
@@ -45,6 +52,7 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   @override
   void initState() {
     super.initState();
+    _sorgu.text = widget.baslangicSorgu ?? '';
     _sorgu.addListener(() => setState(() {}));
   }
 
@@ -112,6 +120,36 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
           onPressed: () =>
               context.canPop() ? context.pop() : context.go('/yol'),
         ),
+        actions: [
+          // Kelime defterini CSV olarak panoya kopyalar (ÖZELLİK 81).
+          IconButton(
+            key: const ValueKey('sozluk-csv'),
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'Kelime defterini CSV olarak kopyala',
+            onPressed: () async {
+              final mesajci = ScaffoldMessenger.of(context);
+              final durum =
+                  ref.read(durumProvider).value ?? const OgrenciDurumu();
+              final kurslar = ref.read(alanKurslariProvider);
+              final n = KelimeDefteri.sayi(durum, kurslar);
+              await Clipboard.setData(
+                ClipboardData(text: KelimeDefteri.csv(durum, kurslar)),
+              );
+              mesajci
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      n == 0
+                          ? 'Kelime defteri boş; yalnız başlık kopyalandı'
+                          : 'Kelime defteri kopyalandı: $n kelime (CSV)',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SayfaGovdesi(
@@ -333,6 +371,9 @@ class _MaddeSatiri extends ConsumerWidget {
             tooltip: not == null ? 'Not' : 'Notu düzenle',
             visualDensity: VisualDensity.compact,
             onPressed: () => notDuzenle(context, ref, kartId, not),
+          ),
+          YerImiDugmesi(
+            anahtar: YerImleri.sozlukAnahtari(kartId, madde.kelime),
           ),
           kartlarda
               ? IconButton(

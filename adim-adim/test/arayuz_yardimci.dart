@@ -24,6 +24,12 @@ import 'sahte_icerik.dart';
 
 class SahteSes extends Ses {
   final okunanlar = <String>[];
+
+  /// Kaç kez durdur çağrıldı (kelime oynatıcı duraklatma testi).
+  int durdurmaSayisi = 0;
+  @override
+  Future<void> durdur() async => durdurmaSayisi++;
+
   @override
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     okunanlar.add(metin);

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/maskot_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -72,6 +73,7 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: Olcu.b2),
+                MaskotKarti(durum: durum, bugun: ref.watch(bugunProvider)),
                 kart(
                   anahtar: const ValueKey('pratik-hatalarim'),
                   simge: Icons.rule,
@@ -114,6 +116,20 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                       : '$kelimeSayisi kelime hazır',
                   onTap: () => context.push('/pratik/kartlar'),
                 ),
+                kart(
+                  anahtar: const ValueKey('pratik-halat'),
+                  simge: Icons.sports_kabaddi_outlined,
+                  baslik: 'Halat çekme',
+                  ayrinti: 'Bilgisayara karşı bilgi yarışı, çevrimdışı',
+                  onTap: () => context.push('/halat'),
+                ),
+                kart(
+                  anahtar: const ValueKey('pratik-hafiza'),
+                  simge: Icons.psychology_outlined,
+                  baslik: 'Hafıza puanı ve çalışma modları',
+                  ayrinti: 'Ünite başına puan; kart, yazma, eşleştirme, test',
+                  onTap: () => context.push('/calisma-modlari'),
+                ),
                 // Yalnız dil kurslarında: sesli etkinlikler.
                 if (durum.alan == 'dil') ...[
                   kart(
@@ -129,6 +145,13 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                     baslik: 'Dinleme radyosu',
                     ayrinti: 'Kısa sesli bölümler: dinle, eşleştir, sırala',
                     onTap: () => context.push('/radyo'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-oynatici'),
+                    simge: Icons.queue_music_outlined,
+                    baslik: 'Kelime defteri oynatıcı',
+                    ayrinti: 'Kelimeleri sırayla sesli çalar',
+                    onTap: () => context.push('/kelime-oynatici'),
                   ),
                   kart(
                     anahtar: const ValueKey('pratik-eller-serbest'),

@@ -8,12 +8,25 @@ class Ses {
 
   FlutterTts? _tts;
 
+  /// Konuşma hızı (0..1; flutter_tts ölçeği). Kelime defteri oynatıcısı
+  /// (ÖZELLİK 82) hızı değiştirir; varsayılan 0,45.
+  double konusmaHizi = 0.45;
+
+  /// Süren okumayı keser (oynatıcı duraklatınca). Hata yutulur.
+  Future<void> durdur() async {
+    try {
+      await _tts?.stop();
+    } catch (e) {
+      debugPrint('Ses durdurulamadı: $e');
+    }
+  }
+
   /// Başarıyla konuşma başlatıldıysa true; hata olursa false.
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     try {
       final tts = _tts ??= FlutterTts();
       await tts.setLanguage(dil);
-      await tts.setSpeechRate(0.45);
+      await tts.setSpeechRate(konusmaHizi);
       await tts.stop();
       await tts.speak(metin);
       return true;
@@ -35,7 +48,7 @@ class Ses {
       final tts = _tts ??= FlutterTts();
       await tts.awaitSpeakCompletion(true);
       await tts.setLanguage(dil);
-      await tts.setSpeechRate(0.45);
+      await tts.setSpeechRate(konusmaHizi);
       await tts.stop();
       await tts.speak(metin).timeout(enCok);
       return true;

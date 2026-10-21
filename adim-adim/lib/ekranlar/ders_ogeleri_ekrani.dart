@@ -12,9 +12,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/yer_imi_dugmesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/ders_ogeleri.dart';
+import '../motor/yer_imi.dart';
 import '../tema/tema.dart';
 
 class DersOgeleriEkrani extends ConsumerWidget {
@@ -209,6 +211,9 @@ class _OgeSatiri extends ConsumerWidget {
                           .oku(oge.metin, dil: oge.sesDili!)
                     : null,
               ),
+            // Yer imi (ÖZELLİK 72): alıştırma adımı kaydedilir; aynı adımdan
+            // gelen satırlar (ör. eşleştirme çiftleri) aynı yer imini paylaşır.
+            YerImiDugmesi(anahtar: YerImleri.adimAnahtari(oge.kartId)),
             kartlarda
                 ? IconButton(
                     icon: Icon(Icons.check_circle, color: r.dogru),

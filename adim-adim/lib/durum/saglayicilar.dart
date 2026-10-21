@@ -24,6 +24,7 @@ import '../motor/pratik.dart';
 import '../motor/satranc_calisma.dart';
 import '../motor/senaryo.dart';
 import '../motor/sure.dart';
+import '../motor/yer_imi.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
@@ -422,6 +423,33 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.
   Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
       _uygula((d) => Motor.notYaz(d, kartId, metin));
+
+  // --- Yer imleri (ÖZELLİK 72) ------------------------------------------
+  // Kartlara, hata defterine, XP'ye ve seriye dokunmaz.
+
+  /// Yer imi varsa kaldırır, yoksa "Genel" koleksiyonuna ekler.
+  Future<OgrenciDurumu> yerImiDegistir(String anahtar) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => YerImleri.degistir(d, anahtar, bugun));
+  }
+
+  Future<OgrenciDurumu> yerImiNotYaz(String anahtar, String? metin) =>
+      _uygula((d) => YerImleri.notYaz(d, anahtar, metin));
+
+  Future<OgrenciDurumu> yerImiTasi(String anahtar, String koleksiyon) =>
+      _uygula((d) => YerImleri.tasi(d, anahtar, koleksiyon));
+
+  Future<OgrenciDurumu> koleksiyonEkle(String ad) =>
+      _uygula((d) => YerImleri.koleksiyonEkle(d, ad));
+
+  Future<OgrenciDurumu> koleksiyonSil(String ad) =>
+      _uygula((d) => YerImleri.koleksiyonSil(d, ad));
+
+  Future<OgrenciDurumu> yerImiAcildi(String anahtar) =>
+      _uygula((d) => YerImleri.gecmiseEkle(d, anahtar));
+
+  Future<OgrenciDurumu> yerImiGecmisiniTemizle() =>
+      _uygula(YerImleri.gecmisiTemizle);
 
   /// Çalışma planını kaydeder; [plan] null ise siler.
   Future<OgrenciDurumu> planKaydet(CalismaPlani? plan) => _uygula(

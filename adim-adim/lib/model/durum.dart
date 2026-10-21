@@ -15,7 +15,9 @@
 /// `aylikDers`/`aylikKart`/`aylikKurs`/`aylikHedefDers`: ay bazında biten ders,
 /// yeni kart, kurs başına ders sayısı ve aylık meydan okuma hedefi (ÖZELLİK
 /// 49, 51), boş harita ve 30; `ardisikBasarisiz`/`sonBasarisizDers`: üst üste
-/// başarısız ders denemesi (ÖZELLİK 50), 0 ve yok)
+/// başarısız ders denemesi (ÖZELLİK 50), 0 ve yok; `yerImleri`/`koleksiyonlar`/
+/// `yerImiGecmisi`: yer imi koleksiyonları, notları ve geçmişi (ÖZELLİK 72),
+/// hepsi boş liste)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -264,6 +266,79 @@ class BilmeceDurumu {
   }
 }
 
+/// Yer imi (ÖZELLİK 72): bir ders adımı ya da sözlük maddesi, bir koleksiyonda,
+/// isteğe bağlı kısa notla. [anahtar] 'adim:dersId#i' ya da
+/// 'sozluk:dersId#i|kelime' biçimindedir (Motor/YerImleri çözer).
+class YerImi {
+  const YerImi({
+    required this.anahtar,
+    this.koleksiyon = varsayilanKoleksiyon,
+    this.not = '',
+    this.gun,
+  });
+
+  static const String varsayilanKoleksiyon = 'Genel';
+  static const String turAdim = 'adim';
+  static const String turSozluk = 'sozluk';
+
+  /// Sınırlar: toplam yer imi, koleksiyon sayısı, koleksiyon adı, not, geçmiş.
+  static const int enCok = 300;
+  static const int koleksiyonEnCok = 20;
+  static const int koleksiyonAdEnCok = 30;
+  static const int notEnCok = 200;
+  static const int gecmisEnCok = 30;
+  static const int anahtarEnCok = 160;
+
+  final String anahtar;
+  final String koleksiyon;
+  final String not;
+
+  /// Eklendiği gün 'YYYY-MM-DD'; null: bilinmiyor.
+  final String? gun;
+
+  String get tur => anahtar.startsWith('$turSozluk:') ? turSozluk : turAdim;
+
+  /// Anahtar biçimi: 'adim:' ya da 'sozluk:' + en az bir '#'.
+  static bool anahtarGecerli(String s) =>
+      s.isNotEmpty &&
+      s.length <= anahtarEnCok &&
+      (s.startsWith('$turAdim:') || s.startsWith('$turSozluk:')) &&
+      s.contains('#');
+
+  YerImi copyWith({String? koleksiyon, String? not}) => YerImi(
+    anahtar: anahtar,
+    koleksiyon: koleksiyon ?? this.koleksiyon,
+    not: not ?? this.not,
+    gun: gun,
+  );
+
+  Map<String, Object?> toJson() => {
+    'anahtar': anahtar,
+    'koleksiyon': koleksiyon,
+    'not': not,
+    'gun': gun,
+  };
+
+  static YerImi? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final a = j['anahtar'];
+    if (a is! String || !anahtarGecerli(a)) return null;
+    final k = j['koleksiyon'];
+    final n = j['not'];
+    final g = j['gun'];
+    final kol = k is String ? k.trim() : '';
+    final not = n is String ? n.trim() : '';
+    return YerImi(
+      anahtar: a,
+      koleksiyon: (kol.isEmpty || kol.length > koleksiyonAdEnCok)
+          ? varsayilanKoleksiyon
+          : kol,
+      not: not.length > notEnCok ? not.substring(0, notEnCok) : not,
+      gun: (g is String && OgrenciDurumu.gunGecerli(g)) ? g : null,
+    );
+  }
+}
+
 class OgrenciDurumu {
   const OgrenciDurumu({
     this.xp = 0,
@@ -314,6 +389,9 @@ class OgrenciDurumu {
     this.aylikHedefDers = varsayilanAylikHedef,
     this.ardisikBasarisiz = 0,
     this.sonBasarisizDers,
+    this.yerImleri = const [],
+    this.koleksiyonlar = const [],
+    this.yerImiGecmisi = const [],
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -473,6 +551,13 @@ class OgrenciDurumu {
   /// En son başarısız denenen dersin kimliği; başarıda null.
   final String? sonBasarisizDers;
 
+  /// Yer imleri, eskiden yeniye (ÖZELLİK 72; en çok [YerImi.enCok]); eski
+  /// kayıtta boş. Koleksiyon adları [koleksiyonlar] ile boş koleksiyonları da
+  /// tutar; geçmiş, en son açılan yer imi anahtarları (yeniden eskiye).
+  final List<YerImi> yerImleri;
+  final List<String> koleksiyonlar;
+  final List<String> yerImiGecmisi;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -553,6 +638,9 @@ class OgrenciDurumu {
     int? ardisikBasarisiz,
     String? sonBasarisizDers,
     bool sonBasarisizDersSil = false,
+    List<YerImi>? yerImleri,
+    List<String>? koleksiyonlar,
+    List<String>? yerImiGecmisi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -612,6 +700,9 @@ class OgrenciDurumu {
       sonBasarisizDers: sonBasarisizDersSil
           ? null
           : (sonBasarisizDers ?? this.sonBasarisizDers),
+      yerImleri: yerImleri ?? this.yerImleri,
+      koleksiyonlar: koleksiyonlar ?? this.koleksiyonlar,
+      yerImiGecmisi: yerImiGecmisi ?? this.yerImiGecmisi,
     );
   }
 
@@ -669,6 +760,9 @@ class OgrenciDurumu {
     'aylikHedefDers': aylikHedefDers,
     'ardisikBasarisiz': ardisikBasarisiz,
     'sonBasarisizDers': sonBasarisizDers,
+    'yerImleri': [for (final y in yerImleri) y.toJson()],
+    'koleksiyonlar': koleksiyonlar,
+    'yerImiGecmisi': yerImiGecmisi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -943,7 +1037,51 @@ class OgrenciDurumu {
               !(j['sonBasarisizDers'] as String).contains('#'))
           ? j['sonBasarisizDers'] as String
           : null,
+      // Eski kayıtta yoksa boş; bozuk girdiler, tekrarlar ve fazlalar atlanır.
+      yerImleri: yerImleriCoz(j['yerImleri']),
+      koleksiyonlar: koleksiyonlarCoz(j['koleksiyonlar']),
+      yerImiGecmisi: yerImiGecmisiCoz(j['yerImiGecmisi']),
     );
+  }
+
+  static List<YerImi> yerImleriCoz(Object? ham) {
+    final sonuc = <YerImi>[];
+    final gorulen = <String>{};
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.enCok) break;
+        final y = YerImi.fromJson(e);
+        if (y != null && gorulen.add(y.anahtar)) sonuc.add(y);
+      }
+    }
+    return List.unmodifiable(sonuc);
+  }
+
+  static List<String> koleksiyonlarCoz(Object? ham) {
+    final sonuc = <String>[];
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.koleksiyonEnCok) break;
+        if (e is! String) continue;
+        final ad = e.trim();
+        if (ad.isEmpty || ad.length > YerImi.koleksiyonAdEnCok) continue;
+        if (!sonuc.contains(ad)) sonuc.add(ad);
+      }
+    }
+    return List.unmodifiable(sonuc);
+  }
+
+  static List<String> yerImiGecmisiCoz(Object? ham) {
+    final sonuc = <String>[];
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.gecmisEnCok) break;
+        if (e is String && YerImi.anahtarGecerli(e) && !sonuc.contains(e)) {
+          sonuc.add(e);
+        }
+      }
+    }
+    return List.unmodifiable(sonuc);
   }
 }
 

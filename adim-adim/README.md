@@ -43,4 +43,12 @@ Yayın imzası: Android release derlemesi `%USERPROFILE%\.anahtar\key.properties
 - Senaryolu konuşma (65): çevrimdışı, dallanan, iki taraflı balonlu sohbetler; cevap seç, yaz ya da söyle. İngilizce 3, Almanca 3, Korece 2 senaryo (Korece cümleler anadil denetiminden geçmedi).
 - Kelime bulutu (66) ve profilde öğrenilen kelime sayısı: bitmiş ders ya da kartı olan kelimeler; boyut kartın yarı ömründen.
 - Telaffuz puanı (77): 0–100, hatalı heceyi gösterir; konuşma tanıma çıktısıyla hedef metnin harf benzerliğinden hesaplanır, bu yüzden "tahmini" etiketlidir (sesin kendisi ölçülmez). Hece bölme sezgiseldir.
+- Yer imi koleksiyonları (72): ders adımları (Bu dersin öğeleri) ve sözlük maddeleri koleksiyonlara kaydedilir; not, taşıma ve açma geçmişi. Profil > Yer imleri.
+- Gerekçeli öneri (73): kural tabanlı, "Bunu öneriyoruz çünkü ..." ve tahmini süre (bekleyen tekrar, zayıf noktalar, düşük hafıza puanlı ünite, sıradaki ders). Yapay zekâ yoktur. Profil > Sana öneri.
+- Öğrenme yolu (74): kurs kimliklerinden türetilen yol > seviye > kurs ağacı ve yüzde ilerleme (Web: HTML > CSS > JS). Profil > Öğrenme yolu.
+- Örnek programlarda arama ve dil başvurusu (75): başvuru terimleri YALNIZ örneklerin kodunda geçenlerdir (etiket, CSS özelliği, JS anahtar sözcüğü/yöntem çağrısı); açıklama örnekteki notundan gelir, dışarıdan API bilgisi eklenmez.
+- Hafıza puanı ve çok modlu çalışma (78): ünite puanı kart yarı ömürlerinden (0-100); kart, yazma, eşleştirme, test modları geçici destedir (SRS, hata defteri, XP değişmez). Pratik merkezi.
+- Metin seçerek sözlükte aç ve CSV (81): ünite özeti, dilbilgisi notu ve örnek ayrıntısında seçim menüsünde "Sözlükte ara"; Sözlük > "Kelime defterini CSV olarak kopyala" (pano; dosya ya da klasör seçimi yok, hücre başı =,+,-,@ formül önleme).
+- Kelime defteri oynatıcı (82): kelimeleri cihaz TTS ile sırayla okur; duraklat/devam, önceki/sonraki, hız, anlamı da oku, döngü. Gerçek TTS cihazda denenmedi; testte sahte ses.
+- Halat çekme ve maskot (83): bilgisayara karşı çevrimdışı bilgi yarışı (yarışma sorularından, tohumla deterministik); çalışma arkadaşı XP'den türeyen emoji aşamalarıdır (saklanmaz, satın alma yok).
 - Gerçek mikrofon ve TTS cihazda denenmedi; testlerde sahte ses/tanıma kullanıldı.
