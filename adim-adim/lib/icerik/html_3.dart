@@ -149,7 +149,7 @@ const Kurs html3 = Kurs(
             Yaz(
               soru:
                   'template.content üzerinde kopya almak için çağrılan yöntemin adını yaz (parantezsiz).',
-              cevaplar: ['cloneNode', 'clonenode'],
+              cevaplar: ['cloneNode', 'clonenode', 'importNode', 'importnode'],
               aciklama: 'cloneNode(true) şablonun derin kopyasını üretir.',
             ),
             Sirala(
@@ -168,8 +168,7 @@ const Kurs html3 = Kurs(
                 (sol: 'attachShadow', sag: 'Gölge DOM kurar'),
                 (sol: 'connectedCallback', sag: 'Sayfaya eklenince çalışır'),
               ],
-              aciklama:
-                  'Web Components bu dört yerleşik özelliğin birleşimidir.',
+              aciklama: 'Web Components bu yerleşik özelliklerin birleşimidir.',
             ),
             Tablo(
               soru: 'Kavram ve rol tablosunu tamamla.',
@@ -360,14 +359,14 @@ const Kurs html3 = Kurs(
             ),
             Bosluk(
               soru:
-                  '<a href="https://ornek.com" target="_blank" rel="noopener ___">',
+                  'Hedef siteye Referer bilgisi gönderilmesin: <a href="https://ornek.com" target="_blank" rel="noopener ___">',
               secenekler: ['nofollow', 'noindex', 'nocache', 'noreferrer'],
               dogru: 3,
               aciklama: 'noreferrer, hedef siteye Referer bilgisini göndermez.',
             ),
             Yaz(
               soru:
-                  'Kullanıcı bağlantılarında arama motoruna güven aktarmayan rel değerini yaz.',
+                  'Arama motoruna bağlantıyı takip etmemesini öneren genel rel değerini yaz.',
               cevaplar: ['nofollow'],
               aciklama:
                   'nofollow arama motorlarına bağlantıyı takip etmemeyi önerir.',

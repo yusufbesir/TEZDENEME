@@ -552,7 +552,7 @@ const Kurs css2 = Kurs(
               soru: 'Boşluğu iki katına çıkar.',
               kod:
                   '.etiket {\n  --bosluk: 8px;\n  padding: calc(var(--bosluk) * ___);\n}',
-              secenekler: ['3px', '"3"', '3'],
+              secenekler: ['2px', '"2"', '2'],
               dogru: 2,
               dil: 'css',
               aciklama: 'Çarpmada çarpanlardan biri birimsiz sayı olmalıdır.',

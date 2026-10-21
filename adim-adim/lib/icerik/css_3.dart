@@ -528,7 +528,7 @@ const Kurs css3 = Kurs(
               aciklama: 'transform ve filter farklı katmanlarda çalışır.',
             ),
             Kod(
-              soru: 'Etiket gölgesini bulanıklaştır.',
+              soru: 'Etiketi bulanıklaştır.',
               kod: '.etiket {\n  filter: ___(4px);\n}',
               secenekler: ['soften', 'blur', 'smooth'],
               dogru: 1,
