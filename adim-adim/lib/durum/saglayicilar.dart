@@ -120,13 +120,21 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
   }
 
-  /// Alan seçimi: yalnızca 'dil' ya da 'kod'.
-  Future<OgrenciDurumu> alanSec(String alan) {
+  /// Alan seçimi: yalnızca 'dil' ya da 'kod'. [ilkAcilisTamam] verilirse
+  /// ilk açılış bayrağı da yazılır (akışın 1. adımı false yazar ki uygulama
+  /// kapanıp açılınca akış sürsün).
+  Future<OgrenciDurumu> alanSec(String alan, {bool? ilkAcilisTamam}) {
     if (alan != 'dil' && alan != 'kod') {
       throw ArgumentError.value(alan, 'alan', "'dil' ya da 'kod' olmalı");
     }
-    return _uygula((d) => d.copyWith(alan: alan));
+    return _uygula(
+      (d) => d.copyWith(alan: alan, ilkAcilisTamam: ilkAcilisTamam),
+    );
   }
+
+  /// İlk açılış ("Hoş geldin") akışı bitti; bir daha gösterilmez.
+  Future<OgrenciDurumu> ilkAcilisTamamla() =>
+      _uygula((d) => d.copyWith(ilkAcilisTamam: true));
 
   Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);

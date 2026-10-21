@@ -207,6 +207,11 @@ void main() {
 
     await dokun(tester, find.text('Programlama'));
     expect(kap.read(durumProvider).value!.alan, 'kod');
+    // İlk açılış akışı (Özellik 28): hedef ve hatırlatma adımları atlanır,
+    // "Başla" ile yola geçilir (ayrıntı: ilk_acilis_arayuz_test.dart).
+    await dokun(tester, find.text('Atla'));
+    await dokun(tester, find.text('Şimdi değil'));
+    await dokun(tester, find.text('Başla'));
     expect(find.text('Sahte Kod Kursu'), findsOneWidget);
     expect(find.text('Sahte Kurs'), findsNothing);
     expect(find.byType(NavigationBar), findsOneWidget);

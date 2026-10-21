@@ -30,10 +30,12 @@ import 'ekranlar/yarisma_ekrani.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
-  // Durum yüklenince ya da alan değişince yönlendirme yeniden değerlendirilir.
+  // Durum yüklenince, alan değişince ya da ilk açılış akışı bitince
+  // yönlendirme yeniden değerlendirilir.
   final yenile = ValueNotifier<int>(0);
   ref.listen(durumProvider, (onceki, simdi) {
     if (onceki?.value?.alan != simdi.value?.alan ||
+        onceki?.value?.ilkAcilisTamam != simdi.value?.ilkAcilisTamam ||
         onceki?.hasValue != simdi.hasValue) {
       yenile.value++;
     }
@@ -44,10 +46,12 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final durum = ref.read(durumProvider).value;
       if (durum == null) return null; // yükleniyor: ekran yükleniyor gösterir
-      // Alan seçilmemişse her yer alan seçimine gider. (Alan seçiliyken
+      // Alan seçilmemişse ya da ilk açılış akışı bitmemişse her yer alan
+      // seçimine (ilk açılışta "Hoş geldin" akışına) gider. (Alan seçiliyken
       // /alan-sec açık kalabilir: Profil'deki "Değiştir" oraya gider; seçim
       // sonrası alan seçim ekranı kendisi /yol'a geçer.)
-      if (durum.alan == null && state.matchedLocation != '/alan-sec') {
+      if ((durum.alan == null || !durum.ilkAcilisTamam) &&
+          state.matchedLocation != '/alan-sec') {
         return '/alan-sec';
       }
       return null;

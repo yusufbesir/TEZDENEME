@@ -1,10 +1,13 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
 /// haftalık hedef, tamamlanan dersler, son açılan ders, öğrenme günlüğü,
-/// kelime notları (kişisel mnemonikler) ve günün bilmecesi cevabı.
+/// kelime notları (kişisel mnemonikler), günün bilmecesi cevabı ve ilk açılış
+/// akışının tamamlanma bayrağı.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
-/// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış).
+/// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
+/// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
+/// ilk açılış akışını görmez).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -266,7 +269,8 @@ class OgrenciDurumu {
     this.gunluk = const [],
     this.kelimeNotlari = const {},
     this.bilmece,
-  });
+    bool? ilkAcilisTamam,
+  }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
   /// toplam en çok [notEnCok] not (eski JSON'da fazlası atlanır).
@@ -312,6 +316,15 @@ class OgrenciDurumu {
   /// Günün bilmecesinin son cevabı; null: hiç cevaplanmadı (eski kayıtlar).
   final BilmeceDurumu? bilmece;
 
+  /// İlk açılış akışının ("Hoş geldin") açıkça kaydedilmiş sonucu; null:
+  /// belirtilmemiş (eski kayıt ya da doğrudan kurulmuş durum).
+  final bool? _ilkAcilisTamam;
+
+  /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
+  /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
+  /// alan seçilmemiş yeni kullanıcı görür.
+  bool get ilkAcilisTamam => _ilkAcilisTamam ?? alan != null;
+
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
   /// Biçim ve takvim denetimi: 'YYYY-MM-DD', 2000-2100 arası, gerçek bir gün
@@ -356,6 +369,7 @@ class OgrenciDurumu {
     List<GunlukKayit>? gunluk,
     Map<String, String>? kelimeNotlari,
     BilmeceDurumu? bilmece,
+    bool? ilkAcilisTamam,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -379,6 +393,7 @@ class OgrenciDurumu {
       gunluk: gunluk ?? this.gunluk,
       kelimeNotlari: kelimeNotlari ?? this.kelimeNotlari,
       bilmece: bilmece ?? this.bilmece,
+      ilkAcilisTamam: ilkAcilisTamam ?? _ilkAcilisTamam,
     );
   }
 
@@ -403,6 +418,7 @@ class OgrenciDurumu {
     'gunluk': [for (final g in gunluk) g.toJson()],
     'kelimeNotlari': kelimeNotlari,
     'bilmece': bilmece?.toJson(),
+    'ilkAcilisTamam': ilkAcilisTamam,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -517,6 +533,10 @@ class OgrenciDurumu {
       gunluk: List.unmodifiable(sonGunluk),
       kelimeNotlari: Map.unmodifiable(notlar),
       bilmece: BilmeceDurumu.fromJson(j['bilmece']),
+      // Eski kayıtta alan yoksa null kalır; getter alan doluysa true sayar.
+      ilkAcilisTamam: j['ilkAcilisTamam'] is bool
+          ? j['ilkAcilisTamam'] as bool
+          : null,
     );
   }
 }
