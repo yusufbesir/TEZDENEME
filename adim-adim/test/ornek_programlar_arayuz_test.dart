@@ -73,8 +73,12 @@ void main() {
       boyut: const Size(480, 600),
       metinOlcegi: 1.5,
     );
+    await tester.scrollUntilVisible(
+      _kart,
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.ensureVisible(_kart);
-    await tester.drag(find.byType(ListView).first, const Offset(0, -150));
     await tester.pumpAndSettle();
     await dokun(tester, _kart);
     expect(tester.takeException(), isNull);

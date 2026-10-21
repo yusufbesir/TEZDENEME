@@ -260,6 +260,86 @@ abstract final class Motor {
   static bool dersBitmis(OgrenciDurumu d, String dersId) =>
       (d.tamamlanan[dersId] ?? 0) > 0 || d.atlananDersler.contains(dersId);
 
+  /// Çalışma planı: bir dersin ortalama süresi (dakika). Kodda ders süresi
+  /// ölçümü yok; ders başına 8-10 alıştırma için makul sabit varsayım.
+  static const int ortalamaDersDakikasi = 4;
+
+  /// Günde [dakika] dakikaya sığan ders sayısı (en az 1).
+  static int planGunlukDers(int dakika) =>
+      math.max(1, dakika ~/ ortalamaDersDakikasi);
+
+  /// Planın hedef kapsamındaki dersler; kurs/ünite bulunamazsa boş.
+  static List<Ders> planDersleri(CalismaPlani plan, List<Kurs> kurslar) {
+    for (final k in kurslar) {
+      if (k.id != plan.kursId) continue;
+      if (plan.uniteId == null) return k.tumDersler.toList();
+      for (final u in k.uniteler) {
+        if (u.id == plan.uniteId) return u.dersler;
+      }
+    }
+    return const [];
+  }
+
+  /// [bugun] dahil, [gunler] (1=Pzt..7=Paz) günlerinde [dersSayisi] dersi
+  /// günde [gunlukDers] ile bitirmenin son günü; ders yoksa ya da gün
+  /// seçilmemişse null.
+  static String? planBitisTarihi(
+    int dersSayisi,
+    int gunlukDers,
+    Set<int> gunler,
+    String bugun,
+  ) {
+    final gecerli = gunler.where((g) => g >= 1 && g <= 7).toSet();
+    final t = _gunCoz(bugun);
+    if (dersSayisi <= 0 || gunlukDers <= 0 || gecerli.isEmpty || t == null) {
+      return null;
+    }
+    var gunSayisi = (dersSayisi + gunlukDers - 1) ~/ gunlukDers;
+    var gun = bugun;
+    var hafta = t.weekday;
+    while (true) {
+      if (gecerli.contains(hafta)) {
+        gunSayisi--;
+        if (gunSayisi == 0) return gun;
+      }
+      gun = _gunEkle(gun, 1);
+      hafta = hafta % 7 + 1;
+    }
+  }
+
+  /// Plan özeti: kalan/toplam ders (atlananlar ve tamamlananlar düşülür),
+  /// günlük ders sayısı, tahmini bitiş ve bugünün çalışma günü olup olmadığı.
+  /// Plan yoksa ya da kapsam bulunamazsa null.
+  static ({
+    int toplam,
+    int kalan,
+    int gunlukDers,
+    String? bitis,
+    bool bugunCalisma,
+  })?
+  planOzeti(OgrenciDurumu d, List<Kurs> kurslar, String bugun) {
+    final plan = d.calismaPlani;
+    if (plan == null) return null;
+    final dersler = planDersleri(plan, kurslar);
+    if (dersler.isEmpty) return null;
+    final kalan = dersler.where((x) => !dersBitmis(d, x.id)).length;
+    final gunluk = planGunlukDers(plan.gunlukDakika);
+    final t = _gunCoz(bugun);
+    return (
+      toplam: dersler.length,
+      kalan: kalan,
+      gunlukDers: gunluk,
+      bitis: planBitisTarihi(kalan, gunluk, plan.gunler, bugun),
+      bugunCalisma: t != null && plan.gunler.contains(t.weekday),
+    );
+  }
+
+  /// Plandan türeyen haftalık hedef önerisi (3..7 gün); ayarı değiştirmez.
+  static int planHaftalikOneri(CalismaPlani plan) => plan.gunler.length.clamp(
+    OgrenciDurumu.enAzHaftalikHedef,
+    OgrenciDurumu.enCokHaftalikHedef,
+  );
+
   /// Seviye belirleme sınavı: en çok soru, ünite başına en az/en çok soru ve
   /// ünitenin "atlandı" sayılması için gereken doğru oranı.
   static const int yerlestirmeEnCok = 20;

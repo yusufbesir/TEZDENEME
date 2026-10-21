@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class AyarlarEkrani extends ConsumerStatefulWidget {
@@ -355,6 +356,36 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 'Haftada bu kadar gün çalışırsan günlük ara verdiğinde bile serin kopmaz.',
                 style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
               ),
+              ListTile(
+                key: const ValueKey('ayar-calisma-plani'),
+                contentPadding: EdgeInsets.zero,
+                minTileHeight: Olcu.hedef,
+                leading: const Icon(Icons.event_note_outlined),
+                title: const Text('Çalışma planı'),
+                subtitle: Text(
+                  durum.calismaPlani == null
+                      ? 'Plan yok'
+                      : 'Önerilen haftalık hedef: haftada '
+                            '${Motor.planHaftalikOneri(durum.calismaPlani!)} gün',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/plan'),
+              ),
+              if (durum.calismaPlani != null &&
+                  Motor.planHaftalikOneri(durum.calismaPlani!) !=
+                      durum.haftalikHedefGun)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    key: const ValueKey('ayar-plana-uydur'),
+                    onPressed: () => notifier.ayarGuncelle(
+                      haftalikHedefGun: Motor.planHaftalikOneri(
+                        durum.calismaPlani!,
+                      ),
+                    ),
+                    child: const Text('Haftalık hedefi plana uydur'),
+                  ),
+                ),
               bolum('Hatırlatma'),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,

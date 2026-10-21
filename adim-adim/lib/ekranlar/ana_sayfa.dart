@@ -21,6 +21,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/basamak.dart';
 import '../bilesenler/bilmece_karti.dart';
+import '../bilesenler/calisma_plani_karti.dart';
 import '../bilesenler/devam_karti.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/hikaye_karti.dart';
@@ -73,7 +74,7 @@ class AnaSayfa extends ConsumerWidget {
               SizedBox(
                 width: panelGenislik,
                 height: kisit.maxHeight,
-                child: _YanPanel(durum: durum, bugun: bugun),
+                child: _YanPanel(durum: durum, bugun: bugun, kurslar: kurslar),
               ),
             ],
           );
@@ -85,8 +86,13 @@ class AnaSayfa extends ConsumerWidget {
 
 /// Yan panel: Öğrenci kartı + günlük hedef; görünür kaydırma çubuğu.
 class _YanPanel extends StatefulWidget {
-  const _YanPanel({required this.durum, required this.bugun});
+  const _YanPanel({
+    required this.durum,
+    required this.bugun,
+    required this.kurslar,
+  });
   final OgrenciDurumu durum;
+  final List<Kurs> kurslar;
   final String bugun;
 
   @override
@@ -116,6 +122,12 @@ class _YanPanelDurumu extends State<_YanPanel> {
             ProfilKarti(durum: widget.durum, bugun: widget.bugun),
             const SizedBox(height: Olcu.b2),
             _GunlukKart(durum: widget.durum, bugun: widget.bugun),
+            const SizedBox(height: Olcu.b2),
+            CalismaPlaniKarti(
+              durum: widget.durum,
+              kurslar: widget.kurslar,
+              bugun: widget.bugun,
+            ),
           ],
         ),
       ),
@@ -296,6 +308,12 @@ class _YolListesi extends StatelessWidget {
       // kurslarda hikâye yoksa kendisi boş çizer.
       if (durum.alan == 'dil' && HikayeKarti.grupla(kurslar).isNotEmpty) ...[
         HikayeKarti(durum: durum, kurslar: kurslar),
+        const SizedBox(height: Olcu.b3),
+      ],
+      // Çalışma planı: yan panel yoksa (tek sütun) hikâye/örnek kartlarının arasında; yan
+      // panel varsa orada durur.
+      if (seritteHalka) ...[
+        CalismaPlaniKarti(durum: durum, kurslar: kurslar, bugun: bugun),
         const SizedBox(height: Olcu.b3),
       ],
       // Örnek programlar kütüphanesi yalnız kod alanında.

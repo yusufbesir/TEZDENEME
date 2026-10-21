@@ -240,6 +240,13 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
       _uygula((d) => Motor.notYaz(d, kartId, metin));
 
+  /// Çalışma planını kaydeder; [plan] null ise siler.
+  Future<OgrenciDurumu> planKaydet(CalismaPlani? plan) => _uygula(
+    (d) => plan == null
+        ? d.copyWith(calismaPlaniSil: true)
+        : d.copyWith(calismaPlani: plan),
+  );
+
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat; `tekrarBildirimiAcik`: açılıştaki
   /// bekleyen tekrar bildirimi. Hatırlatma açılırken bildirim izni

@@ -20,6 +20,7 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
@@ -89,6 +90,7 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
       GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
