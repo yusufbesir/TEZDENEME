@@ -12,6 +12,9 @@ import 'ingilizce_b2.dart';
 import 'japonca_a1.dart';
 import 'js_1.dart';
 import 'korece_a1.dart';
+import 'python_1.dart';
+import 'python_2.dart';
+import 'python_3.dart';
 
 export 'cince_a1.dart' show cinceA1;
 export 'css_1.dart' show css1;
@@ -23,6 +26,9 @@ export 'ingilizce_b2.dart' show ingilizceB2;
 export 'japonca_a1.dart' show japoncaA1;
 export 'js_1.dart' show js1;
 export 'korece_a1.dart' show koreceA1;
+export 'python_1.dart' show python1;
+export 'python_2.dart' show python2;
+export 'python_3.dart' show python3;
 
 final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   ingilizceA1,
@@ -35,6 +41,9 @@ final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   html1,
   css1,
   js1,
+  python1,
+  python2,
+  python3,
 ]);
 
 /// Kimliğe göre kurs bulur; yoksa null döner.
