@@ -30,7 +30,11 @@ abstract final class KelimeDefteri {
   /// Tek hücreyi CSV için hazırlar (formül önleme + tırnak kaçışı).
   static String hucre(String s) {
     var v = s;
-    if (v.isNotEmpty && '=+-@\t'.contains(v[0])) v = "'$v";
+    final bas = v.trimLeft();
+    if (bas.isNotEmpty && '=+-@'.contains(bas[0]) ||
+        v.isNotEmpty && '\t\r'.contains(v[0])) {
+      v = "'$v";
+    }
     if (v.contains(',') ||
         v.contains('"') ||
         v.contains('\n') ||
