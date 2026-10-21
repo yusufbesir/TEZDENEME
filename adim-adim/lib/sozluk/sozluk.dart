@@ -203,6 +203,7 @@ class Sozluk {
   static String kursDili(Kurs kurs) {
     if (kurs.alan == KursAlani.kod) return 'kod';
     return switch (kurs.id.split('-').first) {
+      'almanca' => 'de',
       'korece' => 'ko',
       'japonca' => 'ja',
       'cince' => 'zh',

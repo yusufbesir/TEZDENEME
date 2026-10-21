@@ -62,6 +62,7 @@ void main() {
     // Diller: en, ko, ja, zh, kod (Korece/Japonca/Çince ÖZELLİK 67 ile geldi).
     final toplam = [
       'en',
+      'de',
       'ko',
       'ja',
       'zh',

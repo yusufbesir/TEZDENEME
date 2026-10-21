@@ -17,6 +17,9 @@ void main() {
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'almanca-1',
+      'almanca-2',
+      'almanca-3',
       'korece-1',
       'japonca-1',
       'cince-1',
@@ -39,7 +42,14 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
-    for (final k in [koreceA1, japoncaA1, cinceA1]) {
+    for (final k in [
+      almancaA1,
+      almancaA2,
+      almancaB1,
+      koreceA1,
+      japoncaA1,
+      cinceA1,
+    ]) {
       expect(k.alan, KursAlani.dil);
     }
     for (final k in [

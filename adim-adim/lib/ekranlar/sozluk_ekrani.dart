@@ -60,6 +60,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
     switch (ad) {
       case 'ingilizce':
         return 'İng.$no';
+      case 'almanca':
+        return 'Alm.$no';
       case 'korece':
         return 'Kor.$no';
       case 'japonca':
@@ -148,6 +150,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                     const SizedBox(width: Olcu.b1),
                     cip('İngilizce', 'en'),
                     const SizedBox(width: Olcu.b1),
+                    cip('Almanca', 'de'),
+                    const SizedBox(width: Olcu.b1),
                     cip('Korece', 'ko'),
                     const SizedBox(width: Olcu.b1),
                     cip('Japonca', 'ja'),
@@ -227,6 +231,7 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
 
 /// Sözlük dil kodundan TTS dili ('ko' → 'ko-KR'); bilinmeyen 'en-US'.
 String _sesDili(String dil) => switch (dil) {
+  'de' => 'de-DE',
   'ko' => 'ko-KR',
   'ja' => 'ja-JP',
   'zh' => 'zh-CN',
