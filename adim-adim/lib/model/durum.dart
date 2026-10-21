@@ -8,13 +8,28 @@
 /// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme;
 /// `araSinavlar`/`sertifikalar`: ünite ara sınavı ve seviye sertifika sınavı
 /// en iyi sonuçları, boş harita; `dersEnIyi`/`dersSureSn`: ders başına en iyi
-/// puan yüzdesi ve toplam çalışma süresi, boş harita)
+/// puan yüzdesi ve toplam çalışma süresi, boş harita; `altinUniteler`:
+/// efsanevi zor tekrarı geçilen üniteler, boş küme; `senaryolar`: bitirilen
+/// senaryolu konuşmalar, boş harita; `gunlukSureSn`/`gunlukDakikaHedefi`:
+/// günlük çalışma süresi ve dakika hedefi (ÖZELLİK 59, 80), boş harita ve 0;
+/// `aylikDers`/`aylikKart`/`aylikKurs`/`aylikHedefDers`: ay bazında biten ders,
+/// yeni kart, kurs başına ders sayısı ve aylık meydan okuma hedefi (ÖZELLİK
+/// 49, 51), boş harita ve 30; `ardisikBasarisiz`/`sonBasarisizDers`: üst üste
+/// başarısız ders denemesi (ÖZELLİK 50), 0 ve yok; `yerImleri`/`koleksiyonlar`/
+/// `yerImiGecmisi`: yer imi koleksiyonları, notları ve geçmişi (ÖZELLİK 72),
+/// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
+/// alanları (ÖZELLİK 70), boş liste)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
 /// ilk açılış akışını görmez; tekrar bildirimi açık ve hiç gösterilmemiş).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
+
+import 'kod_projesi.dart';
+import 'satranc_durumu.dart';
+
+export 'kod_projesi.dart';
 
 class Kart {
   const Kart({
@@ -255,6 +270,79 @@ class BilmeceDurumu {
   }
 }
 
+/// Yer imi (ÖZELLİK 72): bir ders adımı ya da sözlük maddesi, bir koleksiyonda,
+/// isteğe bağlı kısa notla. [anahtar] 'adim:dersId#i' ya da
+/// 'sozluk:dersId#i|kelime' biçimindedir (Motor/YerImleri çözer).
+class YerImi {
+  const YerImi({
+    required this.anahtar,
+    this.koleksiyon = varsayilanKoleksiyon,
+    this.not = '',
+    this.gun,
+  });
+
+  static const String varsayilanKoleksiyon = 'Genel';
+  static const String turAdim = 'adim';
+  static const String turSozluk = 'sozluk';
+
+  /// Sınırlar: toplam yer imi, koleksiyon sayısı, koleksiyon adı, not, geçmiş.
+  static const int enCok = 300;
+  static const int koleksiyonEnCok = 20;
+  static const int koleksiyonAdEnCok = 30;
+  static const int notEnCok = 200;
+  static const int gecmisEnCok = 30;
+  static const int anahtarEnCok = 160;
+
+  final String anahtar;
+  final String koleksiyon;
+  final String not;
+
+  /// Eklendiği gün 'YYYY-MM-DD'; null: bilinmiyor.
+  final String? gun;
+
+  String get tur => anahtar.startsWith('$turSozluk:') ? turSozluk : turAdim;
+
+  /// Anahtar biçimi: 'adim:' ya da 'sozluk:' + en az bir '#'.
+  static bool anahtarGecerli(String s) =>
+      s.isNotEmpty &&
+      s.length <= anahtarEnCok &&
+      (s.startsWith('$turAdim:') || s.startsWith('$turSozluk:')) &&
+      s.contains('#');
+
+  YerImi copyWith({String? koleksiyon, String? not}) => YerImi(
+    anahtar: anahtar,
+    koleksiyon: koleksiyon ?? this.koleksiyon,
+    not: not ?? this.not,
+    gun: gun,
+  );
+
+  Map<String, Object?> toJson() => {
+    'anahtar': anahtar,
+    'koleksiyon': koleksiyon,
+    'not': not,
+    'gun': gun,
+  };
+
+  static YerImi? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final a = j['anahtar'];
+    if (a is! String || !anahtarGecerli(a)) return null;
+    final k = j['koleksiyon'];
+    final n = j['not'];
+    final g = j['gun'];
+    final kol = k is String ? k.trim() : '';
+    final not = n is String ? n.trim() : '';
+    return YerImi(
+      anahtar: a,
+      koleksiyon: (kol.isEmpty || kol.length > koleksiyonAdEnCok)
+          ? varsayilanKoleksiyon
+          : kol,
+      not: not.length > notEnCok ? not.substring(0, notEnCok) : not,
+      gun: (g is String && OgrenciDurumu.gunGecerli(g)) ? g : null,
+    );
+  }
+}
+
 class OgrenciDurumu {
   const OgrenciDurumu({
     this.xp = 0,
@@ -294,6 +382,21 @@ class OgrenciDurumu {
     this.donemDersleri = const {},
     this.gunDersiBildirimiAcik = false,
     this.sonGunDersiBildirimGunu,
+    this.satranc = const SatrancDurumu(),
+    this.altinUniteler = const {},
+    this.senaryolar = const {},
+    this.gunlukSureSn = const {},
+    this.gunlukDakikaHedefi = 0,
+    this.aylikDers = const {},
+    this.aylikKart = const {},
+    this.aylikKurs = const {},
+    this.aylikHedefDers = varsayilanAylikHedef,
+    this.ardisikBasarisiz = 0,
+    this.sonBasarisizDers,
+    this.yerImleri = const [],
+    this.koleksiyonlar = const [],
+    this.yerImiGecmisi = const [],
+    this.kodProjeleri = const [],
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -305,6 +408,16 @@ class OgrenciDurumu {
   static const int enAzHaftalikHedef = 3;
   static const int enCokHaftalikHedef = 7;
   static const int varsayilanHaftalikHedef = 5;
+
+  /// Aylık meydan okuma hedefi (ayda bitirilecek ders) sınırları ve varsayılanı.
+  static const int enAzAylikHedef = 5;
+  static const int enCokAylikHedef = 100;
+  static const int varsayilanAylikHedef = 30;
+
+  /// Günlük dakika hedefi üst sınırı (dakika) ve süre haritası boyut sınırları.
+  static const int enCokDakikaHedefi = 240;
+  static const int gunlukSureEnCok = 1000;
+  static const int aylikEnCok = 600;
 
   final int xp;
   final int seri;
@@ -404,6 +517,56 @@ class OgrenciDurumu {
   /// Bu bildirimin en son gösterildiği gün; null: hiç.
   final String? sonGunDersiBildirimGunu;
 
+  /// Satranç modülü durumu (ÖZELLİK 47, 52-57); eski kayıtta boş. Ders
+  /// kartlarından ayrı tutulur (Tekrar sekmesi aralıkları bozulmaz).
+  final SatrancDurumu satranc;
+
+  /// "Altın" ünitelerin kimlikleri (ÖZELLİK 43, efsanevi zor tekrar geçildi);
+  /// eski kayıtta boş. Kart aralıklarına (SRS) dokunmaz.
+  final Set<String> altinUniteler;
+
+  /// Senaryolu konuşma (ÖZELLİK 65): senaryo kimliği -> kaç kez bitirildi;
+  /// eski kayıtta boş. XP/SRS yok.
+  final Map<String, int> senaryolar;
+
+  /// Günlük çalışma süresi: gün -> saniye (ÖZELLİK 59, 80); eski kayıtta boş.
+  /// Ders, mikro ders ve süreli kelime oturumu ekler (Sure.ekle).
+  final Map<String, int> gunlukSureSn;
+
+  /// Günlük dakika hedefi (dakika); 0: ayarlanmamış (eski kayıt). Ayarlı
+  /// değilse çalışma planındaki günlük dakika kullanılır (Sure.hedefDk).
+  final int gunlukDakikaHedefi;
+
+  /// Ay bazında sayaçlar (ÖZELLİK 49, 51), anahtar 'YYYY-MM': bitirilen ders
+  /// sayısı ve ilk kez oluşan (yeni) kart sayısı; eski kayıtta boş. Ders
+  /// sayısı yoksa günlükteki 'ders' kayıtlarından tamamlanır (Meydan.aylikDersler).
+  final Map<String, int> aylikDers;
+  final Map<String, int> aylikKart;
+
+  /// Ay ve kurs bazında bitirilen ders: anahtar 'YYYY-MM|kursKimliği'.
+  final Map<String, int> aylikKurs;
+
+  /// Aylık meydan okuma hedefi: ayda bitirilecek ders (5..100, varsayılan 30).
+  final int aylikHedefDers;
+
+  /// Üst üste başarısız ders denemesi (ÖZELLİK 50): puan eşiğin altında
+  /// kalan ardışık bitiriş sayısı; başarılı bitiş sıfırlar. Eski kayıtta 0.
+  final int ardisikBasarisiz;
+
+  /// En son başarısız denenen dersin kimliği; başarıda null.
+  final String? sonBasarisizDers;
+
+  /// Yer imleri, eskiden yeniye (ÖZELLİK 72; en çok [YerImi.enCok]); eski
+  /// kayıtta boş. Koleksiyon adları [koleksiyonlar] ile boş koleksiyonları da
+  /// tutar; geçmiş, en son açılan yer imi anahtarları (yeniden eskiye).
+  final List<YerImi> yerImleri;
+  final List<String> koleksiyonlar;
+  final List<String> yerImiGecmisi;
+
+  /// Kod projeleri ve oyun alanları (ÖZELLİK 70); eski kayıtta boş. Sınırlar
+  /// [KodProjesi] içinde.
+  final List<KodProjesi> kodProjeleri;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -472,6 +635,22 @@ class OgrenciDurumu {
     Set<String>? donemDersleri,
     bool? gunDersiBildirimiAcik,
     String? sonGunDersiBildirimGunu,
+    SatrancDurumu? satranc,
+    Set<String>? altinUniteler,
+    Map<String, int>? senaryolar,
+    Map<String, int>? gunlukSureSn,
+    int? gunlukDakikaHedefi,
+    Map<String, int>? aylikDers,
+    Map<String, int>? aylikKart,
+    Map<String, int>? aylikKurs,
+    int? aylikHedefDers,
+    int? ardisikBasarisiz,
+    String? sonBasarisizDers,
+    bool sonBasarisizDersSil = false,
+    List<YerImi>? yerImleri,
+    List<String>? koleksiyonlar,
+    List<String>? yerImiGecmisi,
+    List<KodProjesi>? kodProjeleri,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -518,6 +697,23 @@ class OgrenciDurumu {
           gunDersiBildirimiAcik ?? this.gunDersiBildirimiAcik,
       sonGunDersiBildirimGunu:
           sonGunDersiBildirimGunu ?? this.sonGunDersiBildirimGunu,
+      satranc: satranc ?? this.satranc,
+      altinUniteler: altinUniteler ?? this.altinUniteler,
+      senaryolar: senaryolar ?? this.senaryolar,
+      gunlukSureSn: gunlukSureSn ?? this.gunlukSureSn,
+      gunlukDakikaHedefi: gunlukDakikaHedefi ?? this.gunlukDakikaHedefi,
+      aylikDers: aylikDers ?? this.aylikDers,
+      aylikKart: aylikKart ?? this.aylikKart,
+      aylikKurs: aylikKurs ?? this.aylikKurs,
+      aylikHedefDers: aylikHedefDers ?? this.aylikHedefDers,
+      ardisikBasarisiz: ardisikBasarisiz ?? this.ardisikBasarisiz,
+      sonBasarisizDers: sonBasarisizDersSil
+          ? null
+          : (sonBasarisizDers ?? this.sonBasarisizDers),
+      yerImleri: yerImleri ?? this.yerImleri,
+      koleksiyonlar: koleksiyonlar ?? this.koleksiyonlar,
+      yerImiGecmisi: yerImiGecmisi ?? this.yerImiGecmisi,
+      kodProjeleri: kodProjeleri ?? this.kodProjeleri,
     );
   }
 
@@ -564,7 +760,37 @@ class OgrenciDurumu {
     'donemDersleri': donemDersleri.toList()..sort(),
     'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
     'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
+    'satranc': satranc.toJson(),
+    'altinUniteler': altinUniteler.toList()..sort(),
+    'senaryolar': senaryolar,
+    'gunlukSureSn': gunlukSureSn,
+    'gunlukDakikaHedefi': gunlukDakikaHedefi,
+    'aylikDers': aylikDers,
+    'aylikKart': aylikKart,
+    'aylikKurs': aylikKurs,
+    'aylikHedefDers': aylikHedefDers,
+    'ardisikBasarisiz': ardisikBasarisiz,
+    'sonBasarisizDers': sonBasarisizDers,
+    'yerImleri': [for (final y in yerImleri) y.toJson()],
+    'koleksiyonlar': koleksiyonlar,
+    'yerImiGecmisi': yerImiGecmisi,
+    'kodProjeleri': [for (final p in kodProjeleri) p.toJson()],
   };
+
+  static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
+  static final _ayKursDeseni = RegExp(r'^\d{4}-\d{2}\|[^|#]{1,100}$');
+
+  /// Ay anahtarı 'YYYY-MM' (ay 01..12).
+  static bool ayGecerli(String s) {
+    if (!_ayDeseni.hasMatch(s)) return false;
+    final ay = int.parse(s.substring(5, 7));
+    final yil = int.parse(s.substring(0, 4));
+    return ay >= 1 && ay <= 12 && yil >= 2000 && yil <= 2100;
+  }
+
+  /// 'YYYY-MM|kursKimliği' anahtarı.
+  static bool ayKursGecerli(String s) =>
+      _ayKursDeseni.hasMatch(s) && ayGecerli(s.substring(0, 7));
 
   static final _donemDeseni = RegExp(
     r'^(g:\d{4}-\d{2}-\d{2}|h:\d{4}-\d{2}-\d{2}|a:\d{4}-\d{2})$',
@@ -572,6 +798,19 @@ class OgrenciDurumu {
 
   /// Dönem anahtarı biçimi: 'g:YYYY-MM-DD', 'h:YYYY-MM-DD', 'a:YYYY-MM'.
   static bool donemAnahtariGecerli(String s) => _donemDeseni.hasMatch(s);
+
+  /// Anahtarı tarihle başlayan sayaç haritasının en yeni [enCok] girdisini
+  /// tutar (anahtar sırası zaman sırasıdır).
+  static Map<String, int> enYeniKirp(Map<String, int> m, int enCok) =>
+      _enYeniKirp(m, enCok);
+
+  static Map<String, int> _enYeniKirp(Map<String, int> m, int enCok) {
+    if (m.length <= enCok) return m;
+    final anahtarlar = m.keys.toList()..sort();
+    return {
+      for (final k in anahtarlar.sublist(anahtarlar.length - enCok)) k: m[k]!,
+    };
+  }
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
   /// Anahtarlar yalnızca beklenen biçimde (ders/kart kimliği, gün) kabul edilir.
@@ -759,7 +998,103 @@ class OgrenciDurumu {
               gunGecerli(j['sonGunDersiBildirimGunu'] as String))
           ? j['sonGunDersiBildirimGunu'] as String
           : null,
+      // Eski kayıtta yoksa boş satranç durumu.
+      satranc: SatrancDurumu.fromJson(j['satranc']),
+      // Eski kayıtta yoksa boş; geçerli ünite kimliği ('#' içermez) olmayan
+      // girdiler atlanır.
+      altinUniteler: Set.unmodifiable({
+        if (j['altinUniteler'] is List)
+          for (final e in j['altinUniteler'] as List)
+            if (e is String &&
+                e.isNotEmpty &&
+                e.length <= 120 &&
+                !e.contains('#'))
+              e,
+      }),
+      senaryolar: Map.unmodifiable(
+        sayac(j['senaryolar'], (k) => k.isNotEmpty && !k.contains('#')),
+      ),
+      // Eski kayıtta yoksa boş / 0; en çok 24 saat/gün, harita boyutu sınırlı.
+      gunlukSureSn: Map.unmodifiable(
+        _enYeniKirp({
+          for (final e in sayac(j['gunlukSureSn'], gunGecerli).entries)
+            if (e.value <= 86400) e.key: e.value,
+        }, gunlukSureEnCok),
+      ),
+      gunlukDakikaHedefi: tamsayi(
+        j['gunlukDakikaHedefi'],
+        0,
+        max: enCokDakikaHedefi,
+      ),
+      aylikDers: Map.unmodifiable(
+        _enYeniKirp(sayac(j['aylikDers'], ayGecerli), aylikEnCok),
+      ),
+      aylikKart: Map.unmodifiable(
+        _enYeniKirp(sayac(j['aylikKart'], ayGecerli), aylikEnCok),
+      ),
+      aylikKurs: Map.unmodifiable(
+        _enYeniKirp(sayac(j['aylikKurs'], ayKursGecerli), aylikEnCok),
+      ),
+      aylikHedefDers: tamsayi(
+        j['aylikHedefDers'],
+        varsayilanAylikHedef,
+        min: enAzAylikHedef,
+        max: enCokAylikHedef,
+      ),
+      ardisikBasarisiz: tamsayi(j['ardisikBasarisiz'], 0, max: 1000),
+      sonBasarisizDers:
+          (j['sonBasarisizDers'] is String &&
+              (j['sonBasarisizDers'] as String).isNotEmpty &&
+              (j['sonBasarisizDers'] as String).length <= 120 &&
+              !(j['sonBasarisizDers'] as String).contains('#'))
+          ? j['sonBasarisizDers'] as String
+          : null,
+      // Eski kayıtta yoksa boş; bozuk girdiler, tekrarlar ve fazlalar atlanır.
+      yerImleri: yerImleriCoz(j['yerImleri']),
+      koleksiyonlar: koleksiyonlarCoz(j['koleksiyonlar']),
+      yerImiGecmisi: yerImiGecmisiCoz(j['yerImiGecmisi']),
+      kodProjeleri: KodProjesi.listeCoz(j['kodProjeleri']),
     );
+  }
+
+  static List<YerImi> yerImleriCoz(Object? ham) {
+    final sonuc = <YerImi>[];
+    final gorulen = <String>{};
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.enCok) break;
+        final y = YerImi.fromJson(e);
+        if (y != null && gorulen.add(y.anahtar)) sonuc.add(y);
+      }
+    }
+    return List.unmodifiable(sonuc);
+  }
+
+  static List<String> koleksiyonlarCoz(Object? ham) {
+    final sonuc = <String>[];
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.koleksiyonEnCok) break;
+        if (e is! String) continue;
+        final ad = e.trim();
+        if (ad.isEmpty || ad.length > YerImi.koleksiyonAdEnCok) continue;
+        if (!sonuc.contains(ad)) sonuc.add(ad);
+      }
+    }
+    return List.unmodifiable(sonuc);
+  }
+
+  static List<String> yerImiGecmisiCoz(Object? ham) {
+    final sonuc = <String>[];
+    if (ham is List) {
+      for (final e in ham) {
+        if (sonuc.length >= YerImi.gecmisEnCok) break;
+        if (e is String && YerImi.anahtarGecerli(e) && !sonuc.contains(e)) {
+          sonuc.add(e);
+        }
+      }
+    }
+    return List.unmodifiable(sonuc);
   }
 }
 

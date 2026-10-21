@@ -12,6 +12,7 @@
 library;
 
 import '../model/icerik.dart';
+import 'dil_tanimi.dart';
 import 'kok.dart';
 import 'siklik.dart';
 
@@ -133,9 +134,27 @@ class Sozluk {
   static final RegExp _neDemektir = RegExp(r'^"([^"]+)" ne demektir\?$');
 
   /// Tüm kurslardaki Eslestir çiftlerini ve "X ne demektir?" seçim
-  /// sorularını tarar. Aynı kelime+anlam (normalize) tekrarı birleştirilir;
-  /// ilk görülen ders (ve alıştırma indeksi) kalır.
+  /// sorularını tarar. Dil paketlerine bölünerek çalışır (ÖZELLİK 60): her
+  /// dilin maddeleri ayrı üretilir ([kurslarMaddeleri]) ve birleştirilir.
+  /// Aynı kelime+anlam (normalize) tekrarı dil içinde birleştirilir; ilk
+  /// görülen ders (ve alıştırma indeksi) kalır.
   factory Sozluk.kurslardan(List<Kurs> kurslar) {
+    final maddeler = <SozlukMaddesi>[];
+    for (final t in dilTanimlari) {
+      final dilKurslari = [
+        for (final k in kurslar)
+          if (kursDili(k) == t.kod) k,
+      ];
+      maddeler.addAll(kurslarMaddeleri(dilKurslari));
+    }
+    return Sozluk(maddeler);
+  }
+
+  /// [kurslar]daki Eslestir çiftlerinden ve "X ne demektir?" sorularından
+  /// ham (kök/sıklık hesaplanmamış) maddeler üretir; aynı kelime+anlam
+  /// tekrarı atılır. Dil paketi ([DilPaketi]) bu işlevle yüklenir. Oyun
+  /// kurslarında sözlük yoktur.
+  static List<SozlukMaddesi> kurslarMaddeleri(List<Kurs> kurslar) {
     final gorulen = <String>{};
     final sonuc = <SozlukMaddesi>[];
     void ekle(SozlukMaddesi m) {
@@ -196,21 +215,13 @@ class Sozluk {
         }
       }
     }
-    return Sozluk(sonuc);
+    return sonuc;
   }
 
   /// Kursun sözlük dili: kod kursu 'kod'; Korece 'ko', Japonca 'ja', Çince
-  /// 'zh' (kurs kimliğinin önekinden); diğer dil kursları 'en'.
-  static String kursDili(Kurs kurs) {
-    if (kurs.alan == KursAlani.kod) return 'kod';
-    return switch (kurs.id.split('-').first) {
-      'almanca' => 'de',
-      'korece' => 'ko',
-      'japonca' => 'ja',
-      'cince' => 'zh',
-      _ => 'en',
-    };
-  }
+  /// 'zh', Almanca 'de' (kurs kimliğinin önekinden, bkz. [dilTanimlari]);
+  /// diğer dil kursları 'en'.
+  static String kursDili(Kurs kurs) => kursDilKodu(kurs);
 
   /// Arama için normalize: küçük harf, Türkçe harfler sadeleştirilir,
   /// kenar boşlukları atılır. ("İ"→"i", "ı"→"i", "ş"→"s", "ğ"→"g",

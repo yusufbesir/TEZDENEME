@@ -147,6 +147,10 @@ class DersOgeleri {
             // Kod kursunda doldurulmuş kod satırı söz dizimidir.
             ekle(OgeTuru.fiil, _doldur(kod, secenekler[dogru]), null, i);
           }
+        case KodYaz(:final kod, :final cevaplar):
+          if (cevaplar.isNotEmpty && kod.contains('___')) {
+            ekle(OgeTuru.fiil, _doldur(kod, cevaplar.first), null, i);
+          }
         case Tablo(:final baslik, :final satirlar, :final bos):
           for (final b in bos) {
             if (b.satir < 0 ||

@@ -101,6 +101,29 @@ void main() {
     expect(s.sonuclar, [(0, true)]);
   });
 
+  testWidgets('tahmini telaffuz puanı ve hatalı hece gösterilir (ÖZELLİK 77)', (
+    tester,
+  ) async {
+    // Turkey -> turkay: son hece hatalı; "tahmin" etiketi görünür.
+    await _ac(tester, SahteKonusma(yanitlar: ['i am from turkay']));
+    await _konus(tester);
+    expect(find.byKey(const Key('soyle-puan')), findsOneWidget);
+    expect(find.textContaining('Tahmini telaffuz puanı: 96/100'), findsOne);
+    expect(find.byKey(const Key('soyle-hece')), findsOneWidget);
+    expect(find.textContaining('Hatalı hece: key'), findsOneWidget);
+    expect(find.byKey(const Key('soyle-puan-not')), findsOneWidget);
+    expect(find.textContaining('tahmindir'), findsOneWidget);
+  });
+
+  testWidgets('tam doğru söyleyişte hatalı hece satırı yok, puan 100', (
+    tester,
+  ) async {
+    await _ac(tester, SahteKonusma(yanitlar: ['i am from turkey']));
+    await _konus(tester);
+    expect(find.textContaining('Tahmini telaffuz puanı: 100/100'), findsOne);
+    expect(find.byKey(const Key('soyle-hece')), findsNothing);
+  });
+
   testWidgets('3 yanlış deneme: yanlış sayılır ve doğru metin gösterilir', (
     tester,
   ) async {

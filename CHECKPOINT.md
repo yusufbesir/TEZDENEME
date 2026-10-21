@@ -34,6 +34,13 @@
 - 2026-10-16: Yola bağlı kurallar, boyut testi, yerleşim tablosu (PR #21) ve skill'ler (PR #22) birleşti.
 - 2026-10-21: PR #8, #7, #14, #18, ardından Yusuf'un PR yetkisiyle #15, #26, #19 ana dala alındı (#12'yi sahibi birleştirdi); eski `.claude/orchestrator-log.md` satırları ve CLAUDE.md eklemeleri `docs/` altındaki yerlerine taşındı, içerik kaybı yok.
 
+## Kapsam notu (dil ve pratik özellikleri 42, 43, 46, 61, 64, 65, 66, 77)
+- Ayrıntı ve sınırlar `adim-adim/README.md` "Dil ve pratik özellikleri" bölümünde. Fiil çekim sözlüğü yalnız kurs tablolarındaki doğrulanmış çekimleri gösterir (Almanca 13 fiil, İngilizce yalnız be; kısmi kişi/zaman). Senaryolar: en 3, de 3, ko 2 (Korece anadil denetimi yok). Telaffuz puanı metin benzerliğine dayalı tahmindir. Gerçek mikrofon/TTS cihazda denenmedi.
+
+## Kapsam notu (kod pratiği 68, 69, 70; 2026-10-21, commit 47358623) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- 68: kodbosluk/kodsec/kodyaz türleri; 69: kodcalistir (yalnız JS, flutter_js 0.8.7 QuickJS, isolate + döngü bekçisi, ağ yok) ve kodcikti (Python dahil, çalıştırma yok); 70: proje şablonları + oyun alanı (`kodProjeleri`, boyut sınırlı), WebView'siz yapısal önizleme, panoya/dosyaya HTML. Ayrıntı `adim-adim/README.md` "Kod pratiği özellikleri".
+- Cihazda yapılacak: Windows'ta `flutter build windows` → `quickjs_c_bridge.dll` exe yanında mı, JS dersinde "Çalıştır" çıktı veriyor mu, sonsuz döngü 2 sn'de kesiliyor mu; "Dosyaya kaydet" İndirilenler'e yazıyor mu. Android derlemesi (jitpack bağımlılığı) denenmedi. Gerçek motor yalnız Linux kütüphanesiyle test edildi.
+
 ## Devir notu (2026-10-21 15:2x, Yusuf: "tüm önerileri uygulayacağız, bağımlıları birlikte yap") [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Kapsam: 42–83 arası TÜM öneriler (REA-ozellik-haritasi-2026-10-17.md; Duolingo 42–51 = D1..D10, Chess.com 52–57, Drops 58–60, Mondly 61–66, toplu tarama 68–83), yapılanlar hariç: 44, 48, 62, 63, 71, 79 (PR #32, açık). Kalan: 42, 43, 45, 46, 47, 49, 50, 51, 52–57, 58–60, 61, 64, 65, 66, 68–70, 72–78, 80–83. Lig/topluluk/sosyal, ücretli karşılıklar, çevrim içi YZ yapılmaz; ağ gerektirenler çevrimdışı karşılığıyla.
 - Çalışma düzeni: bağımlı özellikler aynı implementer görevinde (örn. satranç 47+52–57 birlikte; ders/kart ekranı özellikleri 42+43+45+61+64+65+66; seri/hedef/başarım 49+50+51+ Drops 58–60; kelime/kart 68–70, 72–78, 80–83), grup başına yeni dal ya da #32'den sonra main'den dal; her grup sonrası verifier, tam paket, PR. PR #32 birleşmeden önce main'e bağımlı dalları onun üstüne aç.
@@ -58,3 +65,8 @@
 - Durum: PR #30 (24, 28, 29, 31, 8.7, 67, 25, 18, 38; 642 test; 25+18+38 toplu doğrulandı) birleştirme onayı Yusuf'ta. Kalan sıra: 25, 18, 38 yeni iş parçacığı tarafından aynı dala eklendi (e759b761, 27c26fef, a39ff2b3); kalan 39, sonra 2, 3, 4, 5… (Yusuf 10:41 "sırayla tüm özellikleri ekle"). Yeni REA/emülatör öneri tabloları Yusuf'a sunulur, karar onda.
 - Kurallar: implementer/verifier claude-sonnet-5-5, implementer yalnız ilgili testler, verifier 2–3 özellikte bir toplu tam paket; her ajan çalışması orchestrator-log'a.
 - Cihaz bekleyenleri: REA sağlık testi (cse_01TFn1Vtzpn4dvkj7tQesGFP, rapor gelmedi), BlueStacks 5 → D:\Programlar\BlueStacks (Yusuf seçti; Hypervisor yeniden başlatma isterse önce sor), sherpa-onnx modeli indirme (Yusuf onayıyla, docs/KONUSMA-TANIMA-KURULUM.md), ko-KR/ja-JP/zh-CN ses paketi kontrolü.
+
+## Doğrulama notu (2026-10-21, toplu verifier A–E) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- Analyze/format temiz, tam paket 1202 geçti (7 gerçek-JS testi LIBQUICKJSC_TEST_PATH olmadan atlanır; motorla 41 test geçti).
+- JS çalıştırıcı sınırları: döngü bekçisi dürüst kod içindir; kullanıcı kodu bekçi değişkenlerini değiştirip atlatabilir, süslü parantezsiz ok fonksiyonu özyinelemesi ve ReDoS bekçisizdir (Dart 5 sn zaman aşımı, arka plan isolate bitene kadar sürer); `.constructor` engeli dize birleştirmeyle aşılabilir. Ağ ve dosya erişimi yoktur. Tek kullanıcılı yerel uygulama olduğu için kabul edildi; sertleştirme istenirse ayrı iş.
+- SOZLESME.md "yeni paket ekleme" kuralına flutter_js ile aykırı gidildi (görev gereği); Yusuf onayı bekliyor. Android derlemesi jitpack'ten bağımlılık çeker (denenmedi).

@@ -20,24 +20,46 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_modlari_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
+import 'ekranlar/eller_serbest_ekrani.dart';
+import 'ekranlar/gorsel_kelime_ekrani.dart';
+import 'ekranlar/kelime_bulutu_ekrani.dart';
+import 'ekranlar/meydan_ekrani.dart';
+import 'ekranlar/ogrenme_yolu_ekrani.dart';
+import 'ekranlar/oneri_ekrani.dart';
+import 'ekranlar/ozet_ekrani.dart';
+import 'ekranlar/sure_ekrani.dart';
+import 'ekranlar/senaryo_ekrani.dart';
+import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
+import 'ekranlar/halat_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
+import 'ekranlar/projeler_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/pratik_etkinlikleri.dart';
 import 'ekranlar/pratik_merkezi_ekrani.dart';
+import 'ekranlar/radyo_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/yer_imleri_ekrani.dart';
 import 'ekranlar/sertifika_ekrani.dart';
 import 'ekranlar/sinav_ekrani.dart';
 import 'ekranlar/unite_ozeti_ekrani.dart';
+import 'ekranlar/unite_rehberi_ekrani.dart';
 import 'ekranlar/yerlestirme_ekrani.dart';
+import 'ekranlar/satranc/araclar.dart';
+import 'ekranlar/satranc/bulmacalar.dart';
+import 'ekranlar/satranc/mac.dart';
+import 'ekranlar/satranc/merkez.dart';
+import 'ekranlar/satranc/oyun_sonu.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
@@ -98,7 +120,41 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
       GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
-      GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
+      GoRoute(
+        path: '/sozluk',
+        // q=<metin>: arama kutusu bu metinle açılır (ÖZELLİK 81, 72).
+        builder: (c, s) =>
+            SozlukEkrani(baslangicSorgu: s.uri.queryParameters['q']),
+      ),
+      GoRoute(
+        path: '/calisma-modlari',
+        builder: (c, s) => const CalismaModlariEkrani(),
+      ),
+      GoRoute(
+        path: '/calisma-modu',
+        // kurs=<id>&unite=<indeks>: ünitenin dört modlu çalışması (ÖZELLİK 78).
+        builder: (c, s) => CalismaModuEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/kelime-oynatici',
+        builder: (c, s) => const KelimeOynaticiEkrani(),
+      ),
+      GoRoute(
+        path: '/halat',
+        // tohum=<sayı>: soru sırası ve bilgisayar cevapları sabitlenir (test).
+        builder: (c, s) => HalatEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(path: '/oneri', builder: (c, s) => const OneriEkrani()),
+      GoRoute(
+        path: '/ogrenme-yolu',
+        builder: (c, s) => const OgrenmeYoluEkrani(),
+      ),
+      GoRoute(path: '/yer-imleri', builder: (c, s) => const YerImleriEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
@@ -115,6 +171,17 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/ornekler',
         builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(path: '/projeler', builder: (c, s) => const ProjelerEkrani()),
+      GoRoute(
+        path: '/proje/:id',
+        builder: (c, s) =>
+            ProjeEditorEkrani(projeId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ornek-basvuru',
+        builder: (c, s) =>
+            OrnekBasvuruEkrani(dilAdi: s.uri.queryParameters['dil']),
       ),
       GoRoute(
         path: '/ornek/:id',
@@ -155,6 +222,21 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/unite-rehberi',
+        builder: (c, s) => UniteRehberiEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/efsanevi',
+        // kurs=<id>&unite=<indeks>: efsanevi zor tekrar (ipucusuz, süreli).
+        builder: (c, s) => EfsaneviEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
         path: '/sertifika',
         builder: (c, s) =>
             SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
@@ -175,6 +257,122 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
+      ),
+      // Meydan okuma ve rekorlar (49), ay/yıl özeti (51), süre takibi ve süreli
+      // oturum (59, 80), görsel kelimeler (58).
+      GoRoute(path: '/meydan', builder: (c, s) => const MeydanEkrani()),
+      GoRoute(path: '/ozet', builder: (c, s) => const OzetEkrani()),
+      GoRoute(path: '/sure', builder: (c, s) => const SureEkrani()),
+      GoRoute(
+        path: '/sure/oturum',
+        builder: (c, s) => SureliOturumEkrani(
+          dakika: int.tryParse(s.uri.queryParameters['dk'] ?? '') ?? 5,
+        ),
+      ),
+      GoRoute(path: '/gorsel', builder: (c, s) => const GorselKelimeEkrani()),
+      // Eller serbest sesli mod (ÖZELLİK 64), senaryolu konuşma (65) ve kelime
+      // bulutu (66).
+      GoRoute(
+        path: '/eller-serbest',
+        builder: (c, s) => const EllerSerbestEkrani(),
+      ),
+      GoRoute(
+        path: '/senaryolar',
+        builder: (c, s) => const SenaryoListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/senaryo/:id',
+        builder: (c, s) =>
+            SenaryoEkrani(senaryoId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/kelime-bulutu',
+        builder: (c, s) => const KelimeBulutuEkrani(),
+      ),
+      // Dinleme radyosu (ÖZELLİK 46).
+      GoRoute(path: '/radyo', builder: (c, s) => const RadyoListesiEkrani()),
+      GoRoute(
+        path: '/radyo/bolum',
+        builder: (c, s) => RadyoBolumEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      // Satranç modülü (ÖZELLİK 47, 52-57).
+      GoRoute(
+        path: '/satranc',
+        builder: (c, s) => const SatrancMerkeziEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/gunluk',
+        builder: (c, s) => const GunlukBulmacaEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/tema',
+        builder: (c, s) => const TemaListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/tema/:id',
+        builder: (c, s) =>
+            TemaBulmacaEkrani(tema: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/yanlislar',
+        builder: (c, s) => const YanlislarimEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/mac',
+        builder: (c, s) => const MiniMacSecimiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/mac/:id',
+        builder: (c, s) => MiniMacEkrani(konumId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/inceleme',
+        builder: (c, s) => const IncelemeEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/serbest',
+        builder: (c, s) => const SerbestTahtaEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/oyunsonu',
+        builder: (c, s) => const OyunSonuListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/oyunsonu/:id',
+        builder: (c, s) =>
+            OyunSonuEkrani(konumId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/koordinat',
+        builder: (c, s) => const KoordinatEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/solo',
+        builder: (c, s) => const SoloListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/solo/:id',
+        builder: (c, s) => SoloEkrani(id: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/analiz',
+        builder: (c, s) => const AnalizListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/analiz/:id',
+        builder: (c, s) => AnalizEkrani(id: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/meydan/:id',
+        builder: (c, s) =>
+            DersMeydanEkrani(dersId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/ustalik',
+        builder: (c, s) => const UstalikEkrani(),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

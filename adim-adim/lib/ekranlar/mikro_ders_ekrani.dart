@@ -53,6 +53,9 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Ekran açıldığından beri geçen süre (günlük süre takibi, ÖZELLİK 80).
+  final Stopwatch _sure = Stopwatch()..start();
+
   bool get _quiz => widget.mod == 'quiz';
 
   /// Dönem dersi kipi ve geçerli dönem türü (aksi halde null).
@@ -151,6 +154,8 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
         : _quiz
         ? await bildirici.quizBitir(widget.dersId ?? '', dogru, toplam)
         : await bildirici.mikroBitir(dogru, toplam);
+    // Harcanan süre günlük süreye eklenir (bir oturumda en çok 1 saat).
+    await bildirici.sureEkle(_sure.elapsed.inSeconds.clamp(0, 3600));
     if (!mounted) return;
     setState(
       () => _ozet = (

@@ -88,7 +88,12 @@ void main() {
     expect((await depo.yukle()).atlananDersler, {'yk-1.u1.d1'});
 
     await dokun(tester, find.byKey(const ValueKey('yerlestirme-don')));
-    // Ünite 1 tamam, sıradaki Ders 2; Ders 3 hâlâ kilitli.
+    // Ünite 1 tamam, sıradaki Ders 2; Ders 3 hâlâ kilitli (tembel liste: görünene kadar kaydır).
+    await tester.scrollUntilVisible(
+      find.textContaining('Kilitli · önceki dersi bitir'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.textContaining('Kilitli · önceki dersi bitir'), findsOneWidget);
     expect(find.text('Başla'), findsOneWidget);
     expect(find.byKey(const ValueKey('yerlestirme-yk-1')), findsOneWidget);

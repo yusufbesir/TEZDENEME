@@ -11,10 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/maskot_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/pratik.dart';
+import '../motor/sure.dart';
 import '../tema/tema.dart';
 
 class PratikMerkeziEkrani extends ConsumerWidget {
@@ -71,6 +73,7 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: Olcu.b2),
+                MaskotKarti(durum: durum, bugun: ref.watch(bugunProvider)),
                 kart(
                   anahtar: const ValueKey('pratik-hatalarim'),
                   simge: Icons.rule,
@@ -97,6 +100,14 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                   onTap: () => context.push('/pratik/tur'),
                 ),
                 kart(
+                  anahtar: const ValueKey('pratik-sureli'),
+                  simge: Icons.hourglass_bottom,
+                  baslik: 'Süreli kelime oturumu',
+                  ayrinti:
+                      '5, 10 ya da 15 dk · ${Sure.bugunMetni(durum, ref.watch(bugunProvider))}',
+                  onTap: () => context.push('/sure'),
+                ),
+                kart(
                   anahtar: const ValueKey('pratik-kartlar'),
                   simge: Icons.flip_outlined,
                   baslik: 'Kelime kartları',
@@ -105,6 +116,58 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                       : '$kelimeSayisi kelime hazır',
                   onTap: () => context.push('/pratik/kartlar'),
                 ),
+                kart(
+                  anahtar: const ValueKey('pratik-halat'),
+                  simge: Icons.sports_kabaddi_outlined,
+                  baslik: 'Halat çekme',
+                  ayrinti: 'Bilgisayara karşı bilgi yarışı, çevrimdışı',
+                  onTap: () => context.push('/halat'),
+                ),
+                kart(
+                  anahtar: const ValueKey('pratik-hafiza'),
+                  simge: Icons.psychology_outlined,
+                  baslik: 'Hafıza puanı ve çalışma modları',
+                  ayrinti: 'Ünite başına puan; kart, yazma, eşleştirme, test',
+                  onTap: () => context.push('/calisma-modlari'),
+                ),
+                // Yalnız dil kurslarında: sesli etkinlikler.
+                if (durum.alan == 'dil') ...[
+                  kart(
+                    anahtar: const ValueKey('pratik-gorsel'),
+                    simge: Icons.image_outlined,
+                    baslik: 'Görsel kelimeler',
+                    ayrinti: 'Simgeli kartlar, konu oyunları',
+                    onTap: () => context.push('/gorsel'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-radyo'),
+                    simge: Icons.radio,
+                    baslik: 'Dinleme radyosu',
+                    ayrinti: 'Kısa sesli bölümler: dinle, eşleştir, sırala',
+                    onTap: () => context.push('/radyo'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-oynatici'),
+                    simge: Icons.queue_music_outlined,
+                    baslik: 'Kelime defteri oynatıcı',
+                    ayrinti: 'Kelimeleri sırayla sesli çalar',
+                    onTap: () => context.push('/kelime-oynatici'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-eller-serbest'),
+                    simge: Icons.headset_mic_outlined,
+                    baslik: 'Eller serbest',
+                    ayrinti: 'Ekrana bakmadan: dinle, tekrar et',
+                    onTap: () => context.push('/eller-serbest'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-senaryo'),
+                    simge: Icons.forum_outlined,
+                    baslik: 'Senaryolu konuşma',
+                    ayrinti: 'Kısa sohbetler: seç, yaz ya da söyle',
+                    onTap: () => context.push('/senaryolar'),
+                  ),
+                ],
               ],
             ),
           ),

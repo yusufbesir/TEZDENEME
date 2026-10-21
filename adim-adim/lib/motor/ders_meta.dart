@@ -82,10 +82,36 @@ class DersMeta {
       case Hamle(:final oyuncuHamleleri):
         puan = oyuncuHamleleri.length >= 2 ? 4 : 3;
         sn = 30 + 20 * oyuncuHamleleri.length;
+      case KodBoslukDoldur(:final kod, :final dogru):
+        puan = dogru.length >= 3 ? 3 : 2;
+        sn = 20 + 8 * dogru.length + kod.length ~/ 10;
+      case KodParcaSec(:final kod):
+        puan = 2;
+        sn = 20 + kod.length ~/ 10;
+      case KodYaz(:final kod):
+        puan = 3;
+        sn = 25 + kod.length ~/ 10;
+      case KodCikti(:final kod):
+        puan = 3;
+        sn = 30 + kod.length ~/ 6;
+      case KodCalistir(:final cozum):
+        puan = 4;
+        sn = 90 + cozum.length ~/ 2;
     }
     sn += a.soru.length ~/ 12;
     final z = puan <= 1 ? Zorluk.kolay : (puan <= 3 ? Zorluk.orta : Zorluk.zor);
     return AdimMeta(zorluk: z, saniye: sn);
+  }
+
+  /// Dersin ortalama zorluk puanı: adımların zorluğu kolay 1, orta 2, zor 3
+  /// olarak ortalanır; alıştırması olmayan ders 0 (ÖZELLİK 50 karşılaştırması).
+  static double dersZorlugu(Ders d) {
+    if (d.alistirmalar.isEmpty) return 0;
+    final t = d.alistirmalar.fold<int>(
+      0,
+      (s, a) => s + adim(a).zorluk.index + 1,
+    );
+    return t / d.alistirmalar.length;
   }
 
   /// Dersin tüm alıştırmalarının tahmini süresi (saniye).

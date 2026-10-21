@@ -18,7 +18,11 @@ import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/kelime_bulutu.dart';
+import '../motor/meydan.dart';
 import '../motor/motor.dart';
+import '../motor/oneri.dart';
+import '../motor/sure.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
 
@@ -50,6 +54,11 @@ class ProfilEkrani extends ConsumerWidget {
     final degerler = [for (final g in gunler) durum.gunlukXp[g.gun] ?? 0];
     final enCok = degerler.fold<int>(0, (a, b) => a > b ? a : b);
     final bitenDers = durum.tamamlanan.values.where((v) => v > 0).length;
+    final meydan = Meydan.aylik(durum, bugun);
+    final oneriler = Oneriler.uret(durum, kurslar, bugun, enCok: 1);
+    final ogrenilenKelime = durum.alan == 'dil'
+        ? KelimeBulutu.ogrenilenSayisi(durum, kurslar)
+        : 0;
 
     return SafeArea(
       child: SayfaGovdesi(
@@ -98,6 +107,84 @@ class ProfilEkrani extends ConsumerWidget {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/pratik'),
             ),
+            // Meydan okuma (49, 51) ve süre takibi (59, 80) satırları.
+            ListTile(
+              key: const ValueKey('profil-meydan'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.flag_outlined, color: r.ana),
+              title: const Text('Meydan okuma ve rekorlar'),
+              subtitle: Text(
+                'Bu ay ${meydan.ilerleme}/${meydan.hedef} ders',
+                key: const ValueKey('profil-meydan-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/meydan'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-sure'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.timer_outlined, color: r.ana),
+              title: const Text('Süre takibi'),
+              subtitle: Text(
+                Sure.bugunMetni(durum, bugun),
+                key: const ValueKey('profil-sure-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/sure'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-oneri'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.tips_and_updates_outlined, color: r.ana),
+              title: const Text('Sana öneri'),
+              subtitle: Text(
+                oneriler.isEmpty ? 'Şimdilik öneri yok' : oneriler.first.baslik,
+                key: const ValueKey('profil-oneri-ozet'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/oneri'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-ogrenme-yolu'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.alt_route, color: r.ana),
+              title: const Text('Öğrenme yolu'),
+              subtitle: Text(
+                'Yol, seviye ve kurs ilerlemen',
+                key: const ValueKey('profil-yol-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/ogrenme-yolu'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-yer-imleri'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.bookmarks_outlined, color: r.ana),
+              title: const Text('Yer imleri'),
+              subtitle: Text(
+                durum.yerImleri.isEmpty
+                    ? 'Adımları ve sözlük maddelerini kaydet'
+                    : '${durum.yerImleri.length} yer imi',
+                key: const ValueKey('profil-yer-imi-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/yer-imleri'),
+            ),
+            if (durum.alan == 'dil')
+              ListTile(
+                key: const ValueKey('profil-kelime-bulutu'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.cloud_outlined, color: r.ana),
+                title: const Text('Kelime bulutu'),
+                subtitle: Text(
+                  '$ogrenilenKelime kelime öğrendin',
+                  key: const ValueKey('profil-kelime-sayisi'),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/kelime-bulutu'),
+              ),
             const SizedBox(height: Olcu.b2),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),

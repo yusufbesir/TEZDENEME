@@ -6,7 +6,18 @@
 /// tablo (yeni: çekim tablosundaki boş hücreleri doldurur), isaretle (yeni:
 /// cümlede doğru kelime(ler)e dokunur), hamle (yeni: oyun tahtasında doğru
 /// hamleyi ya da hamle dizisini oynar; ilk sürümde satranç).
+///
+/// Kodda etkileşimli türler (ÖZELLİK 68, 69): kodbosluk (birden çok boşluğa
+/// parça yerleştirir), kodsec (koddaki doğru satır(lar)a dokunur), kodyaz
+/// (boşluğa anahtar sözcüğü yazar), kodcikti (kodun çıktısını yazar; Python
+/// dahil, çalıştırma yok), kodcalistir (JS kodu cihazdaki motorda çalışır,
+/// çıktı beklenenle karşılaştırılır; motor yoksa çözüm kodunun çıktısı
+/// tahmin edilir).
 library;
+
+import 'kod_calisma.dart';
+
+export 'kod_calisma.dart';
 
 /// Dinle/Soyle alıştırmalarında konuşma ve tanıma dili (BCP-47) varsayılanı.
 /// Korece/Japonca/Çince kursları 'ko-KR' / 'ja-JP' / 'zh-CN' verir.
@@ -152,6 +163,55 @@ sealed class Alistirma {
                 }
               : const {},
           oyun: j['oyun'] as String? ?? Hamle.varsayilanOyun,
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'kodbosluk':
+        return KodBoslukDoldur(
+          soru: soru,
+          kod: j['kod'] as String,
+          dogru: metinler('dogru'),
+          secenekler: metinler('secenekler'),
+          dil: j['dil'] as String? ?? 'js',
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'kodsec':
+        return KodParcaSec(
+          soru: soru,
+          kod: j['kod'] as String,
+          dogru: (j['dogru'] as List).map((e) => e as int).toList(),
+          dil: j['dil'] as String? ?? 'js',
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'kodyaz':
+        return KodYaz(
+          soru: soru,
+          kod: j['kod'] as String,
+          cevaplar: metinler('cevaplar'),
+          dil: j['dil'] as String? ?? 'js',
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'kodcikti':
+        return KodCikti(
+          soru: soru,
+          kod: j['kod'] as String,
+          beklenenCikti: j['beklenenCikti'] as String,
+          dil: j['dil'] as String? ?? 'js',
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'kodcalistir':
+        return KodCalistir(
+          soru: soru,
+          baslangic: j['baslangic'] as String? ?? '',
+          beklenenCikti: j['beklenenCikti'] as String,
+          cozum: j['cozum'] as String,
+          gerekenler: j['gerekenler'] == null
+              ? const []
+              : metinler('gerekenler'),
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -495,6 +555,188 @@ class Hamle extends Alistirma {
     if (matKabul) 'matKabul': true,
     if (hataMesajlari.isNotEmpty) 'hataMesajlari': hataMesajlari,
     if (oyun != varsayilanOyun) 'oyun': oyun,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Kodda çoklu boşluk (ÖZELLİK 68): `kod` içinde bir ya da daha çok `___`;
+/// `dogru[i]` i. boşluğun parçasıdır. `secenekler` parça bankasıdır (doğru
+/// parçaların hepsi ve çeldiriciler); bir parça birden çok kez kullanılabilir.
+/// Cevap: boşluk sırasıyla [List<String>].
+class KodBoslukDoldur extends Alistirma {
+  const KodBoslukDoldur({
+    required super.soru,
+    required this.kod,
+    required this.dogru,
+    required this.secenekler,
+    this.dil = 'js',
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String kod;
+  final List<String> dogru;
+  final List<String> secenekler;
+  final String dil;
+
+  /// Koddaki boşluk sayısı.
+  int get boslukSayisi => '___'.allMatches(kod).length;
+
+  /// Boşlukları sırayla [parcalar] ile doldurur; null parça `___` kalır.
+  String doldur(List<String?> parcalar) {
+    final b = StringBuffer();
+    final bolumler = kod.split('___');
+    for (var i = 0; i < bolumler.length; i++) {
+      b.write(bolumler[i]);
+      if (i < bolumler.length - 1) {
+        b.write(i < parcalar.length ? (parcalar[i] ?? '___') : '___');
+      }
+    }
+    return b.toString();
+  }
+
+  @override
+  String get tur => 'kodbosluk';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'kod': kod,
+    'dogru': dogru,
+    'secenekler': secenekler,
+    'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Kod parçası seçme (ÖZELLİK 68): `kod` satırlara bölünür; `dogru` doğru
+/// satırların indeksleridir (0'dan; birden çok olabilir). Cevap: dokunulan
+/// satır indekslerinin [List<int>]'i (sıra önemsiz).
+class KodParcaSec extends Alistirma {
+  const KodParcaSec({
+    required super.soru,
+    required this.kod,
+    required this.dogru,
+    this.dil = 'js',
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String kod;
+  final List<int> dogru;
+  final String dil;
+
+  List<String> get satirlar => kod.split('\n');
+
+  @override
+  String get tur => 'kodsec';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'kod': kod,
+    'dogru': dogru,
+    'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Anahtar sözcüğü yazma / heceleme (ÖZELLİK 68): `kod` içinde tek `___`;
+/// kullanıcı boşluğa geleni yazar. Karşılaştırma büyük/küçük harfe
+/// DUYARLIDIR (kod dilleri öyledir); baştaki/sondaki boşluk yok sayılır.
+/// Cevap: [String].
+class KodYaz extends Alistirma {
+  const KodYaz({
+    required super.soru,
+    required this.kod,
+    required this.cevaplar,
+    this.dil = 'js',
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String kod;
+  final List<String> cevaplar;
+  final String dil;
+
+  @override
+  String get tur => 'kodyaz';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'kod': kod,
+    'cevaplar': cevaplar,
+    'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Çıktıyı yaz (ÖZELLİK 69, Python dahil): `kod` gösterilir, kullanıcı
+/// çıktısını yazar; [ciktiAyni] ile `beklenenCikti`ya karşılaştırılır. Kod
+/// ÇALIŞTIRILMAZ. Cevap: [String].
+class KodCikti extends Alistirma {
+  const KodCikti({
+    required super.soru,
+    required this.kod,
+    required this.beklenenCikti,
+    this.dil = 'js',
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String kod;
+  final String beklenenCikti;
+  final String dil;
+
+  @override
+  String get tur => 'kodcikti';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'kod': kod,
+    'beklenenCikti': beklenenCikti,
+    'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Çalıştırılabilir ders (ÖZELLİK 69, yalnız JavaScript): kullanıcı
+/// `baslangic` kodunu düzenler ve cihazdaki JS motorunda çalıştırır;
+/// `console.log` çıktısı `beklenenCikti` ile karşılaştırılır ve koddaki
+/// `gerekenler` (ör. 'for') aranır. `cozum` örnek çözümdür (ipucu ve motor
+/// yokken çıktı tahmini için). Cevap: [KodCalismaSonucu] (motorla) ya da
+/// [String] (motor yokken çözüm kodunun çıktı tahmini).
+class KodCalistir extends Alistirma {
+  const KodCalistir({
+    required super.soru,
+    required this.baslangic,
+    required this.beklenenCikti,
+    required this.cozum,
+    this.gerekenler = const [],
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String baslangic;
+  final String beklenenCikti;
+  final String cozum;
+  final List<String> gerekenler;
+
+  /// Yalnız JavaScript çalıştırılır.
+  String get dil => 'js';
+
+  @override
+  String get tur => 'kodcalistir';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'baslangic': baslangic,
+    'beklenenCikti': beklenenCikti,
+    'cozum': cozum,
+    if (gerekenler.isNotEmpty) 'gerekenler': gerekenler,
     'aciklama': aciklama,
     if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };

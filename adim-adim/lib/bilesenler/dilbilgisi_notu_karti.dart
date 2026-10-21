@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../tema/tema.dart';
+import 'sozluklu_secim.dart';
 
 /// Ders başında, alıştırmalardan önce gösterilen kısa dilbilgisi notu kartı.
 /// Kademeli ipucundan ayrıdır (ipucu yanlış cevaptan sonra gelir).
@@ -75,7 +76,9 @@ class DilbilgisiNotuKarti extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: Olcu.b2),
-                          Text(not, style: yazi.bodyLarge),
+                          SozlukluSecim(
+                            child: Text(not, style: yazi.bodyLarge),
+                          ),
                         ],
                       ),
                     ),

@@ -14,17 +14,26 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/fiil_cekim_tablosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/yer_imi_dugmesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/kelime_defteri.dart';
+import '../motor/yer_imi.dart';
+import '../sozluk/dil_tanimi.dart';
 import '../sozluk/sozluk.dart';
 import '../tema/tema.dart';
 
 class SozlukEkrani extends ConsumerStatefulWidget {
-  const SozlukEkrani({super.key});
+  /// [baslangicSorgu]: arama kutusunun ilk metni (ÖZELLİK 81: metin seçerek
+  /// sözlükte aç, yer imi açılışı).
+  const SozlukEkrani({super.key, this.baslangicSorgu});
+  final String? baslangicSorgu;
 
   @override
   ConsumerState<SozlukEkrani> createState() => _SozlukDurumu();
@@ -43,6 +52,7 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   @override
   void initState() {
     super.initState();
+    _sorgu.text = widget.baslangicSorgu ?? '';
     _sorgu.addListener(() => setState(() {}));
   }
 
@@ -110,6 +120,36 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
           onPressed: () =>
               context.canPop() ? context.pop() : context.go('/yol'),
         ),
+        actions: [
+          // Kelime defterini CSV olarak panoya kopyalar (ÖZELLİK 81).
+          IconButton(
+            key: const ValueKey('sozluk-csv'),
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'Kelime defterini CSV olarak kopyala',
+            onPressed: () async {
+              final mesajci = ScaffoldMessenger.of(context);
+              final durum =
+                  ref.read(durumProvider).value ?? const OgrenciDurumu();
+              final kurslar = ref.read(alanKurslariProvider);
+              final n = KelimeDefteri.sayi(durum, kurslar);
+              await Clipboard.setData(
+                ClipboardData(text: KelimeDefteri.csv(durum, kurslar)),
+              );
+              mesajci
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      n == 0
+                          ? 'Kelime defteri boş; yalnız başlık kopyalandı'
+                          : 'Kelime defteri kopyalandı: $n kelime (CSV)',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SayfaGovdesi(
@@ -147,18 +187,11 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                 child: Row(
                   children: [
                     cip('Tümü', null),
-                    const SizedBox(width: Olcu.b1),
-                    cip('İngilizce', 'en'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Almanca', 'de'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Korece', 'ko'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Japonca', 'ja'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Çince', 'zh'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Kod', 'kod'),
+                    // Dil çipleri dil tanımları tablosundan gelir (ÖZELLİK 60).
+                    for (final t in dilTanimlari) ...[
+                      const SizedBox(width: Olcu.b1),
+                      cip(t.ad, t.kod),
+                    ],
                   ],
                 ),
               ),
@@ -230,13 +263,10 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
 }
 
 /// Sözlük dil kodundan TTS dili ('ko' → 'ko-KR'); bilinmeyen 'en-US'.
-String _sesDili(String dil) => switch (dil) {
-  'de' => 'de-DE',
-  'ko' => 'ko-KR',
-  'ja' => 'ja-JP',
-  'zh' => 'zh-CN',
-  _ => 'en-US',
-};
+String _sesDili(String dil) {
+  final t = dilTanimi(dil);
+  return (t == null || t.ttsDili.isEmpty) ? 'en-US' : t.ttsDili;
+}
 
 /// Okunacak metin: Korece/Japonca/Çince maddelerde sondaki "(romanizasyon)"
 /// atılır; yalnız hedef yazı okunur.
@@ -263,8 +293,13 @@ class _MaddeSatiri extends ConsumerWidget {
     final not = ref.watch(
       durumProvider.select((d) => d.value?.kelimeNotlari[kartId]),
     );
+    // Fiil maddesi (ÖZELLİK 61): doğrulanmış çekimi varsa dokununca tablo açılır.
+    final cekim = ref.watch(fiilCekimleriProvider).bul(madde.kelime, madde.dil);
     return ListTile(
       dense: false,
+      onTap: cekim == null
+          ? null
+          : () => fiilCekimiGoster(context, cekim, anlam: madde.anlam),
       leading: sesli
           ? IconButton(
               icon: const Icon(Icons.volume_up_outlined),
@@ -283,6 +318,21 @@ class _MaddeSatiri extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(madde.anlam),
+          if (cekim != null)
+            Row(
+              key: ValueKey('fiil-cekim-${madde.kelime}'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.table_chart_outlined, size: 16, color: r.ana),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    'Çekim tablosu için dokun',
+                    style: yazi.bodySmall?.copyWith(color: r.ana),
+                  ),
+                ),
+              ],
+            ),
           if (ingilizce && madde.kokFarkli)
             Text(
               'kök: ${madde.kok}',
@@ -321,6 +371,9 @@ class _MaddeSatiri extends ConsumerWidget {
             tooltip: not == null ? 'Not' : 'Notu düzenle',
             visualDensity: VisualDensity.compact,
             onPressed: () => notDuzenle(context, ref, kartId, not),
+          ),
+          YerImiDugmesi(
+            anahtar: YerImleri.sozlukAnahtari(kartId, madde.kelime),
           ),
           kartlarda
               ? IconButton(

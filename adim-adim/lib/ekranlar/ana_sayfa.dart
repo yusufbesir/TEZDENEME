@@ -32,6 +32,7 @@ import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/ders_meta.dart';
+import '../motor/efsanevi.dart';
 import '../motor/motor.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
@@ -299,6 +300,20 @@ class _YolListesi extends StatelessWidget {
               onPressed: alistirmaVar ? () => context.push('/mikro') : null,
             ),
           ),
+          // Satranç modülü girişi (ÖZELLİK 47): yalnız Oyunlar alanında; yeni
+          // kart eklemek yerine mevcut düğme satırına eklenir.
+          if (durum.alan == 'oyun') ...[
+            const SizedBox(height: Olcu.b1),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: Olcu.hedef),
+              child: OutlinedButton.icon(
+                key: const ValueKey('satranc-merkezi'),
+                icon: const Icon(Icons.extension_outlined),
+                label: const Text('Satranç merkezi'),
+                onPressed: () => context.push('/satranc'),
+              ),
+            ),
+          ],
           // Günün / haftanın / ayın dersi (ÖZELLİK 63); tamamlanmış ders yoksa
           // kendisi boş çizer.
           if (Motor.donemDersiVar(durum, kurslar)) ...[
@@ -402,30 +417,58 @@ class _YolListesi extends StatelessWidget {
         final biten = unite.dersler
             .where((d) => Motor.dersBitmis(durum, d.id))
             .length;
+        final altin = Efsanevi.altinMi(durum, unite);
         ogeler.add(
-          Semantics(
-            header: true,
-            label: '${unite.ad}. $biten / ${unite.dersler.length} ders tamam.',
-            excludeSemantics: true,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Olcu.b2,
-                vertical: Olcu.b1,
-              ),
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: r.ana, width: 3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.flag, color: r.ana),
-                  const SizedBox(width: Olcu.b1),
-                  Expanded(child: Text(unite.ad, style: yazi.titleMedium)),
-                  Text(
-                    '$biten/${unite.dersler.length}',
-                    style: yazi.labelLarge?.copyWith(color: r.metinIkincil),
+          Container(
+            padding: const EdgeInsets.only(left: Olcu.b2),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: r.ana, width: 3)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    label:
+                        '${unite.ad}. $biten / ${unite.dersler.length} ders '
+                        'tamam.${altin ? ' Altın ünite.' : ''}',
+                    excludeSemantics: true,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: Olcu.b1),
+                      child: Row(
+                        children: [
+                          Icon(
+                            altin ? Icons.workspace_premium : Icons.flag,
+                            color: altin ? r.vurgu : r.ana,
+                          ),
+                          const SizedBox(width: Olcu.b1),
+                          Expanded(
+                            child: Text(unite.ad, style: yazi.titleMedium),
+                          ),
+                          Text(
+                            '$biten/${unite.dersler.length}',
+                            style: yazi.labelLarge?.copyWith(
+                              color: r.metinIkincil,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+                IconButton(
+                  key: ValueKey('unite-rehberi-${unite.id}'),
+                  tooltip: 'Ünite rehberi',
+                  constraints: const BoxConstraints(
+                    minWidth: Olcu.hedef,
+                    minHeight: Olcu.hedef,
+                  ),
+                  icon: const Icon(Icons.auto_stories_outlined),
+                  onPressed: () => context.push(
+                    '/unite-rehberi?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -480,7 +523,8 @@ class _YolListesi extends StatelessWidget {
         final sinavAcik = Motor.araSinavAcik(durum, kurs, ui);
         final ozetAcik =
             Motor.uniteBitmis(durum, unite) && !Motor.uniteOzeti(kurs, ui).bos;
-        if (sinavAcik || ozetAcik) {
+        final efsaneAcik = Efsanevi.acik(durum, kurs, ui);
+        if (sinavAcik || ozetAcik || efsaneAcik) {
           final sonuc = durum.araSinavlar[unite.id];
           ogeler.add(
             Align(
@@ -520,6 +564,24 @@ class _YolListesi extends StatelessWidget {
                       ),
                       icon: const Icon(Icons.summarize_outlined),
                       label: const Text('Ünite özeti'),
+                    ),
+                  if (efsaneAcik)
+                    OutlinedButton.icon(
+                      key: ValueKey('efsanevi-${unite.id}'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => context.push(
+                        '/efsanevi?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                      ),
+                      icon: Icon(
+                        altin
+                            ? Icons.workspace_premium
+                            : Icons.local_fire_department_outlined,
+                      ),
+                      label: Text(
+                        altin ? 'Efsanevi tekrar (altın)' : 'Efsanevi tekrar',
+                      ),
                     ),
                 ],
               ),
@@ -737,7 +799,19 @@ class _OrnekProgramlarKarti extends StatelessWidget {
             context,
           ).textTheme.bodySmall?.copyWith(color: r.metinIkincil),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        // Projeler ve oyun alanı (ÖZELLİK 70): yeni kart yerine bu satırda.
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              key: const ValueKey('projeler-dugmesi'),
+              tooltip: 'Projeler ve oyun alanı',
+              icon: const Icon(Icons.construction),
+              onPressed: () => context.push('/projeler'),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
         onTap: () => context.push('/ornekler'),
       ),
     );

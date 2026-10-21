@@ -527,6 +527,18 @@ class Konum {
     return _oyna(h);
   }
 
+  /// Aynı taşlarla sırayı karşı tarafa geçirir (boş hamle): geçerken karesi
+  /// silinir, rok hakları korunur. FEN denetimi YAPILMAZ; yalnız Solo
+  /// bulmaca gibi tek taraflı oynanan çalışmalarda kullanılır.
+  Konum sirayiDevret() => Konum._(
+    _t,
+    !beyazSirada,
+    rokHaklari,
+    null,
+    yariHamle,
+    beyazSirada ? hamleNo : hamleNo + 1,
+  );
+
   /// UCI metnine ('e2e4', 'e7e8q') karşılık gelen yasal hamle; yoksa null.
   SatrancHamlesi? uciBul(String uci) {
     final u = uci.trim().toLowerCase();

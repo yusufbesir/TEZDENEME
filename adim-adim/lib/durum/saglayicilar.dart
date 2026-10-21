@@ -16,11 +16,24 @@ import '../depo/depo.dart';
 import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../model/satranc_durumu.dart';
+import '../motor/efsanevi.dart';
+import '../motor/kod_calistirici.dart';
+import '../motor/kod_projesi.dart';
+import '../motor/meydan.dart';
 import '../motor/motor.dart';
 import '../motor/pratik.dart';
+import '../motor/satranc_calisma.dart';
+import '../motor/senaryo.dart';
+import '../motor/sure.dart';
+import '../motor/yer_imi.dart';
 import '../servis/bildirim.dart';
+import '../servis/js_motoru.dart';
+import '../servis/proje_aktarici.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
+import '../sozluk/dil_paketi.dart';
+import '../sozluk/fiil_cekimi.dart';
 import '../sozluk/sozluk.dart';
 import '../yarisma/model.dart';
 
@@ -34,6 +47,17 @@ final sesProvider = Provider<Ses>((ref) => Ses());
 /// Konuşma tanıma servisi. Gerçek motor (sherpa-onnx) `main.dart` ya da
 /// uygulama kökünde override edilir; varsayılan "motor yok".
 final konusmaProvider = Provider<KonusmaTanima>((ref) => const KonusmaYok());
+
+/// Kod çalıştırıcı (ÖZELLİK 69): varsayılan cihazdaki QuickJS; testlerde
+/// sahte uygulamayla override edilir. Motor yüklenemezse sonuç "motor yok".
+final kodCalistiriciProvider = Provider<KodCalistirici>(
+  (ref) => const QuickJsCalistirici(),
+);
+
+/// Projeyi .html dosyası olarak kaydeden servis (ÖZELLİK 70); testte sahte.
+final projeAktariciProvider = Provider<ProjeAktarici>(
+  (ref) => const DosyaProjeAktarici(),
+);
 
 final bildirimProvider = Provider<BildirimServisi>(
   (ref) => const GercekBildirim(),
@@ -52,9 +76,22 @@ final kayitHatasiProvider = NotifierProvider<KayitHatasi, String?>(
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
 
-/// Gömülü sözlük: kurs listesinden (varsayılan tumKurslar) bir kez üretilir.
+/// Dil başına sözlük veri paketleri (ÖZELLİK 60): her dilin maddeleri ayrı
+/// yükleme biriminde, ilk istendiğinde üretilir.
+final dilPaketleriProvider = Provider<DilPaketleri>(
+  (ref) => DilPaketleri(ref.watch(kurslarProvider)),
+);
+
+/// Gömülü sözlük: dil paketlerinin birleşimi (kurs listesi varsayılan
+/// tumKurslar); `Sozluk.kurslardan` ile aynı maddeleri verir.
 final sozlukProvider = Provider<Sozluk>(
-  (ref) => Sozluk.kurslardan(ref.watch(kurslarProvider)),
+  (ref) => ref.watch(dilPaketleriProvider).sozluk,
+);
+
+/// Fiil çekim sözlüğü (ÖZELLİK 61): kurs tablolarından derlenen doğrulanmış
+/// çekimler; uydurma çekim yok.
+final fiilCekimleriProvider = Provider<FiilCekimleri>(
+  (ref) => FiilCekimleri.kurslardan(ref.watch(kurslarProvider)),
 );
 
 /// Bugünün günü 'YYYY-MM-DD'. Testte sabitlenebilir.
@@ -226,6 +263,22 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.donemDersiBitir(d, tur, dogru, toplam, bugun));
   }
 
+  /// Günlük çalışma süresine [sn] saniye ekler (ÖZELLİK 59, 80; süreli oturum,
+  /// mikro ders). sn <= 0 ise hiçbir şey yazılmaz.
+  Future<OgrenciDurumu> sureEkle(int sn) async {
+    if (sn <= 0) return _simdiki;
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.sureEkle(d, bugun, sn));
+  }
+
+  /// Günlük dakika hedefini ayarlar; 0 kapatır (ÖZELLİK 80).
+  Future<OgrenciDurumu> dakikaHedefiAyarla(int dk) =>
+      _uygula((d) => Sure.hedefAyarla(d, dk));
+
+  /// Aylık meydan okuma hedefini (ders sayısı) ayarlar (ÖZELLİK 49).
+  Future<OgrenciDurumu> aylikHedefAyarla(int hedef) =>
+      _uygula((d) => Meydan.hedefAyarla(d, hedef));
+
   Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.mikroBitir(d, dogru, toplam, bugun));
@@ -294,6 +347,17 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> eslestirmeBitir(int ms) =>
       _uygula((d) => Pratik.eslestirmeKaydet(d, ms));
 
+  /// Efsanevi zor tekrar geçildi (ÖZELLİK 43): ünite altın olur; kartlara,
+  /// hata defterine, XP'ye ve seriye dokunmaz.
+  Future<OgrenciDurumu> efsaneviGecildi(String uniteId) =>
+      _uygula((d) => Efsanevi.altinYap(d, uniteId));
+
+  /// Senaryolu konuşma bitti (ÖZELLİK 65): bitirme sayısı artar; XP, kart ve
+  /// hata defterine dokunmaz.
+  Future<OgrenciDurumu> senaryoBitir(String id) => _uygula(
+    (d) => d.copyWith(senaryolar: Senaryolar.bitirildi(d.senaryolar, id)),
+  );
+
   /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
   Future<OgrenciDurumu> kartEkle(String kartId) {
     final bugun = ref.read(bugunProvider);
@@ -313,9 +377,108 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     });
   }
 
+  // --- Satranç modülü (ÖZELLİK 47, 52-57) -------------------------------
+  // Ders kartlarına, hata defterine, XP'ye ve seriye dokunmaz; ayrı deste.
+
+  /// Günlük satranç bulmacasının ilk sonucu (aynı gün ikinci kez yazılmaz).
+  Future<OgrenciDurumu> satrancGunlukBitir(bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => SatrancCalisma.gunlukBitir(d, bugun, dogru));
+  }
+
+  /// Tema bulmacası (ya da tekrar destesindeki bulmaca) sonucu.
+  Future<OgrenciDurumu> satrancBulmacaSonucu(String id, bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => SatrancCalisma.bulmacaSonucu(d, id, dogru, bugun));
+  }
+
+  Future<OgrenciDurumu> satrancMacBitir(SatrancMaci mac) =>
+      _uygula((d) => SatrancCalisma.macBitir(d, mac));
+
+  Future<OgrenciDurumu> satrancOyunSonuPratik(String id) =>
+      _uygula((d) => SatrancCalisma.oyunSonuPratikBitir(d, id));
+
+  Future<OgrenciDurumu> satrancOyunSonuMeydan(String id, int hamle) =>
+      _uygula((d) => SatrancCalisma.oyunSonuMeydanBitir(d, id, hamle));
+
+  Future<OgrenciDurumu> satrancKoordinatBitir(String mod, int puan) =>
+      _uygula((d) => SatrancCalisma.koordinatBitir(d, mod, puan));
+
+  Future<OgrenciDurumu> satrancSoloBitir(String id) =>
+      _uygula((d) => SatrancCalisma.soloBitir(d, id));
+
+  Future<OgrenciDurumu> satrancAnalizBitir(
+    String id,
+    bool hamleDogru,
+    bool gerekceDogru,
+  ) => _uygula(
+    (d) => SatrancCalisma.analizBitir(d, id, hamleDogru, gerekceDogru),
+  );
+
+  /// Ders sonu tahta meydan okuması bitişi (ustalık destesine de yazar).
+  Future<OgrenciDurumu> satrancDersMeydanBitir(
+    String dersId,
+    int dogru,
+    int toplam,
+  ) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => SatrancCalisma.dersMeydanBitir(d, dersId, dogru, toplam, bugun),
+    );
+  }
+
+  /// Ustalık kursu sorusunun sonucu.
+  Future<OgrenciDurumu> satrancUstalikSonucu(String dersId, bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => SatrancCalisma.ustalikSonucu(d, dersId, dogru, bugun),
+    );
+  }
+
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.
   Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
       _uygula((d) => Motor.notYaz(d, kartId, metin));
+
+  // --- Yer imleri (ÖZELLİK 72) ------------------------------------------
+  // Kartlara, hata defterine, XP'ye ve seriye dokunmaz.
+
+  /// Yer imi varsa kaldırır, yoksa "Genel" koleksiyonuna ekler.
+  Future<OgrenciDurumu> yerImiDegistir(String anahtar) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => YerImleri.degistir(d, anahtar, bugun));
+  }
+
+  // --- Kod projeleri ve oyun alanı (ÖZELLİK 70) ---------------------------
+
+  /// Projeyi kaydeder; sınır aşılırsa durum değişmez ve neden döner.
+  Future<String?> projeKaydet(KodProjesi p) async {
+    final bugun = ref.read(bugunProvider);
+    final r = KodProjeleri.kaydet(_simdiki, p, bugun);
+    if (r.hata != null) return r.hata;
+    await _uygula((d) => KodProjeleri.kaydet(d, p, bugun).durum);
+    return null;
+  }
+
+  Future<OgrenciDurumu> projeSil(String id) =>
+      _uygula((d) => KodProjeleri.sil(d, id));
+
+  Future<OgrenciDurumu> yerImiNotYaz(String anahtar, String? metin) =>
+      _uygula((d) => YerImleri.notYaz(d, anahtar, metin));
+
+  Future<OgrenciDurumu> yerImiTasi(String anahtar, String koleksiyon) =>
+      _uygula((d) => YerImleri.tasi(d, anahtar, koleksiyon));
+
+  Future<OgrenciDurumu> koleksiyonEkle(String ad) =>
+      _uygula((d) => YerImleri.koleksiyonEkle(d, ad));
+
+  Future<OgrenciDurumu> koleksiyonSil(String ad) =>
+      _uygula((d) => YerImleri.koleksiyonSil(d, ad));
+
+  Future<OgrenciDurumu> yerImiAcildi(String anahtar) =>
+      _uygula((d) => YerImleri.gecmiseEkle(d, anahtar));
+
+  Future<OgrenciDurumu> yerImiGecmisiniTemizle() =>
+      _uygula(YerImleri.gecmisiTemizle);
 
   /// Çalışma planını kaydeder; [plan] null ise siler.
   Future<OgrenciDurumu> planKaydet(CalismaPlani? plan) => _uygula(

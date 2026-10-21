@@ -254,12 +254,39 @@ abstract final class Motor {
     final puan = toplam > 0 ? (dogru * 100 ~/ toplam).clamp(0, 100) : 0;
     final eskiPuan = d.dersEnIyi[dersId] ?? 0;
     final sure = sureSn.clamp(0, 3600);
-    final yeni = _kazancIsle(d, xp, bugun).copyWith(
+    var yeni = _kazancIsle(d, xp, bugun).copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
       sonDersId: dersId,
       dersEnIyi: {...d.dersEnIyi, dersId: puan > eskiPuan ? puan : eskiPuan},
       dersSureSn: {...d.dersSureSn, dersId: (d.dersSureSn[dersId] ?? 0) + sure},
     );
+    // Günlük süre (ÖZELLİK 80), ay sayaçları (49, 51) ve üst üste başarısız
+    // deneme sayacı (50); geçersiz günde ay/süre sayaçlarına dokunulmaz.
+    if (OgrenciDurumu.gunGecerli(bugun)) {
+      final ay = bugun.substring(0, 7);
+      final kurs = kursKimligi(dersId);
+      yeni = yeni.copyWith(
+        aylikDers: OgrenciDurumu.enYeniKirp({
+          ...yeni.aylikDers,
+          ay: (yeni.aylikDers[ay] ?? 0) + 1,
+        }, OgrenciDurumu.aylikEnCok),
+        aylikKurs: kurs == null
+            ? null
+            : OgrenciDurumu.enYeniKirp({
+                ...yeni.aylikKurs,
+                '$ay|$kurs': (yeni.aylikKurs['$ay|$kurs'] ?? 0) + 1,
+              }, OgrenciDurumu.aylikEnCok),
+      );
+      if (sure > 0) yeni = sureEkle(yeni, bugun, sure);
+    }
+    if (toplam > 0) {
+      yeni = basarisizMi(dogru, toplam)
+          ? yeni.copyWith(
+              ardisikBasarisiz: yeni.ardisikBasarisiz + 1,
+              sonBasarisizDers: dersId,
+            )
+          : yeni.copyWith(ardisikBasarisiz: 0, sonBasarisizDersSil: true);
+    }
     return gunlukEkle(
       yeni,
       GunlukKayit(
@@ -272,6 +299,29 @@ abstract final class Motor {
       ),
     );
   }
+
+  /// Günlük çalışma süresine [sn] saniye ekler (ÖZELLİK 59, 80). Tek eklemede
+  /// en çok 4 saat sayılır; geçersiz gün ya da sn <= 0 durumu değiştirmez.
+  /// Harita en çok [OgrenciDurumu.gunlukSureEnCok] gün tutar.
+  static OgrenciDurumu sureEkle(OgrenciDurumu d, String gun, int sn) {
+    if (sn <= 0 || !OgrenciDurumu.gunGecerli(gun)) return d;
+    final ek = sn > 14400 ? 14400 : sn;
+    final toplam = (d.gunlukSureSn[gun] ?? 0) + ek;
+    return d.copyWith(
+      gunlukSureSn: OgrenciDurumu.enYeniKirp({
+        ...d.gunlukSureSn,
+        gun: toplam > 86400 ? 86400 : toplam,
+      }, OgrenciDurumu.gunlukSureEnCok),
+    );
+  }
+
+  /// Başarı eşiği (yüzde): bunun altında biten ders denemesi "başarısız"
+  /// sayılır (ÖZELLİK 50, kolaylaştırma önerisi).
+  static const int basariEsigi = 60;
+
+  /// Doğru/toplamdan yüzde puan eşiğin altında mı? Toplam 0 ise false.
+  static bool basarisizMi(int dogru, int toplam) =>
+      toplam > 0 && dogru * 100 < basariEsigi * toplam;
 
   /// Günlüğe kayıt ekler; liste en çok [GunlukKayit.enCok] kayıt tutar, en
   /// eskisi düşer. Günü geçersiz kayıt eklenmez (durum değişmeden döner).
@@ -424,7 +474,8 @@ abstract final class Motor {
       u.dersler.any((ders) => !dersBitmis(d, ders.id));
 
   /// [dersler]den dersler arası dönerek en çok [adet] mevcut alıştırma
-  /// (konuşma hariç); her dersin kuyruğu [tohum]+[ui] ile karıştırılır.
+  /// (konuşma ve kod çalıştırma hariç: sınavlar kısa ve süreli); her dersin
+  /// kuyruğu [tohum]+[ui] ile karıştırılır.
   static List<({int unite, String kartId, Alistirma alistirma})> _uniteSorulari(
     Kurs kurs,
     int ui,
@@ -436,7 +487,8 @@ abstract final class Motor {
       for (final ders in dersler)
         [
           for (var i = 0; i < ders.alistirmalar.length; i++)
-            if (ders.alistirmalar[i] is! Soyle)
+            if (ders.alistirmalar[i] is! Soyle &&
+                ders.alistirmalar[i] is! KodCalistir)
               (
                 unite: ui,
                 kartId: ders.kartKimligi(i),
@@ -1103,7 +1155,18 @@ abstract final class Motor {
           yariOmurGun: Kart.enAzYariOmur,
         ),
       },
+      aylikKart: _yeniKartSay(d, bugun),
     );
+  }
+
+  /// İlk kez oluşan kart için ay sayacı (ÖZELLİK 51); geçersiz günde değişmez.
+  static Map<String, int>? _yeniKartSay(OgrenciDurumu d, String bugun) {
+    if (!OgrenciDurumu.gunGecerli(bugun)) return null;
+    final ay = bugun.substring(0, 7);
+    return OgrenciDurumu.enYeniKirp({
+      ...d.aylikKart,
+      ay: (d.aylikKart[ay] ?? 0) + 1,
+    }, OgrenciDurumu.aylikEnCok);
   }
 
   /// Kelimeye kişisel not yazar. [metin] null ya da (kırpılmış) boşsa not
@@ -1166,6 +1229,14 @@ abstract final class Motor {
     Tablo() => a.bos.map(a.hucre).join(', '),
     Isaretle() => [for (final i in a.dogru) a.kelimeler[i]].join(' '),
     Hamle() => hamleMetni(a),
+    KodBoslukDoldur() => a.dogru.join(', '),
+    KodParcaSec() => [
+      for (final i in a.dogru)
+        if (i >= 0 && i < a.satirlar.length) a.satirlar[i].trim(),
+    ].join(' | '),
+    KodYaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
+    KodCikti() => ciktiNormalle(a.beklenenCikti),
+    KodCalistir() => a.cozum.trim(),
   };
 
   /// Hamle alıştırmasının oyuncu hamleleri, Türkçe cebirsel gösterimle
@@ -1218,6 +1289,14 @@ abstract final class Motor {
       Tablo() => 'Satır ve sütun başlıklarındaki örüntüye bak',
       Isaretle() => 'Cümleyi baştan oku; birden çok kelime doğru olabilir',
       Hamle() => 'Önce şah çeken, taş alan ve tehdit eden hamlelere bak',
+      KodBoslukDoldur() =>
+        'Boşlukları sırayla doldur; parçayı koddaki yerine göre seç',
+      KodParcaSec() => 'Kodu satır satır oku; birden çok satır doğru olabilir',
+      KodYaz() => 'Kod büyük/küçük harfe duyarlıdır; anahtar sözcüğü tam yaz',
+      KodCikti() =>
+        'Kodu satır satır izle; her adımda değişkenlerin değerini not et',
+      KodCalistir() =>
+        'Önce kodu çalıştır, çıktıyı beklenenle satır satır karşılaştır',
     };
   }
 
@@ -1258,6 +1337,16 @@ abstract final class Motor {
             : uzunlukVeHarf(a.hucre(a.bos.first)),
       Isaretle() => 'Doğru kelime sayısı: ${a.dogru.length}',
       Hamle() => _hamleTasIpucu(a),
+      KodBoslukDoldur() =>
+        a.dogru.isEmpty ? 'Parçalara bak' : 'İlk boşluk: ${a.dogru.first}',
+      KodParcaSec() => 'Doğru satır sayısı: ${a.dogru.length}',
+      KodYaz() => uzunlukVeHarf(a.cevaplar.isEmpty ? '' : a.cevaplar.first),
+      KodCikti() =>
+        'Çıktı ${ciktiNormalle(a.beklenenCikti).split('\n').length} satır',
+      KodCalistir() =>
+        a.gerekenler.isEmpty
+            ? 'Çıktı ${ciktiNormalle(a.beklenenCikti).split('\n').length} satır olmalı'
+            : 'Kodda şunlar olmalı: ${a.gerekenler.join(', ')}',
     };
   }
 
@@ -1274,6 +1363,25 @@ abstract final class Motor {
     }
   }
 
+  /// Tek kartın yarı ömür güncellemesi (kartIsle ile satranç tekrar destesi
+  /// ortak kullanır): doğruda x2, yanlışta /2 (0,5..180 gün); sonraki tekrar
+  /// yarı ömrün yuvarlanmışı kadar gün sonra (en az 1). [onceki] null ise
+  /// başlangıç yarı ömrü 1 gündür.
+  static Kart kartHesapla(Kart? onceki, bool dogruMu, String bugun) {
+    final mevcut = onceki?.yariOmurGun ?? 1.0;
+    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
+    final yariOmur = ham < Kart.enAzYariOmur
+        ? Kart.enAzYariOmur
+        : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
+    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
+    return Kart(
+      kutu: Kart.kutuHesapla(yariOmur),
+      sonraki: _gunEkle(bugun, aralik),
+      yariOmurGun: yariOmur,
+      sonCevap: dogruMu,
+    );
+  }
+
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2
   /// (en çok 180 gün), yanlışta /2 (en az 0,5 gün). Sonraki tekrar = bugün +
   /// yarı ömür (tam sayıya yuvarlanır, en az 1 gün). Kart henüz yoksa yarı ömür
@@ -1285,23 +1393,18 @@ abstract final class Motor {
     bool dogruMu,
     String bugun,
   ) {
-    final mevcut = d.kartlar[kartId]?.yariOmurGun ?? 1.0;
-    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
-    final yariOmur = ham < Kart.enAzYariOmur
-        ? Kart.enAzYariOmur
-        : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
-    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
-    final yeni = d.copyWith(
-      kartlar: {
-        ...d.kartlar,
-        kartId: Kart(
-          kutu: Kart.kutuHesapla(yariOmur),
-          sonraki: _gunEkle(bugun, aralik),
-          yariOmurGun: yariOmur,
-          sonCevap: dogruMu,
-        ),
-      },
-    );
+    final yeni = d
+        .copyWith(
+          kartlar: {
+            ...d.kartlar,
+            kartId: kartHesapla(d.kartlar[kartId], dogruMu, bugun),
+          },
+        )
+        .copyWith(
+          aylikKart: d.kartlar.containsKey(kartId)
+              ? null
+              : _yeniKartSay(d, bugun),
+        );
     if (dogruMu) return yeni;
     final ayrac = kartId.lastIndexOf('#');
     final dersId = ayrac > 0 ? kartId.substring(0, ayrac) : kartId;
@@ -1620,8 +1723,46 @@ abstract final class Motor {
             secilen.containsAll(a.dogru);
       case Hamle():
         return _hamleDogruMu(a, cevap);
+      case KodBoslukDoldur():
+        if (cevap is! List || a.dogru.isEmpty) return false;
+        if (cevap.length != a.dogru.length) return false;
+        for (var i = 0; i < cevap.length; i++) {
+          final e = cevap[i];
+          if (e is! String || e.trim() != a.dogru[i].trim()) return false;
+        }
+        return true;
+      case KodParcaSec():
+        if (cevap is! List || cevap.isEmpty) return false;
+        final secilen = <int>{};
+        for (final e in cevap) {
+          if (e is! int) return false;
+          secilen.add(e);
+        }
+        return secilen.length == cevap.length &&
+            secilen.length == a.dogru.toSet().length &&
+            secilen.containsAll(a.dogru);
+      case KodYaz():
+        if (cevap is! String) return false;
+        final c = kodNormalle(cevap);
+        if (c.isEmpty) return false;
+        return a.cevaplar.any((k) => kodNormalle(k) == c);
+      case KodCikti():
+        return cevap is String && ciktiAyni(cevap, a.beklenenCikti);
+      case KodCalistir():
+        if (cevap is String) {
+          // Motor yokken: çözüm kodunun çıktısı tahmini.
+          return ciktiAyni(cevap, a.beklenenCikti);
+        }
+        if (cevap is! KodCalismaSonucu || !cevap.basarili) return false;
+        if (!ciktiAyni(cevap.cikti, a.beklenenCikti)) return false;
+        return a.gerekenler.every(cevap.kod.contains);
     }
   }
+
+  /// Kod cevabı karşılaştırması: baş/son boşluk atılır, iç boşluklar teke
+  /// iner; büyük/küçük harf DUYARLI (kod dilleri öyledir).
+  static String kodNormalle(String s) =>
+      s.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   /// Hamle cevabı: oyuncu hamleleri sırayla ana hatla eşleşmeli; `matKabul`
   /// ise son hamle, ana hattın önceki hamleleri oynandıktan sonra mat eden
@@ -1727,6 +1868,10 @@ abstract final class Motor {
           case Tablo(:final satirlar):
             for (final satir in satirlar) {
               kalipEkle(satir.where((h) => h.trim().isNotEmpty).join(' - '));
+            }
+          case KodYaz(:final kod, :final cevaplar):
+            if (cevaplar.isNotEmpty && kod.contains('___')) {
+              kalipEkle(_bosluguDoldur(kod, cevaplar.first));
             }
           default:
             break;
