@@ -23,6 +23,12 @@ void main() {
       'html-1',
       'css-1',
       'js-1',
+      'html-2',
+      'html-3',
+      'css-2',
+      'css-3',
+      'js-2',
+      'js-3',
       'python-1',
       'python-2',
       'python-3',
@@ -36,7 +42,20 @@ void main() {
     for (final k in [koreceA1, japoncaA1, cinceA1]) {
       expect(k.alan, KursAlani.dil);
     }
-    for (final k in [html1, css1, js1, python1, python2, python3]) {
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
       expect(k.alan, KursAlani.kod);
     }
   });
@@ -44,7 +63,20 @@ void main() {
   test('kurs, ünite ve ders sayıları', () {
     expect(ingilizceA1.uniteler.length, greaterThanOrEqualTo(4));
     expect(ingilizceA1.tumDersler.length, greaterThanOrEqualTo(12));
-    for (final k in [html1, css1, js1, python1, python2, python3]) {
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
       expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
   });
@@ -121,7 +153,20 @@ void main() {
         expect(a.secenekler[a.dogru], a.okunacak, reason: d.id);
       }
     }
-    for (final k in [html1, css1, js1, python1, python2, python3]) {
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {
         final kodlar = d.alistirmalar.whereType<Kod>().toList();

@@ -12,6 +12,12 @@ import 'ingilizce_b2.dart';
 import 'japonca_a1.dart';
 import 'js_1.dart';
 import 'korece_a1.dart';
+import 'css_2.dart';
+import 'css_3.dart';
+import 'html_2.dart';
+import 'html_3.dart';
+import 'js_2.dart';
+import 'js_3.dart';
 import 'python_1.dart';
 import 'python_2.dart';
 import 'python_3.dart';
@@ -26,6 +32,12 @@ export 'ingilizce_b2.dart' show ingilizceB2;
 export 'japonca_a1.dart' show japoncaA1;
 export 'js_1.dart' show js1;
 export 'korece_a1.dart' show koreceA1;
+export 'css_2.dart' show css2;
+export 'css_3.dart' show css3;
+export 'html_2.dart' show html2;
+export 'html_3.dart' show html3;
+export 'js_2.dart' show js2;
+export 'js_3.dart' show js3;
 export 'python_1.dart' show python1;
 export 'python_2.dart' show python2;
 export 'python_3.dart' show python3;
@@ -41,6 +53,12 @@ final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   html1,
   css1,
   js1,
+  html2,
+  html3,
+  css2,
+  css3,
+  js2,
+  js3,
   python1,
   python2,
   python3,
