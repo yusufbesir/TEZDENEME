@@ -287,6 +287,7 @@ class OgrenciDurumu {
     this.sertifikalar = const {},
     this.dersEnIyi = const {},
     this.dersSureSn = const {},
+    this.eslestirmeEnIyiMs,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -370,6 +371,10 @@ class OgrenciDurumu {
 
   /// Ders başına en iyi puan (yüzde 0..100; eski kayıtta boş) ve toplam
   /// çalışma süresi (saniye; eski kayıtta boş). Ustalık: Motor/DersMeta.
+  /// Pratik merkezi "Zamana karşı eşleştirme" en iyi süresi (ms); null: hiç
+  /// bitirilmedi. Eski kayıtta yoksa null (ÖZELLİK 44).
+  final int? eslestirmeEnIyiMs;
+
   final Map<String, int> dersEnIyi;
   final Map<String, int> dersSureSn;
 
@@ -433,6 +438,7 @@ class OgrenciDurumu {
     Map<String, SinavSonucu>? araSinavlar,
     Map<String, SinavSonucu>? sertifikalar,
     Map<String, int>? dersEnIyi,
+    int? eslestirmeEnIyiMs,
     Map<String, int>? dersSureSn,
   }) {
     return OgrenciDurumu(
@@ -470,6 +476,7 @@ class OgrenciDurumu {
       araSinavlar: araSinavlar ?? this.araSinavlar,
       sertifikalar: sertifikalar ?? this.sertifikalar,
       dersEnIyi: dersEnIyi ?? this.dersEnIyi,
+      eslestirmeEnIyiMs: eslestirmeEnIyiMs ?? this.eslestirmeEnIyiMs,
       dersSureSn: dersSureSn ?? this.dersSureSn,
     );
   }
@@ -509,6 +516,7 @@ class OgrenciDurumu {
       for (final e in sertifikalar.entries) e.key: e.value.toJson(),
     },
     'dersEnIyi': dersEnIyi,
+    'eslestirmeEnIyiMs': eslestirmeEnIyiMs,
     'dersSureSn': dersSureSn,
   };
 
@@ -670,6 +678,12 @@ class OgrenciDurumu {
       dersSureSn: Map.unmodifiable(
         sayac(j['dersSureSn'], (k) => !k.contains('#')),
       ),
+      eslestirmeEnIyiMs:
+          (j['eslestirmeEnIyiMs'] is int &&
+              (j['eslestirmeEnIyiMs'] as int) > 0 &&
+              (j['eslestirmeEnIyiMs'] as int) <= 86400000)
+          ? j['eslestirmeEnIyiMs'] as int
+          : null,
     );
   }
 }

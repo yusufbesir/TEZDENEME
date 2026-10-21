@@ -23,10 +23,13 @@ import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
+import 'ekranlar/filtreli_tekrar_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
+import 'ekranlar/pratik_etkinlikleri.dart';
+import 'ekranlar/pratik_merkezi_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
@@ -153,6 +156,23 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/sertifika',
         builder: (c, s) =>
             SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+      ),
+      GoRoute(
+        path: '/tekrar-filtre',
+        builder: (c, s) => const FiltreliTekrarEkrani(),
+      ),
+      GoRoute(path: '/pratik', builder: (c, s) => const PratikMerkeziEkrani()),
+      GoRoute(
+        path: '/pratik/eslestirme',
+        builder: (c, s) => const EslestirmeEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/tur',
+        builder: (c, s) => const ArtanZorlukEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/kartlar',
+        builder: (c, s) => const KelimeKartlariEkrani(),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

@@ -17,6 +17,7 @@ import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../motor/pratik.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
@@ -261,6 +262,11 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
   }
+
+  /// Pratik merkezi eşleştirme süresi: yalnız daha iyiyse en iyi süre olur.
+  /// Kartlara, hata defterine ve XP'ye dokunmaz.
+  Future<OgrenciDurumu> eslestirmeBitir(int ms) =>
+      _uygula((d) => Pratik.eslestirmeKaydet(d, ms));
 
   /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
   Future<OgrenciDurumu> kartEkle(String kartId) {
