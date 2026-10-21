@@ -299,6 +299,20 @@ class _YolListesi extends StatelessWidget {
               onPressed: alistirmaVar ? () => context.push('/mikro') : null,
             ),
           ),
+          // Satranç modülü girişi (ÖZELLİK 47): yalnız Oyunlar alanında; yeni
+          // kart eklemek yerine mevcut düğme satırına eklenir.
+          if (durum.alan == 'oyun') ...[
+            const SizedBox(height: Olcu.b1),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: Olcu.hedef),
+              child: OutlinedButton.icon(
+                key: const ValueKey('satranc-merkezi'),
+                icon: const Icon(Icons.extension_outlined),
+                label: const Text('Satranç merkezi'),
+                onPressed: () => context.push('/satranc'),
+              ),
+            ),
+          ],
           // Günün / haftanın / ayın dersi (ÖZELLİK 63); tamamlanmış ders yoksa
           // kendisi boş çizer.
           if (Motor.donemDersiVar(durum, kurslar)) ...[

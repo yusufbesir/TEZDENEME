@@ -17,10 +17,12 @@ import '../bilesenler/ders_ozeti.dart';
 import '../bilesenler/dilbilgisi_notu_karti.dart';
 import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/ders_meta.dart';
 import '../motor/ders_ogeleri.dart';
 import '../motor/motor.dart';
+import '../motor/satranc_calisma.dart';
 import '../tema/tema.dart';
 
 /// Ders akışı: alıştırmalar -> özet (doğru sayısı, XP, seri).
@@ -130,6 +132,29 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   Widget? _ustalik(Ders ders) {
     final d = ref.watch(durumProvider).value;
     if (d == null) return null;
+    final kart = _ustalikKarti(d, ders);
+    // Satranç dersleri: ders sonu tahta meydan okuması (ÖZELLİK 56).
+    if (!SatrancCalisma.dersMeydanVar(ref.read(kurslarProvider), ders.id)) {
+      return kart;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        kart,
+        const SizedBox(height: Olcu.b1),
+        OutlinedButton.icon(
+          key: const ValueKey('ders-tahta-meydan'),
+          style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
+          onPressed: () =>
+              context.push('/satranc/meydan/${Uri.encodeComponent(ders.id)}'),
+          icon: const Icon(Icons.extension_outlined),
+          label: const Text('Tahta meydan okuması'),
+        ),
+      ],
+    );
+  }
+
+  Widget _ustalikKarti(OgrenciDurumu d, Ders ders) {
     return UstalikKarti(
       ustalik: DersMeta.dersUstalik(d, ders.id),
       enIyiPuan: DersMeta.enIyiPuan(d, ders.id),

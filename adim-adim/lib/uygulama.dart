@@ -38,6 +38,11 @@ import 'ekranlar/sertifika_ekrani.dart';
 import 'ekranlar/sinav_ekrani.dart';
 import 'ekranlar/unite_ozeti_ekrani.dart';
 import 'ekranlar/yerlestirme_ekrani.dart';
+import 'ekranlar/satranc/araclar.dart';
+import 'ekranlar/satranc/bulmacalar.dart';
+import 'ekranlar/satranc/mac.dart';
+import 'ekranlar/satranc/merkez.dart';
+import 'ekranlar/satranc/oyun_sonu.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
@@ -175,6 +180,82 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
+      ),
+      // Satranç modülü (ÖZELLİK 47, 52-57).
+      GoRoute(
+        path: '/satranc',
+        builder: (c, s) => const SatrancMerkeziEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/gunluk',
+        builder: (c, s) => const GunlukBulmacaEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/tema',
+        builder: (c, s) => const TemaListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/tema/:id',
+        builder: (c, s) =>
+            TemaBulmacaEkrani(tema: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/yanlislar',
+        builder: (c, s) => const YanlislarimEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/mac',
+        builder: (c, s) => const MiniMacSecimiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/mac/:id',
+        builder: (c, s) => MiniMacEkrani(konumId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/inceleme',
+        builder: (c, s) => const IncelemeEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/serbest',
+        builder: (c, s) => const SerbestTahtaEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/oyunsonu',
+        builder: (c, s) => const OyunSonuListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/oyunsonu/:id',
+        builder: (c, s) =>
+            OyunSonuEkrani(konumId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/koordinat',
+        builder: (c, s) => const KoordinatEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/solo',
+        builder: (c, s) => const SoloListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/solo/:id',
+        builder: (c, s) => SoloEkrani(id: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/analiz',
+        builder: (c, s) => const AnalizListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/satranc/analiz/:id',
+        builder: (c, s) => AnalizEkrani(id: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/meydan/:id',
+        builder: (c, s) =>
+            DersMeydanEkrani(dersId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/satranc/ustalik',
+        builder: (c, s) => const UstalikEkrani(),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

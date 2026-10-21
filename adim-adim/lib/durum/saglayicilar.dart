@@ -16,8 +16,10 @@ import '../depo/depo.dart';
 import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../model/satranc_durumu.dart';
 import '../motor/motor.dart';
 import '../motor/pratik.dart';
+import '../motor/satranc_calisma.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
@@ -311,6 +313,64 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
       }
       return yeni;
     });
+  }
+
+  // --- Satranç modülü (ÖZELLİK 47, 52-57) -------------------------------
+  // Ders kartlarına, hata defterine, XP'ye ve seriye dokunmaz; ayrı deste.
+
+  /// Günlük satranç bulmacasının ilk sonucu (aynı gün ikinci kez yazılmaz).
+  Future<OgrenciDurumu> satrancGunlukBitir(bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => SatrancCalisma.gunlukBitir(d, bugun, dogru));
+  }
+
+  /// Tema bulmacası (ya da tekrar destesindeki bulmaca) sonucu.
+  Future<OgrenciDurumu> satrancBulmacaSonucu(String id, bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => SatrancCalisma.bulmacaSonucu(d, id, dogru, bugun));
+  }
+
+  Future<OgrenciDurumu> satrancMacBitir(SatrancMaci mac) =>
+      _uygula((d) => SatrancCalisma.macBitir(d, mac));
+
+  Future<OgrenciDurumu> satrancOyunSonuPratik(String id) =>
+      _uygula((d) => SatrancCalisma.oyunSonuPratikBitir(d, id));
+
+  Future<OgrenciDurumu> satrancOyunSonuMeydan(String id, int hamle) =>
+      _uygula((d) => SatrancCalisma.oyunSonuMeydanBitir(d, id, hamle));
+
+  Future<OgrenciDurumu> satrancKoordinatBitir(String mod, int puan) =>
+      _uygula((d) => SatrancCalisma.koordinatBitir(d, mod, puan));
+
+  Future<OgrenciDurumu> satrancSoloBitir(String id) =>
+      _uygula((d) => SatrancCalisma.soloBitir(d, id));
+
+  Future<OgrenciDurumu> satrancAnalizBitir(
+    String id,
+    bool hamleDogru,
+    bool gerekceDogru,
+  ) => _uygula(
+    (d) => SatrancCalisma.analizBitir(d, id, hamleDogru, gerekceDogru),
+  );
+
+  /// Ders sonu tahta meydan okuması bitişi (ustalık destesine de yazar).
+  Future<OgrenciDurumu> satrancDersMeydanBitir(
+    String dersId,
+    int dogru,
+    int toplam,
+  ) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => SatrancCalisma.dersMeydanBitir(d, dersId, dogru, toplam, bugun),
+    );
+  }
+
+  /// Ustalık kursu sorusunun sonucu.
+  Future<OgrenciDurumu> satrancUstalikSonucu(String dersId, bool dogru) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => SatrancCalisma.ustalikSonucu(d, dersId, dogru, bugun),
+    );
   }
 
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.

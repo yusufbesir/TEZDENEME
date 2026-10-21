@@ -1274,6 +1274,25 @@ abstract final class Motor {
     }
   }
 
+  /// Tek kartın yarı ömür güncellemesi (kartIsle ile satranç tekrar destesi
+  /// ortak kullanır): doğruda x2, yanlışta /2 (0,5..180 gün); sonraki tekrar
+  /// yarı ömrün yuvarlanmışı kadar gün sonra (en az 1). [onceki] null ise
+  /// başlangıç yarı ömrü 1 gündür.
+  static Kart kartHesapla(Kart? onceki, bool dogruMu, String bugun) {
+    final mevcut = onceki?.yariOmurGun ?? 1.0;
+    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
+    final yariOmur = ham < Kart.enAzYariOmur
+        ? Kart.enAzYariOmur
+        : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
+    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
+    return Kart(
+      kutu: Kart.kutuHesapla(yariOmur),
+      sonraki: _gunEkle(bugun, aralik),
+      yariOmurGun: yariOmur,
+      sonCevap: dogruMu,
+    );
+  }
+
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2
   /// (en çok 180 gün), yanlışta /2 (en az 0,5 gün). Sonraki tekrar = bugün +
   /// yarı ömür (tam sayıya yuvarlanır, en az 1 gün). Kart henüz yoksa yarı ömür
@@ -1285,21 +1304,10 @@ abstract final class Motor {
     bool dogruMu,
     String bugun,
   ) {
-    final mevcut = d.kartlar[kartId]?.yariOmurGun ?? 1.0;
-    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
-    final yariOmur = ham < Kart.enAzYariOmur
-        ? Kart.enAzYariOmur
-        : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
-    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
     final yeni = d.copyWith(
       kartlar: {
         ...d.kartlar,
-        kartId: Kart(
-          kutu: Kart.kutuHesapla(yariOmur),
-          sonraki: _gunEkle(bugun, aralik),
-          yariOmurGun: yariOmur,
-          sonCevap: dogruMu,
-        ),
+        kartId: kartHesapla(d.kartlar[kartId], dogruMu, bugun),
       },
     );
     if (dogruMu) return yeni;

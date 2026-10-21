@@ -16,6 +16,8 @@
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
+import 'satranc_durumu.dart';
+
 class Kart {
   const Kart({
     required this.kutu,
@@ -294,6 +296,7 @@ class OgrenciDurumu {
     this.donemDersleri = const {},
     this.gunDersiBildirimiAcik = false,
     this.sonGunDersiBildirimGunu,
+    this.satranc = const SatrancDurumu(),
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -404,6 +407,10 @@ class OgrenciDurumu {
   /// Bu bildirimin en son gösterildiği gün; null: hiç.
   final String? sonGunDersiBildirimGunu;
 
+  /// Satranç modülü durumu (ÖZELLİK 47, 52-57); eski kayıtta boş. Ders
+  /// kartlarından ayrı tutulur (Tekrar sekmesi aralıkları bozulmaz).
+  final SatrancDurumu satranc;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -472,6 +479,7 @@ class OgrenciDurumu {
     Set<String>? donemDersleri,
     bool? gunDersiBildirimiAcik,
     String? sonGunDersiBildirimGunu,
+    SatrancDurumu? satranc,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -518,6 +526,7 @@ class OgrenciDurumu {
           gunDersiBildirimiAcik ?? this.gunDersiBildirimiAcik,
       sonGunDersiBildirimGunu:
           sonGunDersiBildirimGunu ?? this.sonGunDersiBildirimGunu,
+      satranc: satranc ?? this.satranc,
     );
   }
 
@@ -564,6 +573,7 @@ class OgrenciDurumu {
     'donemDersleri': donemDersleri.toList()..sort(),
     'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
     'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
+    'satranc': satranc.toJson(),
   };
 
   static final _donemDeseni = RegExp(
@@ -759,6 +769,8 @@ class OgrenciDurumu {
               gunGecerli(j['sonGunDersiBildirimGunu'] as String))
           ? j['sonGunDersiBildirimGunu'] as String
           : null,
+      // Eski kayıtta yoksa boş satranç durumu.
+      satranc: SatrancDurumu.fromJson(j['satranc']),
     );
   }
 }

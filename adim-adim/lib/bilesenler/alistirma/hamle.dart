@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/icerik.dart';
 import '../../satranc/satranc.dart';
 import '../../tema/tema.dart';
+import '../satranc_tahtasi.dart';
 import 'soru_basligi.dart';
 
 /// Tahtada hamle (satranç): 8x8 tahta, dokun-seç-dokun-oyna. Taşlar Unicode
@@ -29,11 +30,11 @@ class HamleGorunumu extends StatefulWidget {
   final ValueChanged<Object?> onCevap;
 
   /// Tahta kare renkleri (iki temada aynı; taşlar koyu çizilir).
-  static const Color acikKare = Color(0xFFF0D9B5);
-  static const Color koyuKare = Color(0xFFB58863);
+  static const Color acikKare = SatrancTahtasi.acikKare;
+  static const Color koyuKare = SatrancTahtasi.koyuKare;
 
   /// Tahtanın en büyük kenarı (piksel).
-  static const double enBuyukKenar = 420;
+  static const double enBuyukKenar = satrancTahtaEnBuyukKenar;
 
   @override
   State<HamleGorunumu> createState() => _HamleDurumu();
@@ -209,7 +210,7 @@ class _HamleDurumu extends State<HamleGorunumu> {
             final kenar =
                 kisit.maxWidth.clamp(0.0, HamleGorunumu.enBuyukKenar) - 6;
             return Center(
-              child: _Tahta(
+              child: SatrancTahtasi(
                 konum: _konum,
                 kenar: kenar,
                 beyazAltta: oyuncuBeyaz,
@@ -292,217 +293,4 @@ class _HamleDurumu extends State<HamleGorunumu> {
 
   static String _ilkHarfBuyuk(String s) =>
       s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
-}
-
-/// 8x8 tahta. Her kare erişilebilir bir düğmedir: "e4, beyaz at, seçili".
-class _Tahta extends StatelessWidget {
-  const _Tahta({
-    required this.konum,
-    required this.kenar,
-    required this.beyazAltta,
-    required this.secili,
-    required this.hedefler,
-    required this.sonKaynak,
-    required this.sonHedef,
-    required this.sonuc,
-    required this.etkin,
-    required this.onDokun,
-  });
-
-  final Konum konum;
-  final double kenar;
-  final bool beyazAltta;
-  final int? secili;
-  final Set<int> hedefler;
-  final int? sonKaynak;
-  final int? sonHedef;
-
-  /// Kontrol sonrası: true doğru, false yanlış, null henüz kontrol yok.
-  final bool? sonuc;
-  final bool etkin;
-  final ValueChanged<int> onDokun;
-
-  static const _dolu = {
-    'k': '♚',
-    'q': '♛',
-    'r': '♜',
-    'b': '♝',
-    'n': '♞',
-    'p': '♟',
-  };
-  static const _bos = {
-    'k': '♔',
-    'q': '♕',
-    'r': '♖',
-    'b': '♗',
-    'n': '♘',
-    'p': '♙',
-  };
-
-  /// Çerçeve kalınlığı (tahtanın dış kenarına eklenir).
-  static const double _cerceve = 3;
-
-  /// Metin sunumu seçicisi: simgeler emoji olarak çizilmesin.
-  static const _metinSunumu = '︎';
-
-  @override
-  Widget build(BuildContext context) {
-    final r = context.renkler;
-    final kare = kenar / 8;
-    final cerceve = switch (sonuc) {
-      true => r.dogru,
-      false => r.hata,
-      null => r.kenar,
-    };
-    final siraAdi = konum.beyazSirada ? 'beyaz' : 'siyah';
-    final ek = konum.mat ? ', mat' : (konum.sah ? ', şah' : '');
-    return Semantics(
-      container: true,
-      label: 'Satranç tahtası, sıra $siraAdi tarafta$ek',
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: cerceve, width: _cerceve),
-        ),
-        child: SizedBox(
-          width: kenar,
-          height: kenar,
-          child: Column(
-            children: [
-              for (var satir = 0; satir < 8; satir++)
-                Row(
-                  children: [
-                    for (var sutun = 0; sutun < 8; sutun++)
-                      _kare(
-                        context,
-                        beyazAltta
-                            ? (7 - satir) * 8 + sutun
-                            : satir * 8 + (7 - sutun),
-                        kare,
-                        satir,
-                        sutun,
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _kare(
-    BuildContext context,
-    int k,
-    double boyut,
-    int satir,
-    int sutun,
-  ) {
-    final r = context.renkler;
-    final tas = konum.tas(k);
-    final acik = (k ~/ 8 + k % 8).isOdd;
-    final secildi = secili == k;
-    final hedef = hedefler.contains(k);
-    final son = k == sonKaynak || k == sonHedef;
-    var zemin = acik ? HamleGorunumu.acikKare : HamleGorunumu.koyuKare;
-    if (son) zemin = Color.alphaBlend(const Color(0x66E6C229), zemin);
-    if (secildi) zemin = Color.alphaBlend(r.ana.withValues(alpha: 0.45), zemin);
-    final ad = kareAdi(k);
-    final etiket = [
-      ad,
-      tas == null ? 'boş' : tasTamAdi(tas),
-      if (secildi) 'seçili',
-      if (hedef) 'gidilebilir',
-    ].join(', ');
-    final koordinat = TextStyle(
-      fontSize: boyut * 0.2,
-      height: 1,
-      color: acik ? HamleGorunumu.koyuKare : HamleGorunumu.acikKare,
-      fontWeight: FontWeight.w700,
-    );
-    return Semantics(
-      button: true,
-      enabled: etkin,
-      selected: secildi,
-      label: etiket,
-      excludeSemantics: true,
-      onTap: etkin ? () => onDokun(k) : null,
-      child: GestureDetector(
-        key: ValueKey('kare-$ad'),
-        behavior: HitTestBehavior.opaque,
-        onTap: etkin ? () => onDokun(k) : null,
-        child: Container(
-          width: boyut,
-          height: boyut,
-          color: zemin,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              if (sutun == 0)
-                Positioned(
-                  left: 2,
-                  top: 2,
-                  child: Text(
-                    ad[1],
-                    style: koordinat,
-                    textScaler: TextScaler.noScaling,
-                  ),
-                ),
-              if (satir == 7)
-                Positioned(
-                  right: 2,
-                  bottom: 2,
-                  child: Text(
-                    ad[0],
-                    style: koordinat,
-                    textScaler: TextScaler.noScaling,
-                  ),
-                ),
-              if (tas != null) _tasSimgesi(tas, boyut),
-              if (hedef)
-                Container(
-                  width: tas == null ? boyut * 0.28 : boyut * 0.9,
-                  height: tas == null ? boyut * 0.28 : boyut * 0.9,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: tas == null ? const Color(0x5514282C) : null,
-                    border: tas == null
-                        ? null
-                        : Border.all(color: const Color(0x8814282C), width: 3),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _tasSimgesi(String tas, double boyut) {
-    final l = tas.toLowerCase();
-    final stil = TextStyle(fontSize: boyut * 0.78, height: 1);
-    Widget metin(String s, Color renk) => Text(
-      '$s$_metinSunumu',
-      style: stil.copyWith(color: renk),
-      textScaler: TextScaler.noScaling,
-      textAlign: TextAlign.center,
-    );
-    return SizedBox(
-      width: boyut,
-      height: boyut,
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: _beyaz(tas)
-            ? Stack(
-                alignment: Alignment.center,
-                children: [
-                  metin(_dolu[l]!, const Color(0xFFFFFFFF)),
-                  metin(_bos[l]!, const Color(0xFF111111)),
-                ],
-              )
-            : metin(_dolu[l]!, const Color(0xFF111111)),
-      ),
-    );
-  }
-
-  static bool _beyaz(String tas) => tas.toUpperCase() == tas;
 }
