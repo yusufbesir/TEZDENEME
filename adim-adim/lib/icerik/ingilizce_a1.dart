@@ -100,6 +100,9 @@ const Kurs ingilizceA1 = Kurs(
         Ders(
           id: 'ingilizce-1.u1.d2',
           ad: 'Kendini tanıtmak',
+          dilbilgisiNotu:
+              'Be fiili özneye göre değişir: I am, you are, he/she/it is, '
+              'we are, they are. Kısaltma: I\'m, you\'re, she\'s.',
           alistirmalar: [
             Secim(
               soru: '"Where are you from?" ne demektir?',
@@ -107,10 +110,10 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 0,
               aciklama: 'Where nerede/nereden, from -den/-dan demektir.',
             ),
-            Bosluk(
-              soru: 'She ___ a teacher.',
-              secenekler: ['is', 'am', 'are'],
-              dogru: 0,
+            Isaretle(
+              soru: 'Cümledeki be fiilini işaretle.',
+              cumle: 'She is a teacher.',
+              dogru: [1],
               aciklama: 'She, he, it ile is kullanılır.',
             ),
             Bosluk(
@@ -147,15 +150,18 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   'Bunlar özne zamirleridir; be fiilinin biçimini belirlerler.',
             ),
-            Secim(
-              soru: '"He is my friend." cümlesinin anlamı nedir?',
-              secenekler: [
-                'O benim arkadaşım.',
-                'Ben onun arkadaşıyım.',
-                'Biz arkadaşız.',
+            Tablo(
+              soru: 'Be fiili çekim tablosunu tamamla.',
+              baslik: ['Özne', 'Be fiili'],
+              satirlar: [
+                ['I', 'am'],
+                ['you', 'are'],
+                ['she', 'is'],
+                ['we', 'are'],
               ],
-              dogru: 0,
-              aciklama: 'He o (erkek), my benim, friend arkadaş demektir.',
+              bos: [(satir: 0, sutun: 1), (satir: 2, sutun: 1)],
+              secenekler: ['am', 'is', 'are'],
+              aciklama: 'I ile am, she/he/it ile is kullanılır.',
             ),
             Yaz(
               soru: 'İngilizceye çevir: Türkiye\'denim.',

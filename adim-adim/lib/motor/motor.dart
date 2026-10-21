@@ -1088,6 +1088,8 @@ abstract final class Motor {
     Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
     Sirala() => a.dogru.join(' '),
     Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
+    Tablo() => a.bos.map(a.hucre).join(', '),
+    Isaretle() => [for (final i in a.dogru) a.kelimeler[i]].join(' '),
   };
 
   /// Adım 0: açıklamanın ilk cümlesi; yoksa türe göre sabit metin.
@@ -1109,6 +1111,8 @@ abstract final class Motor {
       Dinle() => 'Bir kez daha dinle, sonra yaz',
       Kod() => 'Söz dizimini kontrol et',
       Soyle() => 'Önce dinle, sonra yavaş ve net söyle',
+      Tablo() => 'Satır ve sütun başlıklarındaki örüntüye bak',
+      Isaretle() => 'Cümleyi baştan oku; birden çok kelime doğru olabilir',
     };
   }
 
@@ -1143,6 +1147,11 @@ abstract final class Motor {
         a.ciftler.isEmpty
             ? 'Bildiklerini önce eşle'
             : 'Bir çift: ${a.ciftler.first.sol} = ${a.ciftler.first.sag}',
+      Tablo() =>
+        a.bos.isEmpty
+            ? 'Bildiğin hücrelerle başla'
+            : uzunlukVeHarf(a.hucre(a.bos.first)),
+      Isaretle() => 'Doğru kelime sayısı: ${a.dogru.length}',
     };
   }
 
@@ -1327,6 +1336,26 @@ abstract final class Motor {
           kalan.removeAt(i);
         }
         return kalan.isEmpty;
+      case Tablo():
+        if (cevap is! List || cevap.length != a.bos.length) return false;
+        if (a.bos.isEmpty) return false;
+        for (var i = 0; i < cevap.length; i++) {
+          final e = cevap[i];
+          if (e is! String) return false;
+          final c = _normalle(e);
+          if (c.isEmpty || c != _normalle(a.hucre(a.bos[i]))) return false;
+        }
+        return true;
+      case Isaretle():
+        if (cevap is! List || cevap.isEmpty) return false;
+        final secilen = <int>{};
+        for (final e in cevap) {
+          if (e is! int) return false;
+          secilen.add(e);
+        }
+        return secilen.length == cevap.length &&
+            secilen.length == a.dogru.toSet().length &&
+            secilen.containsAll(a.dogru);
     }
   }
 }
