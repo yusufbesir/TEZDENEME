@@ -146,6 +146,11 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
   }
 
+  /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri
+  /// "atlandı" işaretlenir (XP/seri/kart yok).
+  Future<OgrenciDurumu> yerlestirmeUygula(Kurs kurs, List<int> gecilen) =>
+      _uygula((d) => Motor.yerlestirmeUygula(d, kurs, gecilen));
+
   /// Alan seçimi: yalnızca 'dil' ya da 'kod'. [ilkAcilisTamam] verilirse
   /// ilk açılış bayrağı da yazılır (akışın 1. adımı false yazar ki uygulama
   /// kapanıp açılınca akış sürsün).

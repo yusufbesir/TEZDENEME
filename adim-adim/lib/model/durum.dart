@@ -5,6 +5,7 @@
 /// ayarı/son gösterim günü.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
+/// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -277,6 +278,7 @@ class OgrenciDurumu {
     this.tekrarBildirimiAcik = true,
     this.konusmaAcik = true,
     this.tamamlananHikayeler = const {},
+    this.atlananDersler = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -341,6 +343,11 @@ class OgrenciDurumu {
   /// Okuma hikâyeleri: hikâye kimliği -> kaç kez tamamlandı (eski kayıtta boş).
   final Map<String, int> tamamlananHikayeler;
 
+  /// Seviye belirleme sınavıyla "atlandı" işaretlenen derslerin kimlikleri
+  /// (eski kayıtta boş). Atlanan ders yolda tamamlanmış sayılır ve sonrasını
+  /// açar (Motor.dersBitmis), ama `tamamlanan`a, XP/seriye ve kartlara yansımaz.
+  final Set<String> atlananDersler;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -395,6 +402,7 @@ class OgrenciDurumu {
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
     Map<String, int>? tamamlananHikayeler,
+    Set<String>? atlananDersler,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -424,6 +432,7 @@ class OgrenciDurumu {
       tekrarBildirimiAcik: tekrarBildirimiAcik ?? this.tekrarBildirimiAcik,
       konusmaAcik: konusmaAcik ?? this.konusmaAcik,
       tamamlananHikayeler: tamamlananHikayeler ?? this.tamamlananHikayeler,
+      atlananDersler: atlananDersler ?? this.atlananDersler,
     );
   }
 
@@ -453,6 +462,7 @@ class OgrenciDurumu {
     'tekrarBildirimiAcik': tekrarBildirimiAcik,
     'konusmaAcik': konusmaAcik,
     'tamamlananHikayeler': tamamlananHikayeler,
+    'atlananDersler': atlananDersler.toList()..sort(),
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -586,6 +596,17 @@ class OgrenciDurumu {
         j['tamamlananHikayeler'],
         (k) => !k.contains('#'),
       ),
+      // Eski kayıtta yoksa boş; geçerli ders kimliği (en çok 120 karakter,
+      // '#' içermez) olmayan girdiler atlanır.
+      atlananDersler: Set.unmodifiable({
+        if (j['atlananDersler'] is List)
+          for (final e in j['atlananDersler'] as List)
+            if (e is String &&
+                e.isNotEmpty &&
+                e.length <= 120 &&
+                !e.contains('#'))
+              e,
+      }),
     );
   }
 }

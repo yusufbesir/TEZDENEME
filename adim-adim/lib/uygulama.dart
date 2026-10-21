@@ -29,6 +29,7 @@ import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/yerlestirme_ekrani.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
@@ -116,6 +117,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           dersId: s.uri.queryParameters['ders'],
           yanlis: s.uri.queryParameters['yanlis'],
         ),
+      ),
+      GoRoute(
+        path: '/yerlestirme',
+        builder: (c, s) =>
+            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

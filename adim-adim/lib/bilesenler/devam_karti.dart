@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 /// Gösterilecek hedef ders ve ünitesi; [siradaki] true ise "Sıradaki" önerisi.
@@ -26,8 +27,12 @@ class DevamKarti extends StatelessWidget {
   /// kurslar sırasında ilk tamamlanmamış ders; hiçbiri yoksa null.
   static DevamHedefi? hedefSec(OgrenciDurumu durum, List<Kurs> kurslar) {
     final sonId = durum.sonDersId;
-    if (sonId == null && durum.tamamlanan.isEmpty) return null;
-    bool bitti(String id) => (durum.tamamlanan[id] ?? 0) > 0;
+    if (sonId == null &&
+        durum.tamamlanan.isEmpty &&
+        durum.atlananDersler.isEmpty) {
+      return null;
+    }
+    bool bitti(String id) => Motor.dersBitmis(durum, id);
     if (sonId != null && !bitti(sonId)) {
       final b = _bul(kurslar, sonId);
       if (b != null) return (ders: b.ders, unite: b.unite, siradaki: false);
