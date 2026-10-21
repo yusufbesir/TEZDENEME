@@ -1,8 +1,13 @@
 /// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
-/// Profil) ile kabuk dışı rotalar (ayarlar, ders, mikro ders, alan seçimi).
+/// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
+/// seçimi).
+/// `/mikro` rotası `mod=zayif` (zayıf noktalar) ve `mod=karisik&ders=<id>`
+/// (ünite sonu serpiştirilmiş tekrar) parametrelerini alır.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// MaterialApp builder'ı yükleme ekranını gösterir ve metin ölçeğini
+/// [1,0 ; 1,3] aralığına kıstırır.
 library;
 
 import 'package:flutter/material.dart';
@@ -18,6 +23,7 @@ import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
+import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
 import 'tema/tema.dart';
@@ -75,11 +81,20 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
-      GoRoute(path: '/mikro', builder: (c, s) => const MikroDersEkrani()),
+      GoRoute(
+        path: '/mikro',
+        // mod=zayif: hata defterinden zayıf noktalar dersi;
+        // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar.
+        builder: (c, s) => MikroDersEkrani(
+          mod: s.uri.queryParameters['mod'],
+          dersId: s.uri.queryParameters['ders'],
+        ),
+      ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],
   );
@@ -120,7 +135,17 @@ class AdimAdimUygulama extends ConsumerWidget {
             ),
           );
         }
-        return child ?? const SizedBox.shrink();
+        // Metin ölçeği [1,0 ; 1,3] aralığına kıstırılır: ne okunmaz küçülür
+        // ne de yerleşimi bozacak kadar büyür.
+        final medya = MediaQuery.of(context);
+        final olcek = medya.textScaler
+            .scale(1.0)
+            .clamp(Olcu.metinOlcekEn, Olcu.metinOlcekEnCok)
+            .toDouble();
+        return MediaQuery(
+          data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
+          child: child ?? const SizedBox.shrink(),
+        );
       },
     );
   }

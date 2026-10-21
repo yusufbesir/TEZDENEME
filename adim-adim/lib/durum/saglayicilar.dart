@@ -1,4 +1,6 @@
 /// Riverpod sağlayıcıları: depo, bugün, kurslar, öğrenci durumu ve alan kursları.
+/// Durum yazımları (ders, mikro ders, yarışma, tekrar oturumu, kart, ayarlar;
+/// hata defteri, öğrenme günlüğü, kelime notu ve haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -14,6 +16,8 @@ import '../model/icerik.dart';
 import '../motor/motor.dart';
 import '../servis/bildirim.dart';
 import '../servis/ses.dart';
+import '../sozluk/sozluk.dart';
+import '../yarisma/model.dart';
 
 /// Kalıcı depo. Uygulama başlarken (main) ya da testte override edilir.
 final depoProvider = Provider<Depo>(
@@ -38,6 +42,11 @@ final kayitHatasiProvider = NotifierProvider<KayitHatasi, String?>(
 );
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
+
+/// Gömülü sözlük: kurs listesinden (varsayılan tumKurslar) bir kez üretilir.
+final sozlukProvider = Provider<Sozluk>(
+  (ref) => Sozluk.kurslardan(ref.watch(kurslarProvider)),
+);
 
 /// Bugünün günü 'YYYY-MM-DD'. Testte sabitlenebilir.
 final bugunProvider = Provider<String>((ref) {
@@ -123,15 +132,47 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.mikroBitir(d, dogru, toplam, bugun));
   }
 
-  Future<OgrenciDurumu> yarismaBitir(int puan) {
+  /// [yanlisSorular]: oyunda yanlış bilinen sorular (hata defterine yazılır).
+  /// [dogru]/[toplam]: öğrenme günlüğüne yazılan cevap sayıları.
+  Future<OgrenciDurumu> yarismaBitir(
+    int puan, {
+    List<YarismaSorusu> yanlisSorular = const [],
+    int dogru = 0,
+    int toplam = 0,
+  }) {
     final bugun = ref.read(bugunProvider);
-    return _uygula((d) => Motor.yarismaBitir(d, puan, bugun));
+    return _uygula(
+      (d) => Motor.yarismaBitir(
+        d,
+        puan,
+        bugun,
+        yanlisSorular: yanlisSorular,
+        dogru: dogru,
+        toplam: toplam,
+      ),
+    );
+  }
+
+  /// Tekrar oturumu bitişi: öğrenme günlüğüne tek 'tekrar' kaydı.
+  Future<OgrenciDurumu> tekrarBitir(int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.tekrarBitir(d, dogru, toplam, bugun));
   }
 
   Future<OgrenciDurumu> kartIsle(String kartId, bool dogruMu) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
   }
+
+  /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
+  Future<OgrenciDurumu> kartEkle(String kartId) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.kartEkle(d, kartId, bugun));
+  }
+
+  /// Kelimeye kişisel not yazar; boş/null metin notu siler.
+  Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
+      _uygula((d) => Motor.notYaz(d, kartId, metin));
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat. Hatırlatma açılırken bildirim izni
@@ -142,6 +183,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool koyuTemaSil = false,
     bool? sesAcik,
     int? gunlukHedef,
+    int? haftalikHedefGun,
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
   }) async {
@@ -152,6 +194,10 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         koyuTemaSil: koyuTemaSil,
         sesAcik: sesAcik,
         gunlukHedef: gunlukHedef,
+        haftalikHedefGun: haftalikHedefGun?.clamp(
+          OgrenciDurumu.enAzHaftalikHedef,
+          OgrenciDurumu.enCokHaftalikHedef,
+        ),
         hatirlatmaSaati: hatirlatmaSaati,
         hatirlatmaSil: hatirlatmaSil,
       ),

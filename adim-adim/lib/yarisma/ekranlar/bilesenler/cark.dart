@@ -5,7 +5,7 @@
 /// Dönüş 1.200 ms, `Curves.easeOutCubic` (belge bölüm 6: 250 ms kuralının TEK
 /// istisnası). Hareketi azalt açıksa çark dönmez, hedef dilimde anında durur.
 /// Hedef dilimi dışarıdan verilir (motorun `carkCevir` sonucu); çark yalnızca
-/// o dilimi işaretçinin altına getirir.
+/// o dilimi işaretçinin altına getirir. Dilim simgeleri yarıçapa oranlıdır.
 library;
 
 import 'dart:math' as math;
@@ -213,7 +213,7 @@ class _CarkCizici extends CustomPainter {
           ..strokeWidth = 3
           ..color = kenar,
       );
-      _simgeCiz(canvas, merkez, yaricap * 0.66, baslangic + dilim / 2, i);
+      _simgeCiz(canvas, merkez, yaricap, baslangic + dilim / 2, i);
     }
     canvas.restore();
     // Orta göbek.
@@ -223,16 +223,17 @@ class _CarkCizici extends CustomPainter {
   void _simgeCiz(
     Canvas canvas,
     Offset merkez,
-    double uzaklik,
+    double yaricap,
     double a,
     int i,
   ) {
+    final uzaklik = yaricap * 0.66;
     final ikon = simgeler[i];
     final tp = TextPainter(
       text: TextSpan(
         text: String.fromCharCode(ikon.codePoint),
         style: TextStyle(
-          fontSize: 32,
+          fontSize: yaricap * 0.2, // çark yarıçapıyla orantılı (320 px'te 32)
           fontFamily: ikon.fontFamily,
           package: ikon.fontPackage,
           color: simgeRengi,

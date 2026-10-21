@@ -14,3 +14,6 @@ kararlar.jsonl
 *.keystore
 **/key.properties
 **/*.p12
+
+# Ajan geçici çalışma ağaçları (worktree); depoya girmez
+.claude/worktrees/

@@ -2,6 +2,7 @@
 name: implementer
 description: Tek ve net bir kod görevini uygulayan ve test yazan ajan. Orchestrator ona her seferinde yalnızca bir görev verir.
 model: claude-sonnet-5-5
+effort: medium
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 

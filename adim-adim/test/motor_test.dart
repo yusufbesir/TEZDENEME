@@ -1,3 +1,10 @@
+/// Motor birim testleri: seviye/XP, seri, yarı ömür tekrar (kartIsle), Kart JSON
+/// uyumu, ders kimliği çözümü, mikro ders seçimi (öncelikli kartlar), serpiştirilmiş
+/// ünite tekrarı, yarışma XP'si ve cevap kontrolü.
+/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf
+/// kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/model/icerik.dart';
 import 'package:adim_adim/motor/motor.dart';
@@ -206,25 +213,69 @@ void main() {
       expect(d.kartlar['d#0']!.sonraki, '2025-05-11');
     });
 
-    test('aralıklar 1,2,4,8,16 ve kutu 5te sabit kalır', () {
+    test('doğru cevaplarda yarı ömür x2 gider, kutu göstergesi 1..5', () {
       var d = const OgrenciDurumu();
-      final beklenen = [2, 4, 8, 16, 16, 16];
-      final kutular = [2, 3, 4, 5, 5, 5];
+      final beklenen = [2, 4, 8, 16, 32, 64, 128, 180, 180];
+      final kutular = [2, 3, 4, 5, 5, 5, 5, 5, 5];
       for (var i = 0; i < beklenen.length; i++) {
         d = Motor.kartIsle(d, 'x#1', true, bugun);
-        expect(d.kartlar['x#1']!.kutu, kutular[i]);
-        expect(Motor.gunFarki(bugun, d.kartlar['x#1']!.sonraki), beklenen[i]);
+        final k = d.kartlar['x#1']!;
+        expect(k.yariOmurGun, beklenen[i].toDouble());
+        expect(k.kutu, kutular[i]);
+        expect(Motor.gunFarki(bugun, k.sonraki), beklenen[i]);
+        expect(k.sonCevap, true);
       }
     });
 
-    test('yanlış cevap herhangi kutudan kutu 1e döndürür', () {
+    test('yanlış cevap yarı ömrü yarıya indirir (en az 0,5 gün)', () {
       var d = const OgrenciDurumu(
-        kartlar: {'x#1': Kart(kutu: 5, sonraki: '2025-01-01')},
+        kartlar: {'x#1': Kart(kutu: 5, sonraki: '2025-01-01', yariOmurGun: 16)},
       );
       d = Motor.kartIsle(d, 'x#1', false, bugun);
+      expect(d.kartlar['x#1']!.yariOmurGun, 8.0);
+      expect(d.kartlar['x#1']!.kutu, 4);
+      expect(d.kartlar['x#1']!.sonraki, '2025-05-18');
+      expect(d.kartlar['x#1']!.sonCevap, false);
+      for (var i = 0; i < 6; i++) {
+        d = Motor.kartIsle(d, 'x#1', false, bugun);
+      }
+      expect(d.kartlar['x#1']!.yariOmurGun, 0.5);
       expect(d.kartlar['x#1']!.kutu, 1);
-      expect(d.kartlar['x#1']!.sonraki, '2025-05-11');
+      expect(d.kartlar['x#1']!.sonraki, '2025-05-11'); // en az 1 gün
     });
+
+    test('aralık tam sayıya yuvarlanır, en az 1 gündür', () {
+      const ilk = OgrenciDurumu(
+        kartlar: {'x#1': Kart(kutu: 2, sonraki: '2025-01-01', yariOmurGun: 3)},
+      );
+      final yanlis = Motor.kartIsle(ilk, 'x#1', false, bugun); // 1,5 -> 2
+      expect(yanlis.kartlar['x#1']!.yariOmurGun, 1.5);
+      expect(yanlis.kartlar['x#1']!.sonraki, '2025-05-12');
+      final dogru = Motor.kartIsle(ilk, 'x#1', true, bugun); // 6
+      expect(dogru.kartlar['x#1']!.sonraki, '2025-05-16');
+      final yeniYanlis = Motor.kartIsle(
+        const OgrenciDurumu(),
+        'y#0',
+        false,
+        bugun,
+      ); // 0,5 -> en az 1
+      expect(yeniYanlis.kartlar['y#0']!.sonraki, '2025-05-11');
+    });
+
+    test(
+      'yarı ömrü olmayan eski kart kutusundan türetilen yarı ömürle sürer',
+      () {
+        final eski = OgrenciDurumu.fromJson({
+          'kartlar': {
+            'x#1': {'kutu': 4, 'sonraki': '2025-05-01'},
+          },
+        });
+        expect(eski.kartlar['x#1']!.yariOmurGun, 8.0);
+        final d = Motor.kartIsle(eski, 'x#1', true, bugun);
+        expect(d.kartlar['x#1']!.yariOmurGun, 16.0);
+        expect(d.kartlar['x#1']!.kutu, 5);
+      },
+    );
 
     test('ay ve yıl sonu taşması doğru', () {
       var d = Motor.kartIsle(const OgrenciDurumu(), 'a#0', false, '2025-12-31');
@@ -736,6 +787,285 @@ void main() {
       final d = const OgrenciDurumu().copyWith(alan: 'kod');
       expect(d.alan, 'kod');
       expect(d.copyWith(xp: 3).alan, 'kod');
+    });
+  });
+
+  group('Kart JSON uyumu', () {
+    test(
+      'eski kayıt (yeni alan yok) kutudan yarı ömür alır, sonCevap null',
+      () {
+        for (final e in {1: 1.0, 2: 2.0, 3: 4.0, 4: 8.0, 5: 16.0}.entries) {
+          final k = Kart.fromJson({'kutu': e.key, 'sonraki': '2025-05-14'})!;
+          expect(k.yariOmurGun, e.value);
+          expect(k.sonCevap, isNull);
+          expect(k.kutu, e.key);
+        }
+      },
+    );
+
+    test('geçersiz yarı ömür ve sonCevap türleri eski kayıt gibi okunur', () {
+      for (final bozuk in <Object?>[
+        'x',
+        -1,
+        0.1,
+        181,
+        double.nan,
+        double.infinity,
+      ]) {
+        final k = Kart.fromJson({
+          'kutu': 3,
+          'sonraki': '2025-05-14',
+          'yariOmurGun': bozuk,
+          'sonCevap': 'evet',
+        })!;
+        expect(k.yariOmurGun, 4.0, reason: '$bozuk');
+        expect(k.sonCevap, isNull);
+      }
+    });
+
+    test('toJson/fromJson gidiş dönüş yeni alanları korur', () {
+      const k = Kart(
+        kutu: 4,
+        sonraki: '2025-05-14',
+        yariOmurGun: 9.5,
+        sonCevap: false,
+      );
+      final r = Kart.fromJson(k.toJson())!;
+      expect(r.yariOmurGun, 9.5);
+      expect(r.sonCevap, false);
+      expect(r.kutu, 4);
+    });
+
+    test('kutuHesapla sınırları', () {
+      expect(Kart.kutuHesapla(0.5), 1);
+      expect(Kart.kutuHesapla(1.99), 1);
+      expect(Kart.kutuHesapla(2), 2);
+      expect(Kart.kutuHesapla(3.99), 2);
+      expect(Kart.kutuHesapla(4), 3);
+      expect(Kart.kutuHesapla(8), 4);
+      expect(Kart.kutuHesapla(16), 5);
+      expect(Kart.kutuHesapla(180), 5);
+    });
+  });
+
+  group('ders kimliği çözümü', () {
+    test('uniteNo iki biçimi de çözer', () {
+      expect(Motor.uniteNo('ingilizce-1.u1.d1'), 1);
+      expect(Motor.uniteNo('ingilizce-1.u12.d3'), 12);
+      expect(Motor.uniteNo('html-1-u2-d1'), 2);
+      expect(Motor.uniteNo('js-1-u10-d4'), 10);
+      expect(Motor.uniteNo('sahte-kod-1.u3.d1'), 3);
+    });
+    test('kursKimligi iki biçimi de çözer', () {
+      expect(Motor.kursKimligi('ingilizce-1.u1.d1'), 'ingilizce-1');
+      expect(Motor.kursKimligi('html-1-u2-d1'), 'html-1');
+      expect(Motor.kursKimligi('sahte-kod-1.u3.d1'), 'sahte-kod-1');
+    });
+    test('tanınmayan biçim null verir', () {
+      for (final x in ['', 'abc', 'html-1', 'html-1-u1', 'k.u1', 'k.ux.d1']) {
+        expect(Motor.uniteNo(x), isNull, reason: x);
+        expect(Motor.kursKimligi(x), isNull, reason: x);
+      }
+    });
+  });
+
+  group('serpistirmeSec (ünite sonu karışık tekrar)', () {
+    // 3 ünite; her ünitede 2 ders; ders başına 6 alıştırma, 3 tür.
+    List<Alistirma> al(String on) => [
+      for (var i = 0; i < 2; i++) ...[
+        Secim(soru: '$on s$i', secenekler: const ['a', 'b'], dogru: 0),
+        Yaz(soru: '$on y$i', cevaplar: const ['x']),
+        Sirala(
+          soru: '$on r$i',
+          kelimeler: const ['a', 'b'],
+          dogru: const ['a', 'b'],
+        ),
+      ],
+    ];
+    Kurs kurs(String ad, String Function(int u, int d) kimlik) => Kurs(
+      id: ad,
+      ad: ad,
+      aciklama: '',
+      alan: KursAlani.dil,
+      uniteler: [
+        for (var u = 1; u <= 3; u++)
+          Unite(
+            id: '$ad-$u',
+            ad: 'U$u',
+            dersler: [
+              for (var d = 1; d <= 2; d++)
+                Ders(id: kimlik(u, d), ad: 'D$d', alistirmalar: al('u$u d$d')),
+            ],
+          ),
+      ],
+    );
+    final noktali = kurs('k-1', (u, d) => 'k-1.u$u.d$d');
+    final tireli = kurs('h-1', (u, d) => 'h-1-u$u-d$d');
+
+    test('ilk ünitenin son dersinde önceki ünite olmadığından boş', () {
+      expect(Motor.serpistirmeSec([noktali], 'k-1.u1.d2'), isEmpty);
+    });
+
+    test('ünitenin son olmayan dersinde boş', () {
+      expect(Motor.serpistirmeSec([noktali], 'k-1.u2.d1'), isEmpty);
+      expect(Motor.serpistirmeSec([noktali], 'yok.u2.d2'), isEmpty);
+    });
+
+    for (final kr in [noktali, tireli]) {
+      final ayrac = kr.id == 'k-1' ? '.' : '-';
+      test(
+        '${kr.id}: 2. ünite sonunda yalnız 1. üniteden 5 benzersiz soru',
+        () {
+          final son = kr.uniteler[1].dersler.last.id;
+          final s = Motor.serpistirmeSec([kr], son, tohum: 3);
+          expect(s, hasLength(5));
+          expect({for (final e in s) e.kartId}, hasLength(5));
+          for (final e in s) {
+            expect(e.kartId, startsWith('${kr.id}${ayrac}u1'));
+            expect(Motor.kartCoz([kr], e.kartId), same(e.alistirma));
+          }
+        },
+      );
+    }
+
+    test('3. ünite sonunda 1. ve 2. üniteden gelir, 3. ünite gelmez', () {
+      final s = Motor.serpistirmeSec([noktali], 'k-1.u3.d2', tohum: 1);
+      expect(s, hasLength(5));
+      expect(s.every((e) => !e.kartId.startsWith('k-1.u3')), isTrue);
+    });
+
+    test('türler serpiştirilir: ardışık aynı tür yok, 3 tür de görünür', () {
+      for (var tohum = 0; tohum < 20; tohum++) {
+        final s = Motor.serpistirmeSec([noktali], 'k-1.u3.d2', tohum: tohum);
+        final turler = [for (final e in s) e.alistirma.tur];
+        for (var i = 1; i < turler.length; i++) {
+          expect(turler[i], isNot(turler[i - 1]), reason: 'tohum $tohum');
+        }
+        expect(turler.toSet(), hasLength(3), reason: 'tohum $tohum');
+      }
+    });
+
+    test(
+      'aynı tohum aynı sonucu, farklı tohum (çoğunlukla) farklıyı verir',
+      () {
+        List<String> ids(int t) => [
+          for (final e in Motor.serpistirmeSec(
+            [noktali],
+            'k-1.u3.d2',
+            tohum: t,
+          ))
+            e.kartId,
+        ];
+        expect(ids(7), ids(7));
+        expect(
+          {for (var t = 0; t < 10; t++) ids(t).join(',')}.length,
+          greaterThan(1),
+        );
+      },
+    );
+
+    test('havuz 5ten küçükse hepsi gelir; adet 0 boş', () {
+      const az = Kurs(
+        id: 'a-1',
+        ad: 'a',
+        aciklama: '',
+        alan: KursAlani.dil,
+        uniteler: [
+          Unite(
+            id: 'a-1.u1',
+            ad: 'U1',
+            dersler: [
+              Ders(
+                id: 'a-1.u1.d1',
+                ad: 'D',
+                alistirmalar: [
+                  Yaz(soru: 'q', cevaplar: ['x']),
+                ],
+              ),
+            ],
+          ),
+          Unite(
+            id: 'a-1.u2',
+            ad: 'U2',
+            dersler: [Ders(id: 'a-1.u2.d1', ad: 'D', alistirmalar: [])],
+          ),
+        ],
+      );
+      expect(Motor.serpistirmeSec([az], 'a-1.u2.d1'), hasLength(1));
+      expect(Motor.serpistirmeSec([noktali], 'k-1.u3.d2', adet: 0), isEmpty);
+    });
+
+    test(
+      'girdi kurs listesi ve durum değişmez; yalnız aynı kurs kullanılır',
+      () {
+        final s = Motor.serpistirmeSec([tireli, noktali], 'k-1.u2.d2');
+        expect(s.every((e) => e.kartId.startsWith('k-1.')), isTrue);
+      },
+    );
+  });
+
+  group('mikroSec oncelikliKartlar', () {
+    final kurs = Kurs(
+      id: 'k-1',
+      ad: 'k',
+      aciklama: '',
+      alan: KursAlani.dil,
+      uniteler: [
+        Unite(
+          id: 'k-1.u1',
+          ad: 'U1',
+          dersler: [
+            Ders(
+              id: 'k-1.u1.d1',
+              ad: 'D',
+              alistirmalar: [
+                for (var i = 0; i < 8; i++)
+                  Secim(soru: 's$i', secenekler: const ['a', 'b'], dogru: 0),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    test('öncelikli kartlar zamanı gelenlerden önce, sırayla gelir', () {
+      final d = OgrenciDurumu(
+        kartlar: {'k-1.u1.d1#0': const Kart(kutu: 1, sonraki: '2025-01-01')},
+      );
+      final s = Motor.mikroSec(
+        d,
+        [kurs],
+        '2025-05-10',
+        oncelikliKartlar: const ['k-1.u1.d1#5', 'k-1.u1.d1#3'],
+      );
+      expect(s, hasLength(5));
+      expect(s[0].kartId, 'k-1.u1.d1#5');
+      expect(s[1].kartId, 'k-1.u1.d1#3');
+      expect(s[2].kartId, 'k-1.u1.d1#0');
+      expect({for (final e in s) e.kartId}, hasLength(5));
+    });
+
+    test('çözülemeyen ve yinelenen öncelikli kart atlanır', () {
+      final s = Motor.mikroSec(
+        const OgrenciDurumu(),
+        [kurs],
+        '2025-05-10',
+        oncelikliKartlar: const ['yok.u1.d1#0', 'k-1.u1.d1#2', 'k-1.u1.d1#2'],
+      );
+      expect(s.first.kartId, 'k-1.u1.d1#2');
+      expect(s.where((e) => e.kartId == 'k-1.u1.d1#2'), hasLength(1));
+      expect(s, hasLength(5));
+    });
+
+    test('öncelikli kart adetten fazlaysa ilk adet kadarı alınır', () {
+      final s = Motor.mikroSec(
+        const OgrenciDurumu(),
+        [kurs],
+        '2025-05-10',
+        adet: 2,
+        oncelikliKartlar: [for (var i = 0; i < 6; i++) 'k-1.u1.d1#$i'],
+      );
+      expect([for (final e in s) e.kartId], ['k-1.u1.d1#0', 'k-1.u1.d1#1']);
     });
   });
 }

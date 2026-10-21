@@ -1,4 +1,5 @@
-/// Ders ve mikro ders özet ekranı: kupa/onay simgesi, doğru sayısı, XP, seri.
+/// Ders ve mikro ders özet ekranı: kupa/onay simgesi, doğru sayısı, XP, seri;
+/// isteğe bağlı ek eylem düğmesi (ör. "Karışık tekrar (5 soru)").
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -22,6 +23,8 @@ class DersOzeti extends StatelessWidget {
     required this.xp,
     required this.seri,
     required this.onDon,
+    this.ekEtiket,
+    this.onEk,
   });
 
   final String baslik;
@@ -31,6 +34,10 @@ class DersOzeti extends StatelessWidget {
   final int xp;
   final int seri;
   final VoidCallback onDon;
+
+  /// İsteğe bağlı ek eylem (ör. "Karışık tekrar (5 soru)"); ikisi birlikte verilir.
+  final String? ekEtiket;
+  final VoidCallback? onEk;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +140,14 @@ class DersOzeti extends StatelessWidget {
               ),
             ),
             const Spacer(),
+            if (ekEtiket != null && onEk != null) ...[
+              OutlinedButton.icon(
+                icon: const Icon(Icons.shuffle),
+                label: Text(ekEtiket!),
+                onPressed: onEk,
+              ),
+              const SizedBox(height: Olcu.b2),
+            ],
             FilledButton(onPressed: onDon, child: const Text('Yola dön')),
           ],
         ),
