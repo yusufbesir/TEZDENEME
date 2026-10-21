@@ -7,6 +7,8 @@ import 'eslestir.dart';
 import 'hamle.dart';
 import 'isaretle.dart';
 import 'kod.dart';
+import 'kod_calistir.dart';
+import 'kod_etkilesim.dart';
 import 'secim.dart';
 import 'sirala.dart';
 import 'soyle.dart';
@@ -88,6 +90,35 @@ class AlistirmaKarti extends StatelessWidget {
       onCevap: onCevap,
     ),
     final Hamle a => HamleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+    ),
+    final KodBoslukDoldur a => KodBoslukDoldurGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final KodParcaSec a => KodParcaSecGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final KodYaz a => KodYazGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+      onGonder: onGonder,
+    ),
+    final KodCikti a => KodCiktiGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+    ),
+    final KodCalistir a => KodCalistirGorunumu(
       alistirma: a,
       kontrolEdildi: kontrolEdildi,
       dogruMu: dogruMu,

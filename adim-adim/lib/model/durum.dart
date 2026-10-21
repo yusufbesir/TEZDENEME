@@ -17,7 +17,8 @@
 /// 49, 51), boş harita ve 30; `ardisikBasarisiz`/`sonBasarisizDers`: üst üste
 /// başarısız ders denemesi (ÖZELLİK 50), 0 ve yok; `yerImleri`/`koleksiyonlar`/
 /// `yerImiGecmisi`: yer imi koleksiyonları, notları ve geçmişi (ÖZELLİK 72),
-/// hepsi boş liste)
+/// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
+/// alanları (ÖZELLİK 70), boş liste)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -25,7 +26,10 @@
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
+import 'kod_projesi.dart';
 import 'satranc_durumu.dart';
+
+export 'kod_projesi.dart';
 
 class Kart {
   const Kart({
@@ -392,6 +396,7 @@ class OgrenciDurumu {
     this.yerImleri = const [],
     this.koleksiyonlar = const [],
     this.yerImiGecmisi = const [],
+    this.kodProjeleri = const [],
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -558,6 +563,10 @@ class OgrenciDurumu {
   final List<String> koleksiyonlar;
   final List<String> yerImiGecmisi;
 
+  /// Kod projeleri ve oyun alanları (ÖZELLİK 70); eski kayıtta boş. Sınırlar
+  /// [KodProjesi] içinde.
+  final List<KodProjesi> kodProjeleri;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -641,6 +650,7 @@ class OgrenciDurumu {
     List<YerImi>? yerImleri,
     List<String>? koleksiyonlar,
     List<String>? yerImiGecmisi,
+    List<KodProjesi>? kodProjeleri,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -703,6 +713,7 @@ class OgrenciDurumu {
       yerImleri: yerImleri ?? this.yerImleri,
       koleksiyonlar: koleksiyonlar ?? this.koleksiyonlar,
       yerImiGecmisi: yerImiGecmisi ?? this.yerImiGecmisi,
+      kodProjeleri: kodProjeleri ?? this.kodProjeleri,
     );
   }
 
@@ -763,6 +774,7 @@ class OgrenciDurumu {
     'yerImleri': [for (final y in yerImleri) y.toJson()],
     'koleksiyonlar': koleksiyonlar,
     'yerImiGecmisi': yerImiGecmisi,
+    'kodProjeleri': [for (final p in kodProjeleri) p.toJson()],
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1041,6 +1053,7 @@ class OgrenciDurumu {
       yerImleri: yerImleriCoz(j['yerImleri']),
       koleksiyonlar: koleksiyonlarCoz(j['koleksiyonlar']),
       yerImiGecmisi: yerImiGecmisiCoz(j['yerImiGecmisi']),
+      kodProjeleri: KodProjesi.listeCoz(j['kodProjeleri']),
     );
   }
 

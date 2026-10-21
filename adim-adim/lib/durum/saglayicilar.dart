@@ -18,6 +18,8 @@ import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
 import '../motor/efsanevi.dart';
+import '../motor/kod_calistirici.dart';
+import '../motor/kod_projesi.dart';
 import '../motor/meydan.dart';
 import '../motor/motor.dart';
 import '../motor/pratik.dart';
@@ -26,6 +28,8 @@ import '../motor/senaryo.dart';
 import '../motor/sure.dart';
 import '../motor/yer_imi.dart';
 import '../servis/bildirim.dart';
+import '../servis/js_motoru.dart';
+import '../servis/proje_aktarici.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
 import '../sozluk/dil_paketi.dart';
@@ -43,6 +47,17 @@ final sesProvider = Provider<Ses>((ref) => Ses());
 /// Konuşma tanıma servisi. Gerçek motor (sherpa-onnx) `main.dart` ya da
 /// uygulama kökünde override edilir; varsayılan "motor yok".
 final konusmaProvider = Provider<KonusmaTanima>((ref) => const KonusmaYok());
+
+/// Kod çalıştırıcı (ÖZELLİK 69): varsayılan cihazdaki QuickJS; testlerde
+/// sahte uygulamayla override edilir. Motor yüklenemezse sonuç "motor yok".
+final kodCalistiriciProvider = Provider<KodCalistirici>(
+  (ref) => const QuickJsCalistirici(),
+);
+
+/// Projeyi .html dosyası olarak kaydeden servis (ÖZELLİK 70); testte sahte.
+final projeAktariciProvider = Provider<ProjeAktarici>(
+  (ref) => const DosyaProjeAktarici(),
+);
 
 final bildirimProvider = Provider<BildirimServisi>(
   (ref) => const GercekBildirim(),
@@ -432,6 +447,20 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => YerImleri.degistir(d, anahtar, bugun));
   }
+
+  // --- Kod projeleri ve oyun alanı (ÖZELLİK 70) ---------------------------
+
+  /// Projeyi kaydeder; sınır aşılırsa durum değişmez ve neden döner.
+  Future<String?> projeKaydet(KodProjesi p) async {
+    final bugun = ref.read(bugunProvider);
+    final r = KodProjeleri.kaydet(_simdiki, p, bugun);
+    if (r.hata != null) return r.hata;
+    await _uygula((d) => KodProjeleri.kaydet(d, p, bugun).durum);
+    return null;
+  }
+
+  Future<OgrenciDurumu> projeSil(String id) =>
+      _uygula((d) => KodProjeleri.sil(d, id));
 
   Future<OgrenciDurumu> yerImiNotYaz(String anahtar, String? metin) =>
       _uygula((d) => YerImleri.notYaz(d, anahtar, metin));

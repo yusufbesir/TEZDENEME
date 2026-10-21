@@ -1,4 +1,5 @@
 import '../model/icerik.dart';
+import 'etkilesimli_kod.dart';
 
 /// JavaScript'e Giriş
 const Kurs js1 = Kurs(
@@ -550,5 +551,6 @@ const Kurs js1 = Kurs(
         ),
       ],
     ),
+    jsEtkilesimliUnite,
   ],
 );

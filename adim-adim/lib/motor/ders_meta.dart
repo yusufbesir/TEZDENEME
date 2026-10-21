@@ -82,6 +82,21 @@ class DersMeta {
       case Hamle(:final oyuncuHamleleri):
         puan = oyuncuHamleleri.length >= 2 ? 4 : 3;
         sn = 30 + 20 * oyuncuHamleleri.length;
+      case KodBoslukDoldur(:final kod, :final dogru):
+        puan = dogru.length >= 3 ? 3 : 2;
+        sn = 20 + 8 * dogru.length + kod.length ~/ 10;
+      case KodParcaSec(:final kod):
+        puan = 2;
+        sn = 20 + kod.length ~/ 10;
+      case KodYaz(:final kod):
+        puan = 3;
+        sn = 25 + kod.length ~/ 10;
+      case KodCikti(:final kod):
+        puan = 3;
+        sn = 30 + kod.length ~/ 6;
+      case KodCalistir(:final cozum):
+        puan = 4;
+        sn = 90 + cozum.length ~/ 2;
     }
     sn += a.soru.length ~/ 12;
     final z = puan <= 1 ? Zorluk.kolay : (puan <= 3 ? Zorluk.orta : Zorluk.zor);

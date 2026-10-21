@@ -799,7 +799,19 @@ class _OrnekProgramlarKarti extends StatelessWidget {
             context,
           ).textTheme.bodySmall?.copyWith(color: r.metinIkincil),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        // Projeler ve oyun alanı (ÖZELLİK 70): yeni kart yerine bu satırda.
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              key: const ValueKey('projeler-dugmesi'),
+              tooltip: 'Projeler ve oyun alanı',
+              icon: const Icon(Icons.construction),
+              onPressed: () => context.push('/projeler'),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
         onTap: () => context.push('/ornekler'),
       ),
     );

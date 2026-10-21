@@ -39,6 +39,7 @@ import 'ekranlar/halat_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
+import 'ekranlar/projeler_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/pratik_etkinlikleri.dart';
@@ -170,6 +171,12 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/ornekler',
         builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(path: '/projeler', builder: (c, s) => const ProjelerEkrani()),
+      GoRoute(
+        path: '/proje/:id',
+        builder: (c, s) =>
+            ProjeEditorEkrani(projeId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
         path: '/ornek-basvuru',

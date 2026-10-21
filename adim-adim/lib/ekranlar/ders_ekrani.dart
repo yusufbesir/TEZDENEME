@@ -20,6 +20,7 @@ import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../icerik/projeler.dart';
 import '../motor/ders_meta.dart';
 import '../motor/ders_ogeleri.dart';
 import '../motor/kolaylastirma.dart';
@@ -151,6 +152,24 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
               ustalik,
             ],
           );
+    // Ünitenin son dersi ve ünitenin projesi varsa (ÖZELLİK 70).
+    final proje = dersSonuProjesi(ref.read(kurslarProvider), ders.id);
+    if (proje != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          kart,
+          const SizedBox(height: Olcu.b1),
+          TextButton.icon(
+            key: const ValueKey('bolum-projesi'),
+            icon: const Icon(Icons.construction),
+            label: Text('Bölüm sonu projesi: ${proje.ad}'),
+            onPressed: () =>
+                context.push('/proje/${Uri.encodeComponent(proje.projeId)}'),
+          ),
+        ],
+      );
+    }
     // Satranç dersleri: ders sonu tahta meydan okuması (ÖZELLİK 56).
     if (!SatrancCalisma.dersMeydanVar(ref.read(kurslarProvider), ders.id)) {
       return kart;

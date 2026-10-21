@@ -1,4 +1,5 @@
 import '../model/icerik.dart';
+import 'etkilesimli_kod.dart';
 
 /// HTML'ye Giriş
 const Kurs html1 = Kurs(
@@ -539,5 +540,6 @@ const Kurs html1 = Kurs(
         ),
       ],
     ),
+    htmlEtkilesimliUnite,
   ],
 );

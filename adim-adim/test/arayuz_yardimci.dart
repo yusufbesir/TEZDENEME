@@ -18,6 +18,7 @@ import 'package:adim_adim/yarisma/depo.dart';
 import 'package:adim_adim/yarisma/saglayicilar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'sahte_icerik.dart';
@@ -82,6 +83,7 @@ Future<ProviderContainer> uygulamayiAc(
   KonusmaTanima? konusma,
   Size boyut = const Size(500, 1600),
   double metinOlcegi = 1.0,
+  List<Override> ekOverrides = const [],
 }) async {
   tester.view.physicalSize = boyut;
   tester.view.devicePixelRatio = 1;
@@ -101,6 +103,7 @@ Future<ProviderContainer> uygulamayiAc(
         sesProvider.overrideWithValue(ses ?? SahteSes()),
         bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
         if (konusma != null) konusmaProvider.overrideWithValue(konusma),
+        ...ekOverrides,
       ],
       child: const AdimAdimUygulama(),
     ),

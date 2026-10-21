@@ -1,4 +1,5 @@
 import '../model/icerik.dart';
+import 'etkilesimli_kod.dart';
 
 /// Python'a Giriş
 const Kurs python1 = Kurs(
@@ -732,5 +733,6 @@ const Kurs python1 = Kurs(
         ),
       ],
     ),
+    pythonEtkilesimliUnite,
   ],
 );

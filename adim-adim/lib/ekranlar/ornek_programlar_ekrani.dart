@@ -74,6 +74,13 @@ class _OrnekListeDurumu extends State<OrnekProgramlarEkrani> {
               '/ornek-basvuru?dil=${(_dil ?? OrnekDili.html).name}',
             ),
           ),
+          // Projeler ve oyun alanı (ÖZELLİK 70).
+          IconButton(
+            key: const ValueKey('ornek-projeler'),
+            icon: const Icon(Icons.construction),
+            tooltip: 'Projeler ve oyun alanı',
+            onPressed: () => context.push('/projeler'),
+          ),
         ],
       ),
       body: SafeArea(
