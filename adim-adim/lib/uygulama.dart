@@ -22,6 +22,7 @@ import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
@@ -95,6 +96,15 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/hikaye/:id',
         builder: (c, s) => HikayeEkrani(hikayeId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ornekler',
+        builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(
+        path: '/ornek/:id',
+        builder: (c, s) =>
+            OrnekDetayEkrani(ornekId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
         path: '/mikro',

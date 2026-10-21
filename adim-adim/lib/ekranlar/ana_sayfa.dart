@@ -298,6 +298,11 @@ class _YolListesi extends StatelessWidget {
         HikayeKarti(durum: durum, kurslar: kurslar),
         const SizedBox(height: Olcu.b3),
       ],
+      // Örnek programlar kütüphanesi yalnız kod alanında.
+      if (durum.alan == 'kod') ...[
+        const _OrnekProgramlarKarti(),
+        const SizedBox(height: Olcu.b3),
+      ],
     ];
 
     var dersNo = 0;
@@ -565,6 +570,32 @@ class GununKelimesiKarti extends ConsumerWidget {
                   ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Kod alanı: "Örnek programlar" kütüphanesine giriş kartı.
+class _OrnekProgramlarKarti extends StatelessWidget {
+  const _OrnekProgramlarKarti();
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Card(
+      key: const ValueKey('ornek-programlar-karti'),
+      child: ListTile(
+        minVerticalPadding: Olcu.b1,
+        leading: Icon(Icons.code, color: r.ana),
+        title: const Text('Örnek programlar'),
+        subtitle: Text(
+          'HTML, CSS ve JavaScript için açıklamalı kısa örnekler',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: r.metinIkincil),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push('/ornekler'),
       ),
     );
   }
