@@ -23,6 +23,8 @@ import '../bilesenler/basamak.dart';
 import '../bilesenler/bilmece_karti.dart';
 import '../bilesenler/calisma_plani_karti.dart';
 import '../bilesenler/devam_karti.dart';
+import '../bilesenler/donem_dersleri.dart';
+import '../bilesenler/geri_kazanma_satiri.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/hikaye_karti.dart';
 import '../bilesenler/profil_karti.dart';
@@ -266,26 +268,44 @@ class _YolListesi extends StatelessWidget {
           ],
         ],
       ),
-      Align(
-        alignment: Alignment.centerRight,
-        child: Semantics(
-          label:
-              'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)} / ${durum.haftalikHedefGun} gün',
-          excludeSemantics: true,
-          child: Text(
-            'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)}/${durum.haftalikHedefGun} gün',
-            style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: Semantics(
+              label:
+                  'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)} / ${durum.haftalikHedefGun} gün',
+              excludeSemantics: true,
+              child: Text(
+                'Bu hafta ${Motor.haftaGunSayisi(durum, bugun)}/${durum.haftalikHedefGun} gün',
+                style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+              ),
+            ),
           ),
-        ),
+          // Seri koptuysa geri kazanma ilerlemesi (ÖZELLİK 48).
+          GeriKazanmaSatiri(durum: durum, bugun: bugun),
+        ],
       ),
       const SizedBox(height: Olcu.b2),
-      ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: Olcu.hedef),
-        child: OutlinedButton.icon(
-          icon: const Icon(Icons.timer_outlined),
-          label: const Text('2 dakikalık ders'),
-          onPressed: alistirmaVar ? () => context.push('/mikro') : null,
-        ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: Olcu.hedef),
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.timer_outlined),
+              label: const Text('2 dakikalık ders'),
+              onPressed: alistirmaVar ? () => context.push('/mikro') : null,
+            ),
+          ),
+          // Günün / haftanın / ayın dersi (ÖZELLİK 63); tamamlanmış ders yoksa
+          // kendisi boş çizer.
+          if (Motor.donemDersiVar(durum, kurslar)) ...[
+            const SizedBox(height: Olcu.b1),
+            DonemDersleri(durum: durum, kurslar: kurslar, bugun: bugun),
+          ],
+        ],
       ),
       const SizedBox(height: Olcu.b3),
       // Kaldığın yerden devam: Günün kelimesinin üstünde; gösterilecek ders

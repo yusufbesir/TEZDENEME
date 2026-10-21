@@ -288,6 +288,12 @@ class OgrenciDurumu {
     this.dersEnIyi = const {},
     this.dersSureSn = const {},
     this.eslestirmeEnIyiMs,
+    this.kirilanSeri = 0,
+    this.geriKazanmaGun = 0,
+    this.geriKazanmaSon,
+    this.donemDersleri = const {},
+    this.gunDersiBildirimiAcik = false,
+    this.sonGunDersiBildirimGunu,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -378,6 +384,26 @@ class OgrenciDurumu {
   final Map<String, int> dersEnIyi;
   final Map<String, int> dersSureSn;
 
+  /// Seri geri kazanma (ÖZELLİK 48): kopan serinin değeri; 0: bekleyen yok
+  /// (eski kayıtta 0). 3 gün üst üste günlük hedef tutulunca seri bu değerin
+  /// +3'üne döner (Motor.geriKazanma).
+  final int kirilanSeri;
+
+  /// Geri kazanma ilerlemesi: art arda kaç gün günlük hedef tutuldu (0..2;
+  /// 3'te seri geri gelir ve sıfırlanır) ve son tutulan gün.
+  final int geriKazanmaGun;
+  final String? geriKazanmaSon;
+
+  /// Tamamlanan günün/haftanın/ayın dersleri (ÖZELLİK 63): dönem anahtarı
+  /// ('g:2026-10-21', 'h:2026-10-19' (Pazartesi), 'a:2026-10'); eski kayıtta boş.
+  final Set<String> donemDersleri;
+
+  /// Açılışta "günün dersi hazır" bildirimi (Windows toast); varsayılan kapalı.
+  final bool gunDersiBildirimiAcik;
+
+  /// Bu bildirimin en son gösterildiği gün; null: hiç.
+  final String? sonGunDersiBildirimGunu;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -440,6 +466,12 @@ class OgrenciDurumu {
     Map<String, int>? dersEnIyi,
     int? eslestirmeEnIyiMs,
     Map<String, int>? dersSureSn,
+    int? kirilanSeri,
+    int? geriKazanmaGun,
+    String? geriKazanmaSon,
+    Set<String>? donemDersleri,
+    bool? gunDersiBildirimiAcik,
+    String? sonGunDersiBildirimGunu,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -478,6 +510,14 @@ class OgrenciDurumu {
       dersEnIyi: dersEnIyi ?? this.dersEnIyi,
       eslestirmeEnIyiMs: eslestirmeEnIyiMs ?? this.eslestirmeEnIyiMs,
       dersSureSn: dersSureSn ?? this.dersSureSn,
+      kirilanSeri: kirilanSeri ?? this.kirilanSeri,
+      geriKazanmaGun: geriKazanmaGun ?? this.geriKazanmaGun,
+      geriKazanmaSon: geriKazanmaSon ?? this.geriKazanmaSon,
+      donemDersleri: donemDersleri ?? this.donemDersleri,
+      gunDersiBildirimiAcik:
+          gunDersiBildirimiAcik ?? this.gunDersiBildirimiAcik,
+      sonGunDersiBildirimGunu:
+          sonGunDersiBildirimGunu ?? this.sonGunDersiBildirimGunu,
     );
   }
 
@@ -518,7 +558,20 @@ class OgrenciDurumu {
     'dersEnIyi': dersEnIyi,
     'eslestirmeEnIyiMs': eslestirmeEnIyiMs,
     'dersSureSn': dersSureSn,
+    'kirilanSeri': kirilanSeri,
+    'geriKazanmaGun': geriKazanmaGun,
+    'geriKazanmaSon': geriKazanmaSon,
+    'donemDersleri': donemDersleri.toList()..sort(),
+    'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
+    'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
   };
+
+  static final _donemDeseni = RegExp(
+    r'^(g:\d{4}-\d{2}-\d{2}|h:\d{4}-\d{2}-\d{2}|a:\d{4}-\d{2})$',
+  );
+
+  /// Dönem anahtarı biçimi: 'g:YYYY-MM-DD', 'h:YYYY-MM-DD', 'a:YYYY-MM'.
+  static bool donemAnahtariGecerli(String s) => _donemDeseni.hasMatch(s);
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
   /// Anahtarlar yalnızca beklenen biçimde (ders/kart kimliği, gün) kabul edilir.
@@ -683,6 +736,28 @@ class OgrenciDurumu {
               (j['eslestirmeEnIyiMs'] as int) > 0 &&
               (j['eslestirmeEnIyiMs'] as int) <= 86400000)
           ? j['eslestirmeEnIyiMs'] as int
+          : null,
+      // Eski kayıtta yoksa: bekleyen geri kazanma yok, ilerleme 0.
+      kirilanSeri: tamsayi(j['kirilanSeri'], 0, max: 100000),
+      geriKazanmaGun: tamsayi(j['geriKazanmaGun'], 0, max: 2),
+      geriKazanmaSon:
+          (j['geriKazanmaSon'] is String &&
+              gunGecerli(j['geriKazanmaSon'] as String))
+          ? j['geriKazanmaSon'] as String
+          : null,
+      // Eski kayıtta yoksa boş; bozuk anahtarlar atlanır.
+      donemDersleri: Set.unmodifiable({
+        if (j['donemDersleri'] is List)
+          for (final e in j['donemDersleri'] as List)
+            if (e is String && donemAnahtariGecerli(e)) e,
+      }),
+      gunDersiBildirimiAcik: j['gunDersiBildirimiAcik'] is bool
+          ? j['gunDersiBildirimiAcik'] as bool
+          : false,
+      sonGunDersiBildirimGunu:
+          (j['sonGunDersiBildirimGunu'] is String &&
+              gunGecerli(j['sonGunDersiBildirimGunu'] as String))
+          ? j['sonGunDersiBildirimGunu'] as String
           : null,
     );
   }

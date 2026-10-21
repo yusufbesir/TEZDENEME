@@ -125,11 +125,13 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/mikro',
         // mod=zayif: hata defterinden zayıf noktalar dersi;
         // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar;
-        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz.
+        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz;
+        // mod=donem&donem=gunluk|haftalik|aylik: günün/haftanın/ayın dersi.
         builder: (c, s) => MikroDersEkrani(
           mod: s.uri.queryParameters['mod'],
           dersId: s.uri.queryParameters['ders'],
           yanlis: s.uri.queryParameters['yanlis'],
+          donem: s.uri.queryParameters['donem'],
         ),
       ),
       GoRoute(

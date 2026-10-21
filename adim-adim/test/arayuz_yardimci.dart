@@ -46,6 +46,12 @@ class SahteBildirim implements BildirimServisi {
   }
 
   @override
+  Future<bool> gunDersiBildirimi(int adet) async {
+    cagrilar.add('gundersi:$adet');
+    return izin;
+  }
+
+  @override
   Future<void> iptal() async => cagrilar.add('iptal');
 }
 

@@ -120,6 +120,26 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             .catchError((_) => false),
       );
     }
+    // Günün dersi hazır bildirimi (ÖZELLİK 63; ayar açıksa, günde bir kez).
+    final adet = Motor.gunDersiBildirimiGerekli(
+      d,
+      ref.read(kurslarProvider),
+      bugun,
+    );
+    if (adet != null) {
+      d = d.copyWith(sonGunDersiBildirimGunu: bugun);
+      try {
+        await ref.read(depoProvider).kaydet(d);
+      } catch (e) {
+        debugPrint('Günün dersi bildirim günü kaydedilemedi: $e');
+      }
+      unawaited(
+        ref
+            .read(bildirimProvider)
+            .gunDersiBildirimi(adet)
+            .catchError((_) => false),
+      );
+    }
     return d;
   }
 
@@ -199,6 +219,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// İlk açılış ("Hoş geldin") akışı bitti; bir daha gösterilmez.
   Future<OgrenciDurumu> ilkAcilisTamamla() =>
       _uygula((d) => d.copyWith(ilkAcilisTamam: true));
+
+  /// Günün / haftanın / ayın dersi bitişi (Motor.donemDersiBitir).
+  Future<OgrenciDurumu> donemDersiBitir(String tur, int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.donemDersiBitir(d, tur, dogru, toplam, bugun));
+  }
 
   Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);
@@ -313,6 +339,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool hatirlatmaSil = false,
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
+    bool? gunDersiBildirimiAcik,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -329,6 +356,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         hatirlatmaSil: hatirlatmaSil,
         tekrarBildirimiAcik: tekrarBildirimiAcik,
         konusmaAcik: konusmaAcik,
+        gunDersiBildirimiAcik: gunDersiBildirimiAcik,
       ),
     );
     final bildirim = ref.read(bildirimProvider);
