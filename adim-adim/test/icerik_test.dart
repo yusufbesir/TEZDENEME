@@ -35,6 +35,9 @@ void main() {
       'python-1',
       'python-2',
       'python-3',
+      'satranc-1',
+      'satranc-2',
+      'satranc-3',
     ]);
     expect(kursBul('css-1'), same(css1));
     expect(kursBul('yok'), isNull);

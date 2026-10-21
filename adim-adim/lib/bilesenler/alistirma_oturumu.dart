@@ -67,6 +67,15 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
     for (var i = 0; i < _ipucuAdim; i++) Motor.ipucuUret(_simdiki, i),
   ];
 
+  /// Bant açıklaması: yanlış cevaba özel mesaj (Hamle türünde
+  /// `hataMesajlari`) varsa önce o, sonra alıştırmanın açıklaması.
+  String? get _aciklama {
+    final ozel = _dogruMu ? null : Motor.hataMesaji(_simdiki, _cevap);
+    final genel = _simdiki.aciklama;
+    if (ozel == null || ozel.isEmpty) return genel;
+    return (genel == null || genel.isEmpty) ? ozel : '$ozel\n$genel';
+  }
+
   /// "Bu alıştırmayı atla" ile geçilen konuşma alıştırması sayısı.
   int _atlanan = 0;
 
@@ -189,7 +198,7 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
         if (_kontrolEdildi)
           GeriBildirimBandi(
             dogruMu: _dogruMu,
-            aciklama: _simdiki.aciklama,
+            aciklama: _aciklama,
             dogruCevap: dogruCevapMetni(_simdiki),
             ipuclari: _ipuclar,
             not: not,

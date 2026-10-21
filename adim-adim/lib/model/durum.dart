@@ -308,7 +308,7 @@ class OgrenciDurumu {
   final bool? koyuTema; // null: sistem
   final bool sesAcik;
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
-  final String? alan; // 'dil' | 'kod'; null: henüz seçilmedi
+  final String? alan; // 'dil' | 'kod' | 'oyun'; null: henüz seçilmedi
 
   /// Hata defteri, eskiden yeniye; en çok [HataKaydi.enCok] kayıt.
   final List<HataKaydi> hatalar;
@@ -593,7 +593,9 @@ class OgrenciDurumu {
       koyuTema: j['koyuTema'] is bool ? j['koyuTema'] as bool : null,
       sesAcik: j['sesAcik'] is bool ? j['sesAcik'] as bool : true,
       hatirlatmaSaati: (saat is String && saatGecerli(saat)) ? saat : null,
-      alan: (alan == 'dil' || alan == 'kod') ? alan as String : null,
+      alan: (alan == 'dil' || alan == 'kod' || alan == 'oyun')
+          ? alan as String
+          : null,
       hatalar: List.unmodifiable(sonHatalar),
       haftalikHedefGun: tamsayi(
         j['haftalikHedefGun'],

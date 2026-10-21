@@ -4,7 +4,8 @@
 /// secim, bosluk, yaz, sirala, eslestir, dinle (yeni: metin okunur, kullanıcı
 /// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur),
 /// tablo (yeni: çekim tablosundaki boş hücreleri doldurur), isaretle (yeni:
-/// cümlede doğru kelime(ler)e dokunur).
+/// cümlede doğru kelime(ler)e dokunur), hamle (yeni: oyun tahtasında doğru
+/// hamleyi ya da hamle dizisini oynar; ilk sürümde satranç).
 library;
 
 /// Dinle/Soyle alıştırmalarında konuşma ve tanıma dili (BCP-47) varsayılanı.
@@ -133,6 +134,24 @@ sealed class Alistirma {
           soru: soru,
           cumle: j['cumle'] as String,
           dogru: (j['dogru'] as List).map((e) => e as int).toList(),
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'hamle':
+        final hamHata = j['hataMesajlari'];
+        return Hamle(
+          soru: soru,
+          fen: j['fen'] as String,
+          hamleler: metinler('hamleler'),
+          matKabul: j['matKabul'] == true,
+          hataMesajlari: hamHata is Map
+              ? {
+                  for (final e in hamHata.entries)
+                    if (e.key is String && e.value is String)
+                      e.key as String: e.value as String,
+                }
+              : const {},
+          oyun: j['oyun'] as String? ?? Hamle.varsayilanOyun,
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -431,6 +450,56 @@ class Isaretle extends Alistirma {
   };
 }
 
+/// Tahtada hamle: `fen` başlangıç konumunda kullanıcı doğru hamleyi oynar.
+/// `hamleler` UCI ana hattır ('e2e4', terfi 'e7e8q'): çift indeksler
+/// kullanıcının, tek indeksler rakibin (otomatik oynanan) cevabıdır; tek
+/// hamlelik bulmacada yalnız bir öğe. `matKabul` true ise kullanıcının son
+/// hamlesi mat ettiği sürece kabul edilir (aynı konumda birden çok mat
+/// hamlesi olabilir). `hataMesajlari`: yanlış hamle (UCI) -> ona özel mesaj.
+/// Cevap: kullanıcının oynadığı hamlelerin (UCI) [List<String>]'i; doğru
+/// olması için oyuncu hamleleriyle sırayla eşleşmeli.
+/// `oyun`: tahta türü ('satranc'; Go gibi oyunlar için ayrılmış).
+class Hamle extends Alistirma {
+  const Hamle({
+    required super.soru,
+    required this.fen,
+    required this.hamleler,
+    this.matKabul = false,
+    this.hataMesajlari = const {},
+    this.oyun = varsayilanOyun,
+    super.aciklama,
+    super.ipuclari,
+  });
+
+  static const String varsayilanOyun = 'satranc';
+
+  final String fen;
+  final List<String> hamleler;
+  final bool matKabul;
+  final Map<String, String> hataMesajlari;
+  final String oyun;
+
+  /// Kullanıcının oynaması gereken hamleler (ana hattın çift indeksleri).
+  List<String> get oyuncuHamleleri => [
+    for (var i = 0; i < hamleler.length; i += 2) hamleler[i],
+  ];
+
+  @override
+  String get tur => 'hamle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'fen': fen,
+    'hamleler': hamleler,
+    if (matKabul) 'matKabul': true,
+    if (hataMesajlari.isNotEmpty) 'hataMesajlari': hataMesajlari,
+    if (oyun != varsayilanOyun) 'oyun': oyun,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
 class Ders {
   const Ders({
     required this.id,
@@ -457,7 +526,8 @@ class Unite {
   final List<Ders> dersler;
 }
 
-enum KursAlani { dil, kod }
+/// Kurs alanı. JSON/durumda adıyla saklanır ('dil' | 'kod' | 'oyun').
+enum KursAlani { dil, kod, oyun }
 
 class Kurs {
   const Kurs({

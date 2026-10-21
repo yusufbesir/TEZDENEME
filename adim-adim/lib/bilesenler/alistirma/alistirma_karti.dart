@@ -4,6 +4,7 @@ import '../../model/icerik.dart';
 import 'bosluk.dart';
 import 'dinle.dart';
 import 'eslestir.dart';
+import 'hamle.dart';
 import 'isaretle.dart';
 import 'kod.dart';
 import 'secim.dart';
@@ -84,6 +85,12 @@ class AlistirmaKarti extends StatelessWidget {
     final Isaretle a => IsaretleGorunumu(
       alistirma: a,
       kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Hamle a => HamleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
       onCevap: onCevap,
     ),
   };

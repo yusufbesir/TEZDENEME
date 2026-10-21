@@ -1,4 +1,4 @@
-/// Alan seçimi: tam ekran, iki büyük kart (İngilizce / Programlama).
+/// Alan seçimi: tam ekran, üç büyük kart (İngilizce / Programlama / Oyunlar).
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -284,6 +284,13 @@ class _AlanSecimiDurumu extends ConsumerState<AlanSecimiEkrani> {
       baslik: 'Programlama',
       altMetin: 'HTML, CSS ve JavaScript',
       onTap: () => _alanSec('kod'),
+    ),
+    const SizedBox(height: Olcu.b2),
+    _AlanKarti(
+      alan: 'oyun',
+      baslik: 'Oyunlar',
+      altMetin: 'Satranç: kurallar, taktik ve son oyun',
+      onTap: () => _alanSec('oyun'),
     ),
   ];
 

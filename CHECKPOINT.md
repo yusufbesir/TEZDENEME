@@ -33,6 +33,13 @@
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
 
+## Devir notu (2026-10-21 14:xx, içerik dalgası: 2, 3, 4, 5 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- Birleşik dalda tam paket 720 test geçti (önceki devirdeki 641/675 sayıları eskiydi; 7b23e38'de ölçülen 676 idi). flutter analyze temiz.
+- Eklenenler (PR #30): Python 1-3 (24 ders), HTML/CSS/JS orta ve ileri (6 kurs, 48 ders), Almanca A1/A2/B1 (36 ders, sözlük dili 'de'), Satranç 1-3 (alan Oyunlar, yeni Hamle alıştırması, kendi kural motoru lib/satranc, 72 hamle bulmacası python-chess ile çapraz doğrulandı).
+- Doğrulama: Python, web ve Almanca kursları Sonnet verifier'dan geçti; kesin hatalar düzeltildi.
+- Bilinen sınırlar: bazı Sirala alıştırmalarında alternatif geçerli sıra yanlış sayılır (web kurslarında ~15 yer); Unicode satranç taşları Windows'ta cihazda görülmedi; Oyunlar alanında yarışma yok; Almanca Dinle için de-DE ses paketi cihazda kontrol edilmeli; Jev'siz karar (bulut oturumu).
+- Sıradaki: 42–83 öneriler Yusuf'un seçimiyle (önerilen: 62, 71, 79, 44, 47, 63).
+
 ## Devir notu (2026-10-21 12:50, Adım Adım iş parçacığı → yeni iş parçacığı)
 - Yusuf kuralı (12:48): projeler 150k bağlam limitine göre yürütülür; bağlam ~150k'ya gelince devir notu yazılır ve yeni konuda devam edilir (/compact kullanılmaz). Model seçimi görev zorluğuna göre: basit Haiku, orta Sonnet, zor Opus; Jev ile birlikte yürütülür (Jev bulut oturumundan erişilemiyorsa "Jev'e erişilemedi" yazılır).
 - Durum: PR #30 (24, 28, 29, 31, 8.7, 67, 25, 18, 38; 642 test; 25+18+38 toplu doğrulandı) birleştirme onayı Yusuf'ta. Kalan sıra: 25, 18, 38 yeni iş parçacığı tarafından aynı dala eklendi (e759b761, 27c26fef, a39ff2b3); kalan 39, sonra 2, 3, 4, 5… (Yusuf 10:41 "sırayla tüm özellikleri ekle"). Yeni REA/emülatör öneri tabloları Yusuf'a sunulur, karar onda.

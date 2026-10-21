@@ -157,6 +157,7 @@ class Sozluk {
     }
 
     for (final kurs in kurslar) {
+      if (kurs.alan == KursAlani.oyun) continue; // Oyun kurslarında sözlük yok.
       final dil = kursDili(kurs);
       for (final ders in kurs.tumDersler) {
         for (var i = 0; i < ders.alistirmalar.length; i++) {

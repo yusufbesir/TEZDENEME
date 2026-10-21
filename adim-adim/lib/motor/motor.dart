@@ -10,6 +10,7 @@ import 'dart:math' as math;
 
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../satranc/satranc.dart';
 import '../yarisma/model.dart';
 
 /// Seviye bilgisi.
@@ -923,7 +924,8 @@ abstract final class Motor {
   static String? kursKimligi(String dersId) =>
       _dersKimligi.firstMatch(dersId)?.group(1);
 
-  /// Seçilen alana ait kurslar: 'dil' → dil, 'kod' → kod, diğer → boş.
+  /// Seçilen alana ait kurslar: 'dil' → dil, 'kod' → kod, 'oyun' → oyun,
+  /// diğer → boş.
   static List<Kurs> alanKurslari(List<Kurs> kurslar, String? alan) {
     final KursAlani hedef;
     switch (alan) {
@@ -931,6 +933,8 @@ abstract final class Motor {
         hedef = KursAlani.dil;
       case 'kod':
         hedef = KursAlani.kod;
+      case 'oyun':
+        hedef = KursAlani.oyun;
       default:
         return const [];
     }
@@ -1090,7 +1094,36 @@ abstract final class Motor {
     Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
     Tablo() => a.bos.map(a.hucre).join(', '),
     Isaretle() => [for (final i in a.dogru) a.kelimeler[i]].join(' '),
+    Hamle() => hamleMetni(a),
   };
+
+  /// Hamle alıştırmasının oyuncu hamleleri, Türkçe cebirsel gösterimle
+  /// (ör. "Vxf7#" ya da "Kd8+, sonra Ve8#"). Konum ya da hamle
+  /// çözülemezse UCI metni döner.
+  static String hamleMetni(Hamle a) {
+    try {
+      var k = Konum.fen(a.fen);
+      final parcalar = <String>[];
+      for (var i = 0; i < a.hamleler.length; i++) {
+        final h = k.uciBul(a.hamleler[i]);
+        if (h == null) return a.oyuncuHamleleri.join(', ');
+        if (i.isEven) parcalar.add(turkceSan(k.san(h)));
+        k = k.oyna(h);
+      }
+      return parcalar.join(', sonra ');
+    } on FormatException {
+      return a.oyuncuHamleleri.join(', ');
+    }
+  }
+
+  /// Yanlış cevaba özel mesaj: Hamle alıştırmasında son oynanan yanlış
+  /// hamlenin `hataMesajlari` karşılığı; yoksa ya da cevap doğruysa null.
+  static String? hataMesaji(Alistirma a, Object? cevap) {
+    if (a is! Hamle || cevap is! List || cevap.isEmpty) return null;
+    if (cevapDogruMu(a, cevap)) return null;
+    final son = cevap.last;
+    return son is String ? a.hataMesajlari[son.toLowerCase()] : null;
+  }
 
   /// Adım 0: açıklamanın ilk cümlesi; yoksa türe göre sabit metin.
   static String _genelIpucu(Alistirma a) {
@@ -1113,6 +1146,7 @@ abstract final class Motor {
       Soyle() => 'Önce dinle, sonra yavaş ve net söyle',
       Tablo() => 'Satır ve sütun başlıklarındaki örüntüye bak',
       Isaretle() => 'Cümleyi baştan oku; birden çok kelime doğru olabilir',
+      Hamle() => 'Önce şah çeken, taş alan ve tehdit eden hamlelere bak',
     };
   }
 
@@ -1152,7 +1186,21 @@ abstract final class Motor {
             ? 'Bildiğin hücrelerle başla'
             : uzunlukVeHarf(a.hucre(a.bos.first)),
       Isaretle() => 'Doğru kelime sayısı: ${a.dogru.length}',
+      Hamle() => _hamleTasIpucu(a),
     };
+  }
+
+  /// Hamle ipucu: oynanacak ilk taş ve karesi ("e1 karesindeki kale").
+  static String _hamleTasIpucu(Hamle a) {
+    if (a.hamleler.isEmpty) return 'Tahtaya dikkatle bak';
+    try {
+      final k = Konum.fen(a.fen);
+      final h = k.uciBul(a.hamleler.first);
+      if (h == null) return 'Tahtaya dikkatle bak';
+      return 'Oynanacak taş: ${kareAdi(h.kaynak)} karesindeki ${tasAdi(h.tas)}';
+    } on FormatException {
+      return 'Tahtaya dikkatle bak';
+    }
   }
 
   /// Yarı ömür (Settles & Meeder 2016, basitleştirilmiş): doğruda yarı ömür x2
@@ -1356,6 +1404,40 @@ abstract final class Motor {
         return secilen.length == cevap.length &&
             secilen.length == a.dogru.toSet().length &&
             secilen.containsAll(a.dogru);
+      case Hamle():
+        return _hamleDogruMu(a, cevap);
+    }
+  }
+
+  /// Hamle cevabı: oyuncu hamleleri sırayla ana hatla eşleşmeli; `matKabul`
+  /// ise son hamle, ana hattın önceki hamleleri oynandıktan sonra mat eden
+  /// herhangi bir yasal hamle olabilir.
+  static bool _hamleDogruMu(Hamle a, Object? cevap) {
+    final beklenen = a.oyuncuHamleleri;
+    if (cevap is! List || beklenen.isEmpty) return false;
+    if (cevap.length != beklenen.length) return false;
+    final oynanan = <String>[];
+    for (final e in cevap) {
+      if (e is! String) return false;
+      oynanan.add(e.trim().toLowerCase());
+    }
+    final son = oynanan.length - 1;
+    for (var i = 0; i < son; i++) {
+      if (oynanan[i] != beklenen[i]) return false;
+    }
+    if (oynanan[son] == beklenen[son]) return true;
+    if (!a.matKabul) return false;
+    try {
+      var k = Konum.fen(a.fen);
+      // Son oyuncu hamlesine kadar ana hattı oyna.
+      for (var i = 0; i < son * 2; i++) {
+        final s = k.uciOyna(a.hamleler[i]);
+        if (s == null) return false;
+        k = s;
+      }
+      return k.uciOyna(oynanan[son])?.mat ?? false;
+    } on FormatException {
+      return false;
     }
   }
 

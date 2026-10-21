@@ -172,12 +172,16 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     );
   }
 
-  /// Alan seçimi: yalnızca 'dil' ya da 'kod'. [ilkAcilisTamam] verilirse
+  /// Alan seçimi: yalnızca 'dil', 'kod' ya da 'oyun'. [ilkAcilisTamam] verilirse
   /// ilk açılış bayrağı da yazılır (akışın 1. adımı false yazar ki uygulama
   /// kapanıp açılınca akış sürsün).
   Future<OgrenciDurumu> alanSec(String alan, {bool? ilkAcilisTamam}) {
-    if (alan != 'dil' && alan != 'kod') {
-      throw ArgumentError.value(alan, 'alan', "'dil' ya da 'kod' olmalı");
+    if (alan != 'dil' && alan != 'kod' && alan != 'oyun') {
+      throw ArgumentError.value(
+        alan,
+        'alan',
+        "'dil', 'kod' ya da 'oyun' olmalı",
+      );
     }
     return _uygula(
       (d) => d.copyWith(alan: alan, ilkAcilisTamam: ilkAcilisTamam),
