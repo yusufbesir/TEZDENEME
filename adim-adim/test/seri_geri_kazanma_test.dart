@@ -67,6 +67,19 @@ void main() {
       expect(_hedefli(d, '2026-10-13').seri, 9);
     });
 
+    test('kopan seri tam 3 ise 3. günde seri 6 olur', () {
+      var d = const OgrenciDurumu(haftalikHedefGun: 7);
+      for (final g in ['2026-10-01', '2026-10-02', '2026-10-03']) {
+        d = _hedefli(d, g);
+      }
+      d = _hedefli(d, '2026-10-10');
+      expect(d.kirilanSeri, 3);
+      d = _hedefli(d, '2026-10-11');
+      d = _hedefli(d, '2026-10-12');
+      expect(d.seri, 6);
+      expect(d.kirilanSeri, 0);
+    });
+
     test('aynı gün ikinci ders ilerlemeyi çift saymaz', () {
       var d = _hedefli(_besGunluk(), '2026-10-10');
       d = _hedefli(d, '2026-10-10');

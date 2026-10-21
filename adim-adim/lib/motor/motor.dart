@@ -180,10 +180,6 @@ abstract final class Motor {
     }
     // Bir gün atlandıysa ilerleme sıfırlanır.
     if (ilerSon != null && gunFarki(ilerSon, bugun) > 1) ilerleme = 0;
-    if (kirilan > 0 && yeniSeri >= kirilan) {
-      kirilan = 0; // yeni seri zaten eskisine yetişti
-      ilerleme = 0;
-    }
     final bugunXp = (d.gunlukXp[bugun] ?? 0) + kazanc;
     if (kirilan > 0 && bugunXp >= d.gunlukHedef && ilerSon != bugun) {
       ilerleme = (ilerSon != null && gunFarki(ilerSon, bugun) == 1)
@@ -195,6 +191,10 @@ abstract final class Motor {
         kirilan = 0;
         ilerleme = 0;
       }
+    }
+    if (kirilan > 0 && yeniSeri >= kirilan) {
+      kirilan = 0; // yeni seri zaten eskisine yetişti
+      ilerleme = 0;
     }
     final enSeri = yeniSeri > d.enSeri ? yeniSeri : d.enSeri;
     return d.copyWith(

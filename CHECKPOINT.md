@@ -33,6 +33,12 @@
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
 
+## Devir notu (2026-10-21 15:xx, öneriler 62, 71, 79, 44, 48, 63 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- PR #30 birleşti (main bd33fc3). Yeni dal claude/adim-adim-ozellik-62-71: 62 ders sonu öğeler ekranı, 71 adım meta/ustalık, 79 filtreli tekrar+takvim, 44 pratik merkezi, 48 seri geri kazanma, 63 günün/haftanın/ayın dersi; tam paket 805 test, analyze temiz, toplu verifier'dan geçti (bulunan kirilan==3 hatası düzeltildi, test eklendi).
+- Numaralama notu: Duolingo önerileri 42–51 = D1..D10; seri geri kazanma 48 (D7); 47 = D6 satranç modülü iskeleti (günlük bulmaca, mini maç, serbest tahta), YAPILMADI; Yusuf'a 47'nin satranç iskeleti olduğu söylenecek.
+- Bilinen: günün dersinde cevaplar mikro ders gibi SRS'e yazılır; Windows toast cihazda denenmedi; günün dersi bildirimi varsayılan kapalı.
+- Sıradaki: Yusuf'un seçimi (42–83 kalanlar; öneri: 47 satranç iskeleti, 43 efsanevi zor tekrar, 49 aylık meydan okuma, 50 kolaylaştırma, 51 yıl/ay özeti).
+
 ## Devir notu (2026-10-21 14:xx, içerik dalgası: 2, 3, 4, 5 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Birleşik dalda tam paket 720 test geçti (önceki devirdeki 641/675 sayıları eskiydi; 7b23e38'de ölçülen 676 idi). flutter analyze temiz.
 - Eklenenler (PR #30): Python 1-3 (24 ders), HTML/CSS/JS orta ve ileri (6 kurs, 48 ders), Almanca A1/A2/B1 (36 ders, sözlük dili 'de'), Satranç 1-3 (alan Oyunlar, yeni Hamle alıştırması, kendi kural motoru lib/satranc, 72 hamle bulmacası python-chess ile çapraz doğrulandı).
