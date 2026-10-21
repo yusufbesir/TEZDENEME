@@ -33,6 +33,12 @@
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
 
+## Devir notu (2026-10-21 15:2x, Yusuf: "tüm önerileri uygulayacağız, bağımlıları birlikte yap") [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- Kapsam: 42–83 arası TÜM öneriler (REA-ozellik-haritasi-2026-10-17.md; Duolingo 42–51 = D1..D10, Chess.com 52–57, Drops 58–60, Mondly 61–66, toplu tarama 68–83), yapılanlar hariç: 44, 48, 62, 63, 71, 79 (PR #32, açık). Kalan: 42, 43, 45, 46, 47, 49, 50, 51, 52–57, 58–60, 61, 64, 65, 66, 68–70, 72–78, 80–83. Lig/topluluk/sosyal, ücretli karşılıklar, çevrim içi YZ yapılmaz; ağ gerektirenler çevrimdışı karşılığıyla.
+- Çalışma düzeni: bağımlı özellikler aynı implementer görevinde (örn. satranç 47+52–57 birlikte; ders/kart ekranı özellikleri 42+43+45+61+64+65+66; seri/hedef/başarım 49+50+51+ Drops 58–60; kelime/kart 68–70, 72–78, 80–83), grup başına yeni dal ya da #32'den sonra main'den dal; her grup sonrası verifier, tam paket, PR. PR #32 birleşmeden önce main'e bağımlı dalları onun üstüne aç.
+- Numara notu: 47 = satranç modülü iskeleti (D6), seri geri kazanma 48 yapıldı.
+- Ana sayfaya yeni kart ekleme (lazy liste testleri kırılgan); mevcut satıra düğme ekle. Flutter: /opt/flutter (kapsayıcıda yoksa: git clone --depth 1 -b 3.47.7 https://github.com/flutter/flutter /opt/flutter; FLUTTER_ALLOW_ROOT=1; git config --global --add safe.directory '*'). Git: sığ klonda "unpushed" uyarısı çıkarsa git fetch origin +refs/heads/<dal>:refs/remotes/origin/<dal> ve branch.<dal>.remote/merge ayarla.
+
 ## Devir notu (2026-10-21 15:xx, öneriler 62, 71, 79, 44, 48, 63 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - PR #30 birleşti (main bd33fc3). Yeni dal claude/adim-adim-ozellik-62-71: 62 ders sonu öğeler ekranı, 71 adım meta/ustalık, 79 filtreli tekrar+takvim, 44 pratik merkezi, 48 seri geri kazanma, 63 günün/haftanın/ayın dersi; tam paket 805 test, analyze temiz, toplu verifier'dan geçti (bulunan kirilan==3 hatası düzeltildi, test eklendi).
 - Numaralama notu: Duolingo önerileri 42–51 = D1..D10; seri geri kazanma 48 (D7); 47 = D6 satranç modülü iskeleti (günlük bulmaca, mini maç, serbest tahta), YAPILMADI; Yusuf'a 47'nin satranç iskeleti olduğu söylenecek.
