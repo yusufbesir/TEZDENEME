@@ -3,8 +3,7 @@
 > **Özet:** Değişen durum bilgisi (açık iş, bekleyen karar, sıradaki adım). Kalıcı kural değildir; kurallar `docs/kurallar/` ve `.claude/rules/` altındadır. Her oturum bitirdiği adımı buraya ekler, kesintiden sonra buradan devam edilir. Eski satırlar silinmez, "Tamamlandı" bölümüne taşınır. [İP:Talimat düzeni#zkd4TM]
 
 ## Şu an açık
-- Talimat düzeni, ikinci tur: yola bağlı kurallar, boyut testi, yerleşim tablosu (bu dal).
-- Sıradaki: tekrarlanan prosedürlerin skill'e çevrilmesi (ayrı PR).
+- Talimat düzeni: açık PR turu bitti (2026-10-21 16:25). Yusuf'un yetkisiyle #8, #7, #14, #18, #33, #15, #26, #19 birleşti; #12'yi sahibi birleştirdi. Açık kalan yalnız Adım Adım #32 (dokunulmadı). [İP:Talimat düzeni#zkd4TM]
 
 ## Bekleyen kullanıcı kararları
 - Adım Adım: 20 yeni içerik önerisinden (adim-adim/docs/ONERILER-2026-10-17-YENI-ICERIK.md) hangileri ve hangi sırayla yapılsın? Önerilen ilk üç: sözlük, Python 3 düzey, HTML/CSS/JS orta-ileri.
@@ -12,10 +11,10 @@
 - Adım Adım kararlar (Yusuf 2026-10-17 13:42): (a) Konuşma tanıma ONAYLANDI → öneri 8.7 (telaffuz / konuşma pratiği, Windows'ta speech_to_text ile; zayıf tanıma sınırı belgelenir) plana eklendi, sırada 31'den sonra. (b) Ücretli mekaniklerin ücretsiz karşılıkları (Ü1–Ü15) YAPILMAYACAK; zaten var olanlar (can sınırı yok, zayıf/orta/güçlü tekrar, çevrimdışı, reklamsız) olduğu gibi kalır. (c) Her tarama bölümünde "Önerilmedi" alt başlığı tutulur; özet Yusuf'a verildi. Yapılan: 1, 17, 16 (9f68c7b2), 21 ve 22 (kök bulma + sıklık, ünite paketleri + günün kelimesi; 395 test), 23 (devam kartı + öğrenme günlüğü; 420 test), 26 ve 14 (kişisel not + kademeli ipucu; 460 test). Sıradaki: 24 yapıldı (2026-10-21, 490 test; quiz + günün bilmecesi), 28 yapıldı (510 test), 29 ve 31 yapıldı (553 test, PR #30), 8.7 ve 67 de yapıldı (607 test, PR #30), sıradaki 25, 18, 38, 39, sonra 2, 3, 4, 5. Tasarruf kuralları (Yusuf 10:46): implementer/verifier Sonnet, yalnız ilgili testler, verifier 2–3 özellikte bir toplu. Yusuf 2026-10-21 10:41: "sırayla tüm özellikleri ekle" → onay beklemeden sırayla, aynı PR #30. Ek öneriler: 42–51 Duolingo, 52–57 Chess.com, 58–60 Drops, 61–66 Mondly, 68–83 toplu tarama (Mimo, Quizlet, Sololearn, AnkiDroid, Brilliant, CodeCamp, CodeGym, Programming Hub, Khan, Encode, Oxford, Naver, WordReference, Livio, Trivia Lite, e-Anatomy) (hepsi REA-ozellik-haritasi'nda, her bölümde "Önerilmedi" alt başlığı var).
 - Adım Adım yeni kurs isteği (Yusuf 2026-10-17 13:46): Korece, Japonca ve Çince için başlangıç (A1) kursları sıraya alındı → öneri 67 (Japonca A1 öneri 12'de zaten vardı; Korece hangıl ve Çince pinyin+temel hanzi yazı sistemi ünitesiyle başlar). Başlangıç seviyesi yeter. Drops Korece indirme listesinden kaldırıldı (cihazdaki listede işaretli).
 - Adım Adım çarşamba 2026-10-21 işi: okunamayan APK'ları (uptodown kopyaları yeniden indirilince) BlueStacks benzeri emülatörde kurup deneme, sonra yeni öneriler. Kurulum Yusuf onayıyla cihazda.
-- `.claude/skills` altındaki kullanılmayan skill'ler `skill-kutuphanesi` altına alınsın mı?
-- Jev ayrıntısı `docs/jev/` altında kalıp CLAUDE.md'de yalnız bağ mı bırakılsın?
-- Archify haritası cihaz oturumunda mı çıkarılsın?
-- `docs/orchestrator-log.md` satır biçimi (madde / tablo) tek biçime çevrilsin mi?
+- `.claude/skills` altındaki kullanılmayan skill'ler `skill-kutuphanesi` altına alınsın mı? (Önerim 2026-10-21: evet, ama başka konular bu skill'leri kullanıyor olabilir; taşıma Yusuf'un onayıyla, silme yok.)
+- Jev ayrıntısı `docs/jev/` altında kalıp CLAUDE.md'de yalnız bağ mı bırakılsın? (Önerim 2026-10-21: şimdilik kalsın; CLAUDE.md 4.050 karakter, sınırın altında ve Jev kuralları docs/kurallar/hafiza-ve-not.md'de de var.)
+- Archify haritası cihaz oturumunda mı çıkarılsın? (Yusuf'un kararı; cihaz çevrimdışıyken yapılamaz.)
+- `docs/orchestrator-log.md` satır biçimi (madde / tablo) tek biçime çevrilsin mi? (Önerim 2026-10-21: hayır; birden çok konu aynı anda yazıyor, toplu yeniden biçimleme çakışma üretir. Yeni satırlar tablo biçiminde yazılsın.)
 
 - **Adım Adım BEKLİYOR listesi (Yusuf 2026-10-17 14:57: kullanım sınırı azaldı, son çalışır sürüm hazırlanıyor; limit yenilenince buradan devam):**
   - Yapılan: 1 (PR #28), 17, 16, 21, 22, 23, 26, 14 (PR #29 dalı, 460 test).
@@ -32,6 +31,8 @@
 ## Tamamlandı
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
+- 2026-10-16: Yola bağlı kurallar, boyut testi, yerleşim tablosu (PR #21) ve skill'ler (PR #22) birleşti.
+- 2026-10-21: PR #8, #7, #14, #18, ardından Yusuf'un PR yetkisiyle #15, #26, #19 ana dala alındı (#12'yi sahibi birleştirdi); eski `.claude/orchestrator-log.md` satırları ve CLAUDE.md eklemeleri `docs/` altındaki yerlerine taşındı, içerik kaybı yok.
 
 ## Devir notu (2026-10-21 15:2x, Yusuf: "tüm önerileri uygulayacağız, bağımlıları birlikte yap") [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Kapsam: 42–83 arası TÜM öneriler (REA-ozellik-haritasi-2026-10-17.md; Duolingo 42–51 = D1..D10, Chess.com 52–57, Drops 58–60, Mondly 61–66, toplu tarama 68–83), yapılanlar hariç: 44, 48, 62, 63, 71, 79 (PR #32, açık). Kalan: 42, 43, 45, 46, 47, 49, 50, 51, 52–57, 58–60, 61, 64, 65, 66, 68–70, 72–78, 80–83. Lig/topluluk/sosyal, ücretli karşılıklar, çevrim içi YZ yapılmaz; ağ gerektirenler çevrimdışı karşılığıyla.

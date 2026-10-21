@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' blob: data:; connect-src 'self' ws:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Pırıl</title>
+  <link rel="stylesheet" href="stil.css">
+</head>
+<body>
+  <a class="atla" href="#yazi">Yazı kutusuna geç</a>
+
+  <header class="ust">
+    <div id="karakter" class="karakter" aria-hidden="false"></div>
+    <div class="baslik">
+      <h1>Pırıl</h1>
+      <p id="baglanti-seridi" class="serit" role="status" aria-live="polite">Bağlı değil</p>
+    </div>
+    <label class="anahtar" for="sesli-yanit">
+      <input type="checkbox" id="sesli-yanit">
+      <span>Sesli yanıt</span>
+    </label>
+  </header>
+
+  <nav class="sekmeler" id="sekmeler" role="tablist" aria-label="Bölümler">
+    <button type="button" role="tab" id="sekme-sohbet" aria-controls="panel-sohbet" aria-selected="true">Sohbet</button>
+    <button type="button" role="tab" id="sekme-uzak" aria-controls="panel-uzak" aria-selected="false" hidden>Uzaktan kontrol</button>
+    <button type="button" role="tab" id="sekme-baglanti" aria-controls="panel-baglanti" aria-selected="false" hidden>Bilgisayara bağlan</button>
+  </nav>
+
+  <main>
+    <section id="panel-sohbet" role="tabpanel" aria-labelledby="sekme-sohbet">
+      <ol id="mesajlar" class="mesajlar" aria-label="Konuşma geçmişi"></ol>
+
+      <ol id="adimlar" class="adimlar" aria-label="Yapılan işler" hidden></ol>
+
+      <p id="yanit" class="yanit" aria-live="polite" aria-atomic="true"></p>
+      <p id="sayac" class="sayac" role="timer" hidden></p>
+
+      <form id="komut-formu" class="komut-formu" autocomplete="off">
+        <label class="gizli" for="yazi">Komutunuzu yazın</label>
+        <input id="yazi" type="text" inputmode="text" enterkeyhint="send" placeholder="Örn. beş dakika sayaç kur" maxlength="500">
+        <button type="button" id="mikrofon" class="mikrofon" aria-pressed="false" aria-label="Sesle söyle" hidden>
+          <span aria-hidden="true">🎤</span>
+        </button>
+        <button type="submit" id="gonder">Gönder</button>
+      </form>
+      <p id="bilgi" class="bilgi" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="panel-baglanti" role="tabpanel" aria-labelledby="sekme-baglanti" hidden>
+      <form id="baglanti-formu" class="baglanti-formu" autocomplete="off">
+        <p>Bilgisayardaki Pırıl uygulamasında "Telefon bağlantısı"nı açın; orada görünen adresi ve eşleştirme kodunu girin. Her şey yalnızca yerel ağınızda, şifreli olarak konuşur.</p>
+        <label for="adres">Bilgisayar adresi</label>
+        <input id="adres" type="text" inputmode="url" placeholder="192.168.1.20:8765" spellcheck="false" autocapitalize="off">
+        <label for="kod">Eşleştirme kodu</label>
+        <input id="kod" type="text" placeholder="PIRIL-XXXXXXXX-…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="dugmeler">
+          <button type="submit" id="baglan">Bağlan</button>
+          <button type="button" id="baglantiyi-kes" hidden>Bağlantıyı kes</button>
+        </div>
+        <p id="baglanti-bilgi" class="bilgi" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="panel-uzak" role="tabpanel" aria-labelledby="sekme-uzak" hidden>
+      <p id="uzak-uyari" class="uyari" role="alert" hidden></p>
+      <div class="uzak-ust">
+        <button type="button" id="ekran-yenile">Ekranı yenile</button>
+        <span class="ipucu">Önizlemeye dokunarak işaret edin veya tıklayın.</span>
+      </div>
+      <div class="onizleme-kutu">
+        <img id="onizleme" alt="Bilgisayar ekranı önizlemesi" tabindex="0" hidden>
+        <p id="onizleme-bos" class="bilgi">Henüz ekran görüntüsü yok. "Ekranı yenile"ye basın.</p>
+      </div>
+      <form id="uzak-yazi-formu" class="komut-formu" autocomplete="off">
+        <label class="gizli" for="uzak-yazi">Bilgisayara yazılacak metin</label>
+        <input id="uzak-yazi" type="text" placeholder="Bilgisayara yazılacak metin" maxlength="500">
+        <button type="submit">Yaz</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="mantik.js"></script>
+  <script src="karakter.js"></script>
+  <script src="uygulama.js"></script>
+</body>
+</html>

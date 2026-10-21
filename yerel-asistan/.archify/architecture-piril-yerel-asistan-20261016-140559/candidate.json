@@ -1,0 +1,668 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Pırıl yerel-asistan mimarisi",
+    "output": ".archify/architecture-piril-yerel-asistan-20261016-140559/piril-yerel-asistan.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/yusufbesir/TEZDENEME.git",
+      "revision": "d8abe41c01620bd0c157a787317d99a0821f27bf",
+      "link_mode": "local-only"
+    }
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "Kullanıcı",
+      "sublabel": "yazı veya ses",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "android",
+      "type": "frontend",
+      "label": "Android sarmalayıcı",
+      "sublabel": "Capacitor, APK",
+      "tag": "cleartext yalnız yerel",
+      "pos": [
+        280,
+        200
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/android/capacitor.config.json",
+          "line": 1,
+          "end_line": 14
+        },
+        {
+          "path": "yerel-asistan/android/yamalar/network_security_config.xml",
+          "line": 11,
+          "end_line": 21
+        },
+        {
+          "path": "yerel-asistan/android/scripts/hazirla.js",
+          "line": 26,
+          "end_line": 100
+        }
+      ]
+    },
+    {
+      "id": "ui-phone",
+      "type": "frontend",
+      "label": "Ortak arayüz",
+      "sublabel": "telefon WebView",
+      "pos": [
+        280,
+        60
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/arayuz/uygulama.js",
+          "line": 150,
+          "end_line": 175
+        },
+        {
+          "path": "yerel-asistan/arayuz/uygulama.js",
+          "line": 225,
+          "end_line": 245
+        }
+      ]
+    },
+    {
+      "id": "client",
+      "type": "security",
+      "label": "Protokol istemcisi",
+      "sublabel": "ECDH + AES-GCM",
+      "pos": [
+        520,
+        60
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/protokol/istemci.js",
+          "line": 6,
+          "end_line": 60
+        },
+        {
+          "path": "yerel-asistan/protokol/istemci.js",
+          "line": 190,
+          "end_line": 200
+        }
+      ]
+    },
+    {
+      "id": "lan",
+      "type": "cloud",
+      "label": "Yerel ağ (LAN)",
+      "sublabel": "dış ağa çıkış yok",
+      "pos": [
+        760,
+        60
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/ag.js",
+          "line": 4,
+          "end_line": 36
+        },
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 136,
+          "end_line": 160
+        }
+      ]
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "label": "İstek güvenliği",
+      "sublabel": "file:// kök sınırı",
+      "pos": [
+        40,
+        660
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/guvenlik.js",
+          "line": 19,
+          "end_line": 52
+        }
+      ]
+    },
+    {
+      "id": "ui-pc",
+      "type": "frontend",
+      "label": "Sohbet ve karakter",
+      "sublabel": "renderer, sandbox",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/karakter-pencere.js",
+          "line": 1,
+          "end_line": 15
+        },
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 227,
+          "end_line": 265
+        }
+      ]
+    },
+    {
+      "id": "preload",
+      "type": "security",
+      "label": "Preload köprüsü",
+      "sublabel": "yalnız window.piril",
+      "pos": [
+        280,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/preload.js",
+          "line": 1,
+          "end_line": 22
+        }
+      ]
+    },
+    {
+      "id": "main",
+      "type": "backend",
+      "label": "Electron ana süreç",
+      "sublabel": "tepsi, pencereler, IPC",
+      "pos": [
+        520,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 136,
+          "end_line": 160
+        },
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 359,
+          "end_line": 383
+        }
+      ]
+    },
+    {
+      "id": "pairing",
+      "type": "security",
+      "label": "Eşleştirme kodu",
+      "sublabel": "yenile, bağlantıyı kes",
+      "pos": [
+        520,
+        380
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/eslestirme.js",
+          "line": 13,
+          "end_line": 56
+        },
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 75,
+          "end_line": 95
+        }
+      ]
+    },
+    {
+      "id": "secret",
+      "type": "database",
+      "label": "sir.bin",
+      "sublabel": "safeStorage ile şifreli",
+      "pos": [
+        280,
+        380
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/main.js",
+          "line": 75,
+          "end_line": 95
+        }
+      ]
+    },
+    {
+      "id": "server",
+      "type": "security",
+      "label": "Şifreli ws sunucusu",
+      "sublabel": "ECDH P-256, AES-256-GCM",
+      "tag": "yalnız anahtar açıkken",
+      "pos": [
+        760,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/protokol/sunucu.js",
+          "line": 44,
+          "end_line": 66
+        },
+        {
+          "path": "yerel-asistan/protokol/sunucu.js",
+          "line": 119,
+          "end_line": 160
+        },
+        {
+          "path": "yerel-asistan/protokol/sifre.js",
+          "line": 178,
+          "end_line": 226
+        }
+      ]
+    },
+    {
+      "id": "approval",
+      "type": "security",
+      "label": "Onay ve uzak girdi",
+      "sublabel": "tek onay, 45 sn",
+      "tag": "uzak kontrol izni",
+      "pos": [
+        1000,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/onay.js",
+          "line": 29,
+          "end_line": 75
+        }
+      ]
+    },
+    {
+      "id": "bridge",
+      "type": "backend",
+      "label": "Çekirdek köprüsü",
+      "sublabel": "ctx kurulumu",
+      "pos": [
+        520,
+        660
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/cekirdek-kopru.js",
+          "line": 20,
+          "end_line": 72
+        }
+      ]
+    },
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "Paylaşılan çekirdek",
+      "sublabel": "niyet + beceriler",
+      "pos": [
+        520,
+        800
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/cekirdek/asistan.js",
+          "line": 51,
+          "end_line": 119
+        }
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Ayar ve not deposu",
+      "sublabel": "JSON dosya deposu",
+      "pos": [
+        280,
+        800
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/depo.js",
+          "line": 1,
+          "end_line": 40
+        }
+      ]
+    },
+    {
+      "id": "platform",
+      "type": "backend",
+      "label": "Windows platformu",
+      "sublabel": "platform/windows.js",
+      "pos": [
+        760,
+        800
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/platform/windows.js",
+          "line": 147,
+          "end_line": 175
+        },
+        {
+          "path": "yerel-asistan/pc/platform/windows.js",
+          "line": 408,
+          "end_line": 430
+        }
+      ]
+    },
+    {
+      "id": "ollama",
+      "type": "external",
+      "label": "Yerel Ollama",
+      "sublabel": "127.0.0.1:11434",
+      "tag": "isteğe bağlı",
+      "pos": [
+        520,
+        960
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/cekirdek/yerel-llm.js",
+          "line": 1,
+          "end_line": 22
+        }
+      ]
+    },
+    {
+      "id": "powershell",
+      "type": "external",
+      "label": "PowerShell, Windows",
+      "sublabel": "-EncodedCommand",
+      "pos": [
+        760,
+        960
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "sources": [
+        {
+          "path": "yerel-asistan/pc/platform/windows.js",
+          "line": 22,
+          "end_line": 30
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Android telefon",
+      "wraps": [
+        "ui-phone",
+        "client",
+        "android"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Windows bilgisayar (Electron)",
+      "wraps": [
+        "guard",
+        "ui-pc",
+        "preload",
+        "main",
+        "pairing",
+        "secret",
+        "server",
+        "approval",
+        "bridge",
+        "core",
+        "store",
+        "platform"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-to-phone",
+      "from": "user",
+      "to": "ui-phone",
+      "label": "yazı / ses",
+      "variant": "emphasis"
+    },
+    {
+      "id": "android-loads-ui",
+      "from": "android",
+      "to": "ui-phone",
+      "label": "WebView www/"
+    },
+    {
+      "id": "ui-to-client",
+      "from": "ui-phone",
+      "to": "client",
+      "label": "komutGonder"
+    },
+    {
+      "id": "client-to-lan",
+      "from": "client",
+      "to": "lan",
+      "label": "ws://ip:port",
+      "variant": "security"
+    },
+    {
+      "id": "lan-to-server",
+      "from": "lan",
+      "to": "server",
+      "label": "şifreli zarf: komut, ilerleme, yanıt, onay",
+      "variant": "security"
+    },
+    {
+      "id": "user-to-pc-ui",
+      "from": "user",
+      "to": "ui-pc",
+      "label": "yazı / ses",
+      "variant": "emphasis"
+    },
+    {
+      "id": "guard-to-ui",
+      "from": "guard",
+      "to": "ui-pc",
+      "label": "yalnız kendi dosyaları"
+    },
+    {
+      "id": "ui-to-preload",
+      "from": "ui-pc",
+      "to": "preload",
+      "label": "window.piril"
+    },
+    {
+      "id": "preload-to-main",
+      "from": "preload",
+      "to": "main",
+      "label": "piril:komut"
+    },
+    {
+      "id": "main-to-server",
+      "from": "main",
+      "to": "server",
+      "label": "sunucuBaslat",
+      "variant": "dashed"
+    },
+    {
+      "id": "main-to-pairing",
+      "from": "main",
+      "to": "pairing",
+      "label": "kodu yenile"
+    },
+    {
+      "id": "pairing-to-secret",
+      "from": "pairing",
+      "to": "secret",
+      "label": "sır kaydı"
+    },
+    {
+      "id": "main-to-bridge",
+      "from": "main",
+      "to": "bridge",
+      "label": "komutCalistir",
+      "variant": "emphasis"
+    },
+    {
+      "id": "server-to-bridge",
+      "from": "server",
+      "to": "bridge",
+      "label": "telefon komutu (kaynak: telefon)",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "server-to-approval",
+      "from": "server",
+      "to": "approval",
+      "label": "uzak girdi",
+      "variant": "security"
+    },
+    {
+      "id": "bridge-to-core",
+      "from": "bridge",
+      "to": "core",
+      "label": "calistir(metin, ctx)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "core-to-store",
+      "from": "core",
+      "to": "store",
+      "label": "ctx.depo"
+    },
+    {
+      "id": "core-to-platform",
+      "from": "core",
+      "to": "platform",
+      "label": "ctx.platform",
+      "variant": "security"
+    },
+    {
+      "id": "approval-to-platform",
+      "from": "approval",
+      "to": "platform",
+      "label": "fare, klavye (izinliyse)",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "core-to-ollama",
+      "from": "core",
+      "to": "ollama",
+      "label": "yerelLlm (varsayılan kapalı)",
+      "variant": "dashed"
+    },
+    {
+      "id": "platform-to-ps",
+      "from": "platform",
+      "to": "powershell",
+      "label": "execFile"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Güvenlik sınırı",
+      "items": [
+        "Dış ağa veri gitmez; yalnız şifreli yerel ws ve isteğe bağlı 127.0.0.1 Ollama",
+        "ECDH P-256 + HKDF, ayrı AES-256-GCM yönleri, sıkı sayaç; ileri gizlilik",
+        "Kimliksiz bağlantı tavanı ve 5 hatada IP kilidi; kuyruk en çok 32 ileti"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Onay kapıları",
+      "items": [
+        "Riskli beceriler (ekranı kilitle) çalışmadan önce bilgisayarda onay ister",
+        "Uzak fare/klavye yalnız bilgisayarda uzak kontrol açıkken; onay penceresi açıkken yok sayılır"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Katmanlar",
+      "items": [
+        "Çekirdek, bilgisayar ve telefonda aynı bağımlılıksız JS; telefonda platform boş",
+        "Arayüz hem Electron hem Capacitor WebView içinde ortak",
+        "Android ses tanıma Capacitor eklentisiyle (arayuz/uygulama.js)"
+      ]
+    }
+  ]
+}

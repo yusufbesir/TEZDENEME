@@ -1,0 +1,4 @@
+# Pırıl için gereken en dar Android izinleri (satır başına bir tane)
+android.permission.RECORD_AUDIO
+android.permission.INTERNET
+android.permission.ACCESS_NETWORK_STATE

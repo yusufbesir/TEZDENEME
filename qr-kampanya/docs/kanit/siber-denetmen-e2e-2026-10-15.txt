@@ -1,0 +1,586 @@
+E2E10 ham çıktı (proje qre2e10, HTTP 8090, HTTPS 8450); sır/anahtar maskelenir
+
+==========================================================================================
+## 0) güncel ağacı kopyala
+==========================================================================================
+$ bash -c git -C /home/claude/TEZDENEME diff --stat HEAD | tail -1; diff -rq /home/claude/TEZDENEME/qr-kampanya . -x .env -x yedekler -x gizli -x __pycache__ | head   [pty=hayır]
+ 23 files changed, 339 insertions(+), 62 deletions(-)
+(çıkış kodu: 0)
+[GEÇTİ] kopya repodaki ağaçla aynı 23 files changed, 339 insertions(+), 62 deletions(-)
+
+==========================================================================================
+## 1) kurulum.sh (taze)
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=evet]
+.env oluşturuldu (izinler 600). Bu dosyayı kimseyle paylaşmayın, Git'e eklemeyin.
+BİLGİ: .env dosyasının SONUNA MFA_SIFRELEME_ANAHTARI eklendi (MFA gizli anahtarlarını şifreler; diğer satırlar değiştirilmedi).
+ Image qr-kampanya-app:e2e10 Building 
+ Image qr-kampanya-app:e2e10 Building 
+ Image qr-kampanya-yedek:e2e10 Building 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Image qr-kampanya-app:e2e10 Built 
+ Image qr-kampanya-yedek:e2e10 Built 
+ Image qr-kampanya-app:e2e10 Built 
+ Container qre2e10-yedek-run-54e462ef1e09 Creating 
+ Container qre2e10-yedek-run-54e462ef1e09 Created 
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:999 kip 2750, app yalnızca okur).
+Yedek şifreleme anahtarı üretiliyor (yalnızca bellek dosya sisteminde)...
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+Özel anahtar bellekten SİLİNDİ (kullanıcı onayıyla); kalıcı diske HİÇ yazılmadı. Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+Geri yükleme testi ve geri yükleme sırasında anahtar sizden istenecek (parola yöneticisinden yapıştırırsınız).
+ Container qre2e10-db-1 Creating 
+ Container qre2e10-db-1 Created 
+ Container qre2e10-db-1 Starting 
+ Container qre2e10-db-1 Started 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+ Container qre2e10-db-1 Running 
+ Container qre2e10-yedek-1 Creating 
+ Container qre2e10-hazirlik-1 Creating 
+ Container qre2e10-hazirlik-1 Created 
+ Container qre2e10-app-1 Creating 
+ Container qre2e10-yedek-1 Created 
+ Container qre2e10-app-1 Created 
+ Container qre2e10-caddy-1 Creating 
+ Container qre2e10-caddy-1 Created 
+ Container qre2e10-db-1 Waiting 
+ Container qre2e10-db-1 Waiting 
+ Container qre2e10-db-1 Healthy 
+ Container qre2e10-db-1 Healthy 
+ Container qre2e10-hazirlik-1 Starting 
+ Container qre2e10-yedek-1 Starting 
+ Container qre2e10-hazirlik-1 Started 
+ Container qre2e10-hazirlik-1 Waiting 
+ Container qre2e10-db-1 Waiting 
+ Container qre2e10-yedek-1 Started 
+ Container qre2e10-db-1 Healthy 
+ Container qre2e10-hazirlik-1 Exited 
+ Container qre2e10-app-1 Starting 
+ Container qre2e10-app-1 Started 
+ Container qre2e10-app-1 Waiting 
+ Container qre2e10-app-1 Healthy 
+ Container qre2e10-caddy-1 Starting 
+ Container qre2e10-caddy-1 Started 
+Servisler başlatılıyor...
+ Container qre2e10-caddy-1 Recreate 
+ Container qre2e10-caddy-1 Recreated 
+ Container qre2e10-caddy-1 Starting 
+ Container qre2e10-caddy-1 Started 
+NAME              IMAGE                                                                                          COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+qre2e10-app-1     qr-kampanya-app:e2e10                                                                          "/app/baslat.sh guni…"   app       14 seconds ago   Up 7 seconds (healthy)    8000/tcp
+qre2e10-caddy-1   caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d    "caddy run --config …"   caddy     1 second ago     Up Less than a second     2019/tcp, 0.0.0.0:8090->80/tcp, 0.0.0.0:8450->443/tcp, 0.0.0.0:8450->443/udp
+qre2e10-db-1      postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94   "docker-entrypoint.s…"   db        25 seconds ago   Up 24 seconds (healthy)   5432/tcp
+qre2e10-yedek-1   qr-kampanya-yedek:e2e10                                                                        "/bin/sh /betikler/y…"   yedek     14 seconds ago   Up 12 seconds             5432/tcp
+BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca
+Kurulum tamam. Panel: http://localhost/panel/
+(çıkış kodu: 0)
+[GEÇTİ] kurulum rc 0 rc=0
+[GEÇTİ] .env sonuna MFA_SIFRELEME_ANAHTARI eklendi (tek satır, 44 karakter) uzunluk=[44]
+[GEÇTİ] MFA satırı .env içinde (ayrı satır, öncekiyle birleşmemiş) 
+[GEÇTİ] age anahtarı yalnız terminalde 
+
+==========================================================================================
+## 2) (a) servis durumu + migrasyon
+==========================================================================================
+$ bash -c docker compose ps -a --format '{{.Service}} {{.State}} {{.Health}}'; docker compose logs hazirlik 2>&1 | grep -E '0006|Applying|OK' | tail -8; docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select name from django_migrations where app='qr' order by id desc limit 2"   [pty=hayır]
+app running healthy
+caddy running 
+db running healthy
+hazirlik exited 
+yedek running 
+hazirlik-1  |   Applying auth.0012_alter_user_first_name_max_length... OK
+hazirlik-1  |   Applying qr.0001_initial... OK
+hazirlik-1  |   Applying qr.0002_silme_korumasi... OK
+hazirlik-1  |   Applying qr.0003_ice_aktarma... OK
+hazirlik-1  |   Applying qr.0004_deneme_sayaci... OK
+hazirlik-1  |   Applying qr.0005_uygulama_rolu_yetkileri... OK
+hazirlik-1  |   Applying qr.0006_mfa_gizli_anahtar_sifreli... OK
+hazirlik-1  |   Applying sessions.0001_initial... OK
+0006_mfa_gizli_anahtar_sifreli
+0005_uygulama_rolu_yetkileri
+(çıkış kodu: 0)
+[GEÇTİ] app healthy 
+[GEÇTİ] hazirlik 0006 uygulandı 
+[GEÇTİ] hazirlik exited (başarılı) 
+[GEÇTİ] hazirlik ExitCode 0 0
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8090/saglik   [pty=hayır]
+200
+(çıkış kodu: 0)
+[GEÇTİ] /saglik 200 
+$ bash -c docker compose exec -T app id uygulama   [pty=hayır]
+uid=10001(uygulama) gid=999(uygulama) groups=999(uygulama)
+(çıkış kodu: 0)
+[GEÇTİ] app imajında uygulama uid=10001 gid=999 uid=10001(uygulama) gid=999(uygulama) groups=999(uygulama)
+
+==========================================================================================
+## 3) veri tohumu (yayında + taslak görsel, QR)
+==========================================================================================
+$ docker compose exec -T app python manage.py shell   [pty=hayır]
+18 objects imported automatically (use -v 2 for details).
+
+YAYIN sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png
+TASLAK sayfa/2026/10/3facf0fe0df343d0920aa486b16edbcc.png
+(çıkış kodu: 0)
+
+==========================================================================================
+## 4) (b) MFA kurulumu ve TOTP ile giriş
+==========================================================================================
+[KALDI] giriş sonrası MFA kurulum sayfası http://localhost:8090/panel/giris
+[KALDI] kurulum sayfasında gizli anahtar bulundu 
+[KALDI] kurulum kodu kabul edildi, panele girildi http://localhost:8090/panel/giris?next=/panel/
+$ bash -c docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select length(gizli_anahtar), left(gizli_anahtar,6), onayli from qr_mfacihazi"; docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select data_type, character_maximum_length from information_schema.columns where table_name='qr_mfacihazi' and column_name='gizli_anahtar'"   [pty=hayır]
+text|
+(çıkış kodu: 0)
+(DB: uzunluk|ilk6|onayli)
+[KALDI] DB'de gizli_anahtar Fernet belirteci (gAAAAA..., >=100 karakter), onaylı text|
+
+(Not: kurulum.sh yönetici sorusunu atladı: 'manage.py shell -c' stdout'a '18 objects imported automatically' başlığı basıyor, betikteki = "0" karşılaştırması tutmuyor; yönetici createsuperuser --noinput ile eklendi)
+
+==========================================================================================
+## 4) (b) MFA kurulumu ve TOTP ile giriş
+==========================================================================================
+[GEÇTİ] giriş sonrası MFA kurulum sayfası http://localhost:8090/panel/mfa/kurulum
+[GEÇTİ] kurulum sayfasında gizli anahtar bulundu 
+[GEÇTİ] kurulum kodu kabul edildi, panele girildi http://localhost:8090/panel/
+$ bash -c docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select length(gizli_anahtar), left(gizli_anahtar,6), onayli from qr_mfacihazi"; docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select data_type, character_maximum_length from information_schema.columns where table_name='qr_mfacihazi' and column_name='gizli_anahtar'"   [pty=hayır]
+140|gAAAAA|t
+text|
+(çıkış kodu: 0)
+(DB: uzunluk|ilk6|onayli)
+[GEÇTİ] DB'de gizli_anahtar Fernet belirteci (gAAAAA..., >=100 karakter), onaylı 140|gAAAAA|t
+[GEÇTİ] pg_dump (mfa+oturum tabloları) içinde düz base32 gizli anahtar YOK 
+[GEÇTİ] oturum içeriğinde (çözülmüş) düz gizli anahtar yok 
+[GEÇTİ] ikinci girişte MFA kod ekranı http://localhost:8090/panel/mfa/dogrula
+[GEÇTİ] TOTP koduyla giriş (şifreli sırdan çözülen anahtarla) çalışır http://localhost:8090/panel/
+[GEÇTİ] yanlış kodla giriş OLMAZ 
+
+==========================================================================================
+## 5) (g) Caddy medya sunumu
+==========================================================================================
+$ bash -c for y in sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png sayfa/2026/10/3facf0fe0df343d0920aa486b16edbcc.png; do echo "$y -> $(curl -s -o /dev/null -w '%{http_code}' http://localhost:8090/medya/$y)"; done   [pty=hayır]
+sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png -> 200
+sayfa/2026/10/3facf0fe0df343d0920aa486b16edbcc.png -> 404
+(çıkış kodu: 0)
+[GEÇTİ] yayındaki görsel 200 
+[GEÇTİ] taslak görseli anonim erişimde 200 DEĞİL 
+
+==========================================================================================
+## 6) (c) yönlendirme hız sınırı, çok işçi
+==========================================================================================
+$ bash -c docker top $(docker compose ps -q app) -o pid,args | grep -c 'gunicorn.*config.wsgi' ; docker top $(docker compose ps -q app) -o pid,ppid,args | grep gunicorn | head -6   [pty=hayır]
+4
+25825               25798               /usr/local/bin/python3.13 /usr/local/bin/gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 4 --timeout 300 --access-logfile - --no-control-socket
+25860               25825               /usr/local/bin/python3.13 /usr/local/bin/gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 4 --timeout 300 --access-logfile - --no-control-socket
+25861               25825               /usr/local/bin/python3.13 /usr/local/bin/gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 4 --timeout 300 --access-logfile - --no-control-socket
+25862               25825               /usr/local/bin/python3.13 /usr/local/bin/gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 4 --timeout 300 --access-logfile - --no-control-socket
+(çıkış kodu: 0)
+[GEÇTİ] gunicorn: birden çok süreç (master + >=3 işçi) süreç=4
+30 istek durum kodları: {'302': 5, '429': 25} sıra: 302 302 302 302 302 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429
+[GEÇTİ] 302 sayısı <= 5 (işçiler toplamında aşılmadı) ve >0 {'302': 5, '429': 25}
+[GEÇTİ] limitten sonra 429 var {'302': 5, '429': 25}
+[GEÇTİ] ilk istek 302 
+$ bash -c docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select anahtar, sayi from qr_denemesayaci order by anahtar"   [pty=hayır]
+giris-deneme:a7a7d220e52ff4ce896cf185257fa40f70d9c0551a82845c8cdc276bc33bbff7|1
+hesap:05308f225e0fe7fe4452ff9cdf3f8feb0c2c1b6a8411322f6b6a3473fefafff2|1
+hesap:16a427fea168559cae83e942e9a4857e21597077386f5c216f665c9c1554100b|2
+hesap:56b40258457e806db8cc2f2beb10b4ee7fe6e6a9b49ef95029f623141794434e|1
+hiz:29868452:081fad1c9116e6189c13495195c187b828d8aaeaa13886f3d31ba787dd662263|2
+hiz:29868456:081fad1c9116e6189c13495195c187b828d8aaeaa13886f3d31ba787dd662263|1
+hiz:29868457:081fad1c9116e6189c13495195c187b828d8aaeaa13886f3d31ba787dd662263|6
+hiz:29868457:9da172450988e3c8a8f2ce35e81084fd724540229e92d4e7a71af45765801585|30
+ip:e72d458b7a34ae5cf1ecd1bdfbdd3100158d7c066b05d4e0e45149230eb40809|4
+mfa-deneme:b2f185433e571f86e931784a0326fcad71b3841f56d778188e5f6ed251743410|1
+(çıkış kodu: 0)
+[GEÇTİ] qr_denemesayaci'nde hız satırı var satır=10
+[GEÇTİ] qr_denemesayaci'nde IP metni yok (IPv4/IPv6) 
+[GEÇTİ] anahtarlar hiz:<dk>:<64hex> / sayac HMAC biçiminde 
+anahtar biçimleri (ilk 20 karakter): ['giris-deneme:a', 'hesap:05308f22', 'hesap:16a427fe', 'hesap:56b40258', 'hiz:29868452:0', 'hiz:29868456:0', 'hiz:29868457:0', 'hiz:29868457:9', 'ip:e72d458b7a3', 'mfa-deneme:b2f']
+
+==========================================================================================
+## 7) (d) yedek-al.sh ve kap güvenliği
+==========================================================================================
+$ docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-023733.dump.age
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al rc 0 
+[GEÇTİ] şifreli üçlü: db .dump.age + medya .tar.gz.age + sha256 
+[GEÇTİ] age başlıkları 
+$ bash -c ls -ln yedekler | head; docker inspect -f 'User={{.Config.User}} GroupAdd={{.HostConfig.GroupAdd}} CapDrop={{.HostConfig.CapDrop}} CapAdd={{.HostConfig.CapAdd}} RO={{.HostConfig.ReadonlyRootfs}} SecOpt={{.HostConfig.SecurityOpt}}' $(docker compose ps -q yedek); docker inspect -f 'db CapDrop={{.HostConfig.CapDrop}} CapAdd={{.HostConfig.CapAdd}}' $(docker compose ps -q db); docker compose exec -T yedek id   [pty=hayır]
+total 108
+-rw------- 1 10002 10002 94318 Oct 15 23:37 db-20261016-023733.dump.age
+-rw------- 1 10002 10002   585 Oct 15 23:37 medya-20261016-023733.tar.gz.age
+-rw------- 1 10002 10002   193 Oct 15 23:37 sha256-20261016-023733.txt
+-rw------- 1 10002 10002   107 Oct 15 23:37 yedek-gunlugu.log
+User=10002:10002 GroupAdd=[999] CapDrop=[ALL] CapAdd=[] RO=true SecOpt=[no-new-privileges:true]
+db CapDrop=[ALL] CapAdd=[CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER CAP_SETGID CAP_SETUID]
+uid=10002(yedek) gid=10002(yedek) groups=999(ping),10002(yedek)
+(çıkış kodu: 0)
+[GEÇTİ] yedek: User 10002:10002 
+[GEÇTİ] yedek: GroupAdd [999] 
+[GEÇTİ] yedek: CapDrop [ALL] 
+[GEÇTİ] yedek: ReadonlyRootfs true 
+[GEÇTİ] yedek: no-new-privileges 
+[KALDI] db: CapDrop ALL + CapAdd 
+[GEÇTİ] yedek dosyaları sahibi 10002 
+
+==========================================================================================
+## 8) (e) geri-yukleme-testi.sh (anahtar dosyası argümanı)
+==========================================================================================
+$ bash scripts/geri-yukleme-testi.sh /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10-age.key   [pty=evet]
+== Geri yükleme testi 2026-10-15T23:37:34+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10/qr-kampanya/yedekler/db-20261016-023733.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261016-023733.dump.age: OK
+medya-20261016-023733.tar.gz.age: OK
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10-age.key (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|9|9
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|1|1
+qrkod|1|1
+sayfa|2|2
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 6 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-233734.log
+(çıkış kodu: 0)
+[GEÇTİ] SONUÇ: GEÇTİ rc=0
+$ bash scripts/geri-yukleme-testi.sh --anahtar /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10-age.key   [pty=hayır]
+basename: unrecognized option '--anahtar'
+Try 'basename --help' for more information.
+== Geri yükleme testi 2026-10-15T23:37:40+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10/qr-kampanya/yedekler/db-20261016-023733.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261016-023733.dump.age: OK
+medya-20261016-023733.tar.gz.age: OK
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10-age.key (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|9|9
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|1|1
+qrkod|1|1
+sayfa|2|2
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 6 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-233740.log
+(çıkış kodu: 0)
+(not: --anahtar bayrağı betikte tanımlı değil; yukarıdaki satır yalnızca davranışı gösterir)
+
+==========================================================================================
+## 9) (f) panel yedek durumu
+==========================================================================================
+panel yedek bölümü:  Son yedek: 2026-10-16T02:37:34+03:00 Durum: basarili Dosya: db-20261016-023733.dump.age · Boyut: 92.1 KB Sunucudaki yedek sayısı: 1 · En eski: 2026-10-16 Sunucu dışı kopya son doğrulama: yok Sunucu dışı kopya doğrulanmadı; eski yedekler silinmiyor, disk dolabilir — docs/YEDEKLEME.md 
+[GEÇTİ] panel yedek durumunu gösteriyor (başarılı/dosya) 
+
+==========================================================================================
+## 10) okunamayan medya -> yedek açık hatayla başarısız (600 kipli dosya)
+==========================================================================================
+$ bash -c docker compose exec -T app chmod 600 /veri/medya/sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png; docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+HATA: görsel yedeği başarısız (okunamayan dosya olabilir; docs/BAKIM.md): tar: can't open 'medya/sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png': Permission denied;tar: error exit delayed from previous errors;
+(çıkış kodu: 1)
+[GEÇTİ] 600 kipli medya dosyasında yedek BAŞARISIZ ve dosya/Permission denied belirtilir 
+$ bash -c bash scripts/medya-izni-hazirla.sh && docker compose exec -T yedek sh /betikler/yedek-al.sh; echo rc=$?   [pty=hayır]
+ Container qre2e10-app-run-4c73a064222d Creating 
+ Container qre2e10-app-run-4c73a064222d Created 
+Medya birimi: gruba okuma izni eklendi (yalnızca izin, sahiplik/silme yok).
+Yedek tamam (şifreli): /yedekler/db-20261016-023802.dump.age
+rc=0
+(çıkış kodu: 0)
+[GEÇTİ] medya-izni-hazirla.sh sonrası yedek yeniden başarılı 
+$ bash -c bash scripts/yedek-dizini-hazirla.sh; echo rc=$?; ls -lnd yedekler   [pty=hayır]
+ Container qre2e10-yedek-run-7525205b7072 Creating 
+ Container qre2e10-yedek-run-7525205b7072 Created 
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:999 kip 2750, app yalnızca okur).
+rc=0
+drwx------ 2 10002 10002 4096 Oct 15 23:38 yedekler
+(çıkış kodu: 0)
+[GEÇTİ] yedek-dizini-hazirla.sh idempotent rc 0 
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8090/medya/sayfa/2026/10/1941cfa775e54bb4a46ebadb2f98b7a1.png   [pty=hayır]
+403
+(çıkış kodu: 0)
+[KALDI] medya yine 200 (g+r sonrası) 
+
+==========================================================================================
+## ÖZET (faz A)
+==========================================================================================
+  [GEÇTİ] giriş sonrası MFA kurulum sayfası
+  [GEÇTİ] kurulum sayfasında gizli anahtar bulundu
+  [GEÇTİ] kurulum kodu kabul edildi, panele girildi
+  [GEÇTİ] DB'de gizli_anahtar Fernet belirteci (gAAAAA..., >=100 karakter), onaylı
+  [GEÇTİ] pg_dump (mfa+oturum tabloları) içinde düz base32 gizli anahtar YOK
+  [GEÇTİ] oturum içeriğinde (çözülmüş) düz gizli anahtar yok
+  [GEÇTİ] ikinci girişte MFA kod ekranı
+  [GEÇTİ] TOTP koduyla giriş (şifreli sırdan çözülen anahtarla) çalışır
+  [GEÇTİ] yanlış kodla giriş OLMAZ
+  [GEÇTİ] yayındaki görsel 200
+  [GEÇTİ] taslak görseli anonim erişimde 200 DEĞİL
+  [GEÇTİ] gunicorn: birden çok süreç (master + >=3 işçi)
+  [GEÇTİ] 302 sayısı <= 5 (işçiler toplamında aşılmadı) ve >0
+  [GEÇTİ] limitten sonra 429 var
+  [GEÇTİ] ilk istek 302
+  [GEÇTİ] qr_denemesayaci'nde hız satırı var
+  [GEÇTİ] qr_denemesayaci'nde IP metni yok (IPv4/IPv6)
+  [GEÇTİ] anahtarlar hiz:<dk>:<64hex> / sayac HMAC biçiminde
+  [GEÇTİ] yedek-al rc 0
+  [GEÇTİ] şifreli üçlü: db .dump.age + medya .tar.gz.age + sha256
+  [GEÇTİ] age başlıkları
+  [GEÇTİ] yedek: User 10002:10002
+  [GEÇTİ] yedek: GroupAdd [999]
+  [GEÇTİ] yedek: CapDrop [ALL]
+  [GEÇTİ] yedek: ReadonlyRootfs true
+  [GEÇTİ] yedek: no-new-privileges
+  [KALDI] db: CapDrop ALL + CapAdd
+  [GEÇTİ] yedek dosyaları sahibi 10002
+  [GEÇTİ] SONUÇ: GEÇTİ
+  [GEÇTİ] panel yedek durumunu gösteriyor (başarılı/dosya)
+  [GEÇTİ] 600 kipli medya dosyasında yedek BAŞARISIZ ve dosya/Permission denied belirtilir
+  [GEÇTİ] medya-izni-hazirla.sh sonrası yedek yeniden başarılı
+  [GEÇTİ] yedek-dizini-hazirla.sh idempotent rc 0
+  [KALDI] medya yine 200 (g+r sonrası)
+TOPLAM faz A: 32/34 geçti
+
+## 10b) 600 deneyi sonrası: dosya 644'e geri alındı -> medya 200 (403 deney artığıydı: Caddy yalnızca 'other' okuma biti ile okur)
+
+
+##########################################################################################
+# FAZ B: 9993d61 -> güncel ağaç, guncelle.sh yükseltmesi (proje qre2e10u, HTTP 8091)
+##########################################################################################
+$ bash -c cd /home/claude/TEZDENEME && git archive 9993d61 qr-kampanya | tar -x -C /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10u   [pty=hayır]
+
+(çıkış kodu: 0)
+[GEÇTİ] eski ağaçta MFA_SIFRELEME yok (9993d61) 
+
+==========================================================================================
+## B1) eski sürümle kurulum
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=evet]
+Özel anahtar bellekten SİLİNDİ (kullanıcı onayıyla); kalıcı diske HİÇ yazılmadı. Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+Kurulum tamam. Panel: http://localhost/panel/
+(çıkış kodu: 0)
+[GEÇTİ] eski kurulum rc 0 rc=0
+
+==========================================================================================
+## B2) eski sürümde MFA kurulumu (düz TOTP sırrı DB'de)
+==========================================================================================
+[GEÇTİ] eski sürümde MFA kuruldu ve panele girildi 
+[GEÇTİ] eski sürümde DB'de sır DÜZ base32 (yükseltme öncesi durum) 
+(yükseltme öncesi: gizli_anahtar sütunu düz base32, uzunluk 32 )
+$ bash -c docker inspect -f 'User={{.Config.User}} CapDrop={{.HostConfig.CapDrop}} RO={{.HostConfig.ReadonlyRootfs}}' $(docker compose ps -q yedek); ls -ln yedekler | head -3; ls -l --time-style=+ /dev/null >/dev/null   [pty=hayır]
+User= CapDrop=[] RO=false
+total 0
+(çıkış kodu: 0)
+$ bash -c docker compose exec -T yedek sh /betikler/yedek-al.sh; ls -lnd yedekler; ls -ln yedekler | tail -3   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-024002.dump.age
+drwx------ 2 0 0 4096 Oct 15 23:40 yedekler
+-rw------- 1 0 0   539 Oct 15 23:40 medya-20261016-024002.tar.gz.age
+-rw------- 1 0 0   193 Oct 15 23:40 sha256-20261016-024002.txt
+-rw------- 1 0 0   107 Oct 15 23:40 yedek-gunlugu.log
+(çıkış kodu: 0)
+[GEÇTİ] eski sürümde yedekler root'a ait (0) 
+
+==========================================================================================
+## B3) güncel ağacı üstüne kopyala (.env, gizli, yedekler, tekerlekler korunur) ve guncelle.sh
+==========================================================================================
+[GEÇTİ] yeni ağaç yerinde (sifreleme.py var) 
+$ bash scripts/guncelle.sh   [pty=evet]
+BİLGİ: .env dosyasının SONUNA MFA_SIFRELEME_ANAHTARI eklendi (MFA gizli anahtarlarını şifreler; diğer satırlar değiştirilmedi).
+       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md).
+1/6 İmajlar çekiliyor ve derleniyor...
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d: 429 Too Many Requests
+UYARI: db/caddy imajları çekilemedi (kayıt erişilemiyor olabilir). Etiketler sabit olduğundan yerel imajlarla devam ediliyor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2/6 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/6 Güncelleme öncesi şifreli yedek alınıyor...
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:999 kip 2750, app yalnızca okur).
+Medya birimi: gruba okuma izni eklendi (yalnızca izin, sahiplik/silme yok).
+Yedek tamam (şifreli): /yedekler/db-20261016-024028.dump.age
+4/6 Hazırlık (migrasyonlar, qr_sahip ile) çalıştırılıyor; başarısı beklenir, eski app'e henüz dokunulmaz...
+Attaching to hazirlik-1
+hazirlik-1  | Operations to perform:
+hazirlik-1  |   Apply all migrations: auth, contenttypes, qr, sessions
+hazirlik-1  | Running migrations:
+hazirlik-1  |   Applying qr.0006_mfa_gizli_anahtar_sifreli... OK
+hazirlik-1  | Cache table 'onbellek' already exists.
+hazirlik-1  | Roller güncellendi.
+hazirlik-1  | Hazırlık tamamlandı.
+
+[Khazirlik-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+5/6 Yeni uygulama başlatılıyor...
+Uygulama sağlıklı.
+6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)...
+{"level":"info","ts":1792107642.6561725,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+{"level":"warn","ts":1792107642.6566834,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"warn","ts":1792107642.6571472,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"info","ts":1792107642.6576538,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792107642.6582105,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv0","http_port":80}
+{"level":"info","ts":1792107642.6583197,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc00055d400"}
+Valid configuration
+{"level":"info","ts":1792107642.6587734,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0xc00055d400"}
+{"level":"info","ts":1792107642.658816,"logger":"http","msg":"servers shutting down with eternal grace period"}
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0).
+Güncelleme tamamlandı.
+(çıkış kodu: 0)
+[GEÇTİ] guncelle.sh rc 0 rc=0
+[GEÇTİ] 'Güncelleme tamamlandı.' 
+[GEÇTİ] .env sonuna MFA_SIFRELEME_ANAHTARI eklendi (tek, 44 karakter) 
+[GEÇTİ] eski .env satırları değişmedi (önek aynı) 
+[GEÇTİ] BİLGİ mesajı yazıldı 
+$ bash -c docker compose logs hazirlik 2>&1 | grep -E '0006'; docker compose ps -a --format '{{.Service}} {{.State}} {{.Health}}'; docker compose exec -T db psql -U qrkampanya -d qrkampanya -Atc "select length(gizli_anahtar), left(gizli_anahtar,6), onayli from qr_mfacihazi"   [pty=hayır]
+hazirlik-1  |   Applying qr.0006_mfa_gizli_anahtar_sifreli... OK
+app running healthy
+caddy running 
+db running healthy
+hazirlik exited 
+yedek running 
+140|gAAAAA|t
+(çıkış kodu: 0)
+[GEÇTİ] 0006 uygulandı 
+[GEÇTİ] app healthy 
+[GEÇTİ] mevcut düz sır şifrelendi (gAAAAA, >=100), onaylı 
+[GEÇTİ] pg_dump'ta düz sır yok 
+
+==========================================================================================
+## B4) aynı kullanıcı, aynı uygulama sırrıyla TOTP girişi
+==========================================================================================
+[GEÇTİ] MFA kod ekranı (yeniden kurulum DEĞİL) http://localhost:8091/panel/mfa/dogrula
+[GEÇTİ] aynı sırdan üretilen kodla giriş çalışıyor http://localhost:8091/panel/
+panel yedek bölümü:  Son yedek: 2026-10-16T02:40:29+03:00 Durum: basarili Dosya: db-20261016-024028.dump.age · Boyut: 91.1 KB Sunucudaki yedek sayısı: 2 · En eski: 2026-10-16 Sunucu dışı kopya son doğrulama: yok Sunucu dışı kopya doğrulanmadı; eski yedekler silinmiyor, 
+[GEÇTİ] panel yedek durumu görünür 
+
+==========================================================================================
+## B5) yükseltme sonrası kap güvenliği, yedek sahipliği, medya, hız sınırı, geri yükleme
+==========================================================================================
+$ bash -c docker inspect -f 'User={{.Config.User}} GroupAdd={{.HostConfig.GroupAdd}} CapDrop={{.HostConfig.CapDrop}} RO={{.HostConfig.ReadonlyRootfs}}' $(docker compose ps -q yedek); docker inspect -f '{{.Config.Image}}' $(docker compose ps -q db); ls -lnd yedekler; ls -ln yedekler | awk '{print $3":"$4}' | sort | uniq -c; ls -ln yedekler | grep -c 'db-.*dump.age'   [pty=hayır]
+User=10002:10002 GroupAdd=[999] CapDrop=[ALL] RO=true
+postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+drwx------ 2 10002 10002 4096 Oct 15 23:40 yedekler
+      7 10002:10002
+      1 :
+2
+(çıkış kodu: 0)
+[GEÇTİ] yükseltme sonrası yedek servisi 10002:10002, GroupAdd 999, CapDrop ALL, RO 
+[GEÇTİ] eski root'a ait yedekler 10002'ye devredildi (root sahipli kalmadı) 
+[GEÇTİ] db imajı digest ile 
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8091/medya/sayfa/2026/10/7904bd08438e434ab83c240e7f2c42d8.png; echo; curl -s -o /dev/null -w '%{http_code}' http://localhost:8091/k/E2E011   [pty=hayır]
+200
+302
+(çıkış kodu: 0)
+[GEÇTİ] yükseltme sonrası medya 200, yönlendirme 302 ['200', '302']
+$ bash scripts/geri-yukleme-testi.sh /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e10-age-b.key   [pty=evet]
+Tablo | yedekte | canlıda
+denetim|3|5
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|1|1
+qrkod|1|1
+sayfa|1|1
+SONUÇ: GEÇTİ (sayılar farklı) - yedek alındıktan sonra yeni kayıt eklenmiş olabilir; yedek geri yüklenebildi.
+(çıkış kodu: 0)
+[GEÇTİ] yükseltilmiş yığında geri-yukleme-testi GEÇTİ (yükseltme öncesi alınan yedeklerle) 
+$ bash -c docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-024107.dump.age
+(çıkış kodu: 0)
+[GEÇTİ] yükseltme sonrası yedek-al rc 0 (eski root dizin, yeni uid) 
+
+==========================================================================================
+## B6) guncelle.sh ikinci kez (idempotent): anahtar değişmez
+==========================================================================================
+$ bash scripts/guncelle.sh   [pty=evet]
+10-roller: tamam.
+Yedek tamam (şifreli): /yedekler/db-20261016-024111.dump.age
+hazirlik-1  | Hazırlık tamamlandı.
+Güncelleme tamamlandı.
+(çıkış kodu: 0)
+[GEÇTİ] ikinci guncelle rc 0, MFA anahtarı aynı ve tek 
+
+==========================================================================================
+## ÖZET (faz B)
+==========================================================================================
+  [GEÇTİ] eski ağaçta MFA_SIFRELEME yok (9993d61)
+  [GEÇTİ] eski kurulum rc 0
+  [GEÇTİ] eski sürümde MFA kuruldu ve panele girildi
+  [GEÇTİ] eski sürümde DB'de sır DÜZ base32 (yükseltme öncesi durum)
+  [GEÇTİ] eski sürümde yedekler root'a ait (0)
+  [GEÇTİ] yeni ağaç yerinde (sifreleme.py var)
+  [GEÇTİ] guncelle.sh rc 0
+  [GEÇTİ] 'Güncelleme tamamlandı.'
+  [GEÇTİ] .env sonuna MFA_SIFRELEME_ANAHTARI eklendi (tek, 44 karakter)
+  [GEÇTİ] eski .env satırları değişmedi (önek aynı)
+  [GEÇTİ] BİLGİ mesajı yazıldı
+  [GEÇTİ] 0006 uygulandı
+  [GEÇTİ] app healthy
+  [GEÇTİ] mevcut düz sır şifrelendi (gAAAAA, >=100), onaylı
+  [GEÇTİ] pg_dump'ta düz sır yok
+  [GEÇTİ] MFA kod ekranı (yeniden kurulum DEĞİL)
+  [GEÇTİ] aynı sırdan üretilen kodla giriş çalışıyor
+  [GEÇTİ] panel yedek durumu görünür
+  [GEÇTİ] yükseltme sonrası yedek servisi 10002:10002, GroupAdd 999, CapDrop ALL, RO
+  [GEÇTİ] eski root'a ait yedekler 10002'ye devredildi (root sahipli kalmadı)
+  [GEÇTİ] db imajı digest ile
+  [GEÇTİ] yükseltme sonrası medya 200, yönlendirme 302
+  [GEÇTİ] yükseltilmiş yığında geri-yukleme-testi GEÇTİ (yükseltme öncesi alınan yedeklerle)
+  [GEÇTİ] yükseltme sonrası yedek-al rc 0 (eski root dizin, yeni uid)
+  [GEÇTİ] ikinci guncelle rc 0, MFA anahtarı aynı ve tek

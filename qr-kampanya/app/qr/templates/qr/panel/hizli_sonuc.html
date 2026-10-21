@@ -1,0 +1,31 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Kısa link hazır{% endblock %}
+{% block icerik %}
+<h1>Kısa link hazır</h1>
+<div class="ikili">
+  <div class="kart">
+    <img class="qr-onizleme" src="{% url 'panel:qr_png' qr.pk %}" alt="{{ qr.kisa_kod }} QR kodu" width="220" height="220">
+    <div class="eylemler">
+      <a class="dugme ikincil kucuk" href="{% url 'panel:qr_png' qr.pk %}?indir=1">PNG indir</a>
+      <a class="dugme ikincil kucuk" href="{% url 'panel:qr_svg' qr.pk %}?indir=1">SVG indir</a>
+    </div>
+  </div>
+  <div class="kart">
+    <p><strong>{{ qr.ad }}</strong></p>
+    {% if qr.baslik %}<p>Başlık: {{ qr.baslik }}</p>{% endif %}
+    <p>Hedef: <span class="kisa-url">{{ qr.hedef_url }}</span></p>
+    {% url 'panel:qr_png' qr.pk as png_adresi %}
+    {% include "qr/panel/_paylasim.html" with kisa_url=qr.kisa_url paylasim=paylasim png_adresi=png_adresi kutu_no="sonuc" %}
+    <div class="eylemler"><a class="dugme ikincil kucuk" href="{% url 'panel:qr_detay' qr.pk %}">QR ayrıntıları</a></div>
+  </div>
+</div>
+
+<h2>Bir tane daha</h2>
+<form method="post" action="{% url 'panel:hizli_kisalt' %}" class="kart">
+  {% csrf_token %}
+  {% for alan in form %}
+  <div class="alan">{{ alan.label_tag }}{{ alan }}</div>
+  {% endfor %}
+  <div class="eylemler"><button type="submit" class="dugme">Kısalt</button></div>
+</form>
+{% endblock %}

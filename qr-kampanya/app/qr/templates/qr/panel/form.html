@@ -1,0 +1,22 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}{{ baslik }}{% endblock %}
+{% block icerik %}
+<h1>{{ baslik }}</h1>
+<form method="post" class="kart" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="hata-kutu" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% for alan in form %}
+  <div class="alan{% if alan.errors %} hatali{% endif %}{% if alan.field.widget.input_type == 'checkbox' %} onay{% endif %}">
+    {% if alan.field.widget.input_type == 'checkbox' %}{{ alan }} {{ alan.label_tag }}{% else %}{{ alan.label_tag }}{{ alan }}{% endif %}
+    {% if alan.help_text %}<p class="yardim">{{ alan.help_text }}</p>{% endif %}
+    {{ alan.errors }}
+  </div>
+  {% endfor %}
+  {% block form_ek %}{% endblock %}
+  <div class="eylemler">
+    <button type="submit" class="dugme">Kaydet</button>
+    {% if geri_pk %}<a class="dugme ikincil" href="{% url geri geri_pk %}">Vazgeç</a>{% elif geri %}<a class="dugme ikincil" href="{% url geri %}">Vazgeç</a>{% endif %}
+  </div>
+</form>
+{% block form_sonrasi %}{% endblock %}
+{% endblock %}

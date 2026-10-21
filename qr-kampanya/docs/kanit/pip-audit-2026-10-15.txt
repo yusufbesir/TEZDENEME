@@ -1,0 +1,6 @@
+Tarih: 2026-10-15
+Araç: pip-audit 2.10.1
+Komut: pip-audit --requirement app/requirements.txt --require-hashes --disable-pip
+--- ham çıktı ---
+No known vulnerabilities found
+--- çıkış kodu: 0 ---

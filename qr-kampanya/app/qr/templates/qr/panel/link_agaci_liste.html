@@ -1,0 +1,27 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Link ağaçları{% endblock %}
+{% block icerik %}
+<h1>Link ağaçları</h1>
+<form method="get" class="filtre">
+  <div><label for="q">Ara (başlık / adres)</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
+  <div><label for="durum">Durum</label><select id="durum" name="durum"><option value="">Çöp hariç tümü</option>{% for k, v in durumlar %}<option value="{{ k }}"{% if f.durum == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+  <div><button type="submit" class="dugme">Filtrele</button></div>
+</form>
+{% if ekleme_izni %}<div class="eylemler"><a class="dugme" href="{% url 'panel:agac_olustur' %}">Yeni link ağacı</a></div>{% endif %}
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Başlık</th><th>Adres</th><th>Öğe</th><th>Durum</th><th>Güncelleme</th><th></th></tr></thead>
+  <tbody>
+  {% for a in sayfa %}
+  <tr>
+    <td><a href="{% url 'panel:agac_detay' a.pk %}">{{ a.baslik }}</a></td><td>/l/{{ a.slug }}</td><td>{{ a.oge_sayisi }}</td>
+    <td><span class="etiket-durum durum-{{ a.durum }}">{{ a.get_durum_display }}</span></td>
+    <td>{{ a.guncelleme|date:"d.m.Y H:i" }}</td>
+    <td><a href="{% url 'panel:agac_detay' a.pk %}">Ayrıntı</a> · <a href="{% url 'panel:agac_onizle' a.pk %}" target="_blank" rel="noopener noreferrer">Önizle</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="6">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

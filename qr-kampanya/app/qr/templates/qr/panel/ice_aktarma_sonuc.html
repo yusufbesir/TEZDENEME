@@ -1,0 +1,59 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}İçe aktarma sonucu{% endblock %}
+{% block icerik %}
+<h1>İçe aktarma sonucu</h1>
+<p><strong>{{ ia.dosya_adi }}</strong> — {{ ia.get_durum_display }}</p>
+{% if tamamlandi %}
+<div class="kartlar">
+  <div class="sayi-kart"><strong>{{ s.olusturulan|length }}</strong> oluşturuldu</div>
+  <div class="sayi-kart"><strong>{{ s.guncellenen|length }}</strong> güncellendi</div>
+  <div class="sayi-kart"><strong>{{ s.atlanan|length }}</strong> atlandı</div>
+  <div class="sayi-kart"><strong>{{ s.hatali_satir_sayisi }}</strong> hatalı satır</div>
+</div>
+<div class="eylemler">
+  <a class="dugme" href="{% url 'panel:ice_aktarma_rapor' ia.pk %}">Raporu CSV indir</a>
+  {% if zip_var %}<a class="dugme" href="{% url 'panel:ice_aktarma_zip' ia.pk %}">PNG + SVG ZIP indir</a>{% endif %}
+  <a class="dugme ikincil" href="{% url 'panel:qr_liste' %}">QR kodlara git</a>
+</div>
+
+{% if s.iliskili_olusturulan %}
+<h2>Oluşturulan ürün / kampanya / mağaza</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Tür</th><th>Kod</th><th>Ad</th></tr></thead>
+  <tbody>{% for x in s.iliskili_olusturulan %}<tr><td>{{ x.tur }}</td><td>{{ x.kod }}</td><td>{{ x.ad }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% if s.olusturulan %}
+<h2>Oluşturulanlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır</th><th>Kod</th></tr></thead>
+  <tbody>{% for x in s.olusturulan %}<tr><td>{{ x.no }}</td><td><a href="{% url 'panel:qr_detay' x.pk %}">{{ x.kod }}</a></td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% if s.guncellenen %}
+<h2>Güncellenenler</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır</th><th>Kod</th><th>Değişiklikler</th></tr></thead>
+  <tbody>{% for x in s.guncellenen %}<tr><td>{{ x.no }}</td><td><a href="{% url 'panel:qr_detay' x.pk %}">{{ x.kod }}</a></td><td>{{ x.degisen|join:"; " }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% if s.atlanan %}
+<h2>Atlananlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır</th><th>Kod</th><th>Neden</th></tr></thead>
+  <tbody>{% for x in s.atlanan %}<tr><td>{{ x.no }}</td><td>{{ x.kod }}</td><td>{{ x.neden }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% if hatalar %}
+<h2>Hatalı satırlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Satır no</th><th>Alan</th><th>Hata</th></tr></thead>
+  <tbody>{% for x in hatalar %}<tr><td>{{ x.no }}</td><td>{{ x.alan }}</td><td>{{ x.mesaj }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% if hata_toplam > hatalar|length %}<p class="sessiz">İlk {{ hatalar|length }} hata gösteriliyor; tamamı rapor CSV'sindedir.</p>{% endif %}
+{% endif %}
+{% else %}
+<p class="sessiz">Bu içe aktarma iptal edildi; hiçbir kayıt değiştirilmedi.</p>
+{% endif %}
+<p><a class="dugme ikincil" href="{% url 'panel:ice_aktarma_liste' %}">İçe aktarmalara dön</a></p>
+{% endblock %}

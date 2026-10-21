@@ -1,0 +1,26 @@
+Geri yükleme testi kanıtı - 2026-10-15
+Ortam: Docker Compose, proje adı "qre2e4" (scratch kopya, HTTP 8084), Docker 29.8.2, yedek imajı qr-kampanya-yedek:e2e4
+       (postgres:17.6-alpine + age v1.3.2). Veri: 1 QR kodu, 1 kampanya sayfası ve 1 sayfa görseli (deneme verisi).
+Komut: cd <e2e4 klasörü> && bash scripts/geri-yukleme-testi.sh
+       (özel anahtar varsayılan ./gizli/yedek-anahtari.txt; yedek: yedekler/ içindeki en yeni db-*.dump.age)
+Not: Aşağıdaki çıktı betiğin HAM çıktısıdır (değiştirilmemiştir). Özel anahtarın içeriği çıktıda yoktur, yalnızca dosya yolu yazılır.
+---------------------------------------------------------------------------------------------------------------
+== Geri yükleme testi 2026-10-15T15:53:19+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e4/yedekler/db-20261015-185238.dump.age
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e4/gizli/yedek-anahtari.txt (içeriği yazılmaz)
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-185238.dump.age: OK
+medya-20261015-185238.tar.gz.age: OK
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|1|1
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|0|0
+qrkod|1|1
+sayfa|1|1
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 5 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-155319.log
