@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'arayuz_yardimci.dart';
 import 'sahte_icerik.dart';
 
 const _alan = 'dil';
@@ -46,6 +47,7 @@ Future<ProviderContainer> _kur(
         yarismaDepoProvider.overrideWithValue(BellekYarismaDepo(kayit)),
         kurslarProvider.overrideWithValue([sahteKurs, sahteKodKurs]),
         bugunProvider.overrideWithValue('2026-10-15'),
+        bildirimProvider.overrideWithValue(SahteBildirim()),
       ],
       child: MaterialApp(
         theme: acikTema(),

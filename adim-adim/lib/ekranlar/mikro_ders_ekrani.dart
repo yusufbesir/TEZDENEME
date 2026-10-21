@@ -1,4 +1,8 @@
 /// Mikro ders ekranı: 2 dakikalık, 5 alıştırmalık kısa tekrar + yeni karışık ders.
+/// Dört kip: normal, `mod=zayif` (hata defterindeki zayıf noktalar önce),
+/// `mod=karisik` (ünite sonu serpiştirilmiş tekrar; `ders` parametresi) ve
+/// `mod=quiz` (ders sonu kısa quiz; `ders` ve `yanlis=0,3` parametreleri:
+/// kartlar değişmez, Motor.quizBitir küçük XP ve 'quiz' günlük kaydı yazar).
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -18,7 +22,16 @@ import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class MikroDersEkrani extends ConsumerStatefulWidget {
-  const MikroDersEkrani({super.key});
+  const MikroDersEkrani({super.key, this.mod, this.dersId, this.yanlis});
+
+  /// null: normal; 'zayif' | 'karisik' | 'quiz'.
+  final String? mod;
+
+  /// 'karisik' ve 'quiz' kiplerinde biten ders kimliği.
+  final String? dersId;
+
+  /// 'quiz' kipinde bu oturumda yanlış yapılan indeksler, '0,3,5' biçiminde.
+  final String? yanlis;
 
   @override
   ConsumerState<MikroDersEkrani> createState() => _MikroDurumu();
@@ -29,20 +42,48 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  bool get _quiz => widget.mod == 'quiz';
+
+  Ders? _dersBul(String id) {
+    for (final k in ref.read(kurslarProvider)) {
+      final d = k.dersBul(id);
+      if (d != null) return d;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
     final durum = ref.read(durumProvider).value;
     final kurslar = ref.read(alanKurslariProvider);
-    _liste = durum == null
-        ? const []
-        : Motor.mikroSec(
-            durum,
-            kurslar,
-            ref.read(bugunProvider),
-            adet: 5,
-            tohum: DateTime.now().millisecondsSinceEpoch,
-          );
+    final tohum = DateTime.now().millisecondsSinceEpoch;
+    final bugun = ref.read(bugunProvider);
+    if (durum == null) {
+      _liste = const [];
+    } else if (_quiz) {
+      final ders = widget.dersId == null ? null : _dersBul(widget.dersId!);
+      _liste = ders == null
+          ? const []
+          : Motor.quizSec(ders, Motor.yanlisListesiCoz(widget.yanlis));
+    } else if (widget.mod == 'karisik' && widget.dersId != null) {
+      _liste = Motor.serpistirmeSec(
+        ref.read(kurslarProvider),
+        widget.dersId!,
+        tohum: tohum,
+      );
+    } else {
+      _liste = Motor.mikroSec(
+        durum,
+        kurslar,
+        bugun,
+        adet: 5,
+        tohum: tohum,
+        oncelikliKartlar: widget.mod == 'zayif'
+            ? Motor.zayifKartlar(durum, bugun)
+            : const [],
+      );
+    }
   }
 
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
@@ -52,7 +93,9 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
       context: context,
       builder: (c) => AlertDialog(
         icon: const Icon(Icons.warning_amber_rounded),
-        title: const Text('Mikro dersten çıkılsın mı?'),
+        title: Text(
+          _quiz ? 'Quizden çıkılsın mı?' : 'Mikro dersten çıkılsın mı?',
+        ),
         content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
         actions: [
           TextButton(
@@ -73,15 +116,16 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   Future<void> _bitir(int dogru, int toplam) async {
     if (_kaydediliyor) return;
     _kaydediliyor = true;
-    final yeni = await ref
-        .read(durumProvider.notifier)
-        .mikroBitir(dogru, toplam);
+    final bildirici = ref.read(durumProvider.notifier);
+    final yeni = _quiz
+        ? await bildirici.quizBitir(widget.dersId ?? '', dogru, toplam)
+        : await bildirici.mikroBitir(dogru, toplam);
     if (!mounted) return;
     setState(
       () => _ozet = (
         dogru: dogru,
         toplam: toplam,
-        xp: Motor.mikroXp(dogru, toplam),
+        xp: _quiz ? Motor.quizXp(dogru, toplam) : Motor.mikroXp(dogru, toplam),
         seri: yeni.seri,
       ),
     );
@@ -95,7 +139,12 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
             ? _Bos(onGeri: _cik)
             : _ozet != null
             ? DersOzeti(
-                baslik: 'Mikro ders tamamlandı',
+                baslik: switch (widget.mod) {
+                  'zayif' => 'Zayıf noktalar dersi tamamlandı',
+                  'karisik' => 'Karışık tekrar tamamlandı',
+                  'quiz' => 'Quiz tamamlandı',
+                  _ => 'Mikro ders tamamlandı',
+                },
                 dogru: _ozet!.dogru,
                 toplam: _ozet!.toplam,
                 xp: _ozet!.xp,
@@ -104,9 +153,17 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final o in _liste) o.alistirma],
-                onSonuc: (i, dogru) => ref
-                    .read(durumProvider.notifier)
-                    .kartIsle(_liste[i].kartId, dogru),
+                // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+                notGetir: (i) => ref
+                    .read(durumProvider)
+                    .value
+                    ?.kelimeNotlari[_liste[i].kartId],
+                // Quiz kart (SRS) durumunu değiştirmez; yalnızca pekiştirir.
+                onSonuc: _quiz
+                    ? (_, _) {}
+                    : (i, dogru) => ref
+                          .read(durumProvider.notifier)
+                          .kartIsle(_liste[i].kartId, dogru),
                 onBitti: _bitir,
                 onKapat: _kapatOnayi,
               ),

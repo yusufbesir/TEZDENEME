@@ -1,4 +1,8 @@
-/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri).
+/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri). Ünitenin son
+/// dersinde özetin altında "Karışık tekrar (5 soru)" önerisi çıkar
+/// (önceki ünitelerden serpiştirilmiş 5 alıştırma; XP mikro ders gibi).
+/// Her dersin sonunda ayrıca "Kısa quiz (3 soru)" düğmesi bulunur: bu
+/// oturumda yanlış yapılanlar önce, `/mikro?mod=quiz&ders=<id>&yanlis=0,3`.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -10,6 +14,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
+import '../bilesenler/dilbilgisi_notu_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
@@ -28,6 +33,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Ders başındaki dilbilgisi notu kartı geçildi mi?
+  bool _notGecildi = false;
+
+  /// Bu oturumda ilk cevabı yanlış olan alıştırma indeksleri (sırayla).
+  final List<int> _yanlislar = [];
+
   Ders? _dersBul() {
     for (final k in ref.read(kurslarProvider)) {
       final d = k.dersBul(widget.dersId);
@@ -36,7 +47,18 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     return null;
   }
 
+  /// Bu ders ünitesinin son dersiyse ve önceki ünite alıştırması varsa true.
+  bool _karisikVar(Ders ders) =>
+      Motor.serpistirmeSec(ref.read(kurslarProvider), ders.id).isNotEmpty;
+
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
+
+  /// Kısa quiz rotası: ders kimliği ve yanlış indeksleri sorgu parametresinde.
+  String _quizRotasi(Ders ders) {
+    final yanlis = _yanlislar.join(',');
+    return '/mikro?mod=quiz&ders=${Uri.encodeComponent(ders.id)}'
+        '${yanlis.isEmpty ? '' : '&yanlis=$yanlis'}';
+  }
 
   Future<void> _kapatOnayi() async {
     final cik = await showDialog<bool>(
@@ -78,13 +100,34 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     );
   }
 
+  /// Dersin gösterilecek alıştırmalarının özgün indeksleri. Ayarlarda konuşma
+  /// alıştırmaları kapalıysa [Soyle] olanlar çıkarılır (kart kimliği ve quiz
+  /// için özgün indeks korunur).
+  List<int> _gosterilenler(Ders ders) {
+    final acik = ref.watch(durumProvider).value?.konusmaAcik ?? true;
+    return [
+      for (var i = 0; i < ders.alistirmalar.length; i++)
+        if (acik || ders.alistirmalar[i] is! Soyle) i,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final ders = _dersBul();
+    final idx = ders == null ? const <int>[] : _gosterilenler(ders);
     return Scaffold(
       body: SafeArea(
-        child: ders == null || ders.alistirmalar.isEmpty
+        child: ders == null || idx.isEmpty
             ? _Bulunamadi(onGeri: _cik)
+            : (ders.dilbilgisiNotu?.trim().isNotEmpty ?? false) &&
+                  !_notGecildi &&
+                  _ozet == null
+            ? DilbilgisiNotuKarti(
+                dersAdi: ders.ad,
+                not: ders.dilbilgisiNotu!.trim(),
+                onBasla: () => setState(() => _notGecildi = true),
+                onKapat: _cik,
+              )
             : _ozet != null
             ? DersOzeti(
                 baslik: 'Ders tamamlandı',
@@ -94,12 +137,29 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                 xp: _ozet!.xp,
                 seri: _ozet!.seri,
                 onDon: _cik,
+                ekEtiket: _karisikVar(ders) ? 'Karışık tekrar (5 soru)' : null,
+                onEk: _karisikVar(ders)
+                    ? () => context.push(
+                        '/mikro?mod=karisik&ders=${Uri.encodeComponent(ders.id)}',
+                      )
+                    : null,
+                ek2Etiket: 'Kısa quiz (${Motor.quizAdet} soru)',
+                onEk2: () => context.push(_quizRotasi(ders)),
               )
             : AlistirmaOturumu(
-                alistirmalar: ders.alistirmalar,
-                onSonuc: (i, dogru) => ref
-                    .read(durumProvider.notifier)
-                    .kartIsle(ders.kartKimligi(i), dogru),
+                alistirmalar: [for (final i in idx) ders.alistirmalar[i]],
+                // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+                notGetir: (i) => ref
+                    .read(durumProvider)
+                    .value
+                    ?.kelimeNotlari[ders.kartKimligi(idx[i])],
+                onSonuc: (i, dogru) {
+                  final ozgun = idx[i];
+                  if (!dogru) _yanlislar.add(ozgun);
+                  ref
+                      .read(durumProvider.notifier)
+                      .kartIsle(ders.kartKimligi(ozgun), dogru);
+                },
                 onBitti: (d, t) => _bitir(ders, d, t),
                 onKapat: _kapatOnayi,
               ),

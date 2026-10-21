@@ -1,8 +1,10 @@
-/// Ayarlar ekranı: ad, görünüm, ses, hedef, hatırlatma, veri sıfırlama.
+/// Ayarlar ekranı: ad, görünüm, ses, günlük ve haftalık hedef, hatırlatma
+/// (günlük saat ve açılıştaki bekleyen tekrar bildirimi), veri sıfırlama.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Kabuğun dışında, Profil'deki dişliyle `push` ile açılır.
+/// Hedef etiketi sabit genişlik yerine içeriğe göre genişler.
 library;
 
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class AyarlarEkrani extends ConsumerStatefulWidget {
@@ -302,10 +305,12 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                             notifier.ayarGuncelle(gunlukHedef: v.round()),
                       ),
                     ),
-                    SizedBox(
-                      width: 72,
+                    // Sabit genişlik yok: metin ölçeğiyle birlikte genişler.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 72),
                       child: Text(
                         '${durum.gunlukHedef} XP',
+                        softWrap: false,
                         textAlign: TextAlign.end,
                         style: yazi.titleMedium,
                       ),
@@ -313,6 +318,74 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   ],
                 ),
               ),
+              bolum('Haftalık hedef'),
+              Semantics(
+                label: 'Haftalık hedef: haftada ${durum.haftalikHedefGun} gün',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        min: OgrenciDurumu.enAzHaftalikHedef.toDouble(),
+                        max: OgrenciDurumu.enCokHaftalikHedef.toDouble(),
+                        divisions:
+                            OgrenciDurumu.enCokHaftalikHedef -
+                            OgrenciDurumu.enAzHaftalikHedef,
+                        value: durum.haftalikHedefGun
+                            .clamp(
+                              OgrenciDurumu.enAzHaftalikHedef,
+                              OgrenciDurumu.enCokHaftalikHedef,
+                            )
+                            .toDouble(),
+                        label: '${durum.haftalikHedefGun} gün',
+                        onChanged: (v) =>
+                            notifier.ayarGuncelle(haftalikHedefGun: v.round()),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 72,
+                      child: Text(
+                        'Haftada ${durum.haftalikHedefGun} gün',
+                        textAlign: TextAlign.end,
+                        style: yazi.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                'Haftada bu kadar gün çalışırsan günlük ara verdiğinde bile serin kopmaz.',
+                style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+              ),
+              ListTile(
+                key: const ValueKey('ayar-calisma-plani'),
+                contentPadding: EdgeInsets.zero,
+                minTileHeight: Olcu.hedef,
+                leading: const Icon(Icons.event_note_outlined),
+                title: const Text('Çalışma planı'),
+                subtitle: Text(
+                  durum.calismaPlani == null
+                      ? 'Plan yok'
+                      : 'Önerilen haftalık hedef: haftada '
+                            '${Motor.planHaftalikOneri(durum.calismaPlani!)} gün',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/plan'),
+              ),
+              if (durum.calismaPlani != null &&
+                  Motor.planHaftalikOneri(durum.calismaPlani!) !=
+                      durum.haftalikHedefGun)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    key: const ValueKey('ayar-plana-uydur'),
+                    onPressed: () => notifier.ayarGuncelle(
+                      haftalikHedefGun: Motor.planHaftalikOneri(
+                        durum.calismaPlani!,
+                      ),
+                    ),
+                    child: const Text('Haftalık hedefi plana uydur'),
+                  ),
+                ),
               bolum('Hatırlatma'),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
@@ -342,6 +415,28 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                     onPressed: () => _saatSec(durum.hatirlatmaSaati),
                   ),
                 ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.repeat_outlined, color: r.ana),
+                title: const Text('Açılışta bekleyen tekrar bildirimi'),
+                subtitle: const Text(
+                  'Uygulama açılırken bugün bekleyen tekrar sayısını bildirir',
+                ),
+                value: durum.tekrarBildirimiAcik,
+                onChanged: (v) => notifier.ayarGuncelle(tekrarBildirimiAcik: v),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.mic_none, color: r.ana),
+                title: const Text('Konuşma alıştırmaları'),
+                subtitle: Text(
+                  durum.konusmaAcik
+                      ? 'Derslerde cümleleri yüksek sesle söylersin'
+                      : 'Kapalı: konuşma alıştırmaları derste atlanır',
+                ),
+                value: durum.konusmaAcik,
+                onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
+              ),
               bolum('Veriler'),
               Text(
                 'Tüm verilerin yalnızca bu cihazda saklanır.',

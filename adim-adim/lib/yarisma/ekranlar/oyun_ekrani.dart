@@ -5,10 +5,14 @@
 /// Kurallar `YarismaMotoru`ndadır (bu dosya yalnızca gösterir ve yönlendirir).
 /// Tüm animasyonlar `Olcu.sure` ile ≤250 ms; tek istisna çark (1.200 ms).
 /// Oyun bitince sonuç bir kez kaydedilir: `yarismaKayitProvider.oyunuIsle` ve
-/// `durumProvider.yarismaBitir`. Çıkışta (X) puan kaydedilmez.
+/// `durumProvider.yarismaBitir` (yanlış bilinen sorular hata defterine gider).
+/// Çıkışta (X) puan kaydedilmez.
+/// Yerleşim esnektir: taç ızgarası en çok 240 px'lik hücrelerle akar, kategori
+/// adı iki satıra kadar sarılır.
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -258,7 +262,12 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
       } catch (_) {}
       try {
         await durumHazir;
-        await durum.yarismaBitir(oyun.puan);
+        await durum.yarismaBitir(
+          oyun.puan,
+          yanlisSorular: oyun.sonuc.yanlisBilinenler,
+          dogru: oyun.cevapGecmisi.where((c) => c.dogru).length,
+          toplam: oyun.cevapGecmisi.length,
+        );
       } catch (_) {}
     }());
   }
@@ -415,8 +424,8 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
               boyut: boyut,
             ),
             const SizedBox(height: Olcu.b3),
-            SizedBox(
-              height: 72,
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 72),
               child: Center(
                 child: _afis
                     ? TweenAnimationBuilder<double>(
@@ -428,6 +437,9 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
                           liveRegion: true,
                           child: Text(
                             tacMi ? 'Taç!' : kategori!.ad,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                             style: yazi.headlineLarge,
                           ),
                         ),
@@ -466,13 +478,19 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
             ),
           ),
           const SizedBox(height: Olcu.b2),
-          GridView.count(
-            crossAxisCount: 2,
+          GridView(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: Olcu.b1,
-            crossAxisSpacing: Olcu.b1,
-            childAspectRatio: 2.2,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 240,
+              mainAxisSpacing: Olcu.b1,
+              crossAxisSpacing: Olcu.b1,
+              // Hücre yüksekliği metin ölçeğiyle büyür (iki satır ad sığar).
+              mainAxisExtent: math.max(
+                Olcu.hedef + Olcu.b2,
+                MediaQuery.textScalerOf(context).scale(14) * 1.5 * 2 + Olcu.b2,
+              ),
+            ),
             children: [
               for (final k in YarismaKategori.values)
                 _tacKategoriDugmesi(
@@ -521,6 +539,8 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
                   Expanded(
                     child: Text(
                       k.ad,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: yazi.titleSmall?.copyWith(
                         color: ust,
                         fontWeight: FontWeight.w700,

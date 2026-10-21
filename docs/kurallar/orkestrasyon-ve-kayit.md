@@ -21,6 +21,7 @@
 - Her oturum, yazdığı kasa notlarına ve çıktı/rapor dosyalarına o iş için harcanan girdi (input) ve çıktı (output) token sayılarını ayrı ayrı yazar. Alt ajanların tokenları ayrıca belirtilir ve toplamı verilir. Kesin sayı alınamıyorsa bu açıkça "tahmini" diye yazılır.
 - Her notta "Kullanılan yapay zeka araçları" bölümü olur: ana model, alt ajan modelleri, Jev, Codex/ChatGPT, Gemini gibi işte kullanılan her yapay zeka aracı listelenir.
 - Bu bilgi geçmiş oturumlar için de geriye dönük eklenir; ekleme yoluyla yapılır, mevcut içerik silinmez.
+- Kesin sayı için oturumun kendi sayacı kullanılır (`get_session` çıktısındaki `usage`: girdi, çıktı, önbellek okuma/yazma). Sayaç oturum toplamıdır; alt ajan kırılımını vermez, o yüzden alt ajan tokenları `docs/orchestrator-log.md` satırlarından alınır, orada yoksa "veri yok" yazılır. Geçmiş oturumların tablosu: `token-kaydi/` (proje klasörü). (PR #14'ten taşındı.)
 
 ## Kesintiden sonra devam (kullanıcının kuralı, 2026-10-15)
 - Kullanıcının bilgisayarı çevrimdışı olup tekrar çevrimiçi olduğunda, yarıda kalan her oturum kullanıcıya sormadan kaldığı yerden devam eder. "Devam edeyim mi?" diye sorulmaz.
@@ -32,5 +33,12 @@
 ## Archify mimari haritası (kullanıcının kuralı, 2026-10-16)
 Kullanıcı açık kaynak Archify skill'inin (projeyi tarayıp mimari haritaya çeviren skill) bundan sonraki her yazılım projesinde çalıştırılmasını istedi. Yeni bir proje başlarken ya da mevcut bir projede önemli bir değişiklikten sonra Archify ile projenin mimari haritası çıkarılır ve çıktı proje klasöründe saklanır. Skill kullanıcının bilgisayarında kuruludur (~\.claude\skills\archify ve ~\.codex\skills\archify); bulut oturumlarında yoksa bu açıkça belirtilir. Archify'ın çıktısı proje kodunu dışarı göndermemelidir; gönderiyorsa kullanıcıya sorulur.
 
-## Emek illüzyonu tasarımı (kullanıcının kuralı, 2026-10-16)
-Uygulama arayüzü tasarlarken, gerektiği projelerde (arama, hesaplama, dönüştürme, analiz, oluşturma gibi kullanıcının bir sonuç beklediği işlemlerde) emek illüzyonu (labor illusion / operasyonel şeffaflık) tasarımı kullanılır: uygulama arka planda yaptığı işi adım adım görünür kılar (ör. "Dosyalar okunuyor", "Barkodlar doğrulanıyor", "Sonuçlar karşılaştırılıyor"), böylece arayüz daha inandırıcı ve güven verici olur. Gösterilen adımlar uygulamanın gerçekten yaptığı işleri anlatır; uydurma adım gösterilmez. Gereksiz yapay bekleme eklenmez; çok hızlı işlemlerde adımlar kısa bir animasyonla gösterilebilir ama kullanıcıyı belirgin biçimde yavaşlatmaz. Basit, anlık işlemlerde (ayar değiştirme, menü açma) kullanılmaz.
+## Emek illüzyonu tasarımı
+Bu kural yola bağlı kural olarak taşındı: [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) (arayüz dosyaları açılınca yüklenir). İçerik değişmedi.
+
+## REA her zaman çalışır durumda (kullanıcının kuralı, 2026-10-17)
+Yusuf: "rea bundan sonra hep çalışır halde olsun". REA (APK/ikili yapı analizi MCP sunucusu ve skill'i) cihazda sürekli kullanılabilir tutulur:
+- Araç yolları `C:\Users\TAA PF60V67C\.claude.json` REA bölümünde D:\Programlar altını gösterir (`REA_APKTOOL_COMMAND`, `REA_JADX_MCP_JAR`, `GHIDRA_INSTALL_DIR`). Araçlar taşınırsa aynı gün bu üç değer güncellenir; Yusuf bu düzeltme için izin verdi (2026-10-17 14:21).
+- Her cihaz oturumunun başında, REA'ya iş verilecekse önce `inspect_apktool_client` ile sağlık kontrolü yapılır; "capability_unavailable" dönerse iş başlamadan neden bulunup düzeltilir ve Yusuf'a tek satırla bildirilir.
+- REA'nın ortam değişkenleri yalnız sunucu başlarken okunur; ayar değişince REA yeniden bağlanır (yeni oturum ya da /mcp Reconnect). Koordinatör cihaz oturumunu yeniden başlatarak bunu kendisi yapabilir.
+- APK taramaları REA (apktool + JADX) ile yapılır; REA çalışmıyorsa yalnız geçici olarak doğrudan apktool'a düşülür ve rapora "REA çalışmadı, sebep" yazılır.

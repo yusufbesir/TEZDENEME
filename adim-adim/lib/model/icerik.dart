@@ -2,17 +2,32 @@
 ///
 /// Alıştırma türleri (eski HTML sürümünün şemasıyla uyumlu):
 /// secim, bosluk, yaz, sirala, eslestir, dinle (yeni: metin okunur, kullanıcı
-/// duyduğunu seçer), kod (yeni: kod parçasındaki boşluğu doldurur).
+/// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur),
+/// tablo (yeni: çekim tablosundaki boş hücreleri doldurur), isaretle (yeni:
+/// cümlede doğru kelime(ler)e dokunur), hamle (yeni: oyun tahtasında doğru
+/// hamleyi ya da hamle dizisini oynar; ilk sürümde satranç).
 library;
 
+/// Dinle/Soyle alıştırmalarında konuşma ve tanıma dili (BCP-47) varsayılanı.
+/// Korece/Japonca/Çince kursları 'ko-KR' / 'ja-JP' / 'zh-CN' verir.
+const String varsayilanSesDili = 'en-US';
+
 sealed class Alistirma {
-  const Alistirma({required this.soru, this.aciklama});
+  const Alistirma({
+    required this.soru,
+    this.aciklama,
+    this.ipuclari = const [],
+  });
 
   /// Soru metni. Boşluk türünde `___` yer tutucu bulunur.
   final String soru;
 
   /// Yanlış cevapta gösterilen kısa açıklama.
   final String? aciklama;
+
+  /// Kademeli ipuçları (isteğe bağlı, sırayla). Boşsa Motor.ipucuUret türe
+  /// göre otomatik türetir.
+  final List<String> ipuclari;
 
   String get tur;
 
@@ -24,6 +39,10 @@ sealed class Alistirma {
     final aciklama = j['aciklama'] as String?;
     List<String> metinler(String k) =>
         (j[k] as List).map((e) => e as String).toList();
+    final hamIpucu = j['ipuclari'];
+    final ipuclari = hamIpucu is List
+        ? hamIpucu.whereType<String>().toList()
+        : const <String>[];
     switch (tur) {
       case 'secim':
         return Secim(
@@ -31,6 +50,7 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'bosluk':
         return Bosluk(
@@ -38,12 +58,14 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'yaz':
         return Yaz(
           soru: soru,
           cevaplar: metinler('cevaplar'),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'sirala':
         return Sirala(
@@ -51,6 +73,7 @@ sealed class Alistirma {
           kelimeler: metinler('kelimeler'),
           dogru: metinler('dogru'),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'eslestir':
         return Eslestir(
@@ -59,6 +82,7 @@ sealed class Alistirma {
               .map((c) => (sol: (c as List)[0] as String, sag: c[1] as String))
               .toList(),
           aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'dinle':
         return Dinle(
@@ -66,7 +90,18 @@ sealed class Alistirma {
           okunacak: j['okunacak'] as String,
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
+          dil: j['dil'] as String? ?? varsayilanSesDili,
           aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'soyle':
+        return Soyle(
+          soru: soru,
+          metin: j['metin'] as String,
+          ceviri: j['ceviri'] as String,
+          dil: j['dil'] as String? ?? varsayilanSesDili,
+          aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       case 'kod':
         return Kod(
@@ -76,6 +111,49 @@ sealed class Alistirma {
           dogru: j['dogru'] as int,
           dil: j['dil'] as String? ?? 'html',
           aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'tablo':
+        return Tablo(
+          soru: soru,
+          baslik: metinler('baslik'),
+          satirlar: (j['satirlar'] as List)
+              .map((r) => (r as List).map((e) => e as String).toList())
+              .toList(),
+          bos: (j['bos'] as List)
+              .map((c) => (satir: (c as List)[0] as int, sutun: c[1] as int))
+              .toList(),
+          secenekler: j['secenekler'] == null
+              ? const []
+              : metinler('secenekler'),
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'isaretle':
+        return Isaretle(
+          soru: soru,
+          cumle: j['cumle'] as String,
+          dogru: (j['dogru'] as List).map((e) => e as int).toList(),
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'hamle':
+        final hamHata = j['hataMesajlari'];
+        return Hamle(
+          soru: soru,
+          fen: j['fen'] as String,
+          hamleler: metinler('hamleler'),
+          matKabul: j['matKabul'] == true,
+          hataMesajlari: hamHata is Map
+              ? {
+                  for (final e in hamHata.entries)
+                    if (e.key is String && e.value is String)
+                      e.key as String: e.value as String,
+                }
+              : const {},
+          oyun: j['oyun'] as String? ?? Hamle.varsayilanOyun,
+          aciklama: aciklama,
+          ipuclari: ipuclari,
         );
       default:
         throw FormatException('Bilinmeyen alıştırma türü: $tur');
@@ -90,6 +168,7 @@ class Secim extends Alistirma {
     required this.secenekler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> secenekler;
   final int dogru;
@@ -102,6 +181,7 @@ class Secim extends Alistirma {
     'secenekler': secenekler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -112,6 +192,7 @@ class Bosluk extends Alistirma {
     required this.secenekler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> secenekler;
   final int dogru;
@@ -124,12 +205,18 @@ class Bosluk extends Alistirma {
     'secenekler': secenekler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
 /// Serbest yazma: kabul edilen cevap listesi.
 class Yaz extends Alistirma {
-  const Yaz({required super.soru, required this.cevaplar, super.aciklama});
+  const Yaz({
+    required super.soru,
+    required this.cevaplar,
+    super.aciklama,
+    super.ipuclari,
+  });
   final List<String> cevaplar;
   @override
   String get tur => 'yaz';
@@ -139,6 +226,7 @@ class Yaz extends Alistirma {
     'soru': soru,
     'cevaplar': cevaplar,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -149,6 +237,7 @@ class Sirala extends Alistirma {
     required this.kelimeler,
     required this.dogru,
     super.aciklama,
+    super.ipuclari,
   });
   final List<String> kelimeler; // karışık
   final List<String> dogru; // doğru sıra
@@ -161,12 +250,18 @@ class Sirala extends Alistirma {
     'kelimeler': kelimeler,
     'dogru': dogru,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
 /// Eşleştirme: 3-5 çift.
 class Eslestir extends Alistirma {
-  const Eslestir({required super.soru, required this.ciftler, super.aciklama});
+  const Eslestir({
+    required super.soru,
+    required this.ciftler,
+    super.aciklama,
+    super.ipuclari,
+  });
   final List<({String sol, String sag})> ciftler;
   @override
   String get tur => 'eslestir';
@@ -176,6 +271,7 @@ class Eslestir extends Alistirma {
     'soru': soru,
     'ciftler': ciftler.map((c) => [c.sol, c.sag]).toList(),
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -186,11 +282,16 @@ class Dinle extends Alistirma {
     required this.okunacak,
     required this.secenekler,
     required this.dogru,
+    this.dil = varsayilanSesDili,
     super.aciklama,
+    super.ipuclari,
   });
   final String okunacak;
   final List<String> secenekler;
   final int dogru;
+
+  /// Okuma (TTS) dili; yalnız varsayılandan farklıysa JSON'a yazılır.
+  final String dil;
   @override
   String get tur => 'dinle';
   @override
@@ -200,7 +301,53 @@ class Dinle extends Alistirma {
     'okunacak': okunacak,
     'secenekler': secenekler,
     'dogru': dogru,
+    if (dil != varsayilanSesDili) 'dil': dil,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// "Atla" cevabı: konuşma tanıma yokken `Soyle` alıştırması nötr geçilir
+/// (oturum sonucu bildirmez; SRS'e yanlış yazılmaz).
+final class SoyleAtlandi {
+  const SoyleAtlandi();
+}
+
+/// Konuşma / telaffuz: `dil` dilindeki `metin` yüksek sesle söylenir, tanınan metin
+/// kelime kelime puanlanır (`telaffuzPuani`). `soru` yönergedir, `ceviri`
+/// Türkçe anlamıdır. Cevap: bool (eşik geçildi mi) ya da [atla].
+class Soyle extends Alistirma {
+  const Soyle({
+    required super.soru,
+    required this.metin,
+    required this.ceviri,
+    this.dil = varsayilanSesDili,
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String metin;
+  final String ceviri;
+
+  /// Okuma ve konuşma tanıma dili; yalnız varsayılandan farklıysa JSON'a yazılır.
+  final String dil;
+
+  /// Atla cevabı (tek örnek).
+  static const SoyleAtlandi atla = SoyleAtlandi();
+
+  /// Bir alıştırmanın en çok kaç deneme hakkı olduğu.
+  static const int enCokDeneme = 3;
+
+  @override
+  String get tur => 'soyle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'metin': metin,
+    'ceviri': ceviri,
+    if (dil != varsayilanSesDili) 'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
@@ -213,6 +360,7 @@ class Kod extends Alistirma {
     required this.dogru,
     this.dil = 'html',
     super.aciklama,
+    super.ipuclari,
   });
   final String kod;
   final List<String> secenekler;
@@ -229,13 +377,142 @@ class Kod extends Alistirma {
     'dogru': dogru,
     'dil': dil,
     'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Tablo tamamlama: `satirlar` tam (doğru) hücre metinlerini içerir; `bos`
+/// listesindeki (satır, sütun) hücreleri kullanıcı doldurur. Satır başlığı
+/// 0. sütundadır; `baslik` sütun başlıklarıdır (satirlar ile aynı genişlik).
+/// `secenekler` doluysa boşluklar seçenekten, boşsa yazarak doldurulur.
+/// Cevap: `bos` sırasıyla [List<String>]; karşılaştırma [Motor.cevapDogruMu]
+/// içinde Yaz türünün normalizasyonuyla yapılır.
+class Tablo extends Alistirma {
+  const Tablo({
+    required super.soru,
+    required this.baslik,
+    required this.satirlar,
+    required this.bos,
+    this.secenekler = const [],
+    super.aciklama,
+    super.ipuclari,
+  });
+  final List<String> baslik;
+  final List<List<String>> satirlar;
+  final List<({int satir, int sutun})> bos;
+  final List<String> secenekler;
+
+  /// Boş hücrenin doğru metni.
+  String hucre(({int satir, int sutun}) b) => satirlar[b.satir][b.sutun];
+
+  @override
+  String get tur => 'tablo';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'baslik': baslik,
+    'satirlar': satirlar,
+    'bos': bos.map((b) => [b.satir, b.sutun]).toList(),
+    if (secenekler.isNotEmpty) 'secenekler': secenekler,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Cümlede işaretleme: `cumle` boşluklardan kelimelere bölünür; `dogru`
+/// doğru kelimelerin indeksleridir (birden çok olabilir). Cevap: dokunulan
+/// indekslerin [List<int>]'i (sıra önemsiz).
+class Isaretle extends Alistirma {
+  const Isaretle({
+    required super.soru,
+    required this.cumle,
+    required this.dogru,
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String cumle;
+  final List<int> dogru;
+
+  /// Cümlenin kelimeleri (boşluğa göre).
+  List<String> get kelimeler =>
+      cumle.trim().split(RegExp(r'\s+')).where((k) => k.isNotEmpty).toList();
+  @override
+  String get tur => 'isaretle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'cumle': cumle,
+    'dogru': dogru,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Tahtada hamle: `fen` başlangıç konumunda kullanıcı doğru hamleyi oynar.
+/// `hamleler` UCI ana hattır ('e2e4', terfi 'e7e8q'): çift indeksler
+/// kullanıcının, tek indeksler rakibin (otomatik oynanan) cevabıdır; tek
+/// hamlelik bulmacada yalnız bir öğe. `matKabul` true ise kullanıcının son
+/// hamlesi mat ettiği sürece kabul edilir (aynı konumda birden çok mat
+/// hamlesi olabilir). `hataMesajlari`: yanlış hamle (UCI) -> ona özel mesaj.
+/// Cevap: kullanıcının oynadığı hamlelerin (UCI) [List<String>]'i; doğru
+/// olması için oyuncu hamleleriyle sırayla eşleşmeli.
+/// `oyun`: tahta türü ('satranc'; Go gibi oyunlar için ayrılmış).
+class Hamle extends Alistirma {
+  const Hamle({
+    required super.soru,
+    required this.fen,
+    required this.hamleler,
+    this.matKabul = false,
+    this.hataMesajlari = const {},
+    this.oyun = varsayilanOyun,
+    super.aciklama,
+    super.ipuclari,
+  });
+
+  static const String varsayilanOyun = 'satranc';
+
+  final String fen;
+  final List<String> hamleler;
+  final bool matKabul;
+  final Map<String, String> hataMesajlari;
+  final String oyun;
+
+  /// Kullanıcının oynaması gereken hamleler (ana hattın çift indeksleri).
+  List<String> get oyuncuHamleleri => [
+    for (var i = 0; i < hamleler.length; i += 2) hamleler[i],
+  ];
+
+  @override
+  String get tur => 'hamle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'fen': fen,
+    'hamleler': hamleler,
+    if (matKabul) 'matKabul': true,
+    if (hataMesajlari.isNotEmpty) 'hataMesajlari': hataMesajlari,
+    if (oyun != varsayilanOyun) 'oyun': oyun,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
 }
 
 class Ders {
-  const Ders({required this.id, required this.ad, required this.alistirmalar});
+  const Ders({
+    required this.id,
+    required this.ad,
+    required this.alistirmalar,
+    this.dilbilgisiNotu,
+  });
   final String id; // ör. ingilizce-1.u1.d1
   final String ad;
+
+  /// İsteğe bağlı kısa dilbilgisi notu; varsa ders başında ayrı bir kartta
+  /// gösterilir (yoksa kart yok).
+  final String? dilbilgisiNotu;
   final List<Alistirma> alistirmalar; // her ders 8-10 alıştırma
 
   /// Aralıklı tekrar kart kimliği: dersId#indeks
@@ -249,7 +526,8 @@ class Unite {
   final List<Ders> dersler;
 }
 
-enum KursAlani { dil, kod }
+/// Kurs alanı. JSON/durumda adıyla saklanır ('dil' | 'kod' | 'oyun').
+enum KursAlani { dil, kod, oyun }
 
 class Kurs {
   const Kurs({

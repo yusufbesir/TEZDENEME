@@ -6,8 +6,23 @@
 | Dosya | Konular |
 |---|---|
 | [hafiza-ve-not.md](hafiza-ve-not.md) | Model ataması, not alma, hafızadan silme yasağı, not okuma, hafıza ve Jev, ortak beyin, silme biçimi ve dosya açıklamaları |
-| [guvenlik-ve-dosya.md](guvenlik-ve-dosya.md) | E-posta, güvenlik, dosya düzeni ve iş sahipliği, Windows kurulum/güncelleme/kaldırma, tarayıcı koruması, tersine mühendislik aracı |
-| [orkestrasyon-ve-kayit.md](orkestrasyon-ve-kayit.md) | Orkestratör ve Baş Denetmen, etiketleme, token ve araç kaydı, kesintiden sonra devam, Archify, emek illüzyonu |
+| [guvenlik-ve-dosya.md](guvenlik-ve-dosya.md) | E-posta, güvenlik, dosya düzeni ve iş sahipliği, tarayıcı koruması, tersine mühendislik aracı (Windows kurulum kuralı `.claude/rules/` altında) |
+| [orkestrasyon-ve-kayit.md](orkestrasyon-ve-kayit.md) | Orkestratör ve Baş Denetmen, etiketleme, token ve araç kaydı, kesintiden sonra devam, Archify (emek illüzyonu kuralı `.claude/rules/` altında) |
+| [`.claude/rules/windows-uygulama-dagitimi.md`](../../.claude/rules/windows-uygulama-dagitimi.md) | Yola bağlı: Windows kurulum, güncelleme, kaldırma, klasör düzeni |
+| [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) | Yola bağlı: arayüz dosyalarında emek illüzyonu |
+
+## Yeni kural nereye gider
+| Kuralın niteliği | Yer | Neden |
+|---|---|---|
+| Her oturumda geçerli, kısa (birkaç satır) | `CLAUDE.md` (200 satırın altında kalmalı) | Her oturumda yüklenir; şişerse bağlam maliyeti artar |
+| Yalnızca belirli dosyalar/klasörlerde geçerli | `.claude/rules/<konu>.md` + `paths:` | Yalnızca o yollar açılınca yüklenir |
+| Tekrarlanan adım adım iş (not yazma, yayın vb.) | `.claude/skills/<ad>/SKILL.md` | Çağrılınca yüklenir, kuralı değil prosedürü taşır |
+| Mevcut skill'ler | `kasa-notu-yaz`, `is-kaydi`, `denetmen-raporu` | Kasa notu, iş kaydı (commit, PR, günlük, CHECKPOINT), denetmen raporu |
+| Uzun gerekçe, kullanıcı kararı, referans | `docs/kurallar/<konu>.md` | Gerektiğinde okunur, başlıklarla taranır |
+| Değişen durum (açık PR, bekleyen karar) | `CHECKPOINT.md` | Kalıcı kural değildir, sık güncellenir |
+| Her oturumda şart olan kısa özet | Proje talimatları kutusu (`talimat-kutusu-ozet.md`, 4.000 karakterin altı) | Kutu uzayınca uyarı verir |
+
+Boyut sınırları `tests/test_talimat_boyutu.py` ile denetlenir. `@import` bağlam maliyetini düşürmez, bölmek için kullanılmaz.
 
 ## Kullanım
 - Önce yalnızca ilgili dosyanın özetini ve başlıklarını oku; tamamını açma (token tasarrufu).
