@@ -1358,4 +1358,138 @@ abstract final class Motor {
             secilen.containsAll(a.dogru);
     }
   }
+
+  static final RegExp _neDemektirOzet = RegExp(r'^"([^"]+)" ne demektir\?$');
+
+  static String _bosluguDoldur(String metin, String cevap) =>
+      metin.replaceFirst(RegExp(r'_{3,}'), cevap).trim();
+
+  /// Ünite özeti (türetilir, saklanmaz): ünitenin alıştırmalarından kelime/
+  /// terim çiftleri (Eşleştir, "X ne demektir?" seçimi), kalıp/sözdizimi
+  /// satırları (Sırala, Boşluk, Tablo; kod kurslarında Kod) ve derslerin
+  /// dilbilgisi notları. Aynı öğe tekrarlanmaz; geçersiz indekste boş özet.
+  static UniteOzeti uniteOzeti(Kurs kurs, int uniteIndeks) {
+    if (uniteIndeks < 0 || uniteIndeks >= kurs.uniteler.length) {
+      return UniteOzeti(
+        uniteAd: '',
+        kodMu: kurs.alan == KursAlani.kod,
+        kelimeler: const [],
+        kaliplar: const [],
+        notlar: const [],
+      );
+    }
+    final unite = kurs.uniteler[uniteIndeks];
+    final kelimeler = <({String kelime, String anlam})>[];
+    final kaliplar = <String>[];
+    final notlar = <({String ders, String not})>[];
+    final gorulen = <String>{};
+    void kelimeEkle(String k, String a) {
+      k = k.trim();
+      a = a.trim();
+      if (k.isEmpty || a.isEmpty) return;
+      if (gorulen.add('k\u0000$k\u0000$a')) {
+        kelimeler.add((kelime: k, anlam: a));
+      }
+    }
+
+    void kalipEkle(String k) {
+      k = k.trim();
+      if (k.isEmpty) return;
+      if (gorulen.add('p\u0000$k')) kaliplar.add(k);
+    }
+
+    for (final ders in unite.dersler) {
+      final not = ders.dilbilgisiNotu?.trim();
+      if (not != null && not.isNotEmpty) {
+        notlar.add((ders: ders.ad, not: not));
+      }
+      for (final a in ders.alistirmalar) {
+        switch (a) {
+          case Eslestir(:final ciftler):
+            for (final c in ciftler) {
+              kelimeEkle(c.sol, c.sag);
+            }
+          case Secim(:final soru, :final secenekler, :final dogru):
+            final e = _neDemektirOzet.firstMatch(soru.trim());
+            if (e != null && dogru >= 0 && dogru < secenekler.length) {
+              kelimeEkle(e.group(1)!, secenekler[dogru]);
+            }
+          case Sirala(:final dogru):
+            if (dogru.length > 1) kalipEkle(dogru.join(' '));
+          case Bosluk(:final soru, :final secenekler, :final dogru):
+            if (dogru >= 0 &&
+                dogru < secenekler.length &&
+                soru.contains('___')) {
+              kalipEkle(_bosluguDoldur(soru, secenekler[dogru]));
+            }
+          case Kod(:final kod, :final secenekler, :final dogru):
+            if (dogru >= 0 &&
+                dogru < secenekler.length &&
+                kod.contains('___')) {
+              kalipEkle(_bosluguDoldur(kod, secenekler[dogru]));
+            }
+          case Tablo(:final satirlar):
+            for (final satir in satirlar) {
+              kalipEkle(satir.where((h) => h.trim().isNotEmpty).join(' - '));
+            }
+          default:
+            break;
+        }
+      }
+    }
+    return UniteOzeti(
+      uniteAd: unite.ad,
+      kodMu: kurs.alan == KursAlani.kod,
+      kelimeler: List.unmodifiable(kelimeler),
+      kaliplar: List.unmodifiable(kaliplar),
+      notlar: List.unmodifiable(notlar),
+    );
+  }
+}
+
+/// [Motor.uniteOzeti] sonucu. Kod kurslarında kelime yerine terim, kalıp
+/// yerine sözdizimi başlıkları kullanılır.
+class UniteOzeti {
+  const UniteOzeti({
+    required this.uniteAd,
+    required this.kodMu,
+    required this.kelimeler,
+    required this.kaliplar,
+    required this.notlar,
+  });
+
+  final String uniteAd;
+  final bool kodMu;
+  final List<({String kelime, String anlam})> kelimeler;
+  final List<String> kaliplar;
+  final List<({String ders, String not})> notlar;
+
+  String get kelimeBasligi => kodMu ? 'Terimler' : 'Kelimeler';
+  String get kalipBasligi => kodMu ? 'Sözdizimi' : 'Kalıplar';
+
+  bool get bos => kelimeler.isEmpty && kaliplar.isEmpty && notlar.isEmpty;
+
+  /// Panoya kopyalanacak düz metin.
+  String metin() {
+    final b = StringBuffer('Ünite özeti: $uniteAd');
+    if (kelimeler.isNotEmpty) {
+      b.write('\n\n$kelimeBasligi');
+      for (final k in kelimeler) {
+        b.write('\n- ${k.kelime}: ${k.anlam}');
+      }
+    }
+    if (kaliplar.isNotEmpty) {
+      b.write('\n\n$kalipBasligi');
+      for (final k in kaliplar) {
+        b.write('\n- $k');
+      }
+    }
+    if (notlar.isNotEmpty) {
+      b.write('\n\nDilbilgisi notları');
+      for (final n in notlar) {
+        b.write('\n- ${n.ders}: ${n.not}');
+      }
+    }
+    return b.toString();
+  }
 }

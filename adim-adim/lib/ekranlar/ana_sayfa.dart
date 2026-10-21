@@ -454,29 +454,51 @@ class _YolListesi extends StatelessWidget {
             ),
           );
         }
-        if (Motor.araSinavAcik(durum, kurs, ui)) {
+        final sinavAcik = Motor.araSinavAcik(durum, kurs, ui);
+        final ozetAcik =
+            Motor.uniteBitmis(durum, unite) && !Motor.uniteOzeti(kurs, ui).bos;
+        if (sinavAcik || ozetAcik) {
           final sonuc = durum.araSinavlar[unite.id];
           ogeler.add(
             Align(
               alignment: Alignment.centerLeft,
-              child: OutlinedButton.icon(
-                key: ValueKey('ara-sinav-${unite.id}'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(48, 48),
-                ),
-                onPressed: () => context.push(
-                  '/sinav?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
-                ),
-                icon: Icon(
-                  Motor.araSinavGecildi(durum, unite)
-                      ? Icons.check_circle
-                      : Icons.quiz_outlined,
-                ),
-                label: Text(
-                  sonuc == null
-                      ? 'Ara sınav'
-                      : 'Ara sınav (en iyi %${sonuc.yuzde})',
-                ),
+              child: Wrap(
+                spacing: Olcu.b1,
+                runSpacing: Olcu.b1,
+                children: [
+                  if (sinavAcik)
+                    OutlinedButton.icon(
+                      key: ValueKey('ara-sinav-${unite.id}'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => context.push(
+                        '/sinav?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                      ),
+                      icon: Icon(
+                        Motor.araSinavGecildi(durum, unite)
+                            ? Icons.check_circle
+                            : Icons.quiz_outlined,
+                      ),
+                      label: Text(
+                        sonuc == null
+                            ? 'Ara sınav'
+                            : 'Ara sınav (en iyi %${sonuc.yuzde})',
+                      ),
+                    ),
+                  if (ozetAcik)
+                    OutlinedButton.icon(
+                      key: ValueKey('unite-ozeti-${unite.id}'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => context.push(
+                        '/unite-ozeti?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                      ),
+                      icon: const Icon(Icons.summarize_outlined),
+                      label: const Text('Ünite özeti'),
+                    ),
+                ],
               ),
             ),
           );

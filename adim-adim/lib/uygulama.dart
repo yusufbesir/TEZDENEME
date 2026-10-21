@@ -32,6 +32,7 @@ import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
 import 'ekranlar/sertifika_ekrani.dart';
 import 'ekranlar/sinav_ekrani.dart';
+import 'ekranlar/unite_ozeti_ekrani.dart';
 import 'ekranlar/yerlestirme_ekrani.dart';
 import 'tema/tema.dart';
 
@@ -133,6 +134,13 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         builder: (c, s) => SinavEkrani(
           kursId: s.uri.queryParameters['kurs'] ?? '',
           uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/unite-ozeti',
+        builder: (c, s) => UniteOzetiEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
         ),
       ),
       GoRoute(
