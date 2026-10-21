@@ -1,0 +1,74 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Pano{% endblock %}
+{% block icerik %}
+<h1>Pano</h1>
+
+<div class="kartlar">
+  <div class="sayi-kart"><span class="sayi">{{ sayilar.toplam }}</span><span class="etiket">Toplam QR kod</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ sayilar.aktif }}</span><span class="etiket">Aktif QR kod</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ sayilar.pasif }}</span><span class="etiket">Pasif QR kod</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ sayilar.arsiv }}</span><span class="etiket">Arşivlenmiş QR kod</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ sayilar.cop }}</span><span class="etiket">Çöp kutusundaki QR kod</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ aktif_kampanya }}</span><span class="etiket">Aktif kampanya</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ tarama.insan }}</span><span class="etiket">Tarama (bot hariç)</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ tarama.hepsi }}</span><span class="etiket">Tarama (bot dahil)</span></div>
+  <div class="sayi-kart"><span class="sayi">{{ tarama.bot }}</span><span class="etiket">Bot taraması</span></div>
+</div>
+
+<h2>Süresi yaklaşanlar ({{ yaklasan_gun }} gün içinde)</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Tür</th><th>Kayıt</th><th>Bitiş</th></tr></thead>
+  <tbody>
+  {% for k in yaklasan_kampanya %}<tr><td>Kampanya</td><td><a href="{% url 'panel:kampanya_duzenle' k.pk %}">{{ k.ad }}</a></td><td>{{ k.bitis|date:"d.m.Y H:i" }}</td></tr>{% endfor %}
+  {% for q in yaklasan_qr %}<tr><td>QR kod</td><td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a> {{ q.ad }}</td><td>{{ q.etkin_bitis|date:"d.m.Y H:i" }}</td></tr>{% endfor %}
+  {% if not yaklasan_kampanya and not yaklasan_qr %}<tr><td colspan="3">Süresi yaklaşan kayıt yok.</td></tr>{% endif %}
+  </tbody>
+</table></div>
+
+<h2>Süresi dolmuşlar</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Tür</th><th>Kayıt</th><th>Bitiş</th></tr></thead>
+  <tbody>
+  {% for k in dolmus_kampanya %}<tr><td>Kampanya</td><td><a href="{% url 'panel:kampanya_duzenle' k.pk %}">{{ k.ad }}</a></td><td>{{ k.bitis|date:"d.m.Y H:i" }}</td></tr>{% endfor %}
+  {% for q in dolmus_qr %}<tr><td>QR kod (hâlâ aktif)</td><td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a> {{ q.ad }}</td><td>{{ q.etkin_bitis|date:"d.m.Y H:i" }}</td></tr>{% endfor %}
+  {% if not dolmus_kampanya and not dolmus_qr %}<tr><td colspan="3">Süresi dolmuş kayıt yok.</td></tr>{% endif %}
+  </tbody>
+</table></div>
+
+<h2>Günlük tarama sayıları</h2>
+<form method="get" class="filtre">
+  <div><label for="baslangic">Başlangıç</label><input type="date" id="baslangic" name="baslangic" value="{{ baslangic|date:'Y-m-d' }}"></div>
+  <div><label for="bitis">Bitiş</label><input type="date" id="bitis" name="bitis" value="{{ bitis|date:'Y-m-d' }}"></div>
+  <div><button type="submit" class="dugme">Uygula</button></div>
+</form>
+{% for u in uyarilar %}<div class="uyari-kutu">{{ u }}</div>{% endfor %}
+<div class="tablo-kap"><table>
+  <thead><tr><th>Gün</th><th class="sayi">Tarama (bot hariç)</th><th class="sayi">Bot</th></tr></thead>
+  <tbody>
+  {% for g in gunluk %}<tr><td>{{ g.gun|date:"d.m.Y" }}</td><td class="sayi">{{ g.toplam }}</td><td class="sayi">{{ g.bot }}</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+{% if denetim is not None %}
+<h2>Son denetim kayıtları</h2>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Eylem</th><th>Özet</th></tr></thead>
+  <tbody>
+  {% for k in denetim %}<tr><td>{{ k.zaman|date:"d.m.Y H:i" }}</td><td>{{ k.kullanici_adi|default:"-" }}</td><td>{{ k.eylem }}</td><td>{{ k.ozet }}</td></tr>
+  {% empty %}<tr><td colspan="4">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endif %}
+
+<h2>Yedekleme durumu</h2>
+<div class="kart">
+  {% if yedek.var %}
+  <p>Son yedek: <strong>{{ yedek.zaman }}</strong></p>
+  <p>Durum: <span class="{% if yedek.basarili %}basari-metin{% else %}hata-metin{% endif %}">{{ yedek.durum }}</span></p>
+  <p>Dosya: {{ yedek.dosya|default:"-" }} · Boyut: {{ yedek.boyut }}</p>
+  <p>Sunucudaki yedek sayısı: {% if yedek.yerel_sayi is not None %}{{ yedek.yerel_sayi }}{% else %}-{% endif %} · En eski: {{ yedek.en_eski|default:"-" }}</p>
+  <p>Sunucu dışı kopya son doğrulama: {% if yedek.uzak_zaman %}<strong>{{ yedek.uzak_zaman }}</strong>{% else %}<strong>yok</strong>{% endif %}</p>
+  {% else %}<p>{{ yedek.mesaj }}</p>{% endif %}
+  {% if yedek.uzak_uyari %}<div class="uyari-kutu" id="uzak-kopya-uyari">Sunucu dışı kopya doğrulanmadı; eski yedekler silinmiyor, disk dolabilir — docs/YEDEKLEME.md</div>{% endif %}
+</div>
+{% endblock %}

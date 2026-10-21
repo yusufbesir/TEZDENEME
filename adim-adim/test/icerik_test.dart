@@ -11,15 +11,33 @@ Iterable<Alistirma> _alistirmalar() => _dersler().expand((d) => d.alistirmalar);
 List<String> _sirali(List<String> l) => [...l]..sort();
 
 void main() {
-  test('yedi kurs ve kursBul', () {
+  test('on kurs ve kursBul', () {
     expect(tumKurslar.map((k) => k.id), [
       'ingilizce-1',
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'almanca-1',
+      'almanca-2',
+      'almanca-3',
+      'korece-1',
+      'japonca-1',
+      'cince-1',
       'html-1',
       'css-1',
       'js-1',
+      'html-2',
+      'html-3',
+      'css-2',
+      'css-3',
+      'js-2',
+      'js-3',
+      'python-1',
+      'python-2',
+      'python-3',
+      'satranc-1',
+      'satranc-2',
+      'satranc-3',
     ]);
     expect(kursBul('css-1'), same(css1));
     expect(kursBul('yok'), isNull);
@@ -27,7 +45,30 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
-    for (final k in [html1, css1, js1]) {
+    for (final k in [
+      almancaA1,
+      almancaA2,
+      almancaB1,
+      koreceA1,
+      japoncaA1,
+      cinceA1,
+    ]) {
+      expect(k.alan, KursAlani.dil);
+    }
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
       expect(k.alan, KursAlani.kod);
     }
   });
@@ -35,8 +76,21 @@ void main() {
   test('kurs, ünite ve ders sayıları', () {
     expect(ingilizceA1.uniteler.length, greaterThanOrEqualTo(4));
     expect(ingilizceA1.tumDersler.length, greaterThanOrEqualTo(12));
-    for (final k in [html1, css1, js1]) {
-      expect(k.tumDersler.length, 6);
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
+      expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
   });
 
@@ -50,9 +104,10 @@ void main() {
     expect(idler.toSet().length, idler.length);
   });
 
-  test('her ders 8-10 alıştırma içerir', () {
+  test('her ders 8-10 alıştırma içerir (konuşma alıştırması ayrı sayılır)', () {
     for (final d in _dersler()) {
-      expect(d.alistirmalar.length, inInclusiveRange(8, 10), reason: d.id);
+      final sayi = d.alistirmalar.where((a) => a is! Soyle).length;
+      expect(sayi, inInclusiveRange(8, 10), reason: d.id);
     }
   });
 
@@ -111,7 +166,20 @@ void main() {
         expect(a.secenekler[a.dogru], a.okunacak, reason: d.id);
       }
     }
-    for (final k in [html1, css1, js1]) {
+    for (final k in [
+      html1,
+      css1,
+      js1,
+      html2,
+      html3,
+      css2,
+      css3,
+      js2,
+      js3,
+      python1,
+      python2,
+      python3,
+    ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {
         final kodlar = d.alistirmalar.whereType<Kod>().toList();

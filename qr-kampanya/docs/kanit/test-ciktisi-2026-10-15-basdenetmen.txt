@@ -1,0 +1,784 @@
+# Tam test takımı, 2026-10-15T19:14:07+00:00, gerçek rclone v1.75.0 ile (QR_TEST_RCLONE) — Baş Denetmen düzeltmeleri
+Found 354 test(s).
+Creating test database for alias 'default' ('test_qrkampanya_h')...
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles
+  Apply all migrations: auth, contenttypes, qr, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying qr.0001_initial... OK
+  Applying qr.0002_silme_korumasi... OK
+  Applying qr.0003_ice_aktarma... OK
+  Applying qr.0004_deneme_sayaci... OK
+  Applying qr.0005_uygulama_rolu_yetkileri... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+Roller güncellendi.
+test_ad_normalle (qr.tests.test_denetim_2.Y1UnicodeSayac.test_ad_normalle) ... ok
+test_denetim_kaydinda_gercek_kullanici_adi (qr.tests.test_denetim_2.Y1UnicodeSayac.test_denetim_kaydinda_gercek_kullanici_adi) ... /tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py:61: UserWarning: No directory at: /home/claude/TEZDENEME/qr-kampanya/app/staticfiles/
+  mw_instance = middleware(adapted_handler)
+ok
+test_hesap_anahtari_kullanici_pk_ile (qr.tests.test_denetim_2.Y1UnicodeSayac.test_hesap_anahtari_kullanici_pk_ile) ... ok
+test_unicode_varyantlar_hesap_kilidini_atlatamaz (qr.tests.test_denetim_2.Y1UnicodeSayac.test_unicode_varyantlar_hesap_kilidini_atlatamaz) ... 2026-10-15 22:14:08,463 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,471 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,480 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,488 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,494 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,504 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,511 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,522 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,532 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,541 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,549 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,561 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,569 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,578 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,589 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,597 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,606 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,616 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,624 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,631 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,642 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:08,654 WARNING django.request Too Many Requests: /panel/giris
+ok
+Roller güncellendi.
+test_doctype_reddedilir (qr.tests.test_denetim_2.Y2XlsxBomba.test_doctype_reddedilir) ... ok
+test_normal_xlsx_gecer (qr.tests.test_denetim_2.Y2XlsxBomba.test_normal_xlsx_gecer) ... ok
+test_satir_basina_hucre_siniri_hizla_reddedilir (qr.tests.test_denetim_2.Y2XlsxBomba.test_satir_basina_hucre_siniri_hizla_reddedilir) ... ok
+test_sayfa_yolu_workbook_rels_ile_bulunur (qr.tests.test_denetim_2.Y2XlsxBomba.test_sayfa_yolu_workbook_rels_ile_bulunur) ... ok
+test_sinir_10mb (qr.tests.test_denetim_2.Y2XlsxBomba.test_sinir_10mb) ... ok
+test_tek_satirda_milyonlarca_hucre_hizla_reddedilir (qr.tests.test_denetim_2.Y2XlsxBomba.test_tek_satirda_milyonlarca_hucre_hizla_reddedilir) ... ok
+test_toplam_hucre_siniri (qr.tests.test_denetim_2.Y2XlsxBomba.test_toplam_hucre_siniri) ... ok
+Roller güncellendi.
+test_sayac_sifirla_bilinmeyen_kullanici_hata_vermez (qr.tests.test_denetim_2.Y3KisaDevre.test_sayac_sifirla_bilinmeyen_kullanici_hata_vermez) ... ok
+test_sayac_sifirla_komutu (qr.tests.test_denetim_2.Y3KisaDevre.test_sayac_sifirla_komutu) ... 2026-10-15 22:14:09,599 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,612 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,623 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_tek_ip_hesap_sayacini_sisiremez (qr.tests.test_denetim_2.Y3KisaDevre.test_tek_ip_hesap_sayacini_sisiremez) ... 2026-10-15 22:14:09,717 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,723 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,729 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,736 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,742 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,749 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,755 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,761 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,767 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,773 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,779 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,785 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,791 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,797 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,803 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,809 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,815 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,821 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,827 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,833 WARNING django.request Too Many Requests: /panel/giris
+ok
+Roller güncellendi.
+test_hiz_siniri_ipv6_64 (qr.tests.test_denetim_2.Y4Ipv6.test_hiz_siniri_ipv6_64) ... 2026-10-15 22:14:09,968 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:09,969 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_ip_anahtari (qr.tests.test_denetim_2.Y4Ipv6.test_ip_anahtari) ... ok
+test_ipv6_64_icinde_dondurme_ip_sayacina_takilir (qr.tests.test_denetim_2.Y4Ipv6.test_ipv6_64_icinde_dondurme_ip_sayacina_takilir) ... 2026-10-15 22:14:10,061 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:10,067 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:10,075 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:10,082 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_yedek_dongusu_temizlik_icerir (qr.tests.test_denetim_2.Y4Ipv6.test_yedek_dongusu_temizlik_icerir) ... ok
+Roller güncellendi.
+test_duzenleme_formunda_kisa_kod_salt_okunur (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_duzenleme_formunda_kisa_kod_salt_okunur) ... ok
+test_hedef_gecmisi_ilk_kayit (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_hedef_gecmisi_ilk_kayit) ... ok
+test_kisa_kod_degistirilemez (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_kisa_kod_degistirilemez) ... ok
+test_mukerrer_kisa_kod_buyuk_kucuk_harf_duyarsiz_reddedilir (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_mukerrer_kisa_kod_buyuk_kucuk_harf_duyarsiz_reddedilir) ... ok
+test_otomatik_kisa_kod_uretilir (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_otomatik_kisa_kod_uretilir) ... ok
+test_panelde_kisa_kod_degistirilemez (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_panelde_kisa_kod_degistirilemez) ... ok
+test_panelde_silme_ucu_yok (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_panelde_silme_ucu_yok) ... 2026-10-15 22:14:10,400 WARNING django.request Not Found: /panel/qr/7/sil
+2026-10-15 22:14:10,400 WARNING django.request Not Found: /panel/qr/7/delete
+2026-10-15 22:14:10,405 WARNING django.request Method Not Allowed (POST): /panel/qr/7/
+ok
+test_qr_silinemez (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_qr_silinemez) ... ok
+test_sayfa_silinemez (qr.tests.test_dogrulama_ve_model.ModelKorumaTesti.test_sayfa_silinemez) ... ok
+Roller güncellendi.
+test_genel_ip_ve_idn_reddedilmez (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_genel_ip_ve_idn_reddedilmez) ... ok
+test_idn_hedefte_panel_uyari_gosterir_ama_kaydeder (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_idn_hedefte_panel_uyari_gosterir_ama_kaydeder) ... ok
+test_normal_urller_kabul_edilir (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_normal_urller_kabul_edilir) ... ok
+test_panelden_tehlikeli_url_kaydedilemez (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_panelden_tehlikeli_url_kaydedilemez) ... ok
+test_tehlikeli_buton_url_sayfada_reddedilir (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_tehlikeli_buton_url_sayfada_reddedilir) ... ok
+test_tehlikeli_urller_reddedilir (qr.tests.test_dogrulama_ve_model.UrlDogrulamaTesti.test_tehlikeli_urller_reddedilir) ... ok
+Roller güncellendi.
+test_ayni_ip_ve_kullanici_icin_kayit_sayisi_sinirlidir (qr.tests.test_guvenlik_denetimi.DenetimKaydiSinirTesti.test_ayni_ip_ve_kullanici_icin_kayit_sayisi_sinirlidir) ... ok
+test_kilitlenme_kaydi_da_maskelenir (qr.tests.test_guvenlik_denetimi.DenetimKaydiSinirTesti.test_kilitlenme_kaydi_da_maskelenir) ... ok
+test_var_olmayan_kullanici_adi_acik_yazilmaz (qr.tests.test_guvenlik_denetimi.DenetimKaydiSinirTesti.test_var_olmayan_kullanici_adi_acik_yazilmaz) ... ok
+Roller güncellendi.
+test_ice_aktarma_guncellemesi_eszamanli_hedef_degisikligini_ezmez (qr.tests.test_guvenlik_denetimi.EszamanliDegisiklikTesti.test_ice_aktarma_guncellemesi_eszamanli_hedef_degisikligini_ezmez) ... ok
+test_ice_aktarma_hedef_degisimi_gecmise_yazilir (qr.tests.test_guvenlik_denetimi.EszamanliDegisiklikTesti.test_ice_aktarma_hedef_degisimi_gecmise_yazilir) ... ok
+test_toplu_durum_degisikligi_eszamanli_hedef_degisikligini_ezmez (qr.tests.test_guvenlik_denetimi.EszamanliDegisiklikTesti.test_toplu_durum_degisikligi_eszamanli_hedef_degisikligini_ezmez) ... ok
+test_toplu_durum_degisikligi_hedef_gecmisi_yazmaz_hedef_ayni_kalirsa (qr.tests.test_guvenlik_denetimi.EszamanliDegisiklikTesti.test_toplu_durum_degisikligi_hedef_gecmisi_yazmaz_hedef_ayni_kalirsa) ... ok
+Roller güncellendi.
+test_hiz_asilinca_429_ve_parola_dogrulamasi_calismaz (qr.tests.test_guvenlik_denetimi.GirisDoSTesti.test_hiz_asilinca_429_ve_parola_dogrulamasi_calismaz) ... 2026-10-15 22:14:11,765 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_mfa_uclari_da_sinirlanir (qr.tests.test_guvenlik_denetimi.GirisDoSTesti.test_mfa_uclari_da_sinirlanir) ... 2026-10-15 22:14:11,782 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-15 22:14:11,782 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-15 22:14:11,785 WARNING django.request Too Many Requests: /panel/mfa/kurulum
+2026-10-15 22:14:11,785 WARNING django.request Too Many Requests: /panel/mfa/kurulum
+ok
+test_sinir_kapaliyken_uygulanmaz (qr.tests.test_guvenlik_denetimi.GirisDoSTesti.test_sinir_kapaliyken_uygulanmaz) ... ok
+Roller güncellendi.
+test_basarili_giris_ip_ve_hesap_sayaclarini_sisirmez (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_basarili_giris_ip_ve_hesap_sayaclarini_sisirmez) ... ok
+test_baska_hesap_etkilenmez (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_baska_hesap_etkilenmez) ... ok
+test_hesap_kilidi_gecicidir (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_hesap_kilidi_gecicidir) ... 2026-10-15 22:14:12,310 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_ip_dondurerek_hesap_kilidi_atlatilamaz (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_ip_dondurerek_hesap_kilidi_atlatilamaz) ... 2026-10-15 22:14:12,414 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:12,504 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_kullanici_adi_dondurerek_ip_kilidi_atlatilamaz (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_kullanici_adi_dondurerek_ip_kilidi_atlatilamaz) ... 2026-10-15 22:14:12,582 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_mfa_denemeleri_hesap_sayacina_katilir_ve_yeniden_giris_sifirlamaz (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_mfa_denemeleri_hesap_sayacina_katilir_ve_yeniden_giris_sifirlamaz) ... 2026-10-15 22:14:12,744 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-15 22:14:12,754 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:12,766 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_sayac_atomik_artar (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_sayac_atomik_artar) ... ok
+test_sure_dolan_sayac_sifirlanir (qr.tests.test_guvenlik_denetimi.KilitAtlatmaTesti.test_sure_dolan_sayac_sifirlanir) ... ok
+Roller güncellendi.
+test_eski_onaysiz_kayit_dikkate_alinmaz (qr.tests.test_guvenlik_denetimi.MFAAnahtarTesti.test_eski_onaysiz_kayit_dikkate_alinmaz) ... ok
+test_hesabim_kurulumu_da_veritabaninda_onaysiz_anahtar_tutmaz (qr.tests.test_guvenlik_denetimi.MFAAnahtarTesti.test_hesabim_kurulumu_da_veritabaninda_onaysiz_anahtar_tutmaz) ... ok
+test_saldirgan_ve_kurban_farkli_anahtar_gorur (qr.tests.test_guvenlik_denetimi.MFAAnahtarTesti.test_saldirgan_ve_kurban_farkli_anahtar_gorur) ... ok
+test_saldirganin_anahtari_kurbanin_kurulumundan_sonra_gecersiz (qr.tests.test_guvenlik_denetimi.MFAAnahtarTesti.test_saldirganin_anahtari_kurbanin_kurulumundan_sonra_gecersiz) ... ok
+test_yanlis_kodla_veritabanina_cihaz_yazilmaz (qr.tests.test_guvenlik_denetimi.MFAAnahtarTesti.test_yanlis_kodla_veritabanina_cihaz_yazilmaz) ... ok
+Roller güncellendi.
+test_kendi_sifirlayan_mevcut_oturumunu_korur (qr.tests.test_guvenlik_denetimi.MFASifirlaOturumTesti.test_kendi_sifirlayan_mevcut_oturumunu_korur) ... ok
+test_komut_oturumlari_sonlandirir (qr.tests.test_guvenlik_denetimi.MFASifirlaOturumTesti.test_komut_oturumlari_sonlandirir) ... ok
+test_yonetici_sifirlayinca_hedefin_oturumlari_biter (qr.tests.test_guvenlik_denetimi.MFASifirlaOturumTesti.test_yonetici_sifirlayinca_hedefin_oturumlari_biter) ... ok
+Roller güncellendi.
+test_acilmis_boyut_siniri_okumadan_once_uygulanir (qr.tests.test_guvenlik_denetimi.XlsxDoSTesti.test_acilmis_boyut_siniri_okumadan_once_uygulanir) ... ok
+test_bos_hucre_bombasi_hizla_reddedilir (qr.tests.test_guvenlik_denetimi.XlsxDoSTesti.test_bos_hucre_bombasi_hizla_reddedilir) ... ok
+test_cok_sutunlu_dosya_hala_algilanir (qr.tests.test_guvenlik_denetimi.XlsxDoSTesti.test_cok_sutunlu_dosya_hala_algilanir) ... ok
+test_gecersiz_zip_nazikce_reddedilir (qr.tests.test_guvenlik_denetimi.XlsxDoSTesti.test_gecersiz_zip_nazikce_reddedilir) ... ok
+test_normal_dosya_calisir (qr.tests.test_guvenlik_denetimi.XlsxDoSTesti.test_normal_dosya_calisir) ... ok
+Roller güncellendi.
+test_gun_yerel_tarihtir (qr.tests.test_guvenlik_denetimi.ZiyaretciOzetiTesti.test_gun_yerel_tarihtir) ... ok
+Roller güncellendi.
+test_disa_aktarma_noktalivirgul_bom_ve_kacis (qr.tests.test_ice_aktarma.CsvAyracTest.test_disa_aktarma_noktalivirgul_bom_ve_kacis) ... ok
+Roller güncellendi.
+test_dosya_ici_mukerrer_buyuk_kucuk_harf (qr.tests.test_ice_aktarma.DogrulamaTest.test_dosya_ici_mukerrer_buyuk_kucuk_harf) ... ok
+test_hata_csv_indirme (qr.tests.test_ice_aktarma.DogrulamaTest.test_hata_csv_indirme) ... ok
+test_hatali_tarih_ve_bitis_baslangictan_once (qr.tests.test_ice_aktarma.DogrulamaTest.test_hatali_tarih_ve_bitis_baslangictan_once) ... ok
+test_hatali_url (qr.tests.test_ice_aktarma.DogrulamaTest.test_hatali_url) ... ok
+test_otomatik_kod (qr.tests.test_ice_aktarma.DogrulamaTest.test_otomatik_kod) ... ok
+test_tur_durum_hedef_kod_hatalari (qr.tests.test_ice_aktarma.DogrulamaTest.test_tur_durum_hedef_kod_hatalari) ... ok
+Roller güncellendi.
+test_boyut_siniri (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_boyut_siniri) ... ok
+test_cp1254_turkce_kodlama (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_cp1254_turkce_kodlama) ... ok
+test_gecersiz_uzanti_ve_bos_dosya (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_gecersiz_uzanti_ve_bos_dosya) ... ok
+test_noktalivirgul_ve_bom (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_noktalivirgul_ve_bom) ... ok
+test_ornek_csv_icerik_aktarilir (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_ornek_csv_icerik_aktarilir) ... ok
+test_ornek_xlsx_icerik_aktarilir (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_ornek_xlsx_icerik_aktarilir) ... ok
+test_satir_siniri (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_satir_siniri) ... ok
+test_satir_siniri_sabiti_20000 (qr.tests.test_ice_aktarma.DosyaOkumaTest.test_satir_siniri_sabiti_20000) ... ok
+Roller güncellendi.
+test_elle_esleme_ve_dogrulama (qr.tests.test_ice_aktarma.EslestirmeTest.test_elle_esleme_ve_dogrulama) ... ok
+test_farkli_baslik_adlariyla_icerik_aktarma (qr.tests.test_ice_aktarma.EslestirmeTest.test_farkli_baslik_adlariyla_icerik_aktarma) ... ok
+test_iliskili_kod_yok_ve_ad_yok_hata (qr.tests.test_ice_aktarma.EslestirmeTest.test_iliskili_kod_yok_ve_ad_yok_hata) ... ok
+test_otomatik_esleme_turkce_basliklar (qr.tests.test_ice_aktarma.EslestirmeTest.test_otomatik_esleme_turkce_basliklar) ... ok
+test_sayfa_hedefi_ve_iliskili_kayitlar (qr.tests.test_ice_aktarma.EslestirmeTest.test_sayfa_hedefi_ve_iliskili_kayitlar) ... ok
+Roller güncellendi.
+test_arsivdeki_kod_guncellenmez (qr.tests.test_ice_aktarma.MevcutKodTest.test_arsivdeki_kod_guncellenmez) ... ok
+test_bos_hucre_mevcut_degeri_korur_ve_degisiklik_yoksa_atlanir (qr.tests.test_ice_aktarma.MevcutKodTest.test_bos_hucre_mevcut_degeri_korur_ve_degisiklik_yoksa_atlanir) ... ok
+test_guncelleme_aciksa_hedef_degisir_ve_gecmis_yazilir (qr.tests.test_ice_aktarma.MevcutKodTest.test_guncelleme_aciksa_hedef_degisir_ve_gecmis_yazilir) ... ok
+test_guncelleme_kapaliyken_dokunulmaz (qr.tests.test_ice_aktarma.MevcutKodTest.test_guncelleme_kapaliyken_dokunulmaz) ... ok
+test_guncelleme_yetkisi_gerekir (qr.tests.test_ice_aktarma.MevcutKodTest.test_guncelleme_yetkisi_gerekir) ... 2026-10-15 22:14:15,654 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/e04234eb-1df4-46e5-b1c4-798ac2749e1c/uygula
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/ice_aktarma.py", line 194, in ice_aktarma_uygula
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+Roller güncellendi.
+test_ayni_icerik_aktarma_iki_kez_uygulanamaz (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_ayni_icerik_aktarma_iki_kez_uygulanamaz) ... ok
+test_baskasinin_ice_aktarmasi_404 (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_baskasinin_ice_aktarmasi_404) ... 2026-10-15 22:14:15,852 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/eslestir
+2026-10-15 22:14:15,857 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/onizle
+2026-10-15 22:14:15,862 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/hatalar.csv
+2026-10-15 22:14:15,868 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/sonuc
+2026-10-15 22:14:15,873 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/rapor.csv
+2026-10-15 22:14:15,878 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/zip
+2026-10-15 22:14:15,884 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/uygula
+2026-10-15 22:14:15,890 WARNING django.request Not Found: /panel/qr/ice-aktar/3d3a47dc-fed6-4aa3-88df-625ac98b2975/iptal
+ok
+test_csrf_zorunlu (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_csrf_zorunlu) ... 2026-10-15 22:14:15,903 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/ice-aktar/yukle
+ok
+test_denetim_kaydi_ve_sonuc_raporu (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_denetim_kaydi_ve_sonuc_raporu) ... ok
+test_get_ile_uygulanamaz (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_get_ile_uygulanamaz) ... 2026-10-15 22:14:15,980 WARNING django.request Method Not Allowed (GET): /panel/qr/ice-aktar/48cd445c-6c0a-48a8-9258-01c8ef8d9ca5/uygula
+ok
+test_hata_olursa_hicbir_sey_yazilmaz (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_hata_olursa_hicbir_sey_yazilmaz) ... ok
+test_iptal_edilen_uygulanamaz (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_iptal_edilen_uygulanamaz) ... ok
+test_izleyici_ve_anonim_erisemez (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_izleyici_ve_anonim_erisemez) ... 2026-10-15 22:14:16,071 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:16,077 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/yukle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:16,082 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/3c5cb8af-a845-4e0a-b6a5-d11ac0b84676/uygula
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:16,087 WARNING django.request Forbidden (Permission denied): /panel/qr/ice-aktar/ornek-ice-aktarma.csv
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_liste_24_saatten_eski_bekleyenleri_gostermez (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_liste_24_saatten_eski_bekleyenleri_gostermez) ... 2026-10-15 22:14:16,131 WARNING django.request Not Found: /panel/qr/ice-aktar/cfc83421-50e5-4998-8025-a4ff2802dfcf/onizle
+2026-10-15 22:14:16,137 WARNING django.request Not Found: /panel/qr/ice-aktar/cfc83421-50e5-4998-8025-a4ff2802dfcf/uygula
+ok
+test_ornek_dosyalari (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_ornek_dosyalari) ... ok
+test_zip_icerigi (qr.tests.test_ice_aktarma.UygulamaVeErisimTest.test_zip_icerigi) ... ok
+Roller güncellendi.
+test_denetim_kaydi_ve_oturum_olusturmaz (qr.tests.test_medya_yetki.MedyaYetkiTest.test_denetim_kaydi_ve_oturum_olusturmaz) ... ok
+test_dis_url_tanimli_ve_ic_yol_sabit (qr.tests.test_medya_yetki.MedyaYetkiTest.test_dis_url_tanimli_ve_ic_yol_sabit) ... ok
+test_dogrudan_post_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_dogrudan_post_404) ... 2026-10-15 22:14:16,413 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_gecersiz_yollar_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_gecersiz_yollar_404) ... 2026-10-15 22:14:16,433 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,434 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,434 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,434 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,435 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,435 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,435 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,436 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,436 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,436 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,436 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,437 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,437 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,437 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,437 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_head_alt_istegi_calisir (qr.tests.test_medya_yetki.MedyaYetkiTest.test_head_alt_istegi_calisir) ... ok
+test_mfali_editor_ve_izleyici_taslagi_gorur (qr.tests.test_medya_yetki.MedyaYetkiTest.test_mfali_editor_ve_izleyici_taslagi_gorur) ... ok
+test_mfasi_dogrulanmamis_oturum_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_mfasi_dogrulanmamis_oturum_404) ... 2026-10-15 22:14:16,599 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_pasif_kullanici_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_pasif_kullanici_404) ... 2026-10-15 22:14:16,623 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_referans_verilmeyen_dosya_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_referans_verilmeyen_dosya_404) ... 2026-10-15 22:14:16,634 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,650 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_sayfa_arsive_alininca_gorsel_kapanir (qr.tests.test_medya_yetki.MedyaYetkiTest.test_sayfa_arsive_alininca_gorsel_kapanir) ... 2026-10-15 22:14:16,663 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_sorgu_dizesi_atilir_ve_url_cozulur (qr.tests.test_medya_yetki.MedyaYetkiTest.test_sorgu_dizesi_atilir_ve_url_cozulur) ... 2026-10-15 22:14:16,679 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_taslak_ve_arsiv_anonim_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_taslak_ve_arsiv_anonim_404) ... 2026-10-15 22:14:16,691 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,693 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,694 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_x_forwarded_method_post_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_x_forwarded_method_post_404) ... 2026-10-15 22:14:16,704 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,704 WARNING django.request Not Found: /ic/medya-yetki
+2026-10-15 22:14:16,705 WARNING django.request Not Found: /ic/medya-yetki
+ok
+test_yayindaki_sayfa_gorselleri_anonim_200 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_yayindaki_sayfa_gorselleri_anonim_200) ... ok
+test_yetkisiz_kullanici_404 (qr.tests.test_medya_yetki.MedyaYetkiTest.test_yetkisiz_kullanici_404) ... 2026-10-15 22:14:16,741 WARNING django.request Not Found: /ic/medya-yetki
+ok
+Roller güncellendi.
+test_ayni_64_farkli_adresler_ayni_kovayi_paylasir (qr.tests.test_medya_yetki.YonlendirmeHizSiniriIPv6Test.test_ayni_64_farkli_adresler_ayni_kovayi_paylasir) ... 2026-10-15 22:14:16,892 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-15 22:14:16,893 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-15 22:14:16,893 WARNING django.request Too Many Requests: /k/HIZ001
+2026-10-15 22:14:16,893 WARNING django.request Too Many Requests: /k/HIZ001
+ok
+test_farkli_64_ayri_kova (qr.tests.test_medya_yetki.YonlendirmeHizSiniriIPv6Test.test_farkli_64_ayri_kova) ... 2026-10-15 22:14:16,915 WARNING django.request Too Many Requests: /k/HIZ002
+ok
+Roller güncellendi.
+test_ayni_kod_tekrar_kullanilamaz (qr.tests.test_mfa.MFAGirisTesti.test_ayni_kod_tekrar_kullanilamaz) ... ok
+test_bekleyen_durum_5_dk_sonra_gecersiz (qr.tests.test_mfa.MFAGirisTesti.test_bekleyen_durum_5_dk_sonra_gecersiz) ... ok
+test_bekleyen_durum_yokken_dogrula_girise_yonlendirir (qr.tests.test_mfa.MFAGirisTesti.test_bekleyen_durum_yokken_dogrula_girise_yonlendirir) ... ok
+test_bosluklu_kod_kabul_edilir (qr.tests.test_mfa.MFAGirisTesti.test_bosluklu_kod_kabul_edilir) ... ok
+test_dogru_kodla_giris (qr.tests.test_mfa.MFAGirisTesti.test_dogru_kodla_giris) ... ok
+test_editor_sifirlayamaz (qr.tests.test_mfa.MFAGirisTesti.test_editor_sifirlayamaz) ... 2026-10-15 22:14:17,337 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/92/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:17,343 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/92/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_istege_bagli_kurulum_hesabimdan (qr.tests.test_mfa.MFAGirisTesti.test_istege_bagli_kurulum_hesabimdan) ... ok
+test_kendi_mfasini_sifirlamak_kod_ister (qr.tests.test_mfa.MFAGirisTesti.test_kendi_mfasini_sifirlamak_kod_ister) ... ok
+test_komut_mfa_sifirla (qr.tests.test_mfa.MFAGirisTesti.test_komut_mfa_sifirla) ... ok
+test_kurulum_qr_baslik_ve_issuer (qr.tests.test_mfa.MFAGirisTesti.test_kurulum_qr_baslik_ve_issuer) ... ok
+test_mfa_deneme_kilidi (qr.tests.test_mfa.MFAGirisTesti.test_mfa_deneme_kilidi) ... 2026-10-15 22:14:17,623 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+2026-10-15 22:14:17,630 WARNING django.request Too Many Requests: /panel/mfa/dogrula
+ok
+test_onayli_cihazla_kurulum_ekrani_acilmaz (qr.tests.test_mfa.MFAGirisTesti.test_onayli_cihazla_kurulum_ekrani_acilmaz) ... ok
+test_parola_degistirme (qr.tests.test_mfa.MFAGirisTesti.test_parola_degistirme) ... ok
+test_parola_degistirme_girissiz_yonlenir (qr.tests.test_mfa.MFAGirisTesti.test_parola_degistirme_girissiz_yonlenir) ... ok
+test_parola_dogru_kod_yok_panel_erisimi_yok (qr.tests.test_mfa.MFAGirisTesti.test_parola_dogru_kod_yok_panel_erisimi_yok) ... ok
+test_pasif_kullanici_bekleyen_durumda_reddedilir (qr.tests.test_mfa.MFAGirisTesti.test_pasif_kullanici_bekleyen_durumda_reddedilir) ... ok
+test_pencere_disi_kod_reddedilir (qr.tests.test_mfa.MFAGirisTesti.test_pencere_disi_kod_reddedilir) ... ok
+test_sifirlama_csrf_ister (qr.tests.test_mfa.MFAGirisTesti.test_sifirlama_csrf_ister) ... 2026-10-15 22:14:17,831 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/kullanicilar/91/mfa-sifirla
+ok
+test_yanlis_kod (qr.tests.test_mfa.MFAGirisTesti.test_yanlis_kod) ... ok
+test_yonetici_baskasinin_mfasini_sifirlar (qr.tests.test_mfa.MFAGirisTesti.test_yonetici_baskasinin_mfasini_sifirlar) ... ok
+test_yonetici_olmayan_superuser_hedefi_sifirlayamaz (qr.tests.test_mfa.MFAGirisTesti.test_yonetici_olmayan_superuser_hedefi_sifirlayamaz) ... 2026-10-15 22:14:17,929 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/94/mfa-sifirla
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/mfa.py", line 344, in kullanici_mfa_sifirla
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_zorunlu_degilken_mfasiz_giris (qr.tests.test_mfa.MFAGirisTesti.test_zorunlu_degilken_mfasiz_giris) ... ok
+test_zorunlu_degilken_onayli_cihazda_yine_kod_istenir (qr.tests.test_mfa.MFAGirisTesti.test_zorunlu_degilken_onayli_cihazda_yine_kod_istenir) ... ok
+test_zorunlu_kurulum_akisi (qr.tests.test_mfa.MFAGirisTesti.test_zorunlu_kurulum_akisi) ... ok
+Roller güncellendi.
+test_giris_gerekli (qr.tests.test_panel_qr.GorselUclariTesti.test_giris_gerekli) ... ok
+test_hedef_degisse_gorsel_ayni_kalir (qr.tests.test_panel_qr.GorselUclariTesti.test_hedef_degisse_gorsel_ayni_kalir) ... ok
+test_indirme_basligi (qr.tests.test_panel_qr.GorselUclariTesti.test_indirme_basligi) ... ok
+test_png_imzasi_ve_icerik_kisa_url (qr.tests.test_panel_qr.GorselUclariTesti.test_png_imzasi_ve_icerik_kisa_url) ... ok
+test_rolsuz_kullanici_403 (qr.tests.test_panel_qr.GorselUclariTesti.test_rolsuz_kullanici_403) ... 2026-10-15 22:14:18,344 WARNING django.request Forbidden (Permission denied): /panel/qr/63/png
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_svg_gecerli_xml_ve_kisa_url (qr.tests.test_panel_qr.GorselUclariTesti.test_svg_gecerli_xml_ve_kisa_url) ... ok
+Roller güncellendi.
+test_denetim_kaydi_olusur (qr.tests.test_panel_qr.QROlusturmaTesti.test_denetim_kaydi_olusur) ... ok
+test_detay_hedefi_test_et_baglantisi_guvenli (qr.tests.test_panel_qr.QROlusturmaTesti.test_detay_hedefi_test_et_baglantisi_guvenli) ... ok
+test_hatali_kayit_raporu (qr.tests.test_panel_qr.QROlusturmaTesti.test_hatali_kayit_raporu) ... ok
+test_kampanya_bitis_baslangictan_once_reddedilir (qr.tests.test_panel_qr.QROlusturmaTesti.test_kampanya_bitis_baslangictan_once_reddedilir) ... ok
+test_kampanya_urun_magaza_kayitlari_denetlenir (qr.tests.test_panel_qr.QROlusturmaTesti.test_kampanya_urun_magaza_kayitlari_denetlenir) ... ok
+test_liste_arama_ve_filtre (qr.tests.test_panel_qr.QROlusturmaTesti.test_liste_arama_ve_filtre) ... ok
+test_liste_sayfalama_50 (qr.tests.test_panel_qr.QROlusturmaTesti.test_liste_sayfalama_50) ... ok
+test_panelden_qr_olusturma (qr.tests.test_panel_qr.QROlusturmaTesti.test_panelden_qr_olusturma) ... ok
+Roller güncellendi.
+test_arsivleme_onay_ister (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_arsivleme_onay_ister) ... 2026-10-15 22:14:19,262 WARNING django.request Gone: /k/TOP-A
+ok
+test_csv_formul_enjeksiyonu_ve_bom (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_csv_formul_enjeksiyonu_ve_bom) ... ok
+test_csv_hucre_kacisi_tum_onekler (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_csv_hucre_kacisi_tum_onekler) ... ok
+test_izleyici_durum_degistiremez (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_izleyici_durum_degistiremez) ... 2026-10-15 22:14:19,336 WARNING django.request Forbidden (Permission denied): /panel/qr/toplu
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/qrler.py", line 244, in qr_toplu
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_toplu_pasif_ve_aktif (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_toplu_pasif_ve_aktif) ... ok
+test_toplu_yalnizca_post (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_toplu_yalnizca_post) ... 2026-10-15 22:14:19,430 WARNING django.request Method Not Allowed (GET): /panel/qr/toplu
+ok
+test_xlsx_dis_aktarma_formul_degildir (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_xlsx_dis_aktarma_formul_degildir) ... ok
+test_zip_icerigi (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_zip_icerigi) ... ok
+test_zip_secim_yoksa_hata (qr.tests.test_panel_qr.TopluIslemVeDisaAktarmaTesti.test_zip_secim_yoksa_hata) ... ok
+Roller güncellendi.
+test_sayfalarda_satir_ici_betik_ve_stil_yok (qr.tests.test_sayfa_ve_istatistik.CSPUyumluluguTesti.test_sayfalarda_satir_ici_betik_ve_stil_yok) ... 2026-10-15 22:14:19,861 WARNING django.request Not Found: /k/YOKYOKYOK
+ok
+Roller güncellendi.
+test_botlar_istenirse_toplama_dahil (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_botlar_istenirse_toplama_dahil) ... ok
+test_csv_disa_aktarma_bom_ve_formul_kacisi (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_csv_disa_aktarma_bom_ve_formul_kacisi) ... ok
+test_en_cok_taranan_20_siniri (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_en_cok_taranan_20_siniri) ... ok
+test_kampanya_urun_magaza_bazinda (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_kampanya_urun_magaza_bazinda) ... ok
+test_toplam_tekil_ve_bot_ayri_sutunlar (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_toplam_tekil_ve_bot_ayri_sutunlar) ... ok
+test_uyari_metni_ve_sutun_basliklari (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_uyari_metni_ve_sutun_basliklari) ... ok
+test_xlsx_disa_aktarma (qr.tests.test_sayfa_ve_istatistik.IstatistikTesti.test_xlsx_disa_aktarma) ... ok
+Roller güncellendi.
+test_gecersiz_coklu_gorsel_reddedilir (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_gecersiz_coklu_gorsel_reddedilir) ... ok
+test_gecersiz_gorseller_reddedilir (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_gecersiz_gorseller_reddedilir) ... ok
+test_gorsel_yukleme_dogrulama_ve_silme (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_gorsel_yukleme_dogrulama_ve_silme) ... 2026-10-15 22:14:20,721 WARNING django.request Method Not Allowed (GET): /panel/sayfalar/50/gorsel/31/sil
+ok
+test_html_yorumlanmaz (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_html_yorumlanmaz) ... ok
+test_izleyici_gorsel_silemez (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_izleyici_gorsel_silemez) ... 2026-10-15 22:14:20,761 WARNING django.request Forbidden (Permission denied): /panel/sayfalar/52/gorsel/33/sil
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_mukerrer_slug_reddedilir (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_mukerrer_slug_reddedilir) ... ok
+test_olusturma_taslak_404_yayin (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_olusturma_taslak_404_yayin) ... 2026-10-15 22:14:20,834 WARNING django.request Not Found: /s/yaz-firsati
+2026-10-15 22:14:20,868 WARNING django.request Not Found: /s/yaz-firsati
+ok
+test_onizleme_taslagi_giris_yapmis_kullaniciya_gosterir (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_onizleme_taslagi_giris_yapmis_kullaniciya_gosterir) ... ok
+test_slug_degistirilemez (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_slug_degistirilemez) ... ok
+test_zaman_durumu_baslamadi_ve_bitti (qr.tests.test_sayfa_ve_istatistik.KampanyaSayfasiTesti.test_zaman_durumu_baslamadi_ve_bitti) ... ok
+Roller güncellendi.
+test_gunluk_tablo_tarih_filtresi (qr.tests.test_sayfa_ve_istatistik.PanoTesti.test_gunluk_tablo_tarih_filtresi) ... ok
+test_sayilar_ve_yaklasan (qr.tests.test_sayfa_ve_istatistik.PanoTesti.test_sayilar_ve_yaklasan) ... ok
+test_son_denetim_kayitlari_en_fazla_10 (qr.tests.test_sayfa_ve_istatistik.PanoTesti.test_son_denetim_kayitlari_en_fazla_10) ... ok
+test_yedek_durumu (qr.tests.test_sayfa_ve_istatistik.PanoTesti.test_yedek_durumu) ... ok
+test_denetim_kaydi_guncellenemez (qr.tests.test_silme_korumasi.VeritabaniSilmeKorumasiTesti.test_denetim_kaydi_guncellenemez) ... ok
+test_ham_sql_ile_silme_engellenir (qr.tests.test_silme_korumasi.VeritabaniSilmeKorumasiTesti.test_ham_sql_ile_silme_engellenir) ... ok
+test_toplu_silme_veritabaninda_engellenir (qr.tests.test_silme_korumasi.VeritabaniSilmeKorumasiTesti.test_toplu_silme_veritabaninda_engellenir) ... ok
+Roller güncellendi.
+test_satir_ici_stil_veya_betik_yok (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_satir_ici_stil_veya_betik_yok) ... ok
+test_taze_dogrulama_uyarmaz_ve_zamani_gosterir (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_taze_dogrulama_uyarmaz_ve_zamani_gosterir) ... ok
+test_uzak_alani_yoksa_veya_null_ise_sari_uyari (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_uzak_alani_yoksa_veya_null_ise_sari_uyari) ... ok
+test_yedek_durumu_fonksiyonu_bozuk_alanlara_dayanikli (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_yedek_durumu_fonksiyonu_bozuk_alanlara_dayanikli) ... ok
+test_yedek_durumu_hic_yoksa_da_uyari (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_yedek_durumu_hic_yoksa_da_uyari) ... ok
+test_yedi_gunden_eski_dogrulama_uyarir (qr.tests.test_yedek_sifreleme.PanelYedekUyarisiTesti.test_yedi_gunden_eski_dogrulama_uyarir) ... ok
+Roller güncellendi.
+test_ayarlarda_tehlikeli_url_reddedilir (qr.tests.test_yetki_ve_giris.AyarlarTesti.test_ayarlarda_tehlikeli_url_reddedilir) ... ok
+test_genel_ayarlar_guncelleme_ve_denetim (qr.tests.test_yetki_ve_giris.AyarlarTesti.test_genel_ayarlar_guncelleme_ve_denetim) ... ok
+Roller güncellendi.
+test_csrf_ile_degistirme_calisir (qr.tests.test_yetki_ve_giris.CSRFTesti.test_csrf_ile_degistirme_calisir) ... ok
+test_csrf_olmadan_degistirme_reddedilir (qr.tests.test_yetki_ve_giris.CSRFTesti.test_csrf_olmadan_degistirme_reddedilir) ... 2026-10-15 22:14:22,104 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/yeni
+2026-10-15 22:14:22,105 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/cikis
+ok
+test_giris_formu_csrf_ister (qr.tests.test_yetki_ve_giris.CSRFTesti.test_giris_formu_csrf_ister) ... 2026-10-15 22:14:22,111 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/giris
+ok
+test_toplu_islem_csrf_ister (qr.tests.test_yetki_ve_giris.CSRFTesti.test_toplu_islem_csrf_ister) ... 2026-10-15 22:14:22,132 WARNING django.security.csrf Forbidden (CSRF cookie not set.): /panel/qr/toplu
+ok
+Roller güncellendi.
+test_filtre_ve_salt_okunur (qr.tests.test_yetki_ve_giris.DenetimListesiTesti.test_filtre_ve_salt_okunur) ... 2026-10-15 22:14:22,287 WARNING django.request Method Not Allowed (POST): /panel/denetim/
+ok
+Roller güncellendi.
+test_basarili_giris_sayaci_sifirlar (qr.tests.test_yetki_ve_giris.GirisTesti.test_basarili_giris_sayaci_sifirlar) ... ok
+test_basarili_giris_ve_oturum_yenileme (qr.tests.test_yetki_ve_giris.GirisTesti.test_basarili_giris_ve_oturum_yenileme) ... ok
+test_deneme_kilidi (qr.tests.test_yetki_ve_giris.GirisTesti.test_deneme_kilidi) ... 2026-10-15 22:14:22,527 WARNING django.request Too Many Requests: /panel/giris
+2026-10-15 22:14:22,570 WARNING django.request Too Many Requests: /panel/giris
+ok
+test_giris_yapmis_kullanici_girise_donmez (qr.tests.test_yetki_ve_giris.GirisTesti.test_giris_yapmis_kullanici_girise_donmez) ... ok
+test_hatali_giris_genel_mesaj_ve_denetim (qr.tests.test_yetki_ve_giris.GirisTesti.test_hatali_giris_genel_mesaj_ve_denetim) ... ok
+test_next_yalnizca_ayni_siteye (qr.tests.test_yetki_ve_giris.GirisTesti.test_next_yalnizca_ayni_siteye) ... ok
+test_pasif_kullanici_ayni_genel_mesaji_alir (qr.tests.test_yetki_ve_giris.GirisTesti.test_pasif_kullanici_ayni_genel_mesaji_alir) ... ok
+Roller güncellendi.
+test_kendi_hesabini_pasiflestiremez (qr.tests.test_yetki_ve_giris.KullaniciYonetimiTesti.test_kendi_hesabini_pasiflestiremez) ... ok
+test_kullanici_olusturma_ve_rol (qr.tests.test_yetki_ve_giris.KullaniciYonetimiTesti.test_kullanici_olusturma_ve_rol) ... ok
+test_rol_degistirme_ve_pasiflestirme (qr.tests.test_yetki_ve_giris.KullaniciYonetimiTesti.test_rol_degistirme_ve_pasiflestirme) ... ok
+test_yonetici_super_kullaniciyi_degistiremez (qr.tests.test_yetki_ve_giris.KullaniciYonetimiTesti.test_yonetici_super_kullaniciyi_degistiremez) ... 2026-10-15 22:14:22,913 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/148/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 28, in sarmal
+    return gorunum(request, *args, **kwargs)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yonetim.py", line 65, in kullanici_duzenle
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_zayif_parola_reddedilir (qr.tests.test_yetki_ve_giris.KullaniciYonetimiTesti.test_zayif_parola_reddedilir) ... ok
+Roller güncellendi.
+test_cikis_yalnizca_post (qr.tests.test_yetki_ve_giris.YetkiTesti.test_cikis_yalnizca_post) ... 2026-10-15 22:14:23,068 WARNING django.request Method Not Allowed (GET): /panel/cikis
+ok
+test_editor_kullanici_yonetimine_giremez (qr.tests.test_yetki_ve_giris.YetkiTesti.test_editor_kullanici_yonetimine_giremez) ... 2026-10-15 22:14:23,101 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,107 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,113 WARNING django.request Forbidden (Permission denied): /panel/kullanicilar/151/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,118 WARNING django.request Forbidden (Permission denied): /panel/ayarlar
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_girissiz_erisim_giris_sayfasina_yonlenir (qr.tests.test_yetki_ve_giris.YetkiTesti.test_girissiz_erisim_giris_sayfasina_yonlenir) ... ok
+test_girissiz_post_giris_sayfasina_yonlenir (qr.tests.test_yetki_ve_giris.YetkiTesti.test_girissiz_post_giris_sayfasina_yonlenir) ... ok
+test_izleyici_duzenleyemez (qr.tests.test_yetki_ve_giris.YetkiTesti.test_izleyici_duzenleyemez) ... 2026-10-15 22:14:23,159 WARNING django.request Forbidden (Permission denied): /panel/qr/199/duzenle
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,164 WARNING django.request Forbidden (Permission denied): /panel/kampanyalar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,170 WARNING django.request Forbidden (Permission denied): /panel/sayfalar/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_izleyici_goruntuleyebilir (qr.tests.test_yetki_ve_giris.YetkiTesti.test_izleyici_goruntuleyebilir) ... ok
+test_izleyici_qr_olusturamaz (qr.tests.test_yetki_ve_giris.YetkiTesti.test_izleyici_qr_olusturamaz) ... 2026-10-15 22:14:23,274 WARNING django.request Forbidden (Permission denied): /panel/qr/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+2026-10-15 22:14:23,280 WARNING django.request Forbidden (Permission denied): /panel/qr/yeni
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_rolsuz_kullanici_panele_giremez (qr.tests.test_yetki_ve_giris.YetkiTesti.test_rolsuz_kullanici_panele_giremez) ... 2026-10-15 22:14:23,297 WARNING django.request Forbidden (Permission denied): /panel/
+Traceback (most recent call last):
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/qrvenv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/claude/TEZDENEME/qr-kampanya/app/qr/panel/yardimci.py", line 27, in sarmal
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+ok
+test_yonetici_erisebilir (qr.tests.test_yetki_ve_giris.YetkiTesti.test_yonetici_erisebilir) ... ok
+Roller güncellendi.
+test_arsiv_kodu_410 (qr.tests.test_yonlendirme.YonlendirmeTesti.test_arsiv_kodu_410) ... 2026-10-15 22:14:23,590 WARNING django.request Gone: /k/ARS001
+ok
+test_baslamamis_kampanya_ayarli_urle_yonlenir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_baslamamis_kampanya_ayarli_urle_yonlenir) ... ok
+test_baslamamis_kampanya_mesaj_gosterir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_baslamamis_kampanya_mesaj_gosterir) ... ok
+test_bitmis_kampanya_ayarli_urle_yonlenir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_bitmis_kampanya_ayarli_urle_yonlenir) ... ok
+test_bitmis_kampanya_mesaj_gosterir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_bitmis_kampanya_mesaj_gosterir) ... ok
+test_bitmis_kodun_kendi_bitis_sonrasi_adresi_onceliklidir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_bitmis_kodun_kendi_bitis_sonrasi_adresi_onceliklidir) ... ok
+test_bot_taramalari_ayri_sayilir (qr.tests.test_yonlendirme.YonlendirmeTesti.test_bot_taramalari_ayri_sayilir) ... ok
+test_buyuk_kucuk_harf_duyarsiz (qr.tests.test_yonlendirme.YonlendirmeTesti.test_buyuk_kucuk_harf_duyarsiz) ... ok
+test_dogru_hedefe_302 (qr.tests.test_yonlendirme.YonlendirmeTesti.test_dogru_hedefe_302) ... ok
+test_gecersiz_kisa_kod_404 (qr.tests.test_yonlendirme.YonlendirmeTesti.test_gecersiz_kisa_kod_404) ... 2026-10-15 22:14:23,739 WARNING django.request Not Found: /k/YOKBOYLEKOD
+ok
+test_hedef_degisince_ayni_kod_yeni_hedefe_gider (qr.tests.test_yonlendirme.YonlendirmeTesti.test_hedef_degisince_ayni_kod_yeni_hedefe_gider) ... ok
+test_pasif_kod (qr.tests.test_yonlendirme.YonlendirmeTesti.test_pasif_kod) ... ok
+test_saglik_ucu_200 (qr.tests.test_yonlendirme.YonlendirmeTesti.test_saglik_ucu_200) ... ok
+test_sayfa_yayinda_degilse_yonlendirmez (qr.tests.test_yonlendirme.YonlendirmeTesti.test_sayfa_yayinda_degilse_yonlendirmez) ... ok
+test_sayfa_yonlendirmesi (qr.tests.test_yonlendirme.YonlendirmeTesti.test_sayfa_yonlendirmesi) ... ok
+test_paralel_artirma_kayip_vermez (qr.tests.test_guvenlik_denetimi.SayacEszamanlilikTesti.test_paralel_artirma_kayip_vermez) ... ok
+test_acikca_verilen_ama_olmayan_anahtar_dosyasi_sorulmadan_hata_verir (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_acikca_verilen_ama_olmayan_anahtar_dosyasi_sorulmadan_hata_verir) ... ok
+test_betikler_anahtari_diske_kalici_yazmaz (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_betikler_anahtari_diske_kalici_yazmaz) ... ok
+test_geri_yukle_anahtar_yokken_gizli_girisle_alir_ve_temizler (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukle_anahtar_yokken_gizli_girisle_alir_ve_temizler) ... ok
+test_geri_yukle_iptalde_ve_hatada_da_gecici_dosya_silinir (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukle_iptalde_ve_hatada_da_gecici_dosya_silinir) ... ok
+test_geri_yukle_mevcut_anahtar_dosyasi_yolu_calisir_ve_dosya_kalir (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukle_mevcut_anahtar_dosyasi_yolu_calisir_ve_dosya_kalir) ... ok
+test_geri_yukleme_testi_anahtar_yokken_gizli_girisle_alir_ve_temizler (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukleme_testi_anahtar_yokken_gizli_girisle_alir_ve_temizler) ... ok
+test_geri_yukleme_testi_gecersiz_anahtarda_basarisiz_olur_ve_dosya_birakmaz (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukleme_testi_gecersiz_anahtarda_basarisiz_olur_ve_dosya_birakmaz) ... ok
+test_geri_yukleme_testi_tty_yoksa_ve_anahtar_yoksa_anlasilir_hata_verir (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_geri_yukleme_testi_tty_yoksa_ve_anahtar_yoksa_anlasilir_hata_verir) ... ok
+test_gizli_giriste_ctrl_c_ve_term_terminal_yankisini_geri_acar_ve_gecici_dosyayi_siler (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_gizli_giriste_ctrl_c_ve_term_terminal_yankisini_geri_acar_ve_gecici_dosyayi_siler) ... ok
+test_mevcut_anahtar_dosyasi_yollari_calismaya_devam_eder (qr.tests.test_yedek_sifreleme.AnahtarGizliGirisTesti.test_mevcut_anahtar_dosyasi_yollari_calismaya_devam_eder) ... ok
+test_docker_cagrilarinda_v_degil_mount_kullanilir_iki_nokta_iceren_yol_calisir (qr.tests.test_yedek_sifreleme.AnahtarKayitVeMountTesti.test_docker_cagrilarinda_v_degil_mount_kullanilir_iki_nokta_iceren_yol_calisir) ... ok
+test_kayit_atomik_600_ve_gecici_dosya_birakmaz (qr.tests.test_yedek_sifreleme.AnahtarKayitVeMountTesti.test_kayit_atomik_600_ve_gecici_dosya_birakmaz) ... ok
+test_ortak_mount_iki_nokta_ve_virgul_icin_dogru_dize_uretir_tirnagi_reddeder (qr.tests.test_yedek_sifreleme.AnahtarKayitVeMountTesti.test_ortak_mount_iki_nokta_ve_virgul_icin_dogru_dize_uretir_tirnagi_reddeder) ... ok
+test_yaris_hedef_aradan_olusursa_ezilmez_hata_verir_tmpfs_kopyasi_kalir (qr.tests.test_yedek_sifreleme.AnahtarKayitVeMountTesti.test_yaris_hedef_aradan_olusursa_ezilmez_hata_verir_tmpfs_kopyasi_kalir) ... ok
+test_anahtar_dosyasi_yoksa_ve_alici_varsa_yeni_anahtar_uretilmez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_anahtar_dosyasi_yoksa_ve_alici_varsa_yeni_anahtar_uretilmez) ... ok
+test_betik_anahtari_gunluge_yazan_bir_yapi_icermez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_betik_anahtari_gunluge_yazan_bir_yapi_icermez) ... ok
+test_ctrl_c_ve_term_istemde_anahtar_gizli_altina_kaydedilir_kaybolmaz_ve_tmpfs_temizlenir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_ctrl_c_ve_term_istemde_anahtar_gizli_altina_kaydedilir_kaybolmaz_ve_tmpfs_temizlenir) ... ok
+test_env_yazilamazsa_anahtar_kaybolmaz_sira_hatasi_yok (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_env_yazilamazsa_anahtar_kaybolmaz_sira_hatasi_yok)
+Sıra hatası kalıcı yedek kaybına yol açar: .env'e YEDEK_ALICI yazılamıyorsa (veya sonradan yazılacaksa) anahtar ... ok
+test_evet_disinda_bir_yanit_dosyayi_birakir_ve_uyarir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_evet_disinda_bir_yanit_dosyayi_birakir_ve_uyarir) ... ok
+test_evet_onayi_ozel_anahtari_siler_acik_anahtar_env_de_kalir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_evet_onayi_ozel_anahtari_siler_acik_anahtar_env_de_kalir) ... ok
+test_evet_sonrasi_yapistirilan_anahtar_uyusmazsa_dosya_kalir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_evet_sonrasi_yapistirilan_anahtar_uyusmazsa_dosya_kalir) ... ok
+test_evet_yolunda_gizli_altinda_hicbir_dosya_olusmaz_ve_anahtar_diske_dusmez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_evet_yolunda_gizli_altinda_hicbir_dosya_olusmaz_ve_anahtar_diske_dusmez) ... ok
+test_goster_ve_kaldir_acik_anahtar_env_ile_eslesmiyorsa_silmez_ve_gostermez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_goster_ve_kaldir_acik_anahtar_env_ile_eslesmiyorsa_silmez_ve_gostermez) ... ok
+test_goster_ve_kaldir_secenegi_var_olan_anahtari_evet_ile_siler (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_goster_ve_kaldir_secenegi_var_olan_anahtari_evet_ile_siler) ... ok
+test_istemde_ctrl_c_terminal_yankisini_geri_acar (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_istemde_ctrl_c_terminal_yankisini_geri_acar) ... ok
+test_onay_yoksa_anahtar_gizli_altina_700_600_ile_tasinir_ve_tmpfs_temizlenir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_onay_yoksa_anahtar_gizli_altina_700_600_ile_tasinir_ve_tmpfs_temizlenir) ... ok
+test_sira_betikte_env_yazimi_anahtar_guvence_altina_alindiktan_sonra_gelir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_sira_betikte_env_yazimi_anahtar_guvence_altina_alindiktan_sonra_gelir) ... ok
+test_temizlik_sirasinda_sinyaller_yok_sayilir_ve_uretim_dizini_kapsami_betikte_var (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_temizlik_sirasinda_sinyaller_yok_sayilir_ve_uretim_dizini_kapsami_betikte_var) ... ok
+test_tirnakli_veya_export_alici_varken_yeni_anahtar_uretilmez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_tirnakli_veya_export_alici_varken_yeni_anahtar_uretilmez) ... ok
+test_tmpfs_dizin_secimi_xdg_yalniz_sahibi_gecerli_ve_700_ise (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_tmpfs_dizin_secimi_xdg_yalniz_sahibi_gecerli_ve_700_ise) ... ok
+test_tty_yoksa_anahtar_uretilir_ama_silinmez_ve_buyuk_harfli_uyari_basilir (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_tty_yoksa_anahtar_uretilir_ama_silinmez_ve_buyuk_harfli_uyari_basilir) ... ok
+test_uretim_log_driver_none_ile_tmpfs_a_yazar_stdout_e_yazdirmaz (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_uretim_log_driver_none_ile_tmpfs_a_yazar_stdout_e_yazdirmaz) ... ok
+test_uretim_sirasinda_art_arda_sinyaller_temizligi_yarida_kesmez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_uretim_sirasinda_art_arda_sinyaller_temizligi_yarida_kesmez) ... ok
+test_uretim_sirasinda_ctrl_c_ve_term_tmpfs_dizinini_temizler_env_ve_gizli_degismez (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_uretim_sirasinda_ctrl_c_ve_term_tmpfs_dizinini_temizler_env_ve_gizli_degismez) ... ok
+test_var_olan_anahtar_dosyasi_uzerine_yazilmaz (qr.tests.test_yedek_sifreleme.AnahtarUretimiVeSilmeTesti.test_var_olan_anahtar_dosyasi_uzerine_yazilmaz) ... ok
+test_geri_yukleme_testi_gizli_giris_bash_x_altinda_sizdirmaz (qr.tests.test_yedek_sifreleme.AnahtarXtraceSizintisiTesti.test_geri_yukleme_testi_gizli_giris_bash_x_altinda_sizdirmaz) ... ok
+test_uyusmayan_yapistirma_ve_basic_xtracefd_sizdirmaz (qr.tests.test_yedek_sifreleme.AnahtarXtraceSizintisiTesti.test_uyusmayan_yapistirma_ve_basic_xtracefd_sizdirmaz) ... ok
+test_xtrace_durumu_geri_yuklenir_ve_kapaliyken_acilmaz (qr.tests.test_yedek_sifreleme.AnahtarXtraceSizintisiTesti.test_xtrace_durumu_geri_yuklenir_ve_kapaliyken_acilmaz) ... ok
+test_yedek_anahtari_hazirla_evet_ve_geri_yapistirma_bash_x_altinda_sizdirmaz (qr.tests.test_yedek_sifreleme.AnahtarXtraceSizintisiTesti.test_yedek_anahtari_hazirla_evet_ve_geri_yapistirma_bash_x_altinda_sizdirmaz) ... ok
+test_betikler_gizli_bilgi_icermez (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_betikler_gizli_bilgi_icermez) ... ok
+test_compose_yedek_servisine_ozel_anahtar_verilmez (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_compose_yedek_servisine_ozel_anahtar_verilmez) ... ok
+test_disari_kopyala_dogrulama_ve_kurallar (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_disari_kopyala_dogrulama_ve_kurallar) ... ok
+test_guncelle_app_no_deps_ve_caddy_dogrulamasi (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_guncelle_app_no_deps_ve_caddy_dogrulamasi) ... ok
+test_ortak_coz_log_driver_none_kullanir_ve_hassas_cikti_veren_docker_run_cagrilari_hep_log_driver_none (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_ortak_coz_log_driver_none_kullanir_ve_hassas_cikti_veren_docker_run_cagrilari_hep_log_driver_none) ... ok
+test_yedek_al_silme_yapmaz_ve_duz_yedek_yazmaz (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_yedek_al_silme_yapmaz_ve_duz_yedek_yazmaz) ... ok
+test_yedek_dongusu_temizlik_icerir (qr.tests.test_yedek_sifreleme.BetikIcerikTesti.test_yedek_dongusu_temizlik_icerir) ... ok
+test_acik_indirerek_dogrulama_tek_check_ve_download (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_acik_indirerek_dogrulama_tek_check_ve_download) ... ok
+test_adlandirilmis_uzak_ve_baglanti_dizesi_secenekleri_belirsiz_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_adlandirilmis_uzak_ve_baglanti_dizesi_secenekleri_belirsiz_sayilir) ... ok
+test_ag_dosya_sistemi_turunde_ozet_sorgusu_olumlu_olsa_bile_download_kullanilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ag_dosya_sistemi_turunde_ozet_sorgusu_olumlu_olsa_bile_download_kullanilir) ... ok
+test_ag_turu_ayni_makineyi_gosteriyorsa_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ag_turu_ayni_makineyi_gosteriyorsa_yerel_sayilir) ... ok
+test_alias_yerel_hedefe_isaret_ediyorsa_engellenir_uzaga_isaret_ediyorsa_silinir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_alias_yerel_hedefe_isaret_ediyorsa_engellenir_uzaga_isaret_ediyorsa_silinir) ... ok
+test_baglanti_dizesinde_kimlik_bilgisi_varsa_uyarir_degeri_yazmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_baglanti_dizesinde_kimlik_bilgisi_varsa_uyarir_degeri_yazmaz) ... ok
+test_baglanti_dizesindeki_host_ve_endpoint_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_baglanti_dizesindeki_host_ve_endpoint_yerel_sayilir) ... ok
+test_basarisiz_dogrulamada_onceki_basarili_zaman_korunur (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_basarisiz_dogrulamada_onceki_basarili_zaman_korunur)
+Doğrulama başarısızsa 'zaman' yenilenmez (önceki başarılı zaman kalır). ... ok
+test_baska_makineyi_gosteren_ag_turu_sunucu_disi_sayilir_ve_silinir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_baska_makineyi_gosteren_ag_turu_sunucu_disi_sayilir_ve_silinir) ... ok
+test_betik_yorumu_zaman_anlamini_dogru_belirtir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_betik_yorumu_zaman_anlamini_dogru_belirtir) ... ok
+test_bilinmeyen_veya_bos_tur_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_bilinmeyen_veya_bos_tur_yerel_sayilir) ... ok
+test_bos_ssh_alani_hedefi_belirsiz_yapmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_bos_ssh_alani_hedefi_belirsiz_yapmaz) ... ok
+test_check_cagrisi_icin_rclone_gunluk_ortami_temizlenir_ve_log_level_notice_verilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_check_cagrisi_icin_rclone_gunluk_ortami_temizlenir_ve_log_level_notice_verilir) ... ok
+test_dogrulama_kaydinda_kimlik_bilgisi_yok (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_dogrulama_kaydinda_kimlik_bilgisi_yok) ... ok
+test_en_yeni_yedek_eski_ve_dogrulanmis_olsa_bile_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_en_yeni_yedek_eski_ve_dogrulanmis_olsa_bile_silinmez) ... ok
+test_en_yeni_yetim_zaman_son_tam_uclunun_korumasini_kaldirmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_en_yeni_yetim_zaman_son_tam_uclunun_korumasini_kaldirmaz) ... ok
+test_eski_dogrulanmis_uclu_silinir_yeni_ve_en_yeni_korunur (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_eski_dogrulanmis_uclu_silinir_yeni_ve_en_yeni_korunur) ... ok
+test_eslesmeyen_onay_silmez_eslesen_onay_siler (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_eslesmeyen_onay_silmez_eslesen_onay_siler) ... ok
+test_gecersiz_saklama_gun_silmeyi_engeller (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gecersiz_saklama_gun_silmeyi_engeller) ... ok
+test_gercek_rclone_ayarda_ssh_dolu_veya_yerel_alias_ise_silme_yok (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gercek_rclone_ayarda_ssh_dolu_veya_yerel_alias_ise_silme_yok) ... ok
+test_gercek_rclone_crypt_hedefi_ozetsiz_yolu_download_ile_dogrular (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gercek_rclone_crypt_hedefi_ozetsiz_yolu_download_ile_dogrular)
+Gerçek rclone: crypt uzak ortak özet sunmaz -> uyarı + otomatik --download. (crypt yerel klasöre yazar, ... ok
+test_gercek_rclone_ortam_degiskeniyle_yerele_yonlendirme_etkisizdir_yerel_uclu_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gercek_rclone_ortam_degiskeniyle_yerele_yonlendirme_etkisizdir_yerel_uclu_silinmez)
+Ayar dosyası dış bir adresi gösterir; RCLONE_SFTP_HOST=localhost / RCLONE_ALIAS_REMOTE=/yerel ... ok
+test_gercek_rclone_ozetsiz_sftp_ve_yerel_adres_algilama (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gercek_rclone_ozetsiz_sftp_ve_yerel_adres_algilama)
+Gerçek `rclone serve sftp` (özetsiz istemci: disable_hashcheck) + RCLONE_LOG_LEVEL=ERROR/LOG_FILE: ... ok
+test_gercek_uzak_turu_silmeyi_engellemez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gercek_uzak_turu_silmeyi_engellemez) ... ok
+test_gunluk_bastirilsa_bile_ozet_yok_metni_yedek_tetik_olarak_calisir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_gunluk_bastirilsa_bile_ozet_yok_metni_yedek_tetik_olarak_calisir) ... ok
+test_hash_yok_mesaji_rclone_belgesindeki_metinle_eslesir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_hash_yok_mesaji_rclone_belgesindeki_metinle_eslesir) ... ok
+test_indirerek_tam_dogrulama_kapsam_siniri_uygulamaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_indirerek_tam_dogrulama_kapsam_siniri_uygulamaz) ... ok
+test_izin_listesinde_olmayan_tur_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_izin_listesinde_olmayan_tur_yerel_sayilir) ... ok
+test_json_ozgur_metinler_kacirilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_json_ozgur_metinler_kacirilir) ... ok
+test_kapsamli_download_basarisizsa_hicbir_sey_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_kapsamli_download_basarisizsa_hicbir_sey_silinmez) ... ok
+test_onay_yoksa_kopyalanir_dogrulanir_ama_silinmez_ve_uyari_surer (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_onay_yoksa_kopyalanir_dogrulanir_ama_silinmez_ve_uyari_surer) ... ok
+test_ozel_ag_adresleri_onay_olsa_bile_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozel_ag_adresleri_onay_olsa_bile_yerel_sayilir) ... ok
+test_ozel_ag_araligi_disindaki_adresler_sunucu_disi_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozel_ag_araligi_disindaki_adresler_sunucu_disi_sayilir) ... ok
+test_ozet_sorgusu_bos_veya_hatali_ise_dogrudan_kapsamli_download (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozet_sorgusu_bos_veya_hatali_ise_dogrudan_kapsamli_download) ... ok
+test_ozet_varsa_download_kullanilmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozet_varsa_download_kullanilmaz) ... ok
+test_ozet_yok_ve_download_basarisizsa_silme_yok_ve_onceki_zaman_korunur (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozet_yok_ve_download_basarisizsa_silme_yok_ve_onceki_zaman_korunur) ... ok
+test_ozet_yoksa_uyarir_ve_otomatik_download_ile_dogrular_sonra_siler (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ozet_yoksa_uyarir_ve_otomatik_download_ile_dogrular_sonra_siler) ... ok
+test_rclone_config_show_ciktisi_gizli_deger_olarak_yazilmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_rclone_config_show_ciktisi_gizli_deger_olarak_yazilmaz) ... ok
+test_rclone_komutu_guvenli_ayristirilir_glob_genislemez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_rclone_komutu_guvenli_ayristirilir_glob_genislemez) ... ok
+test_rclone_local_turu_ve_baglanti_dizesi_silmeyi_engeller (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_rclone_local_turu_ve_baglanti_dizesi_silmeyi_engeller) ... ok
+test_rclone_ortam_degiskeni_yoksa_uyari_basilmaz (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_rclone_ortam_degiskeni_yoksa_uyari_basilmaz) ... ok
+test_rclone_ortam_degiskenleri_tum_cagrilarda_kaldirilir_yalniz_config_ve_sifre_kalir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_rclone_ortam_degiskenleri_tum_cagrilarda_kaldirilir_yalniz_config_ve_sifre_kalir)
+RCLONE_SFTP_HOST=localhost gibi değişkenler artık tespiti de rclone'u da etkilemez: ayar dosyası tek kaynak. ... ok
+test_ssh_alani_dolu_ise_hedef_belirsiz_sayilir_silme_yok (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_ssh_alani_dolu_ise_hedef_belirsiz_sayilir_silme_yok)
+sftp `ssh = ssh u@127.0.0.1` dış komutu gerçek hedefi gizleyebilir: ayarda ya da bağlantı dizesinde -> yerel. ... ok
+test_union_upstreams_guvenli_ayristirilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_union_upstreams_guvenli_ayristirilir) ... ok
+test_unix_socket_emulator_ve_ek_adres_alanlari_yerel_sayilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_unix_socket_emulator_ve_ek_adres_alanlari_yerel_sayilir)
+webdav unix_socket (yerel soket), azure use_emulator, swift storage_url, pcloud hostname -> bu makine: silme yok. ... ok
+test_uzak_hedef_yoksa_hicbir_sey_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_uzak_hedef_yoksa_hicbir_sey_silinmez) ... ok
+test_uzakta_kismen_dogrulanan_uclu_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_uzakta_kismen_dogrulanan_uclu_silinmez) ... ok
+test_uzakta_olmayan_uclu_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_uzakta_olmayan_uclu_silinmez) ... ok
+test_yerel_hedef_izni_1_artik_yetmez_ad_birebir_olmali_ve_kullanim_gunluge_yazilir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yerel_hedef_izni_1_artik_yetmez_ad_birebir_olmali_ve_kullanim_gunluge_yazilir) ... ok
+test_yerel_hedef_izni_yalniz_deneme_icin_silmeye_izin_verir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yerel_hedef_izni_yalniz_deneme_icin_silmeye_izin_verir) ... ok
+test_yerel_hedefte_agir_download_yapilmaz_silme_de_yoktur (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yerel_hedefte_agir_download_yapilmaz_silme_de_yoktur) ... ok
+test_yerel_yol_hedefleri_silmeyi_engeller (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yerel_yol_hedefleri_silmeyi_engeller) ... ok
+test_yerelde_eksik_uclu_silinmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yerelde_eksik_uclu_silinmez) ... ok
+test_yetim_en_yeniye_ragmen_eski_tam_uclu_silinir_en_yeni_tam_korunur (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_yetim_en_yeniye_ragmen_eski_tam_uclu_silinir_en_yeni_tam_korunur) ... ok
+test_zaman_baska_dosya_dogrulanamasa_bile_en_yeni_tam_uclu_dogrulandiysa_guncellenir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_zaman_baska_dosya_dogrulanamasa_bile_en_yeni_tam_uclu_dogrulandiysa_guncellenir) ... ok
+test_zaman_en_yeni_tam_uclu_dogrulaninca_kapsamli_downloadda_da_guncellenir (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_zaman_en_yeni_tam_uclu_dogrulaninca_kapsamli_downloadda_da_guncellenir) ... ok
+test_zaman_en_yeni_tam_uclu_uzakta_dogrulanmadiysa_guncellenmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_zaman_en_yeni_tam_uclu_uzakta_dogrulanmadiysa_guncellenmez) ... ok
+test_zaman_yalniz_yetim_dosya_varsa_tam_uclu_yoksa_guncellenmez (qr.tests.test_yedek_sifreleme.DisariKopyalaSilmeTesti.test_zaman_yalniz_yetim_dosya_varsa_tam_uclu_yoksa_guncellenmez) ... ok
+test_ana_akis_tmpfs_uyari_basmaz (qr.tests.test_yedek_sifreleme.DiskteSilmeUyarisiTesti.test_ana_akis_tmpfs_uyari_basmaz) ... ok
+test_goster_ve_kaldir_silmeden_once_ve_sonra_diskte_kurtarilabilir_uyarisi_basar (qr.tests.test_yedek_sifreleme.DiskteSilmeUyarisiTesti.test_goster_ve_kaldir_silmeden_once_ve_sonra_diskte_kurtarilabilir_uyarisi_basar) ... ok
+test_pg_restore_tek_islem_ve_hatada_durur (qr.tests.test_yedek_sifreleme.GeriYuklemeTekIslemTesti.test_pg_restore_tek_islem_ve_hatada_durur) ... ok
+test_uyari_kosullari (qr.tests.test_yedek_sifreleme.UzakKopyaUyariFonksiyonTesti.test_uyari_kosullari) ... ok
+test_ad_dogrulayici_iyi_adlari_kabul_kotu_adlari_reddeder (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_ad_dogrulayici_iyi_adlari_kabul_kotu_adlari_reddeder) ... ok
+test_betiklerde_ad_kabuk_metnine_gomulmez (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_betiklerde_ad_kabuk_metnine_gomulmez) ... ok
+test_eski_sifresiz_adlar_yalniz_eski_dogrulayicidan_gecer (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_eski_sifresiz_adlar_yalniz_eski_dogrulayicidan_gecer) ... ok
+test_geri_yukle_kotu_adli_dosyayi_reddeder_ve_hicbir_sey_calistirmaz (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_geri_yukle_kotu_adli_dosyayi_reddeder_ve_hicbir_sey_calistirmaz) ... ok
+test_geri_yukleme_testi_kotu_adli_dosyayi_reddeder (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_geri_yukleme_testi_kotu_adli_dosyayi_reddeder) ... ok
+test_geri_yukleme_testi_otomatik_secimde_kotu_adlari_atlar (qr.tests.test_yedek_sifreleme.YedekAdiEnjeksiyonTesti.test_geri_yukleme_testi_otomatik_secimde_kotu_adlari_atlar) ... ok
+
+----------------------------------------------------------------------
+Ran 354 tests in 60.381s
+
+OK
+Destroying test database for alias 'default' ('test_qrkampanya_h')...

@@ -1,0 +1,23 @@
+{% extends "qr/panel/form.html" %}
+{% block form_sonrasi %}
+{% if sayfa %}
+<div class="eylemler">
+  <a class="dugme ikincil" href="{% url 'panel:sayfa_onizle' sayfa.pk %}" target="_blank" rel="noopener noreferrer">Önizle (yeni sekme)</a>
+  {% if sayfa.durum == "yayinda" %}<a class="dugme ikincil" href="/s/{{ sayfa.slug }}" target="_blank" rel="noopener noreferrer">Yayındaki sayfayı aç</a>{% endif %}
+  <a class="dugme ikincil" href="{% url 'panel:sayfa_liste' %}">Sayfa listesi</a>
+</div>
+<h2>Ürün görselleri</h2>
+{% if gorseller %}
+<div class="gorsel-liste">
+  {% for g in gorseller %}
+  <div class="kart">
+    <img src="{{ g.gorsel.url }}" alt="{{ g.aciklama|default:'Sayfa görseli' }}">
+    <form method="post" action="{% url 'panel:sayfa_gorsel_sil' sayfa.pk g.pk %}">{% csrf_token %}
+      <button type="submit" class="dugme tehlike kucuk">Görseli sil</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% else %}<p class="sessiz">Henüz ürün görseli yok.</p>{% endif %}
+{% endif %}
+{% endblock %}

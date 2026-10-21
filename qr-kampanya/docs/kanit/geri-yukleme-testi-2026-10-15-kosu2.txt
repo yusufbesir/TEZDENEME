@@ -1,0 +1,25 @@
+# Geri yükleme testi ham çıktısı (ikinci, bağımsız koşu)
+# Etiket: [İP:Dinamik QR ve kampanya sistemi#tnmy6Q]
+# Tarih: 2026-10-15. Ortam: bulut geliştirme ortamı, Docker Compose yığını qre2e5 (temiz kurulum, kurulum.sh yerel mod).
+# Komut: bash scripts/geri-yukleme-testi.sh
+# Çalıştıran: verifier ajanı (claude-sonnet-5-5).
+
+== Geri yükleme testi 2026-10-15T16:02:39+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e5/yedekler/db-20261015-190233.dump.age
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e5/gizli/yedek-anahtari.txt (içeriği yazılmaz)
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-190233.dump.age: OK
+medya-20261015-190233.tar.gz.age: OK
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|1|1
+hedefgecmisi|0|0
+kampanya|0|0
+kullanici|1|1
+qrkod|1|1
+sayfa|2|2
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 6 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-160239.log

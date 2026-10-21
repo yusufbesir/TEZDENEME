@@ -1,0 +1,31 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}API anahtarlarım{% endblock %}
+{% block icerik %}
+<h1>API anahtarlarım</h1>
+<p>API anahtarı, betiklerin ve diğer programların panel dışından kısa bağlantı oluşturmasını ve sorgulamasını sağlar. Anahtar sizin yetkilerinizle çalışır. Kullanım: <code>docs/API.md</code>.</p>
+<form method="post" action="{% url 'panel:api_parola_girisi' %}" class="kart">
+  {% csrf_token %}
+  <h2>API’de parola girişi: {% if parola_girisi %}açık{% else %}kapalı{% endif %}</h2>
+  <p>Açıkken programlar anahtar yerine kullanıcı adınız ve parolanızla (POST gövdesinde) API’ye girebilir. İki adımlı doğrulamanız (MFA) etkinse her istekte <code>totp</code> kodu da zorunludur. Anahtar kullanmak daha güvenlidir; parola girişini yalnızca gerekiyorsa açın. Değiştirmek için mevcut parolanızı girin.</p>
+  <input type="hidden" name="durum" value="{% if parola_girisi %}kapat{% else %}ac{% endif %}">
+  <div class="alan"><label for="api-parola">Mevcut parola</label><input type="password" id="api-parola" name="parola" autocomplete="current-password" required></div>
+  <div class="eylemler"><button type="submit" class="dugme {% if parola_girisi %}ikincil{% endif %}">{% if parola_girisi %}Parola girişini kapat{% else %}Parola girişini aç{% endif %}</button></div>
+</form>
+<div class="eylemler"><a class="dugme" href="{% url 'panel:api_anahtari_olustur' %}">Yeni API anahtarı</a></div>
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Ad</th><th>Önek</th>{% if tumu %}<th>Sahibi</th>{% endif %}<th>Oluşturulma</th><th>Son kullanım</th><th>Durum</th><th></th></tr></thead>
+  <tbody>
+  {% for a in sayfa %}
+  <tr>
+    <td>{{ a.ad }}</td><td><code>qrk_{{ a.onek }}</code></td>{% if tumu %}<td>{{ a.kullanici.username }}</td>{% endif %}
+    <td>{{ a.olusturma|date:"d.m.Y H:i" }}</td><td>{% if a.son_kullanim %}{{ a.son_kullanim|date:"d.m.Y H:i" }}{% else %}Hiç kullanılmadı{% endif %}</td>
+    <td><span class="etiket-durum {% if a.aktif_mi %}durum-aktif{% else %}durum-arsiv{% endif %}">{{ a.durum_metni }}</span></td>
+    <td>{% if not a.iptal_zamani %}<a href="{% url 'panel:api_anahtari_iptal' a.pk %}">İptal et</a>{% endif %}</td>
+  </tr>
+  {% empty %}<tr><td colspan="7">Henüz API anahtarı yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

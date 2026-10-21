@@ -1,0 +1,73 @@
+# Caddy: HTTPS (Let's Encrypt sertifikası otomatik alınır ve yenilenir) ve ters vekil.
+# SITE_ADRESI .env içinde tanımlanır. Örnek: qr.ornekfirma.com
+# Yerel deneme için: SITE_ADRESI=http://localhost
+{
+	email {$ACME_EPOSTA}
+	# trusted_proxies BİLEREK tanımlı değil: Caddy'nin önünde başka bir vekil/CDN yok, istemciden gelen
+	# X-Forwarded-For güvenilmez ve Caddy tarafından ezilir. (Önüne vekil konursa o vekilin adresi eklenmeli.)
+}
+
+{$SITE_ADRESI} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		?Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# İç uçlar (/ic/*) dışarıya kapalıdır; yalnızca Caddy'nin app'e yaptığı alt istekler kullanır.
+	handle /ic/* {
+		respond 404
+	}
+
+	# Yüklenen görseller doğrudan Caddy tarafından sunulur (salt okunur), ama önce app'e yetki sorulur:
+	# forward_auth alt isteği GET /ic/medya-yetki gönderir (asıl yol X-Forwarded-Uri, yöntem X-Forwarded-Method
+	# başlığında; çerezler dahil istek başlıkları kopyalanır). 2xx ise dosya sunulur, değilse app'in yanıtı (404) döner.
+	# Yayında olmayan sayfaların görselleri yalnızca panelde yetkili oturumla açılır.
+	handle /medya/* {
+		route {
+			forward_auth app:8000 {
+				uri /ic/medya-yetki
+				header_up X-Forwarded-Proto {scheme}
+			}
+			uri strip_prefix /medya
+			root * /srv/medya
+			header Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'none'; sandbox"
+			header Cache-Control "private, max-age=3600"
+			file_server
+		}
+	}
+
+	handle {
+		reverse_proxy app:8000 {
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Erişim günlüğünde istemci IP'si maskelenir (IPv4 /24, IPv6 /48); çerez ve XFF günlüğe yazılmaz.
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip ip_mask 24 48
+				request>client_ip ip_mask 24 48
+				request>headers>X-Forwarded-For delete
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+				request>headers>Referer delete
+				# Sorgu dizesindeki hassas parametreler (API parolası/TOTP/anahtar, hedef adres, başlık) günlüğe yazılmaz.
+				request>uri query {
+					delete password
+					delete totp
+					delete api_key
+					delete key
+					delete url
+					delete baslik
+				}
+			}
+		}
+	}
+}

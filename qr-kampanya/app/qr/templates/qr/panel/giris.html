@@ -1,0 +1,21 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Giriş{% endblock %}
+{% block icerik %}
+<div class="kart giris-kutu">
+  <h1>Yönetim paneli girişi</h1>
+  {% if hata %}<div class="hata-kutu" role="alert">{{ hata }}</div>{% endif %}
+  <form method="post" action="{% url 'panel:giris' %}" autocomplete="on">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="alan">
+      <label for="id_username">Kullanıcı adı</label>
+      <input type="text" name="username" id="id_username" value="{{ kullanici_adi|default:'' }}" autocomplete="username" autofocus required maxlength="150">
+    </div>
+    <div class="alan">
+      <label for="id_password">Parola</label>
+      <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="dugme">Giriş yap</button>
+  </form>
+</div>
+{% endblock %}

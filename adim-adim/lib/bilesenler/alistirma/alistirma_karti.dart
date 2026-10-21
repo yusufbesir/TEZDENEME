@@ -4,9 +4,13 @@ import '../../model/icerik.dart';
 import 'bosluk.dart';
 import 'dinle.dart';
 import 'eslestir.dart';
+import 'hamle.dart';
+import 'isaretle.dart';
 import 'kod.dart';
 import 'secim.dart';
 import 'sirala.dart';
+import 'soyle.dart';
+import 'tablo.dart';
 import 'yaz.dart';
 
 /// Alıştırma türüne göre doğru widget'ı seçer.
@@ -62,9 +66,31 @@ class AlistirmaKarti extends StatelessWidget {
       kontrolEdildi: kontrolEdildi,
       onCevap: onCevap,
     ),
+    final Soyle a => SoyleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+      onGonder: onGonder,
+    ),
     final Kod a => KodGorunumu(
       alistirma: a,
       kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Tablo a => TabloGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Isaretle a => IsaretleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+    ),
+    final Hamle a => HamleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
       onCevap: onCevap,
     ),
   };

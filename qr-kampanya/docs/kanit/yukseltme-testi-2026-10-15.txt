@@ -1,0 +1,219 @@
+# Eski sürümden yükseltme testi ham çıktısı
+# Etiket: [İP:Dinamik QR ve kampanya sistemi#tnmy6Q]
+# Tarih: 2026-10-15. Ortam: bulut geliştirme ortamı, Docker Compose yığını qre2e6.
+# Senaryo: f7f3828 sürümü kuruldu, veri girildi, yeni kod üzerine kopyalanıp bash scripts/guncelle.sh çalıştırıldı.
+# Çalıştıran: implementer ajanı (claude-sonnet-5-5). Parola/özel anahtar içermez (yalnızca age açık anahtarı görünür).
+
+.env dosyasının SONUNA eksik anahtar eklendi: POSTGRES_SAHIP_PAROLA (diğer satırlar değiştirilmedi).
+.env dosyasının SONUNA eksik anahtar eklendi: POSTGRES_UYGULAMA_PAROLA (diğer satırlar değiştirilmedi).
+1/5 İmajlar çekiliyor ve derleniyor...
+ Image caddy:2.10.2-alpine Pulling 
+ Image postgres:17.6-alpine Pulling 
+ Image caddy:2.10.2-alpine Pulled 
+ Image postgres:17.6-alpine Pulled 
+ Image qr-kampanya-app:e2e6 Building 
+ Image qr-kampanya-yedek:e2e6 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.81kB done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.83kB done
+#2 DONE 0.0s
+
+#3 [yedek internal] load build definition from Dockerfile
+#3 transferring dockerfile: 2.16kB done
+#3 DONE 0.0s
+
+#4 [yedek] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 0.2s
+
+#5 [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#6 DONE 0.2s
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 ...
+
+#8 [app internal] load .dockerignore
+#8 transferring context: 84B done
+#8 DONE 0.0s
+
+#9 [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
+#9 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#9 DONE 0.0s
+
+#10 [app internal] load build context
+#10 transferring context: 467.52kB 0.0s done
+#10 DONE 0.0s
+
+#11 [app stage-0 6/7] COPY . .
+#11 CACHED
+
+#12 [app stage-0 2/7] WORKDIR /app
+#12 CACHED
+
+#13 [app stage-0 5/7] RUN useradd --system --uid 10001 --home /app uygulama     && mkdir -p /veri/medya /veri/static     && chown -R uygulama /veri
+#13 CACHED
+
+#14 [app stage-0 3/7] COPY requirements.txt .
+#14 CACHED
+
+#15 [app stage-0 4/7] RUN --mount=type=bind,source=.,target=/baglam     if [ -d /baglam/tekerlekler ]; then       pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt;     else       pip install --require-hashes --no-deps -r requirements.txt;     fi
+#15 CACHED
+
+#16 [app stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 755 /app/baslat.sh
+#16 CACHED
+
+#17 [app] exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:a7e0d8bd6cad2b06d2ae7a8d44f711ee752e8e0613a768b1eb0d6f5aed07e3c2 done
+#17 exporting config sha256:bb53be9b898fb4adb2b11159fa9d9be90a0392a863f1e073588a1a66c0d30494 done
+#17 exporting attestation manifest sha256:25e7f6ea84a9e83752b0ff87c34bce582a97954a8a07e4a724e577d0ca9d5ed7 done
+#17 exporting manifest list sha256:a656c9282ca05b17a1e8d27ef80bf800f21f1c4a0b222c00ed402bdcb8a8b6c3 done
+#17 naming to docker.io/library/qr-kampanya-app:e2e6 done
+#17 unpacking to docker.io/library/qr-kampanya-app:e2e6 done
+#17 DONE 0.1s
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 ...
+
+#18 [app] resolving provenance for metadata file
+#18 DONE 0.0s
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 DONE 1.5s
+
+#19 [yedek internal] load .dockerignore
+#19 transferring context: 2B done
+#19 DONE 0.0s
+
+#20 [yedek internal] load build context
+#20 transferring context: 184B done
+#20 DONE 0.0s
+
+#21 [yedek stage-0 1/2] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#21 resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 0.0s done
+#21 CACHED
+
+#22 [yedek stage-0 2/2] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#22 0.312 age arşivi yerel paketlerden alınıyor: age-v1.3.2-linux-amd64.tar.gz
+#22 0.525 /tmp/age-kur/age-v1.3.2-linux-amd64.tar.gz: OK
+#22 1.573 v1.3.2
+#22 DONE 1.6s
+
+#23 [yedek] exporting to image
+#23 exporting layers 0.4s done
+#23 exporting manifest sha256:218188631c29c8962e8dbadd333df41f6f9e56ebb631538128ac96cacbd50d43 done
+#23 exporting config sha256:5dabdee24ff27cf9c85ae3c8df9d0a954b983846f8554d15393ebdeff5f68097 done
+#23 exporting attestation manifest sha256:ecae7229059d62d56eb0ade78e9f9c35293dafa1d22d617f5f1da7ad2759552b done
+#23 exporting manifest list sha256:aa570d587d0dea85a2cf08352dbaf9a2461b66f305cac00207eb4fef2a1300ed done
+#23 naming to docker.io/library/qr-kampanya-yedek:e2e6 done
+#23 unpacking to docker.io/library/qr-kampanya-yedek:e2e6 0.1s done
+#23 DONE 0.5s
+
+#24 [yedek] resolving provenance for metadata file
+#24 DONE 0.0s
+ Image qr-kampanya-yedek:e2e6 Built 
+ Image qr-kampanya-app:e2e6 Built 
+2/5 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+ Container qre2e6-db-1 Recreate 
+ Container qre2e6-db-1 Recreated 
+ Container qre2e6-db-1 Starting 
+ Container qre2e6-db-1 Started 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/5 Güncelleme öncesi şifreli yedek alınıyor...
+Yedek şifreleme anahtarı üretiliyor...
+Public key: age19dzcyku7d084k32zh7zadtgjy7dhy87rr939lvln6n2ywuhg55cq57ffpu
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+
+====================================================================================
+ ÇOK ÖNEMLİ - YEDEK ANAHTARI
+ Yedekleriniz şifrelidir. Özel anahtar dosyası:   gizli/yedek-anahtari.txt
+ -> Bu dosyanın içeriğini ŞİMDİ parola yöneticinize (Bitwarden, 1Password vb.) kopyalayın
+    ve sunucu dışında bir yerde de saklayın.
+ -> Bu dosya kaybolursa yedekleriniz ASLA açılamaz. Kimse kurtaramaz.
+ -> Dosyayı kimseyle paylaşmayın, e-postayla göndermeyin, Git'e eklemeyin.
+ -> Sunucuyu kurduktan sonra dosyayı sunucudan silmeniz önerilir (yedek servisi ona ihtiyaç duymaz;
+    yalnızca geri yükleme sırasında gerekir). Böylece sunucu ele geçirilse bile yedekler açılamaz.
+====================================================================================
+ Container qre2e6-yedek-1 Recreate 
+ Container qre2e6-yedek-1 Recreated 
+ Container qre2e6-yedek-1 Starting 
+ Container qre2e6-yedek-1 Started 
+Yedek tamam (şifreli): /yedekler/db-20261015-191621.dump.age
+4/5 Servisler yeniden başlatılıyor (hazırlık migrasyonları qr_sahip ile uygular, sonra app/caddy)...
+ Container qre2e6-caddy-1 Running 
+ Container qre2e6-yedek-1 Running 
+ Container qre2e6-db-1 Running 
+ Container qre2e6-hazirlik-1 Creating 
+ Container qre2e6-hazirlik-1 Created 
+ Container qre2e6-app-1 Recreate 
+ Container qre2e6-app-1 Recreated 
+ Container qre2e6-db-1 Waiting 
+ Container qre2e6-db-1 Waiting 
+ Container qre2e6-db-1 Healthy 
+ Container qre2e6-db-1 Healthy 
+ Container qre2e6-hazirlik-1 Starting 
+ Container qre2e6-hazirlik-1 Started 
+ Container qre2e6-hazirlik-1 Waiting 
+ Container qre2e6-db-1 Waiting 
+ Container qre2e6-db-1 Healthy 
+ Container qre2e6-hazirlik-1 Exited 
+ Container qre2e6-app-1 Starting 
+ Container qre2e6-app-1 Started 
+ Container qre2e6-app-1 Waiting 
+ Container qre2e6-app-1 Healthy 
+5/5 Sağlık kontrolü...
+Uygulama sağlıklı.
+
+real	0m40.004s
+user	0m1.242s
+sys	0m0.952s
+
+##### curl /k/E2E001
+302
+##### rol-dogrulama.sh
+Bağlanan hesap: qr_uygulama (süper kullanıcı: hayır)
+GEÇTİ  DROP TABLE qr_denetimkaydi: reddedildi (InsufficientPrivilege)
+GEÇTİ  ALTER TABLE qr_qrkod DISABLE TRIGGER ALL: reddedildi (InsufficientPrivilege)
+GEÇTİ  TRUNCATE qr_qrkod: reddedildi (InsufficientPrivilege)
+GEÇTİ  DELETE FROM qr_qrkod: reddedildi (InsufficientPrivilege)
+GEÇTİ  UPDATE qr_denetimkaydi SET ...: reddedildi (InsufficientPrivilege)
+GEÇTİ  CREATE TABLE ...: reddedildi (InsufficientPrivilege)
+GEÇTİ  SELECT çalışıyor
+SONUÇ: GEÇTİ
+##### geri-yukleme-testi.sh
+== Geri yükleme testi 2026-10-15T16:18:52+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e6/qr-kampanya/yedekler/db-20261015-191800.dump.age
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e6/qr-kampanya/gizli/yedek-anahtari.txt (içeriği yazılmaz)
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-191800.dump.age: OK
+medya-20261015-191800.tar.gz.age: OK
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|1|1
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|0|0
+qrkod|1|1
+sayfa|1|1
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 5 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+
+# Ek kanıt (orkestratör, yükseltmeden sonra qre2e6 veritabanı biriminden okundu):
+# select app, name, applied from django_migrations where app='qr'
+qr|0001_initial|2026-10-15 16:13:31 (eski sürüm kurulumu)
+qr|0002_silme_korumasi|2026-10-15 16:13:31
+qr|0003_ice_aktarma|2026-10-15 16:13:31
+qr|0004_deneme_sayaci|2026-10-15 16:13:31
+qr|0005_uygulama_rolu_yetkileri|2026-10-15 16:16:25 (guncelle.sh ile uygulandı)

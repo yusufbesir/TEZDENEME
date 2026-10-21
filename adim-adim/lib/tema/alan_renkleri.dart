@@ -1,4 +1,4 @@
-/// Alan (İngilizce / Programlama) vurgu renkleri.
+/// Alan (İngilizce / Programlama / Oyunlar) vurgu renkleri.
 ///
 /// Bu dosya: eğitim alanlarının başlık ve sahanlık bandında kullanılan vurgu
 /// renkleri. Sahibi Yusuf (yusufbesir). Değiştirme kuralı: renkler
@@ -24,27 +24,35 @@ abstract final class AlanRenkleri {
   static const Color kodAcik = Color(0xFF007E57);
   static const Color kodKoyu = Color(0xFF51DAA7);
 
-  /// Alan kimliğine ('dil' | 'kod') göre vurgu rengi.
+  /// Oyunlar (satranç): Okabe-Ito turuncusunun koyulaştırılmışı (açık
+  /// zeminde yaklaşık 5:1) ve kendisi (koyu zeminde).
+  static const Color oyunAcik = Color(0xFFA85000);
+  static const Color oyunKoyu = Color(0xFFE69F00);
+
+  /// Alan kimliğine ('dil' | 'kod' | 'oyun') göre vurgu rengi.
   static Color renk(String? alan, Brightness parlaklik) {
     final koyu = parlaklik == Brightness.dark;
     return switch (alan) {
       'kod' => koyu ? kodKoyu : kodAcik,
+      'oyun' => koyu ? oyunKoyu : oyunAcik,
       _ => koyu ? dilKoyu : dilAcik,
     };
   }
 
   static Color kursRengi(KursAlani alan, Brightness parlaklik) =>
-      renk(alan == KursAlani.kod ? 'kod' : 'dil', parlaklik);
+      renk(alan.name, parlaklik);
 
   /// Alan adı (Türkçe, arayüzde gösterilen).
   static String ad(String? alan) => switch (alan) {
     'kod' => 'Programlama',
     'dil' => 'İngilizce',
+    'oyun' => 'Oyunlar',
     _ => 'Alan seçilmedi',
   };
 
   static IconData simge(String? alan) => switch (alan) {
     'kod' => Icons.code,
+    'oyun' => Icons.extension,
     _ => Icons.translate,
   };
 }

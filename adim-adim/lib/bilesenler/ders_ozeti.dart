@@ -1,5 +1,7 @@
 /// Ders ve mikro ders özet ekranı: kupa/onay simgesi, doğru sayısı, XP, seri;
-/// isteğe bağlı ek eylem düğmesi (ör. "Karışık tekrar (5 soru)").
+/// isteğe bağlı iki ek eylem düğmesi (ör. "Karışık tekrar (5 soru)" ve
+/// "Kısa quiz (3 soru)"); ikisi alt alta durur. İçerik pencereye sığmazsa
+/// (kısa pencere + büyük yazı) sayfa kaydırılır, taşmaz.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -25,6 +27,10 @@ class DersOzeti extends StatelessWidget {
     required this.onDon,
     this.ekEtiket,
     this.onEk,
+    this.ekSimge = Icons.shuffle,
+    this.ek2Etiket,
+    this.onEk2,
+    this.ek2Simge = Icons.quiz_outlined,
   });
 
   final String baslik;
@@ -38,6 +44,13 @@ class DersOzeti extends StatelessWidget {
   /// İsteğe bağlı ek eylem (ör. "Karışık tekrar (5 soru)"); ikisi birlikte verilir.
   final String? ekEtiket;
   final VoidCallback? onEk;
+  final IconData ekSimge;
+
+  /// İkinci isteğe bağlı ek eylem (ör. "Kısa quiz (3 soru)"); ikisi birlikte
+  /// verilir. Birinciyle birlikte de tek başına da gösterilebilir.
+  final String? ek2Etiket;
+  final VoidCallback? onEk2;
+  final IconData ek2Simge;
 
   @override
   Widget build(BuildContext context) {
@@ -60,96 +73,117 @@ class DersOzeti extends StatelessWidget {
         );
 
     return SayfaGovdesi(
-      child: Padding(
-        padding: const EdgeInsets.all(Olcu.b3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Spacer(),
-            Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: sure,
-                curve: Curves.easeOutBack,
-                builder: (context, olcek, child) =>
-                    Transform.scale(scale: olcek, child: child),
-                child: Icon(
-                  tam ? Icons.emoji_events : Icons.check_circle,
-                  size: 64,
-                  color: tam ? r.vurgu : r.dogru,
-                ),
-              ),
-            ),
-            const SizedBox(height: Olcu.b2),
-            Text(
-              baslik,
-              textAlign: TextAlign.center,
-              style: yazi.headlineMedium,
-            ),
-            if (altBaslik != null) ...[
-              const SizedBox(height: Olcu.b1),
-              Text(
-                altBaslik!,
-                textAlign: TextAlign.center,
-                style: yazi.bodyLarge?.copyWith(color: r.metinIkincil),
-              ),
-            ],
-            const SizedBox(height: Olcu.b3),
-            Card(
+      child: LayoutBuilder(
+        builder: (context, kisit) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: kisit.maxHeight),
+            child: IntrinsicHeight(
               child: Padding(
-                padding: const EdgeInsets.all(Olcu.b2),
+                padding: const EdgeInsets.all(Olcu.b3),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Semantics(
-                      label: 'Doğru: $dogru/$toplam',
-                      excludeSemantics: true,
-                      child: satir(
-                        Icons.check_circle_outline,
-                        r.dogru,
-                        'Doğru',
-                        Text('$dogru/$toplam', style: yazi.titleLarge),
-                      ),
-                    ),
-                    Semantics(
-                      label: 'Kazanılan XP: +$xp',
-                      excludeSemantics: true,
-                      child: satir(
-                        Icons.bolt,
-                        r.vurgu,
-                        'Kazanılan XP',
-                        TweenAnimationBuilder<int>(
-                          tween: IntTween(begin: 0, end: xp),
-                          duration: sure,
-                          builder: (context, v, _) =>
-                              Text('+$v', style: yazi.titleLarge),
+                    const Spacer(),
+                    Center(
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: sure,
+                        curve: Curves.easeOutBack,
+                        builder: (context, olcek, child) =>
+                            Transform.scale(scale: olcek, child: child),
+                        child: Icon(
+                          tam ? Icons.emoji_events : Icons.check_circle,
+                          size: 64,
+                          color: tam ? r.vurgu : r.dogru,
                         ),
                       ),
                     ),
-                    Semantics(
-                      label: 'Seri: $seri gün',
-                      excludeSemantics: true,
-                      child: satir(
-                        Icons.local_fire_department,
-                        r.vurgu,
-                        'Seri',
-                        Text('$seri gün', style: yazi.titleLarge),
+                    const SizedBox(height: Olcu.b2),
+                    Text(
+                      baslik,
+                      textAlign: TextAlign.center,
+                      style: yazi.headlineMedium,
+                    ),
+                    if (altBaslik != null) ...[
+                      const SizedBox(height: Olcu.b1),
+                      Text(
+                        altBaslik!,
+                        textAlign: TextAlign.center,
+                        style: yazi.bodyLarge?.copyWith(color: r.metinIkincil),
                       ),
+                    ],
+                    const SizedBox(height: Olcu.b3),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(Olcu.b2),
+                        child: Column(
+                          children: [
+                            Semantics(
+                              label: 'Doğru: $dogru/$toplam',
+                              excludeSemantics: true,
+                              child: satir(
+                                Icons.check_circle_outline,
+                                r.dogru,
+                                'Doğru',
+                                Text('$dogru/$toplam', style: yazi.titleLarge),
+                              ),
+                            ),
+                            Semantics(
+                              label: 'Kazanılan XP: +$xp',
+                              excludeSemantics: true,
+                              child: satir(
+                                Icons.bolt,
+                                r.vurgu,
+                                'Kazanılan XP',
+                                TweenAnimationBuilder<int>(
+                                  tween: IntTween(begin: 0, end: xp),
+                                  duration: sure,
+                                  builder: (context, v, _) =>
+                                      Text('+$v', style: yazi.titleLarge),
+                                ),
+                              ),
+                            ),
+                            Semantics(
+                              label: 'Seri: $seri gün',
+                              excludeSemantics: true,
+                              child: satir(
+                                Icons.local_fire_department,
+                                r.vurgu,
+                                'Seri',
+                                Text('$seri gün', style: yazi.titleLarge),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    if (ekEtiket != null && onEk != null) ...[
+                      OutlinedButton.icon(
+                        icon: Icon(ekSimge),
+                        label: Text(ekEtiket!),
+                        onPressed: onEk,
+                      ),
+                      const SizedBox(height: Olcu.b2),
+                    ],
+                    if (ek2Etiket != null && onEk2 != null) ...[
+                      OutlinedButton.icon(
+                        key: const Key('ozet-ek2'),
+                        icon: Icon(ek2Simge),
+                        label: Text(ek2Etiket!),
+                        onPressed: onEk2,
+                      ),
+                      const SizedBox(height: Olcu.b2),
+                    ],
+                    FilledButton(
+                      onPressed: onDon,
+                      child: const Text('Yola dön'),
                     ),
                   ],
                 ),
               ),
             ),
-            const Spacer(),
-            if (ekEtiket != null && onEk != null) ...[
-              OutlinedButton.icon(
-                icon: const Icon(Icons.shuffle),
-                label: Text(ekEtiket!),
-                onPressed: onEk,
-              ),
-              const SizedBox(height: Olcu.b2),
-            ],
-            FilledButton(onPressed: onDon, child: const Text('Yola dön')),
-          ],
+          ),
         ),
       ),
     );

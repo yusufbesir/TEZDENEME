@@ -21,6 +21,7 @@
 - Her oturum, yazdığı kasa notlarına ve çıktı/rapor dosyalarına o iş için harcanan girdi (input) ve çıktı (output) token sayılarını ayrı ayrı yazar. Alt ajanların tokenları ayrıca belirtilir ve toplamı verilir. Kesin sayı alınamıyorsa bu açıkça "tahmini" diye yazılır.
 - Her notta "Kullanılan yapay zeka araçları" bölümü olur: ana model, alt ajan modelleri, Jev, Codex/ChatGPT, Gemini gibi işte kullanılan her yapay zeka aracı listelenir.
 - Bu bilgi geçmiş oturumlar için de geriye dönük eklenir; ekleme yoluyla yapılır, mevcut içerik silinmez.
+- Kesin sayı için oturumun kendi sayacı kullanılır (`get_session` çıktısındaki `usage`: girdi, çıktı, önbellek okuma/yazma). Sayaç oturum toplamıdır; alt ajan kırılımını vermez, o yüzden alt ajan tokenları `docs/orchestrator-log.md` satırlarından alınır, orada yoksa "veri yok" yazılır. Geçmiş oturumların tablosu: `token-kaydi/` (proje klasörü). (PR #14'ten taşındı.)
 
 ## Kesintiden sonra devam (kullanıcının kuralı, 2026-10-15)
 - Kullanıcının bilgisayarı çevrimdışı olup tekrar çevrimiçi olduğunda, yarıda kalan her oturum kullanıcıya sormadan kaldığı yerden devam eder. "Devam edeyim mi?" diye sorulmaz.
@@ -34,3 +35,10 @@ Kullanıcı açık kaynak Archify skill'inin (projeyi tarayıp mimari haritaya �
 
 ## Emek illüzyonu tasarımı
 Bu kural yola bağlı kural olarak taşındı: [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) (arayüz dosyaları açılınca yüklenir). İçerik değişmedi.
+
+## REA her zaman çalışır durumda (kullanıcının kuralı, 2026-10-17)
+Yusuf: "rea bundan sonra hep çalışır halde olsun". REA (APK/ikili yapı analizi MCP sunucusu ve skill'i) cihazda sürekli kullanılabilir tutulur:
+- Araç yolları `C:\Users\TAA PF60V67C\.claude.json` REA bölümünde D:\Programlar altını gösterir (`REA_APKTOOL_COMMAND`, `REA_JADX_MCP_JAR`, `GHIDRA_INSTALL_DIR`). Araçlar taşınırsa aynı gün bu üç değer güncellenir; Yusuf bu düzeltme için izin verdi (2026-10-17 14:21).
+- Her cihaz oturumunun başında, REA'ya iş verilecekse önce `inspect_apktool_client` ile sağlık kontrolü yapılır; "capability_unavailable" dönerse iş başlamadan neden bulunup düzeltilir ve Yusuf'a tek satırla bildirilir.
+- REA'nın ortam değişkenleri yalnız sunucu başlarken okunur; ayar değişince REA yeniden bağlanır (yeni oturum ya da /mcp Reconnect). Koordinatör cihaz oturumunu yeniden başlatarak bunu kendisi yapabilir.
+- APK taramaları REA (apktool + JADX) ile yapılır; REA çalışmıyorsa yalnız geçici olarak doğrudan apktool'a düşülür ve rapora "REA çalışmadı, sebep" yazılır.

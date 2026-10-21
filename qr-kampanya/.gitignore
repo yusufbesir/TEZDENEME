@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+yedekler/
+*.dump
+*.sql.gz
+__pycache__/
+*.pyc
+app/staticfiles/
+app/medya/
+test-sonuclari/
+app/tekerlekler/
+yedek/paketler/*
+!yedek/paketler/.gitkeep
+gizli/

@@ -1,0 +1,21 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Eklentiler{% endblock %}
+{% block icerik %}
+<h1>Eklentiler</h1>
+<p class="yardim">Salt okunur bilgi sayfası. Panelden eklenti yüklenemez, açılıp kapatılamaz: eklentiler sunucuda <code>app/eklentiler/</code> altına konur ve yalnızca <code>QR_EKLENTILER</code> ortam değişkeninde adı geçerse çalışır. Eklenti sunucuda uygulamayla aynı yetkiyle çalışır; yalnızca güvendiğiniz kodu ekleyin (docs/EKLENTILER.md).</p>
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Eklenti</th><th>Durum</th><th>Açıklama</th><th>Kancalar</th></tr></thead>
+  <tbody>
+  {% for e in eklentiler %}
+  <tr>
+    <td>{{ e.ad }}</td>
+    <td>{{ e.durum }}{% if e.hata %}<br><small>{{ e.hata }}</small>{% endif %}</td>
+    <td>{{ e.aciklama|default:"-" }}</td>
+    <td>{{ e.olaylar|join:", "|default:"-" }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="4">Yüklü eklenti dosyası yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

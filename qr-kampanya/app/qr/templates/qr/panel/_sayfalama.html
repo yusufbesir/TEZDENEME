@@ -1,0 +1,7 @@
+{% if sayfa.paginator.num_pages > 1 %}
+<nav class="sayfalama" aria-label="Sayfalama">
+  {% if sayfa.has_previous %}<a class="dugme ikincil kucuk" href="?{% if sorgu_dizesi %}{{ sorgu_dizesi }}&amp;{% endif %}sayfa_no={{ sayfa.previous_page_number }}">Önceki</a>{% endif %}
+  <span>Sayfa {{ sayfa.number }} / {{ sayfa.paginator.num_pages }} ({{ sayfa.paginator.count }} kayıt)</span>
+  {% if sayfa.has_next %}<a class="dugme ikincil kucuk" href="?{% if sorgu_dizesi %}{{ sorgu_dizesi }}&amp;{% endif %}sayfa_no={{ sayfa.next_page_number }}">Sonraki</a>{% endif %}
+</nav>
+{% endif %}
