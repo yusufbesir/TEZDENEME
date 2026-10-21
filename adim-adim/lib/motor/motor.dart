@@ -254,6 +254,207 @@ abstract final class Motor {
     );
   }
 
+  /// Ders yolda bitmiş mi: en az bir kez bitirilmiş ya da seviye belirleme
+  /// sınavında atlanmış. Yolun doğrusal kilidi ve "sıradaki ders" bununla
+  /// hesaplanır.
+  static bool dersBitmis(OgrenciDurumu d, String dersId) =>
+      (d.tamamlanan[dersId] ?? 0) > 0 || d.atlananDersler.contains(dersId);
+
+  /// Çalışma planı: bir dersin ortalama süresi (dakika). Kodda ders süresi
+  /// ölçümü yok; ders başına 8-10 alıştırma için makul sabit varsayım.
+  static const int ortalamaDersDakikasi = 4;
+
+  /// Günde [dakika] dakikaya sığan ders sayısı (en az 1).
+  static int planGunlukDers(int dakika) =>
+      math.max(1, dakika ~/ ortalamaDersDakikasi);
+
+  /// Planın hedef kapsamındaki dersler; kurs/ünite bulunamazsa boş.
+  static List<Ders> planDersleri(CalismaPlani plan, List<Kurs> kurslar) {
+    for (final k in kurslar) {
+      if (k.id != plan.kursId) continue;
+      if (plan.uniteId == null) return k.tumDersler.toList();
+      for (final u in k.uniteler) {
+        if (u.id == plan.uniteId) return u.dersler;
+      }
+    }
+    return const [];
+  }
+
+  /// [bugun] dahil, [gunler] (1=Pzt..7=Paz) günlerinde [dersSayisi] dersi
+  /// günde [gunlukDers] ile bitirmenin son günü; ders yoksa ya da gün
+  /// seçilmemişse null.
+  static String? planBitisTarihi(
+    int dersSayisi,
+    int gunlukDers,
+    Set<int> gunler,
+    String bugun,
+  ) {
+    final gecerli = gunler.where((g) => g >= 1 && g <= 7).toSet();
+    final t = _gunCoz(bugun);
+    if (dersSayisi <= 0 || gunlukDers <= 0 || gecerli.isEmpty || t == null) {
+      return null;
+    }
+    var gunSayisi = (dersSayisi + gunlukDers - 1) ~/ gunlukDers;
+    var gun = bugun;
+    var hafta = t.weekday;
+    while (true) {
+      if (gecerli.contains(hafta)) {
+        gunSayisi--;
+        if (gunSayisi == 0) return gun;
+      }
+      gun = _gunEkle(gun, 1);
+      hafta = hafta % 7 + 1;
+    }
+  }
+
+  /// Plan özeti: kalan/toplam ders (atlananlar ve tamamlananlar düşülür),
+  /// günlük ders sayısı, tahmini bitiş ve bugünün çalışma günü olup olmadığı.
+  /// Plan yoksa ya da kapsam bulunamazsa null.
+  static ({
+    int toplam,
+    int kalan,
+    int gunlukDers,
+    String? bitis,
+    bool bugunCalisma,
+  })?
+  planOzeti(OgrenciDurumu d, List<Kurs> kurslar, String bugun) {
+    final plan = d.calismaPlani;
+    if (plan == null) return null;
+    final dersler = planDersleri(plan, kurslar);
+    if (dersler.isEmpty) return null;
+    final kalan = dersler.where((x) => !dersBitmis(d, x.id)).length;
+    final gunluk = planGunlukDers(plan.gunlukDakika);
+    final t = _gunCoz(bugun);
+    return (
+      toplam: dersler.length,
+      kalan: kalan,
+      gunlukDers: gunluk,
+      bitis: planBitisTarihi(kalan, gunluk, plan.gunler, bugun),
+      bugunCalisma: t != null && plan.gunler.contains(t.weekday),
+    );
+  }
+
+  /// Plandan türeyen haftalık hedef önerisi (3..7 gün); ayarı değiştirmez.
+  static int planHaftalikOneri(CalismaPlani plan) => plan.gunler.length.clamp(
+    OgrenciDurumu.enAzHaftalikHedef,
+    OgrenciDurumu.enCokHaftalikHedef,
+  );
+
+  /// Seviye belirleme sınavı: en çok soru, ünite başına en az/en çok soru ve
+  /// ünitenin "atlandı" sayılması için gereken doğru oranı.
+  static const int yerlestirmeEnCok = 20;
+  static const int yerlestirmeUniteEnAz = 3;
+  static const int yerlestirmeUniteEnCok = 5;
+  static const double yerlestirmeEsik = 0.8;
+
+  /// Ünite henüz tam bitmemiş mi (en az bir dersi bitmiş değil)?
+  static bool _uniteAcik(OgrenciDurumu d, Unite u) =>
+      u.dersler.any((ders) => !dersBitmis(d, ders.id));
+
+  /// Seviye belirleme sınavı soruları: [kurs]un henüz tamamlanmamış
+  /// ünitelerinden, ünite sırasıyla (artan zorluk). Her üniteden dersleri
+  /// dolaşarak 3..5 mevcut alıştırma; toplam en çok [yerlestirmeEnCok] (çok
+  /// ünite varsa ilk 6 ünite). Konuşma ([Soyle]) alıştırmaları seçilmez.
+  /// `unite` = kurs.uniteler içindeki indeks. Aynı [tohum] aynı sonucu verir.
+  static List<({int unite, String kartId, Alistirma alistirma})> yerlestirmeSec(
+    OgrenciDurumu d,
+    Kurs kurs, {
+    int tohum = 0,
+  }) {
+    final acik = [
+      for (var i = 0; i < kurs.uniteler.length; i++)
+        if (_uniteAcik(d, kurs.uniteler[i])) i,
+    ];
+    final kullanilan = acik.take(yerlestirmeEnCok ~/ yerlestirmeUniteEnAz);
+    if (kullanilan.isEmpty) return const [];
+    final adet = (yerlestirmeEnCok ~/ kullanilan.length).clamp(
+      yerlestirmeUniteEnAz,
+      yerlestirmeUniteEnCok,
+    );
+    final sonuc = <({int unite, String kartId, Alistirma alistirma})>[];
+    for (final ui in kullanilan) {
+      // Ünitenin bitmemiş derslerinden havuz; dersler arası dönerek (her
+      // dersten sırayla) alınır ki sınav üniteyi bütün olarak yoklasın.
+      final dersler = [
+        for (final ders in kurs.uniteler[ui].dersler)
+          if (!dersBitmis(d, ders.id)) ders,
+      ];
+      final kuyruklar = [
+        for (final ders in dersler)
+          [
+            for (var i = 0; i < ders.alistirmalar.length; i++)
+              if (ders.alistirmalar[i] is! Soyle)
+                (
+                  unite: ui,
+                  kartId: ders.kartKimligi(i),
+                  alistirma: ders.alistirmalar[i],
+                ),
+          ]..shuffle(math.Random(tohum + ui)),
+      ];
+      var alinan = 0;
+      while (alinan < adet && kuyruklar.any((k) => k.isNotEmpty)) {
+        for (final k in kuyruklar) {
+          if (alinan >= adet) break;
+          if (k.isEmpty) continue;
+          sonuc.add(k.removeAt(0));
+          alinan++;
+        }
+      }
+    }
+    return sonuc;
+  }
+
+  /// Sınav sonucu: ünite sırasıyla doğru oranı hesaplanır; oranı
+  /// [yerlestirmeEsik] ve üstü olan üniteler geçilir, ilk başarısız üniteden
+  /// sonrası (sorulmuş olsa da) geçilmez. [dogrular] sorularla aynı sırada.
+  /// Dönen `gecilen`: geçilen ünite indeksleri; `kalan`: bir ünite
+  /// kaldıysa o ünitenin indeksi (yoksa null).
+  static ({List<int> gecilen, int? kalan}) yerlestirmeDegerlendir(
+    List<({int unite, String kartId, Alistirma alistirma})> sorular,
+    List<bool> dogrular,
+  ) {
+    final toplam = <int, int>{};
+    final dogru = <int, int>{};
+    for (var i = 0; i < sorular.length && i < dogrular.length; i++) {
+      final u = sorular[i].unite;
+      toplam[u] = (toplam[u] ?? 0) + 1;
+      if (dogrular[i]) dogru[u] = (dogru[u] ?? 0) + 1;
+    }
+    final gecilen = <int>[];
+    int? kalan;
+    for (final u in (toplam.keys.toList()..sort())) {
+      if ((dogru[u] ?? 0) / toplam[u]! >= yerlestirmeEsik) {
+        gecilen.add(u);
+      } else {
+        kalan = u;
+        break;
+      }
+    }
+    return (gecilen: gecilen, kalan: kalan);
+  }
+
+  /// Geçilen ünitelerin henüz tamamlanmamış derslerini "atlandı" işaretler.
+  /// XP, seri, kartlar (SRS), `tamamlanan` ve günlük değişmez. Zaten
+  /// tamamlanmış dersler atlanmaz. Geçersiz ünite indeksleri yok sayılır.
+  static OgrenciDurumu yerlestirmeUygula(
+    OgrenciDurumu d,
+    Kurs kurs,
+    List<int> gecilenUniteler,
+  ) {
+    final yeni = {...d.atlananDersler};
+    for (final u in gecilenUniteler) {
+      if (u < 0 || u >= kurs.uniteler.length) continue;
+      for (final ders in kurs.uniteler[u].dersler) {
+        if ((d.tamamlanan[ders.id] ?? 0) == 0) yeni.add(ders.id);
+      }
+    }
+    if (yeni.length == d.atlananDersler.length) return d;
+    return d.copyWith(atlananDersler: Set.unmodifiable(yeni));
+  }
+
+  /// Kurs ünitesi (indeks) tümüyle bitmiş ya da atlanmış mı?
+  static bool uniteBitmis(OgrenciDurumu d, Unite u) => !_uniteAcik(d, u);
+
   /// Mikro dersin kazandıracağı XP: 5 + doğru*2 (+3 tam puan).
   /// Sınırlar dersXp ile aynıdır; toplam 0 ise tam puan bonusu yok.
   static int mikroXp(int dogru, int toplam) {

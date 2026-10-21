@@ -14,6 +14,7 @@ import '../icerik/hikayeler.dart';
 import '../model/durum.dart';
 import '../model/hikaye.dart';
 import '../model/icerik.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class HikayeKarti extends StatelessWidget {
@@ -47,7 +48,7 @@ class HikayeKarti extends StatelessWidget {
     var guncel = 0;
     for (var i = 0; i < gruplar.length; i++) {
       if (gruplar[i].kurs.tumDersler.any(
-        (d) => (durum.tamamlanan[d.id] ?? 0) == 0,
+        (d) => !Motor.dersBitmis(durum, d.id),
       )) {
         guncel = i;
         break;

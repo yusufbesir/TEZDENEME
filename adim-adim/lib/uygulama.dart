@@ -20,14 +20,17 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/yerlestirme_ekrani.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
@@ -87,6 +90,7 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
       GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
@@ -95,6 +99,15 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/hikaye/:id',
         builder: (c, s) => HikayeEkrani(hikayeId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ornekler',
+        builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(
+        path: '/ornek/:id',
+        builder: (c, s) =>
+            OrnekDetayEkrani(ornekId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
         path: '/mikro',
@@ -106,6 +119,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           dersId: s.uri.queryParameters['ders'],
           yanlis: s.uri.queryParameters['yanlis'],
         ),
+      ),
+      GoRoute(
+        path: '/yerlestirme',
+        builder: (c, s) =>
+            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

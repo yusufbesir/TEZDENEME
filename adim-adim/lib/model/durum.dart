@@ -5,6 +5,7 @@
 /// ayarı/son gösterim günü.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
+/// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -277,6 +278,8 @@ class OgrenciDurumu {
     this.tekrarBildirimiAcik = true,
     this.konusmaAcik = true,
     this.tamamlananHikayeler = const {},
+    this.atlananDersler = const {},
+    this.calismaPlani,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -341,6 +344,15 @@ class OgrenciDurumu {
   /// Okuma hikâyeleri: hikâye kimliği -> kaç kez tamamlandı (eski kayıtta boş).
   final Map<String, int> tamamlananHikayeler;
 
+  /// Seviye belirleme sınavıyla "atlandı" işaretlenen derslerin kimlikleri
+  /// (eski kayıtta boş). Atlanan ders yolda tamamlanmış sayılır ve sonrasını
+  /// açar (Motor.dersBitmis), ama `tamamlanan`a, XP/seriye ve kartlara yansımaz.
+  final Set<String> atlananDersler;
+
+  /// Çalışma planı (hedef + günde dakika + haftanın günleri); null: plan yok
+  /// (eski kayıtlar). Haftalık hedefle (`haftalikHedefGun`) ayrı tutulur.
+  final CalismaPlani? calismaPlani;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -395,6 +407,9 @@ class OgrenciDurumu {
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
     Map<String, int>? tamamlananHikayeler,
+    Set<String>? atlananDersler,
+    CalismaPlani? calismaPlani,
+    bool calismaPlaniSil = false,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -424,6 +439,10 @@ class OgrenciDurumu {
       tekrarBildirimiAcik: tekrarBildirimiAcik ?? this.tekrarBildirimiAcik,
       konusmaAcik: konusmaAcik ?? this.konusmaAcik,
       tamamlananHikayeler: tamamlananHikayeler ?? this.tamamlananHikayeler,
+      atlananDersler: atlananDersler ?? this.atlananDersler,
+      calismaPlani: calismaPlaniSil
+          ? null
+          : (calismaPlani ?? this.calismaPlani),
     );
   }
 
@@ -453,6 +472,8 @@ class OgrenciDurumu {
     'tekrarBildirimiAcik': tekrarBildirimiAcik,
     'konusmaAcik': konusmaAcik,
     'tamamlananHikayeler': tamamlananHikayeler,
+    'atlananDersler': atlananDersler.toList()..sort(),
+    'calismaPlani': calismaPlani?.toJson(),
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -586,6 +607,99 @@ class OgrenciDurumu {
         j['tamamlananHikayeler'],
         (k) => !k.contains('#'),
       ),
+      // Eski kayıtta yoksa boş; geçerli ders kimliği (en çok 120 karakter,
+      // '#' içermez) olmayan girdiler atlanır.
+      atlananDersler: Set.unmodifiable({
+        if (j['atlananDersler'] is List)
+          for (final e in j['atlananDersler'] as List)
+            if (e is String &&
+                e.isNotEmpty &&
+                e.length <= 120 &&
+                !e.contains('#'))
+              e,
+      }),
+      // Eski kayıtta yoksa ya da bozuksa null (plan yok).
+      calismaPlani: CalismaPlani.fromJson(j['calismaPlani']),
     );
   }
+}
+
+/// Çalışma planı: hangi kurs (ve istenirse hangi ünite), günde kaç dakika,
+/// haftanın hangi günleri (1=Pazartesi .. 7=Pazar). Hesaplar Motor'dadır.
+class CalismaPlani {
+  const CalismaPlani({
+    required this.kursId,
+    this.uniteId,
+    this.gunlukDakika = 15,
+    this.gunler = const {1, 2, 3, 4, 5},
+  });
+
+  /// Seçilebilir günlük süreler (dakika).
+  static const List<int> dakikaSecenekleri = [10, 15, 20, 30];
+
+  final String kursId;
+
+  /// Hedef ünite kimliği; null: kursun tamamı.
+  final String? uniteId;
+  final int gunlukDakika;
+  final Set<int> gunler;
+
+  CalismaPlani copyWith({
+    String? kursId,
+    String? uniteId,
+    bool uniteSil = false,
+    int? gunlukDakika,
+    Set<int>? gunler,
+  }) => CalismaPlani(
+    kursId: kursId ?? this.kursId,
+    uniteId: uniteSil ? null : (uniteId ?? this.uniteId),
+    gunlukDakika: gunlukDakika ?? this.gunlukDakika,
+    gunler: gunler ?? this.gunler,
+  );
+
+  Map<String, Object?> toJson() => {
+    'kursId': kursId,
+    'uniteId': uniteId,
+    'gunlukDakika': gunlukDakika,
+    'gunler': gunler.toList()..sort(),
+  };
+
+  /// Eksik/bozuk girdide null (plan yok); asla fırlatmaz. Dakika geçersizse
+  /// 15, günler 1..7 dışındakiler atılır ve boşsa plan geçersizdir.
+  static CalismaPlani? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final k = j['kursId'];
+    if (k is! String || k.isEmpty || k.length > 120) return null;
+    final u = j['uniteId'];
+    final dk = j['gunlukDakika'];
+    final g = {
+      if (j['gunler'] is List)
+        for (final e in j['gunler'] as List)
+          if (e is int && e >= 1 && e <= 7) e,
+    };
+    if (g.isEmpty) return null;
+    return CalismaPlani(
+      kursId: k,
+      uniteId: u is String && u.isNotEmpty && u.length <= 120 ? u : null,
+      gunlukDakika: dk is int && dakikaSecenekleri.contains(dk) ? dk : 15,
+      gunler: Set.unmodifiable(g),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is CalismaPlani &&
+      other.kursId == kursId &&
+      other.uniteId == uniteId &&
+      other.gunlukDakika == gunlukDakika &&
+      other.gunler.length == gunler.length &&
+      other.gunler.containsAll(gunler);
+
+  @override
+  int get hashCode => Object.hash(
+    kursId,
+    uniteId,
+    gunlukDakika,
+    Object.hashAllUnordered(gunler),
+  );
 }

@@ -146,6 +146,11 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
   }
 
+  /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri
+  /// "atlandı" işaretlenir (XP/seri/kart yok).
+  Future<OgrenciDurumu> yerlestirmeUygula(Kurs kurs, List<int> gecilen) =>
+      _uygula((d) => Motor.yerlestirmeUygula(d, kurs, gecilen));
+
   /// Alan seçimi: yalnızca 'dil' ya da 'kod'. [ilkAcilisTamam] verilirse
   /// ilk açılış bayrağı da yazılır (akışın 1. adımı false yazar ki uygulama
   /// kapanıp açılınca akış sürsün).
@@ -234,6 +239,13 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.
   Future<OgrenciDurumu> notYaz(String kartId, String? metin) =>
       _uygula((d) => Motor.notYaz(d, kartId, metin));
+
+  /// Çalışma planını kaydeder; [plan] null ise siler.
+  Future<OgrenciDurumu> planKaydet(CalismaPlani? plan) => _uygula(
+    (d) => plan == null
+        ? d.copyWith(calismaPlaniSil: true)
+        : d.copyWith(calismaPlani: plan),
+  );
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat; `tekrarBildirimiAcik`: açılıştaki

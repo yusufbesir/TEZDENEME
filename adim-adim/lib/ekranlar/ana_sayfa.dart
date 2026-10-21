@@ -21,6 +21,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/basamak.dart';
 import '../bilesenler/bilmece_karti.dart';
+import '../bilesenler/calisma_plani_karti.dart';
 import '../bilesenler/devam_karti.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/hikaye_karti.dart';
@@ -73,7 +74,7 @@ class AnaSayfa extends ConsumerWidget {
               SizedBox(
                 width: panelGenislik,
                 height: kisit.maxHeight,
-                child: _YanPanel(durum: durum, bugun: bugun),
+                child: _YanPanel(durum: durum, bugun: bugun, kurslar: kurslar),
               ),
             ],
           );
@@ -85,8 +86,13 @@ class AnaSayfa extends ConsumerWidget {
 
 /// Yan panel: Öğrenci kartı + günlük hedef; görünür kaydırma çubuğu.
 class _YanPanel extends StatefulWidget {
-  const _YanPanel({required this.durum, required this.bugun});
+  const _YanPanel({
+    required this.durum,
+    required this.bugun,
+    required this.kurslar,
+  });
   final OgrenciDurumu durum;
+  final List<Kurs> kurslar;
   final String bugun;
 
   @override
@@ -116,6 +122,12 @@ class _YanPanelDurumu extends State<_YanPanel> {
             ProfilKarti(durum: widget.durum, bugun: widget.bugun),
             const SizedBox(height: Olcu.b2),
             _GunlukKart(durum: widget.durum, bugun: widget.bugun),
+            const SizedBox(height: Olcu.b2),
+            CalismaPlaniKarti(
+              durum: widget.durum,
+              kurslar: widget.kurslar,
+              bugun: widget.bugun,
+            ),
           ],
         ),
       ),
@@ -212,7 +224,7 @@ class _YolListesi extends StatelessWidget {
     String? siradakiId;
     for (final k in kurslar) {
       for (final d in k.tumDersler) {
-        if ((durum.tamamlanan[d.id] ?? 0) == 0) {
+        if (!Motor.dersBitmis(durum, d.id)) {
           siradakiId = d.id;
           break;
         }
@@ -298,14 +310,23 @@ class _YolListesi extends StatelessWidget {
         HikayeKarti(durum: durum, kurslar: kurslar),
         const SizedBox(height: Olcu.b3),
       ],
+      // Çalışma planı: yan panel yoksa (tek sütun) hikâye/örnek kartlarının arasında; yan
+      // panel varsa orada durur.
+      if (seritteHalka) ...[
+        CalismaPlaniKarti(durum: durum, kurslar: kurslar, bugun: bugun),
+        const SizedBox(height: Olcu.b3),
+      ],
+      // Örnek programlar kütüphanesi yalnız kod alanında.
+      if (durum.alan == 'kod') ...[
+        const _OrnekProgramlarKarti(),
+        const SizedBox(height: Olcu.b3),
+      ],
     ];
 
     var dersNo = 0;
     for (final kurs in kurslar) {
       final tumu = kurs.tumDersler.toList();
-      final kursBiten = tumu
-          .where((d) => (durum.tamamlanan[d.id] ?? 0) > 0)
-          .length;
+      final kursBiten = tumu.where((d) => Motor.dersBitmis(durum, d.id)).length;
       // Sahanlık bandı: kurs adı, alan renginde 3 px alt çizgi, biten/toplam.
       ogeler.add(
         Semantics(
@@ -338,9 +359,26 @@ class _YolListesi extends StatelessWidget {
         ),
       );
       ogeler.add(const SizedBox(height: Olcu.b2));
+      if (Motor.yerlestirmeSec(durum, kurs).isNotEmpty) {
+        ogeler.add(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              key: ValueKey('yerlestirme-${kurs.id}'),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
+              onPressed: () => context.push(
+                '/yerlestirme?kurs=${Uri.encodeComponent(kurs.id)}',
+              ),
+              icon: const Icon(Icons.fast_forward),
+              label: const Text('Seviyemi belirle'),
+            ),
+          ),
+        );
+        ogeler.add(const SizedBox(height: Olcu.b2));
+      }
       for (final unite in kurs.uniteler) {
         final biten = unite.dersler
-            .where((d) => (durum.tamamlanan[d.id] ?? 0) > 0)
+            .where((d) => Motor.dersBitmis(durum, d.id))
             .length;
         ogeler.add(
           Semantics(
@@ -374,7 +412,7 @@ class _YolListesi extends StatelessWidget {
           final ders = unite.dersler[i];
           dersNo++;
           final kez = durum.tamamlanan[ders.id] ?? 0;
-          final BasamakDurumu bd = kez > 0
+          final BasamakDurumu bd = Motor.dersBitmis(durum, ders.id)
               ? BasamakDurumu.tamam
               : (ders.id == siradakiId
                     ? BasamakDurumu.siradaki
@@ -565,6 +603,32 @@ class GununKelimesiKarti extends ConsumerWidget {
                   ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Kod alanı: "Örnek programlar" kütüphanesine giriş kartı.
+class _OrnekProgramlarKarti extends StatelessWidget {
+  const _OrnekProgramlarKarti();
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Card(
+      key: const ValueKey('ornek-programlar-karti'),
+      child: ListTile(
+        minVerticalPadding: Olcu.b1,
+        leading: Icon(Icons.code, color: r.ana),
+        title: const Text('Örnek programlar'),
+        subtitle: Text(
+          'HTML, CSS ve JavaScript için açıklamalı kısa örnekler',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: r.metinIkincil),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push('/ornekler'),
       ),
     );
   }
