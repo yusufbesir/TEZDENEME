@@ -1,6 +1,8 @@
 /// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri). Ünitenin son
 /// dersinde özetin altında "Karışık tekrar (5 soru)" önerisi çıkar
 /// (önceki ünitelerden serpiştirilmiş 5 alıştırma; XP mikro ders gibi).
+/// Her dersin sonunda ayrıca "Kısa quiz (3 soru)" düğmesi bulunur: bu
+/// oturumda yanlış yapılanlar önce, `/mikro?mod=quiz&ders=<id>&yanlis=0,3`.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -30,6 +32,9 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Bu oturumda ilk cevabı yanlış olan alıştırma indeksleri (sırayla).
+  final List<int> _yanlislar = [];
+
   Ders? _dersBul() {
     for (final k in ref.read(kurslarProvider)) {
       final d = k.dersBul(widget.dersId);
@@ -43,6 +48,13 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
       Motor.serpistirmeSec(ref.read(kurslarProvider), ders.id).isNotEmpty;
 
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
+
+  /// Kısa quiz rotası: ders kimliği ve yanlış indeksleri sorgu parametresinde.
+  String _quizRotasi(Ders ders) {
+    final yanlis = _yanlislar.join(',');
+    return '/mikro?mod=quiz&ders=${Uri.encodeComponent(ders.id)}'
+        '${yanlis.isEmpty ? '' : '&yanlis=$yanlis'}';
+  }
 
   Future<void> _kapatOnayi() async {
     final cik = await showDialog<bool>(
@@ -106,6 +118,8 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                         '/mikro?mod=karisik&ders=${Uri.encodeComponent(ders.id)}',
                       )
                     : null,
+                ek2Etiket: 'Kısa quiz (${Motor.quizAdet} soru)',
+                onEk2: () => context.push(_quizRotasi(ders)),
               )
             : AlistirmaOturumu(
                 alistirmalar: ders.alistirmalar,
@@ -114,9 +128,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                     .read(durumProvider)
                     .value
                     ?.kelimeNotlari[ders.kartKimligi(i)],
-                onSonuc: (i, dogru) => ref
-                    .read(durumProvider.notifier)
-                    .kartIsle(ders.kartKimligi(i), dogru),
+                onSonuc: (i, dogru) {
+                  if (!dogru) _yanlislar.add(i);
+                  ref
+                      .read(durumProvider.notifier)
+                      .kartIsle(ders.kartKimligi(i), dogru);
+                },
                 onBitti: (d, t) => _bitir(ders, d, t),
                 onKapat: _kapatOnayi,
               ),

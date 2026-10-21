@@ -1,6 +1,7 @@
 /// Öğrenme motoru: XP, seviye, esnek seri ve haftalık hedef, yarı ömür tabanlı
 /// aralıklı tekrar, hata defteri, öğrenme günlüğü, serpiştirilmiş ünite
-/// tekrarı, kelime notları, kademeli ipucu ve cevap kontrolü.
+/// tekrarı, kelime notları, kademeli ipucu, cevap kontrolü, ders sonu kısa
+/// quiz ve günün bilmecesi.
 /// Saf Dart; Flutter'a bağımlı değildir. Tüm işlevler yan etkisizdir.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
@@ -212,7 +213,8 @@ abstract final class Motor {
   }
 
   /// Verilen günün günlük özeti: kayıt sayısı (ders + mikro + tekrar +
-  /// yarışma), doğru/toplam ve XP toplamları. Kayıt yoksa sıfırlar.
+  /// yarışma + quiz + bilmece), doğru/toplam ve XP toplamları. Kayıt yoksa
+  /// sıfırlar.
   static ({int dersler, int dogru, int toplam, int xp}) gunlukOzeti(
     OgrenciDurumu d,
     String gun,
@@ -277,6 +279,141 @@ abstract final class Motor {
         tur: GunlukKayit.turMikro,
         dogru: dogru,
         toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
+  /// Ders sonu kısa quizin soru sayısı.
+  static const int quizAdet = 3;
+
+  /// Kısa quiz seçimi: [ders]in alıştırmalarından en çok [adet] tane. Önce bu
+  /// oturumda yanlış yapılan indeksler ([yanlislar], verilen sırayla, geçersiz
+  /// ve yinelenenler atlanır), kalan yer dersin diğer alıştırmalarından indeks
+  /// sırasıyla doldurulur. Ders [adet]ten az alıştırmaysa hepsi gelir.
+  static List<({String kartId, Alistirma alistirma})> quizSec(
+    Ders ders,
+    List<int> yanlislar, {
+    int adet = quizAdet,
+  }) {
+    final sonuc = <({String kartId, Alistirma alistirma})>[];
+    if (adet <= 0) return sonuc;
+    final alinan = <int>{};
+    void al(int i) {
+      if (sonuc.length >= adet) return;
+      if (i < 0 || i >= ders.alistirmalar.length) return;
+      if (!alinan.add(i)) return;
+      sonuc.add((kartId: ders.kartKimligi(i), alistirma: ders.alistirmalar[i]));
+    }
+
+    for (final i in yanlislar) {
+      al(i);
+    }
+    for (var i = 0; i < ders.alistirmalar.length; i++) {
+      al(i);
+    }
+    return sonuc;
+  }
+
+  /// '0,3,5' biçimindeki yanlış indeks listesini çözer; bozuk parçalar atlanır.
+  static List<int> yanlisListesiCoz(String? metin) {
+    if (metin == null || metin.trim().isEmpty) return const [];
+    return [
+      for (final p in metin.split(','))
+        if (int.tryParse(p.trim()) case final i? when i >= 0) i,
+    ];
+  }
+
+  /// Kısa quizin kazandıracağı XP: doğru başına 1 (3 doğru = +3). Küçük tutulur;
+  /// quiz dersin kart (SRS) durumunu değiştirmez, yalnızca pekiştirir.
+  static int quizXp(int dogru, int toplam) {
+    final t = toplam < 0 ? 0 : toplam;
+    return dogru < 0 ? 0 : (dogru > t ? t : dogru);
+  }
+
+  /// Kısa quiz bitişi: XP/seri işlenir (kartlar ve `tamamlanan` değişmez),
+  /// günlüğe 'quiz' kaydı (id = dersId) eklenir. Toplam 0 ise durum değişmez.
+  static OgrenciDurumu quizBitir(
+    OgrenciDurumu d,
+    String dersId,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) {
+    if (toplam <= 0) return d;
+    final xp = quizXp(dogru, toplam);
+    return gunlukEkle(
+      _kazancIsle(d, xp, bugun),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turQuiz,
+        id: dersId,
+        dogru: quizXp(dogru, toplam),
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
+  /// Günün bilmecesinin doğru cevaba XP'si.
+  static const int bilmeceXp = 2;
+
+  /// FNV-1a (32 bit) benzeri basit, platformdan bağımsız metin özeti
+  /// (Sozluk.gununKelimesi ile aynı kalıp); deterministik günlük seçimlerde.
+  static int metinOzeti(String s) {
+    var h = 0x811c9dc5;
+    for (final r in s.runes) {
+      h ^= r;
+      h = (h * 0x01000193) & 0xffffffff;
+    }
+    return h;
+  }
+
+  /// Günün bilmecesi: [kurslar]daki tüm Secim alıştırmaları arasından [bugun]
+  /// metninin özetiyle deterministik seçilen tek soru; Secim yoksa null.
+  static ({String kartId, Secim secim})? bilmeceSec(
+    List<Kurs> kurslar,
+    String bugun,
+  ) {
+    final havuz = <({String kartId, Secim secim})>[];
+    for (final k in kurslar) {
+      for (final ders in k.tumDersler) {
+        for (var i = 0; i < ders.alistirmalar.length; i++) {
+          final a = ders.alistirmalar[i];
+          if (a is Secim) havuz.add((kartId: ders.kartKimligi(i), secim: a));
+        }
+      }
+    }
+    if (havuz.isEmpty) return null;
+    return havuz[metinOzeti(bugun.trim()) % havuz.length];
+  }
+
+  /// Bugünün bilmecesi henüz cevaplanmadıysa true.
+  static bool bilmeceCevaplanabilir(OgrenciDurumu d, String bugun) =>
+      d.bilmece?.gun != bugun;
+
+  /// Günün bilmecesini cevaplar: aynı gün ikinci cevap reddedilir (durum
+  /// değişmez). Doğruda +[bilmeceXp] XP ve seri işlenir; yanlışta XP yok.
+  /// Her iki durumda günlüğe 'bilmece' kaydı (dogru 0/1, toplam 1) eklenir
+  /// ve `bilmece` alanı güne yazılır. Kartlar değişmez.
+  static OgrenciDurumu bilmeceCevapla(
+    OgrenciDurumu d,
+    bool dogruMu,
+    String bugun,
+  ) {
+    if (!OgrenciDurumu.gunGecerli(bugun)) return d;
+    if (!bilmeceCevaplanabilir(d, bugun)) return d;
+    final xp = dogruMu ? bilmeceXp : 0;
+    final temel = dogruMu ? _kazancIsle(d, xp, bugun) : d;
+    return gunlukEkle(
+      temel.copyWith(
+        bilmece: BilmeceDurumu(gun: bugun, dogru: dogruMu),
+      ),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turBilmece,
+        dogru: dogruMu ? 1 : 0,
+        toplam: 1,
         xp: xp,
       ),
     );

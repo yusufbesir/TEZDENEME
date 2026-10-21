@@ -1,10 +1,10 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
-/// haftalık hedef, tamamlanan dersler, son açılan ders, öğrenme günlüğü ve
-/// kelime notları (kişisel mnemonikler).
+/// haftalık hedef, tamamlanan dersler, son açılan ders, öğrenme günlüğü,
+/// kelime notları (kişisel mnemonikler) ve günün bilmecesi cevabı.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
-/// haftalık hedef 5, son ders yok, günlük boş, not yok).
+/// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -142,8 +142,9 @@ class HataKaydi {
   }
 }
 
-/// Öğrenme günlüğü kaydı: bitirilen bir ders, mikro ders, tekrar oturumu ya da
-/// yarışma. Günlük, en çok [enCok] kayıt tutar; en eskisi düşer.
+/// Öğrenme günlüğü kaydı: bitirilen bir ders, mikro ders, tekrar oturumu,
+/// yarışma, ders sonu kısa quiz ya da günün bilmecesi. Günlük, en çok [enCok]
+/// kayıt tutar; en eskisi düşer.
 class GunlukKayit {
   const GunlukKayit({
     required this.gun,
@@ -158,7 +159,16 @@ class GunlukKayit {
   static const String turMikro = 'mikro';
   static const String turTekrar = 'tekrar';
   static const String turYarisma = 'yarisma';
-  static const List<String> turler = [turDers, turMikro, turTekrar, turYarisma];
+  static const String turQuiz = 'quiz';
+  static const String turBilmece = 'bilmece';
+  static const List<String> turler = [
+    turDers,
+    turMikro,
+    turTekrar,
+    turYarisma,
+    turQuiz,
+    turBilmece,
+  ];
 
   /// En çok saklanan kayıt sayısı; en eskisi düşer.
   static const int enCok = 200;
@@ -169,10 +179,10 @@ class GunlukKayit {
   /// Kaydın günü 'YYYY-MM-DD'.
   final String gun;
 
-  /// 'ders' | 'mikro' | 'tekrar' | 'yarisma'.
+  /// 'ders' | 'mikro' | 'tekrar' | 'yarisma' | 'quiz' | 'bilmece'.
   final String tur;
 
-  /// Ders kimliği (ders) ya da kategori (yarışma); diğerlerinde null.
+  /// Ders kimliği (ders, quiz) ya da kategori (yarışma); diğerlerinde null.
   final String? id;
 
   /// Doğru cevap sayısı ve toplam soru; yarışmada bilinmiyorsa 0/0.
@@ -211,6 +221,30 @@ class GunlukKayit {
   }
 }
 
+/// Günün bilmecesinin cevabı: hangi gün cevaplandı ve doğru muydu.
+/// Aynı gün ikinci cevap kabul edilmez (Motor.bilmeceCevapla).
+class BilmeceDurumu {
+  const BilmeceDurumu({required this.gun, required this.dogru});
+
+  /// Cevabın günü 'YYYY-MM-DD'.
+  final String gun;
+
+  /// Cevap doğru muydu?
+  final bool dogru;
+
+  Map<String, Object?> toJson() => {'gun': gun, 'dogru': dogru};
+
+  /// Bozuk kaydı null döndürür (cevaplanmamış sayılır).
+  static BilmeceDurumu? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final gun = j['gun'];
+    final dogru = j['dogru'];
+    if (gun is! String || !OgrenciDurumu.gunGecerli(gun)) return null;
+    if (dogru is! bool) return null;
+    return BilmeceDurumu(gun: gun, dogru: dogru);
+  }
+}
+
 class OgrenciDurumu {
   const OgrenciDurumu({
     this.xp = 0,
@@ -231,6 +265,7 @@ class OgrenciDurumu {
     this.sonDersId,
     this.gunluk = const [],
     this.kelimeNotlari = const {},
+    this.bilmece,
   });
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -273,6 +308,9 @@ class OgrenciDurumu {
   /// Kelimeye kişisel not (mnemonik): kart kimliği ('dersId#i') -> not metni
   /// (en çok [notEnCokKarakter] karakter). Eski kayıtlarda boş.
   final Map<String, String> kelimeNotlari;
+
+  /// Günün bilmecesinin son cevabı; null: hiç cevaplanmadı (eski kayıtlar).
+  final BilmeceDurumu? bilmece;
 
   static final _gunDeseni = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
@@ -317,6 +355,7 @@ class OgrenciDurumu {
     String? sonDersId,
     List<GunlukKayit>? gunluk,
     Map<String, String>? kelimeNotlari,
+    BilmeceDurumu? bilmece,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -339,6 +378,7 @@ class OgrenciDurumu {
       sonDersId: sonDersId ?? this.sonDersId,
       gunluk: gunluk ?? this.gunluk,
       kelimeNotlari: kelimeNotlari ?? this.kelimeNotlari,
+      bilmece: bilmece ?? this.bilmece,
     );
   }
 
@@ -362,6 +402,7 @@ class OgrenciDurumu {
     'sonDersId': sonDersId,
     'gunluk': [for (final g in gunluk) g.toJson()],
     'kelimeNotlari': kelimeNotlari,
+    'bilmece': bilmece?.toJson(),
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -475,6 +516,7 @@ class OgrenciDurumu {
           : null,
       gunluk: List.unmodifiable(sonGunluk),
       kelimeNotlari: Map.unmodifiable(notlar),
+      bilmece: BilmeceDurumu.fromJson(j['bilmece']),
     );
   }
 }

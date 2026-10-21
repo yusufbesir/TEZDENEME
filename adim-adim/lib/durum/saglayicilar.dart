@@ -1,6 +1,7 @@
 /// Riverpod sağlayıcıları: depo, bugün, kurslar, öğrenci durumu ve alan kursları.
 /// Durum yazımları (ders, mikro ders, yarışma, tekrar oturumu, kart, ayarlar;
-/// hata defteri, öğrenme günlüğü, kelime notu ve haftalık hedef dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
+/// hata defteri, öğrenme günlüğü, kelime notu, haftalık hedef, kısa quiz ve
+/// günün bilmecesi dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -157,6 +158,19 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> tekrarBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.tekrarBitir(d, dogru, toplam, bugun));
+  }
+
+  /// Ders sonu kısa quiz bitişi: küçük XP ve günlüğe 'quiz' kaydı; kartlar
+  /// ve `tamamlanan` değişmez.
+  Future<OgrenciDurumu> quizBitir(String dersId, int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.quizBitir(d, dersId, dogru, toplam, bugun));
+  }
+
+  /// Günün bilmecesini cevaplar; aynı gün ikinci cevap durumu değiştirmez.
+  Future<OgrenciDurumu> bilmeceCevapla(bool dogruMu) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.bilmeceCevapla(d, dogruMu, bugun));
   }
 
   Future<OgrenciDurumu> kartIsle(String kartId, bool dogruMu) {
