@@ -7,6 +7,7 @@ import 'eslestir.dart';
 import 'kod.dart';
 import 'secim.dart';
 import 'sirala.dart';
+import 'soyle.dart';
 import 'yaz.dart';
 
 /// Alıştırma türüne göre doğru widget'ı seçer.
@@ -61,6 +62,12 @@ class AlistirmaKarti extends StatelessWidget {
       alistirma: a,
       kontrolEdildi: kontrolEdildi,
       onCevap: onCevap,
+    ),
+    final Soyle a => SoyleGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      onCevap: onCevap,
+      onGonder: onGonder,
     ),
     final Kod a => KodGorunumu(
       alistirma: a,

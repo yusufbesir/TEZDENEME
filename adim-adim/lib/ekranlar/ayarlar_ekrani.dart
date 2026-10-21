@@ -394,6 +394,18 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 value: durum.tekrarBildirimiAcik,
                 onChanged: (v) => notifier.ayarGuncelle(tekrarBildirimiAcik: v),
               ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.mic_none, color: r.ana),
+                title: const Text('Konuşma alıştırmaları'),
+                subtitle: Text(
+                  durum.konusmaAcik
+                      ? 'Derslerde cümleleri yüksek sesle söylersin'
+                      : 'Kapalı: konuşma alıştırmaları derste atlanır',
+                ),
+                value: durum.konusmaAcik,
+                onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
+              ),
               bolum('Veriler'),
               Text(
                 'Tüm verilerin yalnızca bu cihazda saklanır.',

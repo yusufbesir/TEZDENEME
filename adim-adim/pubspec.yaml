@@ -44,6 +44,8 @@ dependencies:
   timezone: ^0.10.1
   flutter_localizations:
     sdk: flutter
+  sherpa_onnx: ^1.13.8
+  record: ^6.2.1
 
 dev_dependencies:
   flutter_test:

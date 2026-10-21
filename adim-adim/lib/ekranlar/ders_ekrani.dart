@@ -96,12 +96,24 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     );
   }
 
+  /// Dersin gösterilecek alıştırmalarının özgün indeksleri. Ayarlarda konuşma
+  /// alıştırmaları kapalıysa [Soyle] olanlar çıkarılır (kart kimliği ve quiz
+  /// için özgün indeks korunur).
+  List<int> _gosterilenler(Ders ders) {
+    final acik = ref.watch(durumProvider).value?.konusmaAcik ?? true;
+    return [
+      for (var i = 0; i < ders.alistirmalar.length; i++)
+        if (acik || ders.alistirmalar[i] is! Soyle) i,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final ders = _dersBul();
+    final idx = ders == null ? const <int>[] : _gosterilenler(ders);
     return Scaffold(
       body: SafeArea(
-        child: ders == null || ders.alistirmalar.isEmpty
+        child: ders == null || idx.isEmpty
             ? _Bulunamadi(onGeri: _cik)
             : _ozet != null
             ? DersOzeti(
@@ -122,17 +134,18 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                 onEk2: () => context.push(_quizRotasi(ders)),
               )
             : AlistirmaOturumu(
-                alistirmalar: ders.alistirmalar,
+                alistirmalar: [for (final i in idx) ders.alistirmalar[i]],
                 // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
                 notGetir: (i) => ref
                     .read(durumProvider)
                     .value
-                    ?.kelimeNotlari[ders.kartKimligi(i)],
+                    ?.kelimeNotlari[ders.kartKimligi(idx[i])],
                 onSonuc: (i, dogru) {
-                  if (!dogru) _yanlislar.add(i);
+                  final ozgun = idx[i];
+                  if (!dogru) _yanlislar.add(ozgun);
                   ref
                       .read(durumProvider.notifier)
-                      .kartIsle(ders.kartKimligi(i), dogru);
+                      .kartIsle(ders.kartKimligi(ozgun), dogru);
                 },
                 onBitti: (d, t) => _bitir(ders, d, t),
                 onKapat: _kapatOnayi,

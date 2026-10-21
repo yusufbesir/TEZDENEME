@@ -275,6 +275,7 @@ class OgrenciDurumu {
     bool? ilkAcilisTamam,
     this.sonTekrarBildirimGunu,
     this.tekrarBildirimiAcik = true,
+    this.konusmaAcik = true,
     this.tamamlananHikayeler = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
@@ -333,6 +334,10 @@ class OgrenciDurumu {
   /// Açılışta bekleyen tekrar sayısı bildirilsin mi? Varsayılan true.
   final bool tekrarBildirimiAcik;
 
+  /// Konuşma alıştırmaları (Soyle) derse dahil edilsin mi? Varsayılan true;
+  /// kapalıysa ders akışında bu alıştırmalar çıkarılır.
+  final bool konusmaAcik;
+
   /// Okuma hikâyeleri: hikâye kimliği -> kaç kez tamamlandı (eski kayıtta boş).
   final Map<String, int> tamamlananHikayeler;
 
@@ -388,6 +393,7 @@ class OgrenciDurumu {
     bool? ilkAcilisTamam,
     String? sonTekrarBildirimGunu,
     bool? tekrarBildirimiAcik,
+    bool? konusmaAcik,
     Map<String, int>? tamamlananHikayeler,
   }) {
     return OgrenciDurumu(
@@ -416,6 +422,7 @@ class OgrenciDurumu {
       sonTekrarBildirimGunu:
           sonTekrarBildirimGunu ?? this.sonTekrarBildirimGunu,
       tekrarBildirimiAcik: tekrarBildirimiAcik ?? this.tekrarBildirimiAcik,
+      konusmaAcik: konusmaAcik ?? this.konusmaAcik,
       tamamlananHikayeler: tamamlananHikayeler ?? this.tamamlananHikayeler,
     );
   }
@@ -444,6 +451,7 @@ class OgrenciDurumu {
     'ilkAcilisTamam': ilkAcilisTamam,
     'sonTekrarBildirimGunu': sonTekrarBildirimGunu,
     'tekrarBildirimiAcik': tekrarBildirimiAcik,
+    'konusmaAcik': konusmaAcik,
     'tamamlananHikayeler': tamamlananHikayeler,
   };
 
@@ -572,6 +580,7 @@ class OgrenciDurumu {
       tekrarBildirimiAcik: j['tekrarBildirimiAcik'] is bool
           ? j['tekrarBildirimiAcik'] as bool
           : true,
+      konusmaAcik: j['konusmaAcik'] is bool ? j['konusmaAcik'] as bool : true,
       // Eski kayıtta yoksa boş; anahtar hikâye kimliği ('#' içermez).
       tamamlananHikayeler: sayac(
         j['tamamlananHikayeler'],

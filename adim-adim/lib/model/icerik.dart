@@ -2,8 +2,12 @@
 ///
 /// Alıştırma türleri (eski HTML sürümünün şemasıyla uyumlu):
 /// secim, bosluk, yaz, sirala, eslestir, dinle (yeni: metin okunur, kullanıcı
-/// duyduğunu seçer), kod (yeni: kod parçasındaki boşluğu doldurur).
+/// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur).
 library;
+
+/// Dinle/Soyle alıştırmalarında konuşma ve tanıma dili (BCP-47) varsayılanı.
+/// Korece/Japonca/Çince kursları 'ko-KR' / 'ja-JP' / 'zh-CN' verir.
+const String varsayilanSesDili = 'en-US';
 
 sealed class Alistirma {
   const Alistirma({
@@ -83,6 +87,16 @@ sealed class Alistirma {
           okunacak: j['okunacak'] as String,
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
+          dil: j['dil'] as String? ?? varsayilanSesDili,
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'soyle':
+        return Soyle(
+          soru: soru,
+          metin: j['metin'] as String,
+          ceviri: j['ceviri'] as String,
+          dil: j['dil'] as String? ?? varsayilanSesDili,
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -223,12 +237,16 @@ class Dinle extends Alistirma {
     required this.okunacak,
     required this.secenekler,
     required this.dogru,
+    this.dil = varsayilanSesDili,
     super.aciklama,
     super.ipuclari,
   });
   final String okunacak;
   final List<String> secenekler;
   final int dogru;
+
+  /// Okuma (TTS) dili; yalnız varsayılandan farklıysa JSON'a yazılır.
+  final String dil;
   @override
   String get tur => 'dinle';
   @override
@@ -238,6 +256,51 @@ class Dinle extends Alistirma {
     'okunacak': okunacak,
     'secenekler': secenekler,
     'dogru': dogru,
+    if (dil != varsayilanSesDili) 'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// "Atla" cevabı: konuşma tanıma yokken `Soyle` alıştırması nötr geçilir
+/// (oturum sonucu bildirmez; SRS'e yanlış yazılmaz).
+final class SoyleAtlandi {
+  const SoyleAtlandi();
+}
+
+/// Konuşma / telaffuz: `dil` dilindeki `metin` yüksek sesle söylenir, tanınan metin
+/// kelime kelime puanlanır (`telaffuzPuani`). `soru` yönergedir, `ceviri`
+/// Türkçe anlamıdır. Cevap: bool (eşik geçildi mi) ya da [atla].
+class Soyle extends Alistirma {
+  const Soyle({
+    required super.soru,
+    required this.metin,
+    required this.ceviri,
+    this.dil = varsayilanSesDili,
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String metin;
+  final String ceviri;
+
+  /// Okuma ve konuşma tanıma dili; yalnız varsayılandan farklıysa JSON'a yazılır.
+  final String dil;
+
+  /// Atla cevabı (tek örnek).
+  static const SoyleAtlandi atla = SoyleAtlandi();
+
+  /// Bir alıştırmanın en çok kaç deneme hakkı olduğu.
+  static const int enCokDeneme = 3;
+
+  @override
+  String get tur => 'soyle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'metin': metin,
+    'ceviri': ceviri,
+    if (dil != varsayilanSesDili) 'dil': dil,
     'aciklama': aciklama,
     if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };

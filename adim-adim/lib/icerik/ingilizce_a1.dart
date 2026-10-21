@@ -89,6 +89,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'name' 'neym' diye okunur ve 'ad' demektir; 'game' (oyun) ile karıştırma, 'my name is' kendini tanıtma kalıbıdır.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'Good morning, nice to meet you.',
+              ceviri: 'Günaydın, tanıştığımıza memnun oldum.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
@@ -179,6 +185,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'Spain' 'speyn' gibi okunur; 'from' sözcüğü 'nereden' anlamına gelir ve 'she is from' kalıbı kökeni söyler.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'I am from Turkey.',
+              ceviri: "Türkiye'denim.",
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
       ],
@@ -261,6 +273,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'seven' 'sevın' gibi okunur; 'I have' 'sahibim' demektir ve 'cats' sonundaki s sesiyle çoğul olur.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'I have six cats.',
+              ceviri: 'Altı kedim var.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
@@ -339,6 +357,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 1,
               aciklama:
                   "'blue' 'blu:' diye okunur, 'car' ise 'ka:r' gibi; cümle arabanın mavi olduğunu söyler.",
+            ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'My bag is black.',
+              ceviri: 'Çantam siyah.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
             ),
           ],
         ),
@@ -427,6 +451,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'brother' 'bradhır' gibi okunur (th sesi dil uçtadır); 'tall' boyu uzun anlamına gelir.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'This is my sister.',
+              ceviri: 'Bu benim kız kardeşim.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
@@ -505,6 +535,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 2,
               aciklama:
                   "'kitchen' 'kiçın' gibi okunur; 'small' 'smol' diye okunur ve 'küçük' demektir.",
+            ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'The table is in the kitchen.',
+              ceviri: 'Masa mutfakta.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
             ),
           ],
         ),

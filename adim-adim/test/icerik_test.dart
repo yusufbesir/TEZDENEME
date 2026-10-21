@@ -11,12 +11,15 @@ Iterable<Alistirma> _alistirmalar() => _dersler().expand((d) => d.alistirmalar);
 List<String> _sirali(List<String> l) => [...l]..sort();
 
 void main() {
-  test('yedi kurs ve kursBul', () {
+  test('on kurs ve kursBul', () {
     expect(tumKurslar.map((k) => k.id), [
       'ingilizce-1',
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'korece-1',
+      'japonca-1',
+      'cince-1',
       'html-1',
       'css-1',
       'js-1',
@@ -27,6 +30,9 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
+    for (final k in [koreceA1, japoncaA1, cinceA1]) {
+      expect(k.alan, KursAlani.dil);
+    }
     for (final k in [html1, css1, js1]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -50,9 +56,10 @@ void main() {
     expect(idler.toSet().length, idler.length);
   });
 
-  test('her ders 8-10 alıştırma içerir', () {
+  test('her ders 8-10 alıştırma içerir (konuşma alıştırması ayrı sayılır)', () {
     for (final d in _dersler()) {
-      expect(d.alistirmalar.length, inInclusiveRange(8, 10), reason: d.id);
+      final sayi = d.alistirmalar.where((a) => a is! Soyle).length;
+      expect(sayi, inInclusiveRange(8, 10), reason: d.id);
     }
   });
 

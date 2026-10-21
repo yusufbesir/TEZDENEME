@@ -18,6 +18,7 @@ import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
 import '../servis/bildirim.dart';
+import '../servis/konusma.dart';
 import '../servis/ses.dart';
 import '../sozluk/sozluk.dart';
 import '../yarisma/model.dart';
@@ -28,6 +29,10 @@ final depoProvider = Provider<Depo>(
 );
 
 final sesProvider = Provider<Ses>((ref) => Ses());
+
+/// Konuşma tanıma servisi. Gerçek motor (sherpa-onnx) `main.dart` ya da
+/// uygulama kökünde override edilir; varsayılan "motor yok".
+final konusmaProvider = Provider<KonusmaTanima>((ref) => const KonusmaYok());
 
 final bildirimProvider = Provider<BildirimServisi>(
   (ref) => const GercekBildirim(),
@@ -244,6 +249,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
     bool? tekrarBildirimiAcik,
+    bool? konusmaAcik,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -259,6 +265,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         hatirlatmaSaati: hatirlatmaSaati,
         hatirlatmaSil: hatirlatmaSil,
         tekrarBildirimiAcik: tekrarBildirimiAcik,
+        konusmaAcik: konusmaAcik,
       ),
     );
     final bildirim = ref.read(bildirimProvider);

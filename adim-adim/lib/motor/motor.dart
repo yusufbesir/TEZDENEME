@@ -737,6 +737,7 @@ abstract final class Motor {
     Bosluk() => a.secenekler[a.dogru],
     Dinle() => a.secenekler[a.dogru],
     Kod() => a.secenekler[a.dogru],
+    Soyle() => a.metin,
     Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
     Sirala() => a.dogru.join(' '),
     Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
@@ -760,6 +761,7 @@ abstract final class Motor {
       Eslestir() => 'Bildiklerini önce eşle',
       Dinle() => 'Bir kez daha dinle, sonra yaz',
       Kod() => 'Söz dizimini kontrol et',
+      Soyle() => 'Önce dinle, sonra yavaş ve net söyle',
     };
   }
 
@@ -785,6 +787,7 @@ abstract final class Motor {
       Secim() => yanlisEle(a.secenekler, a.dogru),
       Dinle() => yanlisEle(a.secenekler, a.dogru),
       Kod() => yanlisEle(a.secenekler, a.dogru),
+      Soyle() => 'İlk kelime: ${a.metin.split(' ').first}',
       Sirala() =>
         a.dogru.isEmpty
             ? 'Cümle büyük harfle başlar, noktalama ile biter'
@@ -953,6 +956,8 @@ abstract final class Motor {
         return cevap is int && cevap == a.dogru;
       case Kod():
         return cevap is int && cevap == a.dogru;
+      case Soyle():
+        return cevap == true;
       case Yaz():
         if (cevap is! String) return false;
         final c = _normalle(cevap);
