@@ -1,0 +1,19 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Hesabım{% endblock %}
+{% block icerik %}
+<h1>Hesabım</h1>
+<div class="kart">
+  <h2>İki adımlı doğrulama (MFA)</h2>
+  {% if mfa_acik %}
+  <p>Durum: <strong>açık</strong>.</p>
+  <div class="eylemler"><a class="dugme ikincil" href="{% url 'panel:hesap_mfa_sifirla' %}">MFA'yı kapat / sıfırla</a></div>
+  {% else %}
+  <p>Durum: <strong>kapalı</strong>.{% if mfa_zorunlu %} Bir sonraki girişte kurulum istenecek.{% endif %}</p>
+  <div class="eylemler"><a class="dugme" href="{% url 'panel:hesap_mfa_kur' %}">MFA kur</a></div>
+  {% endif %}
+</div>
+<div class="kart">
+  <h2>Parola</h2>
+  <div class="eylemler"><a class="dugme" href="{% url 'panel:parola_degistir' %}">Parolayı değiştir</a></div>
+</div>
+{% endblock %}

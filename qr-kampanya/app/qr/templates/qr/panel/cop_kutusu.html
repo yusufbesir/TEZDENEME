@@ -1,0 +1,41 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Çöp kutusu{% endblock %}
+{% block icerik %}
+<h1>Çöp kutusu</h1>
+<p class="yardim">Çöpteki kodlar taranınca "kullanımda değil" yanıtı verir (HTTP 410). Kalıcı silme yoktur; kısa kodlar başka bir kayda verilmez.
+  Geri yüklenen kod, çöpe atılmadan önceki durumuna döner.</p>
+{% if perms.qr.change_qrkod %}
+<form method="post" action="{% url 'panel:cop_geri_yukle' %}" data-toplu="secili">
+  {% csrf_token %}
+  <div class="eylemler">
+    <span>Seçili: <strong data-secili-sayac="secili">0</strong></span>
+    <button type="submit" class="dugme ikincil kucuk">Seçilenleri geri yükle</button>
+  </div>
+{% endif %}
+  <div class="tablo-kap">
+  <table>
+    <thead><tr>
+      {% if perms.qr.change_qrkod %}<th class="secim-sutunu"><input type="checkbox" data-hepsini-sec="secili" aria-label="Tümünü seç"></th>{% endif %}
+      <th>Kısa kod</th><th>Ad</th><th>Hedef</th><th>Çöpe taşınma</th><th>Önceki durum</th>{% if perms.qr.change_qrkod %}<th>İşlem</th>{% endif %}
+    </tr></thead>
+    <tbody>
+    {% for q in sayfa %}
+    <tr>
+      {% if perms.qr.change_qrkod %}<td><input type="checkbox" name="secili" value="{{ q.pk }}" aria-label="{{ q.kisa_kod }} seç"></td>{% endif %}
+      <td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td>
+      <td>{{ q.ad }}</td>
+      <td>{% if q.hedef_turu == "sayfa" %}Sayfa: {{ q.sayfa.baslik }}{% else %}{{ q.hedef_url|truncatechars:50 }}{% endif %}</td>
+      <td>{{ q.cope_atilma|date:"d.m.Y H:i"|default:"-" }}</td>
+      <td>{{ q.onceki_durum_metni|default:"-" }}</td>
+      {% if perms.qr.change_qrkod %}<td><button type="submit" form="gy-{{ q.pk }}" class="dugme ikincil kucuk">Geri yükle</button></td>{% endif %}
+    </tr>
+    {% empty %}<tr><td colspan="7">Çöp kutusu boş.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% if perms.qr.change_qrkod %}</form>
+{% for q in sayfa %}
+<form method="post" action="{% url 'panel:cop_geri_yukle' %}" id="gy-{{ q.pk }}">{% csrf_token %}<input type="hidden" name="secili" value="{{ q.pk }}"></form>
+{% endfor %}{% endif %}
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

@@ -1,0 +1,148 @@
+# ORTA bulgular: ham kanıt (gerçek rclone 1.75.0 + rclone serve sftp 127.0.0.1; gerçek docker + qr-kampanya-yedek:e2e8). Gizli bilgi yok.
+
+## bash -n scripts/*.sh: OK
+
+## Birim testleri (python manage.py test qr, QR_TEST_RCLONE ayarlı)
+----------------------------------------------------------------------
+Ran 320 tests in 47.158s
+
+OK
+Destroying test database for alias 'default'...
+
+## disari-kopyala.sh e2e
+=== ORTA 1: yerel/aynı makine/belirsiz hedefler (hepsi 'sunucu dışı SAYILMADI' + silme YOK beklenir) ===
+makine: hostname=vm ip=192.0.2.2
+--- HEDEF=sflocalhost:
+UYARI: YEDEK_UZAK_HEDEF (sflocalhost) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026/10/15 18:06:49 ERROR : No common hash found - not using a hash for checks
+2026-10-15T18:06:50+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → sflocalhost; yerel yedek SİLİNMEDİ
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfhash:
+UYARI: YEDEK_UZAK_HEDEF (sfhash) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026-10-15T18:06:51+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → sfhash; yerel yedek SİLİNMEDİ
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfname:
+UYARI: YEDEK_UZAK_HEDEF (sfname) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026/10/15 18:06:51 ERROR : No common hash found - not using a hash for checks
+2026-10-15T18:06:51+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → sfname; yerel yedek SİLİNMEDİ
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfip:
+UYARI: YEDEK_UZAK_HEDEF (sfip) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026/10/15 18:06:52 CRITICAL: Failed to create file system for "sfip:": NewFs: couldn't connect SSH: dial tcp 192.0.2.2:52222: connect: connection refused
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=yokad:kova
+UYARI: YEDEK_UZAK_HEDEF (yokad) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: uzak türü belirlenemedi (ad listremotes'ta yok veya listremotes hata verdi)
+2026/10/15 18:06:52 CRITICAL: Failed to create file system for "yokad:kova": didn't find section in config file ("yokad")
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfuzak,host=localhost:
+UYARI: YEDEK_UZAK_HEDEF (sfuzak) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: adlandırılmış uzak ad bağlantı dizesi seçenekleri içeriyor (seçenekler ayarı geçersiz kılar; belirsiz sayıldı)
+2026/10/15 18:06:52 ERROR : No common hash found - not using a hash for checks
+2026-10-15T18:06:52+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → sfuzak; yerel yedek SİLİNMEDİ
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfhash,host=203.0.113.9:
+UYARI: YEDEK_UZAK_HEDEF (sfhash) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: adlandırılmış uzak ad bağlantı dizesi seçenekleri içeriyor (seçenekler ayarı geçersiz kılar; belirsiz sayıldı)
+2026/10/15 18:06:55 CRITICAL: Failed to create file system for "sfhash,host=203.0.113.9:": NewFs: couldn't connect SSH: dial tcp 203.0.113.9:52222: i/o timeout
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=:sftp,host=localhost,port=52222,user=t:
+UYARI: YEDEK_UZAK_HEDEF ((adsız)) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026/10/15 18:06:55 CRITICAL: Failed to create file system for ":sftp,host=localhost,port=52222,user=t:": couldn't connect to ssh-agent: SSH agent requested but SSH_AUTH_SOCK not-specified
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=:sftp,host='<makine-ip>',port=52222,user=t:
+UYARI: YEDEK_UZAK_HEDEF ((adsız)) bu sunucudaki bir klasör/adres görünüyor veya sunucu dışı olduğu güvenle belirlenemedi; sunucu dışı SAYILMADI.
+       Neden: host alanı bu makineyi gösteriyor (localhost/loopback/makine adı veya IP'si)
+2026/10/15 18:06:55 CRITICAL: Failed to create file system for ":sftp,host='192.0.2.2',port=52222,user=t:": couldn't connect to ssh-agent: SSH agent requested but SSH_AUTH_SOCK not-specified
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+--- HEDEF=sfuzak: (203.0.113.9: başka makine; sunucu dışı SAYILIR, kopyalama bağlantı kurulamadığı için hata verir - sınıflandırma kanıtı)
+2026/10/15 18:06:59 CRITICAL: Failed to create file system for "sfuzak:": NewFs: couldn't connect SSH: dial tcp 203.0.113.9:52222: i/o timeout
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 0; --download'lı: 0; --files-from'lu: 0]
+
+=== ORTA 2: özetsiz sftp (disable_hashcheck), RCLONE_LOG_LEVEL=ERROR + RCLONE_LOG_FILE, deneme izni (127.0.0.1 hedefi yerel olduğundan) ===
+--- features (gerçek rclone 1.75.0) Hashes:
+sfhash -> "Hashes":["md5","sha1"]
+sfnohash -> "Hashes":[]
+--- (a) normal çalışma: günlük bastırma ortamıyla
+UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın.
+UYARI: hedef ağ dosya sistemi türünde (sftp/ftp/smb/webdav/http); ortak özet (hash) desteği sunucuya bağlıdır ve rclone'un özellik bilgisi buna güvenilmez, bu yüzden özet güvenilmez sayıldı.
+       Otomatik olarak 6 dosya (silinmeye aday eski üçlüler + en yeni üçlü) indirilip birebir karşılaştırılıyor (--download; ağ trafiği harcar).
+2026-10-15T18:07:00+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (indirerek-ozet-yok) → sfnohash
+2026-10-15T18:07:00+00:00 SİLİNDİ yerel yedek: db-20260915-031500.dump.age (uzakta doğrulandı: sfnohash; saklama 14 gün)
+2026-10-15T18:07:00+00:00 SİLİNDİ yerel yedek: medya-20260915-031500.tar.gz.age (uzakta doğrulandı: sfnohash; saklama 14 gün)
+2026-10-15T18:07:00+00:00 SİLİNDİ yerel yedek: sha256-20260915-031500.txt (uzakta doğrulandı: sfnohash; saklama 14 gün)
+2026-10-15T18:07:00+00:00 tamam: 3 yerel dosya silindi.
+   [yerelde kalan dosya: 3/6]  [check çağrıları: 1; --download'lı: 1; --files-from'lu: 1]
+    check çağrısı: check <proje>/yedekler sfnohash: --one-way --log-level NOTICE --files-from <gecici> --download --combined <gecici>
+--- (b) --download başarısız (sarmal rclone zorla hata verir): HİÇBİR şey silinmemeli
+UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın.
+UYARI: hedef ağ dosya sistemi türünde (sftp/ftp/smb/webdav/http); ortak özet (hash) desteği sunucuya bağlıdır ve rclone'un özellik bilgisi buna güvenilmez, bu yüzden özet güvenilmez sayıldı.
+       Otomatik olarak 6 dosya (silinmeye aday eski üçlüler + en yeni üçlü) indirilip birebir karşılaştırılıyor (--download; ağ trafiği harcar).
+UYARI: indirerek doğrulama da BAŞARISIZ oldu; bu çalıştırmada hiçbir yerel yedek silinmeyecek.
+UYARI: bazı dosyalar uzakta doğrulanamadı (ayrıntı aşağıda).
+2026-10-15T18:07:00+00:00 dışarı kopyalama: 0 dosya uzakta doğrulandı (indirerek-ozet-yok) → sfnohash
+Korundu (üçlü tam değil veya uzakta doğrulanmadı): 20260915-031500
+2026-10-15T18:07:00+00:00 tamam: 0 yerel dosya silindi.
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 1; --files-from'lu: 1]
+--- (c) karşılaştırma: özet sunan sftp (sfhash) yine de ağ dosya sistemi olduğundan --download ile doğrulanır
+UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın.
+UYARI: hedef ağ dosya sistemi türünde (sftp/ftp/smb/webdav/http); ortak özet (hash) desteği sunucuya bağlıdır ve rclone'un özellik bilgisi buna güvenilmez, bu yüzden özet güvenilmez sayıldı.
+       Otomatik olarak 6 dosya (silinmeye aday eski üçlüler + en yeni üçlü) indirilip birebir karşılaştırılıyor (--download; ağ trafiği harcar).
+2026-10-15T18:07:01+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (indirerek-ozet-yok) → sfhash
+2026-10-15T18:07:01+00:00 SİLİNDİ yerel yedek: db-20260915-031500.dump.age (uzakta doğrulandı: sfhash; saklama 14 gün)
+2026-10-15T18:07:01+00:00 SİLİNDİ yerel yedek: medya-20260915-031500.tar.gz.age (uzakta doğrulandı: sfhash; saklama 14 gün)
+2026-10-15T18:07:01+00:00 SİLİNDİ yerel yedek: sha256-20260915-031500.txt (uzakta doğrulandı: sfhash; saklama 14 gün)
+2026-10-15T18:07:01+00:00 tamam: 3 yerel dosya silindi.
+   [yerelde kalan dosya: 3/6]  [check çağrıları: 1; --download'lı: 1; --files-from'lu: 1]
+--- (d) kapsam sınırı: 40g + 5g + 0g üçlüleri; indirilecek = 40g ve en yeni (5g kapsam dışı)
+UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın.
+UYARI: hedef ağ dosya sistemi türünde (sftp/ftp/smb/webdav/http); ortak özet (hash) desteği sunucuya bağlıdır ve rclone'un özellik bilgisi buna güvenilmez, bu yüzden özet güvenilmez sayıldı.
+       Otomatik olarak 6 dosya (silinmeye aday eski üçlüler + en yeni üçlü) indirilip birebir karşılaştırılıyor (--download; ağ trafiği harcar).
+2026-10-15T18:07:02+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (indirerek-ozet-yok) → sfnohash
+2026-10-15T18:07:02+00:00 SİLİNDİ yerel yedek: db-20260905-031500.dump.age (uzakta doğrulandı: sfnohash; saklama 14 gün)
+2026-10-15T18:07:02+00:00 SİLİNDİ yerel yedek: medya-20260905-031500.tar.gz.age (uzakta doğrulandı: sfnohash; saklama 14 gün)
+2026-10-15T18:07:02+00:00 SİLİNDİ yerel yedek: sha256-20260905-031500.txt (uzakta doğrulandı: sfnohash; saklama 14 gün)
+Korundu (üçlü tam değil veya uzakta doğrulanmadı): 20261010-031500
+2026-10-15T18:07:02+00:00 tamam: 3 yerel dosya silindi.
+   [yerelde kalan dosya: 6/6]  [check çağrıları: 1; --download'lı: 1; --files-from'lu: 1]
+    uzak-dogrulama.json dogrulanan adedi: 6 (6 beklenir, 5g üçlüsü hariç)
+    uzak-dogrulama.json: { "zaman": "2026-10-15T18:07:02+00:00", "son_deneme": "2026-10-15T18:07:02+00:00", "hedef": "sfnohash", "yontem": "indir...
+
+## yedek-anahtari-hazirla.sh e2e
+=== ORTA 3: gerçek docker (imaj qr-kampanya-yedek:e2e8), gerçek age-keygen ===
+--- KONTROL (eski yöntem): docker run ... age-keygen > dosya, varsayılan günlük sürücüsü, --rm yok
+   docker logs içinde AGE-SECRET-KEY satırı sayısı (eski yöntem): 1
+   /var/lib/docker/containers altında anahtar içeren dosya sayısı (eski yöntem): 1
+   kontrol konteyneri silindi; sonra bulunan dosya sayısı: 0
+--- YENİ yöntem (elle): --log-driver none + -o ile tmpfs bind-mount
+   rc=0; stdout bayt sayısı: 0 (anahtar stdout'a yazılmadı); stderr'de anahtar var mı: False
+   docker logs çıktısı: 'Error response from daemon: configured logging driver does not support reading'
+   LogConfig: none
+   tmpfs dosyası: izin=0o600, anahtar satırı=1, dosya sistemi=tmpfs
+   /var/lib/docker/containers altında anahtar içeren dosya sayısı: 0
+   journald: mevcut
+--- BETİK, EVET yolu (gerçek docker + pty, geri yapıştırma doğrulaması)
+   çıkış=0; anahtar ekranda gösterildi: True
+   gizli/ içeriği: []
+   proje dizininde anahtar içeren dosya sayısı: 0
+   .env YEDEK_ALICI var: True
+   /dev/shm artığı: []
+   stdout/stderr'de anahtar: False
+   çıktı özeti: Özel anahtar bellekten SİLİNDİ (kullanıcı onayıyla); kalıcı diske HİÇ yazılmadı. Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+   /var/lib/docker/containers altında anahtar içeren dosya: 0
+   docker ps -a (kalan konteyner): 0
+--- BETİK, onay yok yolu
+   çıkış=0; gizli/ izin=0o700 dosya izin=0o600; dosyada anahtar: True; .env YEDEK_ALICI var: True; /dev/shm artığı: []
+   uyarı basıldı: True
+   ardından --goster-ve-kaldir (gerçek açık anahtar eşleşmesi) EVET:
+   çıkış=0; gizli/ içeriği: []; çıktı: Özel anahtar dosyası sunucudan SİLİNDİ (kullanıcı onayıyla). Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+--- BETİK, --goster-ve-kaldir ile YEDEK_ALICI uyuşmazlığı (başka anahtarın açık anahtarı .env'de)
+   çıkış=1; dosya duruyor: True; anahtar gösterildi: False; çıktı: UYARI: gizli/yedek-anahtari.txt dosyasındaki anahtar .env içindeki YEDEK_ALICI ile EŞLEŞMİYOR (veya YEDEK_ALICI tanımlı değil).
+--- BETİK, Ctrl-C (istemde)
+   çıkış=130; anahtar gizli/ altına kaydedildi: True (izin 0o600); .env'de YEDEK_ALICI: False; /dev/shm artığı: []
+   journald'de (journalctl) AGE-SECRET-KEY satırı sayısı: 0

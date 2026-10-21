@@ -1,0 +1,10 @@
+{% extends "qr/genel/taban.html" %}
+{% block baslik %}{{ baslik }}{% endblock %}
+{% block aciklama %}{{ baslik }}{% endblock %}
+{% block icerik %}
+<main class="ortala">
+  <p class="hata-kodu">{{ kod }}</p>
+  <h1>{{ baslik }}</h1>
+  <p>Aradığınız sayfaya ulaşılamıyor. Lütfen adresi kontrol edin.</p>
+</main>
+{% endblock %}

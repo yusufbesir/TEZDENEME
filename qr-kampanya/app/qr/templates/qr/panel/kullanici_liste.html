@@ -1,0 +1,25 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Kullanıcılar{% endblock %}
+{% block icerik %}
+<h1>Kullanıcılar</h1>
+<form method="get" class="filtre">
+  <div><label for="q">Ara</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
+  <div><button type="submit" class="dugme">Ara</button></div>
+</form>
+<div class="eylemler">{% if perms.auth.add_user %}<a class="dugme" href="{% url 'panel:kullanici_olustur' %}">Yeni kullanıcı</a>{% endif %}</div>
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Kullanıcı adı</th><th>Ad soyad</th><th>E-posta</th><th>Rol</th><th>Durum</th><th></th></tr></thead>
+  <tbody>
+  {% for s in satirlar %}
+  <tr>
+    <td>{{ s.kullanici.username }}</td><td>{{ s.kullanici.get_full_name }}</td><td>{{ s.kullanici.email }}</td><td>{{ s.rol }}</td>
+    <td><span class="etiket-durum {% if s.kullanici.is_active %}durum-aktif{% else %}durum-pasif{% endif %}">{% if s.kullanici.is_active %}Aktif{% else %}Pasif{% endif %}</span></td>
+    <td><a href="{% url 'panel:kullanici_duzenle' s.kullanici.pk %}">Düzenle</a> · <a href="{% url 'panel:kullanici_mfa_sifirla' s.kullanici.pk %}">MFA sıfırla</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="6">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

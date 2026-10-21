@@ -21,6 +21,7 @@
 - Her oturum, yazdığı kasa notlarına ve çıktı/rapor dosyalarına o iş için harcanan girdi (input) ve çıktı (output) token sayılarını ayrı ayrı yazar. Alt ajanların tokenları ayrıca belirtilir ve toplamı verilir. Kesin sayı alınamıyorsa bu açıkça "tahmini" diye yazılır.
 - Her notta "Kullanılan yapay zeka araçları" bölümü olur: ana model, alt ajan modelleri, Jev, Codex/ChatGPT, Gemini gibi işte kullanılan her yapay zeka aracı listelenir.
 - Bu bilgi geçmiş oturumlar için de geriye dönük eklenir; ekleme yoluyla yapılır, mevcut içerik silinmez.
+- Kesin sayı için oturumun kendi sayacı kullanılır (`get_session` çıktısındaki `usage`: girdi, çıktı, önbellek okuma/yazma). Sayaç oturum toplamıdır; alt ajan kırılımını vermez, o yüzden alt ajan tokenları `docs/orchestrator-log.md` satırlarından alınır, orada yoksa "veri yok" yazılır. Geçmiş oturumların tablosu: `token-kaydi/` (proje klasörü). (PR #14'ten taşındı.)
 
 ## Kesintiden sonra devam (kullanıcının kuralı, 2026-10-15)
 - Kullanıcının bilgisayarı çevrimdışı olup tekrar çevrimiçi olduğunda, yarıda kalan her oturum kullanıcıya sormadan kaldığı yerden devam eder. "Devam edeyim mi?" diye sorulmaz.

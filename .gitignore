@@ -9,6 +9,16 @@ kararlar.jsonl
 *.oturum.jsonl
 *.log.jsonl
 
+# Yerel Asistan bağımlılıkları
+yerel-asistan/**/node_modules
+
+# Yerel Asistan üretilen klasörler
+yerel-asistan/android/www/
+yerel-asistan/android/android/
+yerel-asistan/pc/dist/
+yerel-asistan/pc/cekirdek/
+yerel-asistan/pc/protokol/
+yerel-asistan/pc/arayuz/
 # Yayın imza anahtarları hiçbir alt klasörden depoya girmez (depo herkese açık).
 *.jks
 *.keystore

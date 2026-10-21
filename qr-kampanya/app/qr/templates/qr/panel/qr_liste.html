@@ -1,0 +1,92 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}QR kodlar{% endblock %}
+{% block icerik %}
+<h1>QR kodlar</h1>
+<form method="get" class="filtre">
+  <div><label for="q">Ara (kod, ad, başlık, ürün, kampanya, etiket)</label><input type="search" id="q" name="q" value="{{ f.q }}"></div>
+  <div><label for="tur">Tür</label><select id="tur" name="tur"><option value="">Tümü</option>{% for k, v in turler %}<option value="{{ k }}"{% if f.tur == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+  <div><label for="durum">Durum</label><select id="durum" name="durum"><option value="">Tümü</option>{% for k, v in durumlar %}<option value="{{ k }}"{% if f.durum == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+  <div><label for="kampanya">Kampanya</label><select id="kampanya" name="kampanya"><option value="">Tümü</option>{% for k in kampanyalar %}<option value="{{ k.pk }}"{% if f.kampanya == k.pk|stringformat:"s" %} selected{% endif %}>{{ k.ad }}</option>{% endfor %}</select></div>
+  <div><label for="magaza">Mağaza</label><select id="magaza" name="magaza"><option value="">Tümü</option>{% for m in magazalar %}<option value="{{ m.pk }}"{% if f.magaza == m.pk|stringformat:"s" %} selected{% endif %}>{{ m.ad }}</option>{% endfor %}</select></div>
+  <div><label for="urun">Ürün</label><select id="urun" name="urun"><option value="">Tümü</option>{% for u in urunler %}<option value="{{ u.pk }}"{% if f.urun == u.pk|stringformat:"s" %} selected{% endif %}>{{ u.ad }}</option>{% endfor %}</select></div>
+  <div><label for="alan">Arama alanı</label><select id="alan" name="alan">{% for k, v in arama_alanlari %}<option value="{{ k }}"{% if f.alan == k %} selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+  <div><label for="tarama_min">Tarama en az</label><input type="number" min="0" id="tarama_min" name="tarama_min" value="{{ f.tarama_min }}"></div>
+  <div><label for="tarama_max">Tarama en çok</label><input type="number" min="0" id="tarama_max" name="tarama_max" value="{{ f.tarama_max }}"></div>
+  <div><label for="sonra">Oluşturma: bu tarihten sonra (dahil)</label><input type="date" id="sonra" name="sonra" value="{{ f.sonra }}"></div>
+  <div><label for="once">Oluşturma: bu tarihten önce (dahil)</label><input type="date" id="once" name="once" value="{{ f.once }}"></div>
+  <div><label for="adet">Sayfa boyutu</label><select id="adet" name="adet">{% for n in sayfa_boyutlari %}<option value="{{ n }}"{% if n == sayfa_boyutu %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
+  {% if sirala_acik %}<input type="hidden" name="sirala" value="{{ sirala }}"><input type="hidden" name="yon" value="{{ yon }}">{% endif %}
+  <div><button type="submit" class="dugme">Filtrele</button></div>
+</form>
+
+<div class="eylemler">
+  {% if perms.qr.add_qrkod %}<a class="dugme" href="{% url 'panel:qr_olustur' %}">Yeni QR kod</a>{% endif %}
+  <a class="dugme ikincil" href="{% url 'panel:qr_disa_aktar' %}?{% if sorgu_dizesi %}{{ sorgu_dizesi }}&amp;{% endif %}bicim=csv">CSV indir</a>
+  <a class="dugme ikincil" href="{% url 'panel:qr_disa_aktar' %}?{% if sorgu_dizesi %}{{ sorgu_dizesi }}&amp;{% endif %}bicim=xlsx">Excel (.xlsx) indir</a>
+</div>
+
+<form method="post" action="{% url 'panel:qr_toplu' %}" data-toplu="secili">
+  {% csrf_token %}
+  <div class="eylemler">
+    <span>Seçili: <strong data-secili-sayac="secili">0</strong></span>
+    {% if perms.qr.change_qrkod %}
+    <button type="submit" name="islem" value="aktif" class="dugme ikincil kucuk">Aktif yap</button>
+    <button type="submit" name="islem" value="pasif" class="dugme ikincil kucuk">Pasif yap</button>
+    <button type="submit" name="islem" value="arsivle" class="dugme ikincil kucuk">Arşivle</button>
+    <button type="submit" name="islem" value="cope" class="dugme ikincil kucuk">Çöp kutusuna taşı</button>
+    {% endif %}
+    <button type="submit" name="islem" value="zip" class="dugme ikincil kucuk">Seçilenleri ZIP indir</button>
+  </div>
+  <div class="tablo-kap">
+  <table>
+    <thead><tr>
+      <th class="secim-sutunu"><input type="checkbox" data-hepsini-sec="secili" aria-label="Tümünü seç"></th>
+      {% for b in basliklar %}{% if b.etiket == "Hedef" %}<th>Tür</th>{% endif %}
+      <th{% if b.mevcut %} aria-sort="{% if b.yon == 'artan' %}ascending{% else %}descending{% endif %}"{% endif %}><a href="{{ b.adres }}">{{ b.etiket }}{% if b.isaret %} {{ b.isaret }}{% endif %}</a></th>
+      {% if b.etiket == "Hedef" %}<th>Durum</th>{% endif %}{% endfor %}
+      <th>Bitiş</th>{% if perms.qr.change_qrkod %}<th>İşlem</th>{% endif %}
+    </tr></thead>
+    <tbody>
+    {% for q in sayfa %}
+    <tr data-qr-satir="{{ q.pk }}">
+      <td><input type="checkbox" name="secili" value="{{ q.pk }}" aria-label="{{ q.kisa_kod }} seç"></td>
+      <td><a href="{% url 'panel:qr_detay' q.pk %}">{{ q.kisa_kod }}</a></td>
+      <td data-alan="ad">{{ q.ad }}</td>
+      <td data-alan="baslik">{{ q.baslik|truncatechars:40 }}</td>
+      <td>{{ q.get_tur_display }}</td>
+      <td data-alan="hedef_url">{% if q.hedef_turu == "sayfa" %}Sayfa: {{ q.sayfa.baslik }}{% else %}{{ q.hedef_url|truncatechars:50 }}{% endif %}</td>
+      <td><span class="etiket-durum durum-{{ q.durum }}">{{ q.get_durum_display }}</span></td>
+      <td>{{ q.tarama_sayisi }}</td>
+      <td>{{ q.olusturma|date:"d.m.Y H:i" }}</td>
+      <td>{{ q.bitis|date:"d.m.Y H:i"|default:"-" }}</td>
+      {% if perms.qr.change_qrkod %}<td>
+        {% if q.durum == "arsiv" or q.durum == "cop" %}{% if q.durum == "arsiv" %}<a class="dugme ikincil kucuk" href="{% url 'panel:qr_duzenle' q.pk %}">Düzenle</a>{% endif %}
+        {% else %}<a class="dugme ikincil kucuk" href="{% url 'panel:qr_duzenle' q.pk %}" data-hizli-ac="hd-{{ q.pk }}">Düzenle</a>{% endif %}
+      </td>{% endif %}
+    </tr>
+    {% if perms.qr.change_qrkod and q.durum != "arsiv" and q.durum != "cop" %}
+    <tr class="hizli-satir" id="hd-satir-{{ q.pk }}" hidden>
+      <td colspan="{{ sutun_sayisi }}">
+        <div class="hizli-alanlar">
+          <label>Ad <input type="text" name="ad" form="hd-{{ q.pk }}" value="{{ q.ad }}" maxlength="200"></label>
+          <label>Başlık <input type="text" name="baslik" form="hd-{{ q.pk }}" value="{{ q.baslik }}" maxlength="300"></label>
+          {% if q.hedef_turu == "harici" %}<label>Hedef URL <input type="url" name="hedef_url" form="hd-{{ q.pk }}" value="{{ q.hedef_url }}" maxlength="2000" required></label>{% endif %}
+          <button type="submit" form="hd-{{ q.pk }}" class="dugme kucuk">Kaydet</button>
+          <button type="button" class="dugme ikincil kucuk" data-hizli-kapat="hd-{{ q.pk }}">Vazgeç</button>
+          <span class="hata-metin" data-hizli-hata="hd-{{ q.pk }}" role="alert"></span>
+        </div>
+      </td>
+    </tr>
+    {% endif %}
+    {% empty %}<tr><td colspan="{{ sutun_sayisi }}">Kayıt yok.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</form>
+{% if perms.qr.change_qrkod %}{% for q in sayfa %}{% if q.durum != "arsiv" and q.durum != "cop" %}
+<form method="post" action="{% url 'panel:qr_hizli_duzenle' q.pk %}" id="hd-{{ q.pk }}" data-hizli-form="{{ q.pk }}">
+  {% csrf_token %}<input type="hidden" name="donus_sorgu" value="{{ request.GET.urlencode }}">
+</form>
+{% endif %}{% endfor %}{% endif %}
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

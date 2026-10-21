@@ -1,0 +1,72 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}İstatistik raporu{% endblock %}
+{% block icerik %}
+<h1>İstatistik raporu</h1>
+<div class="uyari-kutu" role="note">{{ tekil_uyarisi }}</div>
+<form method="get" class="filtre">
+  <div><label for="baslangic">Başlangıç</label><input type="date" id="baslangic" name="baslangic" value="{{ baslangic|date:'Y-m-d' }}"></div>
+  <div><label for="bitis">Bitiş</label><input type="date" id="bitis" name="bitis" value="{{ bitis|date:'Y-m-d' }}"></div>
+  <div class="alan onay"><input type="checkbox" id="bot_dahil" name="bot_dahil" value="1"{% if bot_dahil %} checked{% endif %}> <label for="bot_dahil">Botları toplama dahil et</label></div>
+  <div><button type="submit" class="dugme">Uygula</button></div>
+</form>
+{% for u in uyarilar %}<div class="uyari-kutu">{{ u }}</div>{% endfor %}
+<p class="sessiz">Toplam tarama {% if bot_dahil %}bot taramalarını da içerir{% else %}bot taramalarını içermez{% endif %}. "Tahmini tekil ziyaret" botları her zaman hariç tutar. Bot sayısı ayrı sütundadır.</p>
+
+<h2>Zaman grafiği</h2>
+<div class="aralik-secici" role="group" aria-label="Grafik aralığı">
+  {% for a in aralik_baglantilari %}<a class="dugme ikincil kucuk{% if a.secili %} secili{% endif %}" href="{{ a.adres }}"{% if a.secili %} aria-current="true"{% endif %}>{{ a.etiket }}</a>{% endfor %}
+</div>
+<div class="kart grafik">{{ grafik_svg }}</div>
+<p class="sessiz">Tüm QR kodlar, Europe/Istanbul saat dilimi; seçili aralık: toplam {{ grafik_seri.toplam }} tarama{% if bot_dahil %} (bot dahil){% else %} (bot hariç){% endif %}, bot: {{ grafik_seri.bot_toplam }}. Tarih aralığı formundan bağımsızdır.</p>
+
+<h2>En çok taranan {{ en_cok|length }} kod</h2>
+<div class="eylemler">
+  <a class="dugme ikincil kucuk" href="?baslangic={{ baslangic|date:'Y-m-d' }}&amp;bitis={{ bitis|date:'Y-m-d' }}{% if bot_dahil %}&amp;bot_dahil=1{% endif %}&amp;tablo=en_cok&amp;bicim=csv">CSV</a>
+  <a class="dugme ikincil kucuk" href="?baslangic={{ baslangic|date:'Y-m-d' }}&amp;bitis={{ bitis|date:'Y-m-d' }}{% if bot_dahil %}&amp;bot_dahil=1{% endif %}&amp;tablo=en_cok&amp;bicim=xlsx">Excel</a>
+</div>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kısa kod</th><th>Ad</th><th class="sayi">Toplam tarama</th><th class="sayi">Tahmini tekil ziyaret</th><th class="sayi">Bot taraması</th></tr></thead>
+  <tbody>
+  {% for s in en_cok %}<tr><td>{{ s.kod }}</td><td>{{ s.ad }}</td><td class="sayi">{{ s.toplam }}</td><td class="sayi">{{ s.tekil }}</td><td class="sayi">{{ s.bot }}</td></tr>
+  {% empty %}<tr><td colspan="5">Bu aralıkta tarama yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2>Yönlendiren siteler</h2>
+<p class="sessiz">Yalnızca Referer başlığının alan adı saklanır (yol ve sorgu saklanmaz). İlk {{ yonlendirenler|length }} site; {% if bot_dahil %}bot dahil{% else %}bot hariç{% endif %}.</p>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Alan adı</th><th class="sayi">Tarama</th></tr></thead>
+  <tbody>
+  {% for s in yonlendirenler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>
+  {% empty %}<tr><td colspan="2">Bu aralıkta yönlendiren site kaydı yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+<p class="sessiz">Yönlendiren bilgisi olmayan (doğrudan, kendi sitemiz ya da gizli): {{ yon_bilinmeyen }}</p>
+
+<h2>Ülkeler</h2>
+<p class="sessiz">Yalnızca GeoIP veritabanı ayarlıysa (GEOIP_VERITABANI) dolar; IP adresi saklanmaz.</p>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Ülke (ISO kodu)</th><th class="sayi">Tarama</th></tr></thead>
+  <tbody>
+  {% for s in ulkeler %}<tr><td>{{ s.deger }}</td><td class="sayi">{{ s.toplam }}</td></tr>
+  {% empty %}<tr><td colspan="2">Bu aralıkta ülke kaydı yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+<p class="sessiz">Ülkesi bilinmeyen: {{ ulke_bilinmeyen }}</p>
+
+{% for ad, baslik, satirlar, kesildi in bolumler %}
+<h2>{{ baslik }} bazında</h2>
+<div class="eylemler">
+  <a class="dugme ikincil kucuk" href="?baslangic={{ baslangic|date:'Y-m-d' }}&amp;bitis={{ bitis|date:'Y-m-d' }}{% if bot_dahil %}&amp;bot_dahil=1{% endif %}&amp;tablo={{ ad }}&amp;bicim=csv">CSV</a>
+  <a class="dugme ikincil kucuk" href="?baslangic={{ baslangic|date:'Y-m-d' }}&amp;bitis={{ bitis|date:'Y-m-d' }}{% if bot_dahil %}&amp;bot_dahil=1{% endif %}&amp;tablo={{ ad }}&amp;bicim=xlsx">Excel</a>
+</div>
+<div class="tablo-kap"><table>
+  <thead><tr><th>Kod</th><th>Ad</th><th class="sayi">Toplam tarama</th><th class="sayi">Tahmini tekil ziyaret</th><th class="sayi">Bot taraması</th></tr></thead>
+  <tbody>
+  {% for s in satirlar %}<tr><td>{{ s.kod }}</td><td>{{ s.ad }}</td><td class="sayi">{{ s.toplam }}</td><td class="sayi">{{ s.tekil }}</td><td class="sayi">{{ s.bot }}</td></tr>
+  {% empty %}<tr><td colspan="5">Bu aralıkta tarama yok.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% if kesildi %}<p class="sessiz">İlk {{ ekran_siniri }} satır gösterildi; tamamı için dışa aktarmayı kullanın.</p>{% endif %}
+{% endfor %}
+{% endblock %}
