@@ -49,3 +49,5 @@ app.*.map.json
 *.jks
 *.keystore
 *.p12
+# Kurulum paketi üretim artıkları (tool/kurulum/derle.ps1 üretir)
+tool/kurulum/uretilen/
