@@ -38,11 +38,14 @@ dependencies:
   go_router: ^17.2.3
   path_provider: ^2.1.5
   path: ^1.9.1
+  crypto: ^3.0.3
   flutter_tts: ^4.2.5
   flutter_local_notifications: ^20.1.0
   timezone: ^0.10.1
   flutter_localizations:
     sdk: flutter
+  sherpa_onnx: ^1.13.8
+  record: ^6.2.1
 
 dev_dependencies:
   flutter_test:

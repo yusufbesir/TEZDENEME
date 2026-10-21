@@ -1,9 +1,20 @@
+/// Ayarlar ekranı: ad, görünüm, ses, günlük ve haftalık hedef, hatırlatma
+/// (günlük saat ve açılıştaki bekleyen tekrar bildirimi), veri sıfırlama.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Kabuğun dışında, Profil'deki dişliyle `push` ile açılır.
+/// Hedef etiketi sabit genişlik yerine içeriğe göre genişler.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class AyarlarEkrani extends ConsumerStatefulWidget {
@@ -202,161 +213,260 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
       ),
     );
 
-    return SafeArea(
-      child: SayfaGovdesi(
-        child: ListView(
-          padding: const EdgeInsets.all(Olcu.b3),
-          children: [
-            Semantics(
-              header: true,
-              child: Text('Ayarlar', style: yazi.headlineMedium),
-            ),
-            bolum('Profil'),
-            TextField(
-              controller: _ad,
-              focusNode: _adOdak,
-              maxLength: 40,
-              textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(
-                labelText: 'Adın (isteğe bağlı)',
-                prefixIcon: Icon(Icons.person_outline),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ayarlar'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Geri',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/profil'),
+        ),
+      ),
+      body: SafeArea(
+        child: SayfaGovdesi(
+          child: ListView(
+            padding: const EdgeInsets.all(Olcu.b3),
+            children: [
+              bolum('Profil'),
+              TextField(
+                controller: _ad,
+                focusNode: _adOdak,
+                maxLength: 40,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: 'Adın (isteğe bağlı)',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+                onSubmitted: (_) => _adKaydet(),
               ),
-              onSubmitted: (_) => _adKaydet(),
-            ),
-            bolum('Görünüm'),
-            SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<bool?>(
-                showSelectedIcon: true,
-                segments: const [
-                  ButtonSegment(
-                    value: null,
-                    icon: Icon(Icons.brightness_auto),
-                    label: Text('Sistem'),
-                  ),
-                  ButtonSegment(
-                    value: false,
-                    icon: Icon(Icons.light_mode_outlined),
-                    label: Text('Açık'),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    icon: Icon(Icons.dark_mode_outlined),
-                    label: Text('Koyu'),
-                  ),
-                ],
-                selected: {durum.koyuTema},
-                onSelectionChanged: (s) {
-                  final v = s.first;
-                  if (v == null) {
-                    notifier.ayarGuncelle(koyuTemaSil: true);
-                  } else {
-                    notifier.ayarGuncelle(koyuTema: v);
-                  }
-                },
-              ),
-            ),
-            bolum('Ses'),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              secondary: Icon(
-                durum.sesAcik ? Icons.volume_up : Icons.volume_off,
-                color: r.ana,
-              ),
-              title: const Text('Ses'),
-              subtitle: Text(
-                durum.sesAcik
-                    ? 'Dinleme alıştırmaları sesli okunur'
-                    : 'Kapalı: dinleme cümlesi yazıyla gösterilir',
-              ),
-              value: durum.sesAcik,
-              onChanged: (v) => notifier.ayarGuncelle(sesAcik: v),
-            ),
-            bolum('Günlük hedef'),
-            Semantics(
-              label: 'Günlük hedef: ${durum.gunlukHedef} XP',
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      min: 10,
-                      max: 200,
-                      divisions: 19,
-                      value: durum.gunlukHedef.clamp(10, 200).toDouble(),
-                      label: '${durum.gunlukHedef} XP',
-                      onChanged: (v) =>
-                          notifier.ayarGuncelle(gunlukHedef: v.round()),
+              bolum('Görünüm'),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<bool?>(
+                  showSelectedIcon: true,
+                  segments: const [
+                    ButtonSegment(
+                      value: null,
+                      icon: Icon(Icons.brightness_auto),
+                      label: Text('Sistem'),
                     ),
-                  ),
-                  SizedBox(
-                    width: 72,
-                    child: Text(
-                      '${durum.gunlukHedef} XP',
-                      textAlign: TextAlign.end,
-                      style: yazi.titleMedium,
+                    ButtonSegment(
+                      value: false,
+                      icon: Icon(Icons.light_mode_outlined),
+                      label: Text('Açık'),
                     ),
+                    ButtonSegment(
+                      value: true,
+                      icon: Icon(Icons.dark_mode_outlined),
+                      label: Text('Koyu'),
+                    ),
+                  ],
+                  selected: {durum.koyuTema},
+                  onSelectionChanged: (s) {
+                    final v = s.first;
+                    if (v == null) {
+                      notifier.ayarGuncelle(koyuTemaSil: true);
+                    } else {
+                      notifier.ayarGuncelle(koyuTema: v);
+                    }
+                  },
+                ),
+              ),
+              bolum('Ses'),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  durum.sesAcik ? Icons.volume_up : Icons.volume_off,
+                  color: r.ana,
+                ),
+                title: const Text('Ses'),
+                subtitle: Text(
+                  durum.sesAcik
+                      ? 'Dinleme alıştırmaları sesli okunur'
+                      : 'Kapalı: dinleme cümlesi yazıyla gösterilir',
+                ),
+                value: durum.sesAcik,
+                onChanged: (v) => notifier.ayarGuncelle(sesAcik: v),
+              ),
+              bolum('Günlük hedef'),
+              Semantics(
+                label: 'Günlük hedef: ${durum.gunlukHedef} XP',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        min: 10,
+                        max: 200,
+                        divisions: 19,
+                        value: durum.gunlukHedef.clamp(10, 200).toDouble(),
+                        label: '${durum.gunlukHedef} XP',
+                        onChanged: (v) =>
+                            notifier.ayarGuncelle(gunlukHedef: v.round()),
+                      ),
+                    ),
+                    // Sabit genişlik yok: metin ölçeğiyle birlikte genişler.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 72),
+                      child: Text(
+                        '${durum.gunlukHedef} XP',
+                        softWrap: false,
+                        textAlign: TextAlign.end,
+                        style: yazi.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              bolum('Haftalık hedef'),
+              Semantics(
+                label: 'Haftalık hedef: haftada ${durum.haftalikHedefGun} gün',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        min: OgrenciDurumu.enAzHaftalikHedef.toDouble(),
+                        max: OgrenciDurumu.enCokHaftalikHedef.toDouble(),
+                        divisions:
+                            OgrenciDurumu.enCokHaftalikHedef -
+                            OgrenciDurumu.enAzHaftalikHedef,
+                        value: durum.haftalikHedefGun
+                            .clamp(
+                              OgrenciDurumu.enAzHaftalikHedef,
+                              OgrenciDurumu.enCokHaftalikHedef,
+                            )
+                            .toDouble(),
+                        label: '${durum.haftalikHedefGun} gün',
+                        onChanged: (v) =>
+                            notifier.ayarGuncelle(haftalikHedefGun: v.round()),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 72,
+                      child: Text(
+                        'Haftada ${durum.haftalikHedefGun} gün',
+                        textAlign: TextAlign.end,
+                        style: yazi.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                'Haftada bu kadar gün çalışırsan günlük ara verdiğinde bile serin kopmaz.',
+                style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+              ),
+              ListTile(
+                key: const ValueKey('ayar-calisma-plani'),
+                contentPadding: EdgeInsets.zero,
+                minTileHeight: Olcu.hedef,
+                leading: const Icon(Icons.event_note_outlined),
+                title: const Text('Çalışma planı'),
+                subtitle: Text(
+                  durum.calismaPlani == null
+                      ? 'Plan yok'
+                      : 'Önerilen haftalık hedef: haftada '
+                            '${Motor.planHaftalikOneri(durum.calismaPlani!)} gün',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/plan'),
+              ),
+              if (durum.calismaPlani != null &&
+                  Motor.planHaftalikOneri(durum.calismaPlani!) !=
+                      durum.haftalikHedefGun)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    key: const ValueKey('ayar-plana-uydur'),
+                    onPressed: () => notifier.ayarGuncelle(
+                      haftalikHedefGun: Motor.planHaftalikOneri(
+                        durum.calismaPlani!,
+                      ),
+                    ),
+                    child: const Text('Haftalık hedefi plana uydur'),
                   ),
-                ],
+                ),
+              bolum('Hatırlatma'),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  durum.hatirlatmaSaati == null
+                      ? Icons.notifications_off_outlined
+                      : Icons.notifications_active_outlined,
+                  color: r.ana,
+                ),
+                title: const Text('Günlük hatırlatma'),
+                subtitle: Text(
+                  durum.hatirlatmaSaati == null
+                      ? 'Kapalı'
+                      : 'Her gün ${durum.hatirlatmaSaati}',
+                ),
+                value: durum.hatirlatmaSaati != null,
+                onChanged: (v) => v
+                    ? _hatirlatmaAyarla('20:00')
+                    : notifier.ayarGuncelle(hatirlatmaSil: true),
               ),
-            ),
-            bolum('Hatırlatma'),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              secondary: Icon(
-                durum.hatirlatmaSaati == null
-                    ? Icons.notifications_off_outlined
-                    : Icons.notifications_active_outlined,
-                color: r.ana,
+              if (durum.hatirlatmaSaati != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.schedule),
+                    label: Text('Saati değiştir (${durum.hatirlatmaSaati})'),
+                    onPressed: () => _saatSec(durum.hatirlatmaSaati),
+                  ),
+                ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.repeat_outlined, color: r.ana),
+                title: const Text('Açılışta bekleyen tekrar bildirimi'),
+                subtitle: const Text(
+                  'Uygulama açılırken bugün bekleyen tekrar sayısını bildirir',
+                ),
+                value: durum.tekrarBildirimiAcik,
+                onChanged: (v) => notifier.ayarGuncelle(tekrarBildirimiAcik: v),
               ),
-              title: const Text('Günlük hatırlatma'),
-              subtitle: Text(
-                durum.hatirlatmaSaati == null
-                    ? 'Kapalı'
-                    : 'Her gün ${durum.hatirlatmaSaati}',
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.mic_none, color: r.ana),
+                title: const Text('Konuşma alıştırmaları'),
+                subtitle: Text(
+                  durum.konusmaAcik
+                      ? 'Derslerde cümleleri yüksek sesle söylersin'
+                      : 'Kapalı: konuşma alıştırmaları derste atlanır',
+                ),
+                value: durum.konusmaAcik,
+                onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
               ),
-              value: durum.hatirlatmaSaati != null,
-              onChanged: (v) => v
-                  ? _hatirlatmaAyarla('20:00')
-                  : notifier.ayarGuncelle(hatirlatmaSil: true),
-            ),
-            if (durum.hatirlatmaSaati != null)
+              bolum('Veriler'),
+              Text(
+                'Tüm verilerin yalnızca bu cihazda saklanır.',
+                style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+              ),
+              const SizedBox(height: Olcu.b2),
               Align(
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.schedule),
-                  label: Text('Saati değiştir (${durum.hatirlatmaSaati})'),
-                  onPressed: () => _saatSec(durum.hatirlatmaSaati),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: r.hata,
+                    side: BorderSide(color: r.hata),
+                  ),
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Verileri sıfırla'),
+                  onPressed: _sifirlaOnayi,
                 ),
               ),
-            bolum('Veriler'),
-            Text(
-              'Tüm verilerin yalnızca bu cihazda saklanır.',
-              style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
-            ),
-            const SizedBox(height: Olcu.b2),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: r.hata,
-                  side: BorderSide(color: r.hata),
+              bolum('Hakkında'),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.description_outlined, color: r.ana),
+                title: const Text('Lisanslar'),
+                onTap: () => showLicensePage(
+                  context: context,
+                  applicationName: 'Adım Adım',
                 ),
-                icon: const Icon(Icons.delete_outline),
-                label: const Text('Verileri sıfırla'),
-                onPressed: _sifirlaOnayi,
               ),
-            ),
-            bolum('Hakkında'),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.description_outlined, color: r.ana),
-              title: const Text('Lisanslar'),
-              onTap: () => showLicensePage(
-                context: context,
-                applicationName: 'Adım Adım',
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

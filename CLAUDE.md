@@ -11,7 +11,7 @@ Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtı
 - Mimari, güvenlik ve veri bütünlüğü kararları sende kalır.
 - Yalnızca `scout`, `implementer` ve `verifier` ajanlarını kullan.
 - `verifier` Geçti deyince commit'le.
-- Her ajan çalışmasından sonra `.claude/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
+- Her ajan çalışmasından sonra `docs/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
 - Bilmediğin şeyi tahmin etme, sor.
 - Mevcut bir dosyanın üzerine yazmadan önce sor.
 
@@ -48,9 +48,8 @@ Jev, TypeSafe AI'ın karar modelidir. Metin ve kod üretmez; tipli sorulara seç
 - Jev'e erişilemezse yanıtta "Jev'e erişilemedi" diye açıkça yaz. Jev denetim işlerinde kullanılmaz.
 - Jev'e yalnız Vercel AI Gateway üzerinden gidilir; anahtar yalnız `AI_GATEWAY_API_KEY` ortam değişkeninde ya da cihazdaki mevcut anahtar dosyasında durur. Ayrıntı: `docs/jev/karar-kurgusu.md`.
 
-## Token ve Araç Kaydı Kuralları
+## Proje Kuralları (ayrıntı)
 
-- Her oturum, yazdığı kasa notlarına ve çıktı/rapor dosyalarına o iş için harcanan girdi (input) ve çıktı (output) token sayılarını ayrı ayrı yazar. Alt ajanların tokenları ayrıca belirtilir ve toplamı verilir. Kesin sayı alınamıyorsa bu açıkça "tahmini" ya da "veri yok" diye yazılır.
-- Her notta "Kullanılan yapay zeka araçları" bölümü olur: ana model, alt ajan modelleri, Jev, Codex/ChatGPT, Gemini gibi işte kullanılan her yapay zeka aracı listelenir.
-- Kesin sayı için oturumun kendi sayacı kullanılır (`get_session` çıktısındaki `usage`: girdi, çıktı, önbellek okuma/yazma). Sayaç oturum toplamıdır; alt ajan kırılımını vermez, o yüzden alt ajan tokenları `.claude/orchestrator-log.md` satırlarından alınır, orada yoksa "veri yok" yazılır.
-- Geçmiş oturumlar için kayıt ekleme yoluyla yapılır, mevcut içerik silinmez. Tablo: `token-kaydi/` (proje klasörü).
+Kullanıcının kalıcı kuralları (hafıza, silme yasağı, güvenlik, dosya düzeni, etiket ve token kaydı vb.) `docs/kurallar/` altındadır. İlgili işte önce `docs/kurallar/README.md` dizinine ve ilgili dosyanın özetine bak; tamamını açma. Kural silinmez, değişiklik kullanıcıya önerilir.
+
+Güncel durum (açık PR, bekleyen karar) `CHECKPOINT.md` dosyasındadır. Yola bağlı kurallar `.claude/rules/` altındadır.

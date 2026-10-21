@@ -1,12 +1,26 @@
+/// Tekrar sekmesi: seçili alanın zamanı gelen (yarı ömür tabanlı) kartlarını
+/// sorar; altında "Kelime sağlığı" panosu (Zayıf/Orta/Güçlü) ve "Hata defteri"
+/// bölümü (yanlış kart ve yarışma soruları, "Zayıf noktalar dersi" düğmesi)
+/// bulunur. Oturum bitince öğrenme günlüğüne tek 'tekrar' kaydı yazılır.
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
+import '../bilesenler/kelime_sagligi_panosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../tema/kategori_renkleri.dart';
 import '../tema/tema.dart';
+import '../yarisma/model.dart';
+import '../yarisma/soru_bankasi.dart';
 
 /// Aralıklı tekrar: zamanı gelen kartları sırayla sorar.
 class TekrarEkrani extends ConsumerStatefulWidget {
@@ -20,35 +34,24 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
   List<({String kartId, Alistirma alistirma})>? _oturum;
   ({int dogru, int toplam})? _sonuc;
 
-  /// Kart kimliğinden (dersId#indeks) alıştırmayı bulur; bulunamazsa null.
-  Alistirma? _coz(String kartId) {
-    final ayrac = kartId.lastIndexOf('#');
-    if (ayrac <= 0) return null;
-    final dersId = kartId.substring(0, ayrac);
-    final indeks = int.tryParse(kartId.substring(ayrac + 1));
-    if (indeks == null || indeks < 0) return null;
-    for (final k in ref.read(kurslarProvider)) {
-      final d = k.dersBul(dersId);
-      if (d != null) {
-        return indeks < d.alistirmalar.length ? d.alistirmalar[indeks] : null;
-      }
-    }
-    return null;
-  }
-
   List<({String kartId, Alistirma alistirma})> _bekleyenler() {
     final durum = ref.read(durumProvider).value;
     if (durum == null) return const [];
     final bugun = ref.read(bugunProvider);
+    // Yalnızca seçili alanın kurslarına ait kartlar; diğer alanın kartları
+    // orada bekler, kaybolmaz.
+    final kurslar = ref.read(alanKurslariProvider);
     return [
       for (final id in Motor.tekrarBekleyen(durum, bugun))
-        if (_coz(id) case final a?) (kartId: id, alistirma: a),
+        if (Motor.kartCoz(kurslar, id) case final a?)
+          (kartId: id, alistirma: a),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(durumProvider);
+    ref.watch(alanKurslariProvider);
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
 
@@ -57,10 +60,17 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
       return SafeArea(
         child: AlistirmaOturumu(
           alistirmalar: [for (final o in oturum) o.alistirma],
+          // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+          notGetir: (i) =>
+              ref.read(durumProvider).value?.kelimeNotlari[oturum[i].kartId],
           onSonuc: (i, dogru) => ref
               .read(durumProvider.notifier)
               .kartIsle(oturum[i].kartId, dogru),
-          onBitti: (d, t) => setState(() => _sonuc = (dogru: d, toplam: t)),
+          onBitti: (d, t) {
+            // Oturum sonu: öğrenme günlüğüne tek 'tekrar' kaydı.
+            ref.read(durumProvider.notifier).tekrarBitir(d, t);
+            setState(() => _sonuc = (dogru: d, toplam: t));
+          },
           onKapat: () => setState(() => _oturum = null),
         ),
       );
@@ -85,38 +95,61 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
               Expanded(
                 child: Center(
                   child: SingleChildScrollView(
-                    child: sonuc != null
-                        ? _Mesaj(
-                            simge: Icons.check_circle,
-                            renk: r.dogru,
-                            baslik: 'Tekrar tamamlandı',
-                            metin:
-                                '${sonuc.toplam} karttan ${sonuc.dogru} tanesini doğru bildin.',
-                            dugme: 'Tamam',
-                            onTap: () => setState(() {
-                              _sonuc = null;
-                              _oturum = null;
-                            }),
-                          )
-                        : bekleyen.isEmpty
-                        ? const _Mesaj(
-                            simge: Icons.task_alt,
-                            baslik: 'Bugün tekrar yok',
-                            metin:
-                                'Ders çözdükçe tekrar kartların burada birikir.',
-                          )
-                        : _Mesaj(
-                            simge: Icons.replay,
-                            renk: r.ana,
-                            baslik: '${bekleyen.length} kart bekliyor',
-                            metin:
-                                'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
-                            dugme: 'Tekrara başla',
-                            onTap: () => setState(() {
-                              _oturum = bekleyen;
-                              _sonuc = null;
-                            }),
-                          ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: sonuc != null
+                              ? _Mesaj(
+                                  simge: Icons.check_circle,
+                                  renk: r.dogru,
+                                  baslik: 'Tekrar tamamlandı',
+                                  metin:
+                                      '${sonuc.toplam} karttan ${sonuc.dogru} tanesini doğru bildin.',
+                                  dugme: 'Tamam',
+                                  onTap: () => setState(() {
+                                    _sonuc = null;
+                                    _oturum = null;
+                                  }),
+                                )
+                              : bekleyen.isEmpty
+                              ? const _Mesaj(
+                                  simge: Icons.task_alt,
+                                  baslik: 'Bugün tekrar yok',
+                                  metin:
+                                      'Ders çözdükçe tekrar kartların burada birikir.',
+                                )
+                              : _Mesaj(
+                                  simge: Icons.replay,
+                                  renk: r.ana,
+                                  baslik: '${bekleyen.length} kart bekliyor',
+                                  metin:
+                                      'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
+                                  dugme: 'Tekrara başla',
+                                  onTap: () => setState(() {
+                                    _oturum = bekleyen;
+                                    _sonuc = null;
+                                  }),
+                                ),
+                        ),
+                        const SizedBox(height: Olcu.b4),
+                        KelimeSagligiPanosu(
+                          durum:
+                              ref.read(durumProvider).value ??
+                              const OgrenciDurumu(),
+                          kurslar: ref.read(alanKurslariProvider),
+                        ),
+                        const SizedBox(height: Olcu.b4),
+                        _HataDefteri(
+                          durum:
+                              ref.read(durumProvider).value ??
+                              const OgrenciDurumu(),
+                          kurslar: ref.read(alanKurslariProvider),
+                          bugun: ref.read(bugunProvider),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -165,6 +198,161 @@ class _Mesaj extends StatelessWidget {
           FilledButton(onPressed: onTap, child: Text(dugme!)),
         ],
       ],
+    );
+  }
+}
+
+/// Hata defteri bölümü: seçili alanın yanlış kartları ve yarışma soruları
+/// (en yeni önce, en çok 20 satır) ve "Zayıf noktalar dersi" düğmesi.
+class _HataDefteri extends StatelessWidget {
+  const _HataDefteri({
+    required this.durum,
+    required this.kurslar,
+    required this.bugun,
+  });
+  final OgrenciDurumu durum;
+  final List<Kurs> kurslar;
+  final String bugun;
+
+  static const int _enCokSatir = 20;
+
+  /// Kayıt metni ve (yarışmada) kategori; alanda çözülemiyorsa null.
+  ({String metin, YarismaKategori? kategori})? _coz(HataKaydi h) {
+    if (h.tur == HataKaydi.turKart) {
+      final a = Motor.kartCoz(kurslar, h.id);
+      return a == null ? null : (metin: a.soru, kategori: null);
+    }
+    for (final q in tumSorular) {
+      if (q.id == h.id && q.alan == durum.alan) {
+        return (metin: q.soru, kategori: q.kategori);
+      }
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    final parlaklik = Theme.of(context).brightness;
+    final satirlar = <({HataKaydi hata, String metin, YarismaKategori? kat})>[];
+    for (final h in durum.hatalar.reversed) {
+      final c = _coz(h);
+      if (c != null) satirlar.add((hata: h, metin: c.metin, kat: c.kategori));
+    }
+    final zayifVar = Motor.zayifKartlar(
+      durum,
+      bugun,
+    ).any((id) => Motor.kartCoz(kurslar, id) != null);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          header: true,
+          child: Text('Hata defteri', style: yazi.titleLarge),
+        ),
+        const SizedBox(height: Olcu.b1),
+        if (satirlar.isEmpty)
+          Text(
+            'Yanlış bildiklerin burada birikir.',
+            style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+          )
+        else ...[
+          Text(
+            '${satirlar.length} kayıt',
+            style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+          ),
+          const SizedBox(height: Olcu.b1),
+          for (final s in satirlar.take(_enCokSatir))
+            _HataSatiri(
+              metin: s.metin,
+              ayrinti:
+                  '${s.kat?.ad ?? 'Alıştırma'} · ${s.hata.seviye} · ${s.hata.gun}',
+              renk: s.kat == null
+                  ? r.ana
+                  : KategoriRenkleri.renk(s.kat!, parlaklik),
+              simge: s.kat == null
+                  ? Icons.style_outlined
+                  : KategoriRenkleri.simge(s.kat!),
+            ),
+        ],
+        const SizedBox(height: Olcu.b2),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.track_changes),
+            label: const Text('Zayıf noktalar dersi'),
+            onPressed: zayifVar ? () => context.push('/mikro?mod=zayif') : null,
+          ),
+        ),
+        if (!zayifVar)
+          Padding(
+            padding: const EdgeInsets.only(top: Olcu.b1),
+            child: Text(
+              'Son 7 günde yanlış yaptığın alıştırma yok.',
+              style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _HataSatiri extends StatelessWidget {
+  const _HataSatiri({
+    required this.metin,
+    required this.ayrinti,
+    required this.renk,
+    required this.simge,
+  });
+  final String metin;
+  final String ayrinti;
+  final Color renk;
+  final IconData simge;
+
+  @override
+  Widget build(BuildContext context) {
+    final yazi = Theme.of(context).textTheme;
+    final r = context.renkler;
+    // Renk tek başına bilgi taşımaz: simge ve kategori adı da gösterilir.
+    return Semantics(
+      label: '$ayrinti. $metin',
+      excludeSemantics: true,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: Olcu.b1),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Olcu.b2,
+          vertical: Olcu.b1,
+        ),
+        decoration: BoxDecoration(
+          border: Border(left: BorderSide(color: renk, width: 4)),
+          color: r.yuzey,
+        ),
+        child: Row(
+          children: [
+            Icon(simge, color: renk),
+            const SizedBox(width: Olcu.b2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    metin,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: yazi.bodyMedium,
+                  ),
+                  Text(
+                    ayrinti,
+                    style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

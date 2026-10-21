@@ -64,3 +64,40 @@ final Kurs sahteKurs = Kurs(
     ),
   ],
 );
+
+/// Kod alanı için ikinci küçük kurs: 1 ünite, 1 ders, 2 alıştırma.
+const sahteKodKursId = 'sahte-kod-1';
+const sahteKodDers1 = 'sahte-kod-1.u1.d1';
+
+final Kurs sahteKodKurs = Kurs(
+  id: sahteKodKursId,
+  ad: 'Sahte Kod Kursu',
+  aciklama: 'Test için küçük kod kursu.',
+  alan: KursAlani.kod,
+  uniteler: [
+    Unite(
+      id: 'sahte-kod-1.u1',
+      ad: 'Kod Ünitesi',
+      dersler: [
+        Ders(
+          id: sahteKodDers1,
+          ad: 'Kod Dersi',
+          alistirmalar: const [
+            Secim(
+              soru: 'HTML neyin kısaltmasıdır?',
+              secenekler: ['İşaretleme dili', 'Veritabanı'],
+              dogru: 0,
+            ),
+            Kod(
+              soru: 'Boşluğu doldur.',
+              kod: '<b>___</b>',
+              secenekler: ['kalın', '</i>'],
+              dogru: 0,
+              dil: 'html',
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);

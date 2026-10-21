@@ -2,13 +2,34 @@
 # skill-etkinlestir.sh testi: geçici sahte kökte çalışır, gerçek depoya dokunmaz.
 set -uo pipefail
 GERCEK="$(cd "$(dirname "$0")/.." && pwd)"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
+T="$(mktemp -d)"; trap 'find "$T" -delete' EXIT
 mkdir -p "$T/scripts"; cp "$GERCEK/scripts/skill-etkinlestir.sh" "$T/scripts/"
 S="$T/scripts/skill-etkinlestir.sh"
 L="$T/skill-kutuphanesi"
-for d in a__x/tekil a__x/ortak b__y/ortak a__x/loop; do mkdir -p "$L/$d"; echo "# s" > "$L/$d/SKILL.md"; done
+for d in a__x/tekil a__x/ortak b__y/ortak a__x/loop a__x/taze; do mkdir -p "$L/$d"; echo "# s" > "$L/$d/SKILL.md"; done
 echo "extra" > "$L/a__x/tekil/ek.txt"
+echo "extra" > "$L/a__x/taze/ek.txt"
 printf '# Dizin\nObsidian notları\nbaşka satır\n' > "$L/INDEKS.md"
+
+# Sahte kaynak kilidi + içerik özeti (a__x tam commit'li, b__y null)
+mkdir -p "$T/docs/skill-kaynaklari"
+(cd "$T" && find skill-kutuphanesi/a__x skill-kutuphanesi/b__y -type f | LC_ALL=C sort | xargs sha256sum > docs/skill-kaynaklari/icerik-ozeti.sha256)
+cat > "$T/docs/skill-kaynaklari/kaynak-kilidi.json" <<'JSN'
+{
+  "kaynaklar": [
+    {
+      "depo": "a/x",
+      "hedef": "skill-kutuphanesi/a__x",
+      "tam_commit": "0123456789abcdef0123456789abcdef01234567"
+    },
+    {
+      "depo": "b/y",
+      "hedef": "skill-kutuphanesi/b__y",
+      "tam_commit": null
+    }
+  ]
+}
+JSN
 
 BAS=0; HAT=0
 kontrol() { # ad beklenen_cikis cikti_deseni -- komut...
@@ -30,8 +51,19 @@ kontrol "mevcut reddi" 1 "zaten var" -- "$S" tekil
 kontrol "bulunamadı" 1 "bulunamadı" -- "$S" yokboyle
 kontrol "belirsiz" 1 "b__y" -- "$S" ortak
 yok "$T/.claude/skills/ortak" "belirsiz etkinleşmedi"
-kontrol "sahip/ad ile çözme" 0 "Etkinleştirildi" -- "$S" b__y/ortak
-[[ "$(cat "$T/.claude/skills/ortak/.kaynak")" == "skill-kutuphanesi/b__y/ortak" ]] && { BAS=$((BAS+1)); echo "GEÇTİ: doğru depo"; } || { HAT=$((HAT+1)); echo "KALDI: doğru depo"; }
+kontrol "null tam_commit reddi" 1 "tam_commit" -- "$S" b__y/ortak
+yok "$T/.claude/skills/ortak" "null commit etkinleşmedi"
+kontrol "sahip/ad ile çözme" 0 "Etkinleştirildi" -- "$S" a__x/ortak
+[[ "$(cat "$T/.claude/skills/ortak/.kaynak")" == "skill-kutuphanesi/a__x/ortak" ]] && { BAS=$((BAS+1)); echo "GEÇTİ: doğru depo"; } || { HAT=$((HAT+1)); echo "KALDI: doğru depo"; }
+# kilit zorlaması: bozulmuş ve fazladan dosya
+echo "bozuk" >> "$L/a__x/taze/ek.txt"
+kontrol "bozulmuş dosya reddi" 1 "ek.txt" -- "$S" a__x/taze
+yok "$T/.claude/skills/taze" "bozuk skill kopyalanmadı"
+echo "extra" > "$L/a__x/taze/ek.txt"
+echo "yabanci" > "$L/a__x/taze/yabanci.txt"
+kontrol "fazladan dosya reddi" 1 "yabanci.txt" -- "$S" a__x/taze
+yok "$T/.claude/skills/taze" "fazladan dosyalı skill kopyalanmadı"
+rm "$L/a__x/taze/yabanci.txt"
 kontrol "yerleşik ad" 1 "yerleşik" -- "$S" loop
 kontrol "yerleşik ad sahip/ad" 1 "yerleşik" -- "$S" a__x/loop
 yok "$T/.claude/skills/loop" "yerleşik etkinleşmedi"

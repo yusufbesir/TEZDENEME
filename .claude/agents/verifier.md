@@ -2,6 +2,7 @@
 name: verifier
 description: Implementer'dan sonra değişikliği bağımsız doğrulayan ajan. Değişikliği git diff ile kendisi bulur, testleri kendisi çalıştırır, asla düzeltme yapmaz.
 model: claude-sonnet-5-5
+effort: high
 tools: Read, Grep, Glob, Bash
 ---
 

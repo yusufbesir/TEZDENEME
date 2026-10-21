@@ -1,3 +1,11 @@
+/// Tasarım sabitleri, kırılma noktaları (dar/orta/geniş) ve açık/koyu tema.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Kırılma noktaları ve metin ölçeği sınırı yalnız burada tanımlanır.
+/// `kisaSayi` ve `siganMetin`: yazıyı küçültmeden sığdırma yardımcıları.
+library;
+
 import 'package:flutter/material.dart';
 
 import 'renkler.dart';
@@ -12,8 +20,31 @@ abstract final class Olcu {
   static const double b2 = 16;
   static const double b3 = 24;
   static const double b4 = 32;
-  static const double genisEkran = 900;
   static const double icerikGenislik = 720;
+
+  // Kırılma noktaları (pencere genişliği, mantıksal px) — tek yerde.
+  /// Altı: dar (alt gezinme çubuğu, tek sütun, 56 px hedef halkası).
+  static const double darEkran = 600;
+
+  /// 600–899: orta (daraltılmış NavigationRail, tek sütun).
+  /// >= 900: geniş (genişletilmiş rail; yeterli yer varsa iki sütun).
+  static const double genisEkran = 900;
+
+  /// Rail genişlikleri (daraltılmış / genişletilmiş) ve ayırıcı çizgi.
+  static const double railDar = 80;
+  static const double railGenis = 180;
+
+  /// Yol sütununun en az genişliği ve yan panelin sınırları.
+  static const double yolMinGenislik = 360;
+  static const double panelMin = 300;
+  static const double panelMax = 420;
+
+  /// Metin ölçeği sınırları: hiçbir yerde 1,0'ın altına inmez.
+  static const double metinOlcekEn = 1.0;
+  static const double metinOlcekEnCok = 1.3;
+
+  static bool dar(double genislik) => genislik < darEkran;
+  static bool genis(double genislik) => genislik >= genisEkran;
 
   /// Animasyonlar en çok 250 ms; sistem animasyonları kapattıysa 0.
   static Duration sure(BuildContext context, [int ms = 200]) {
@@ -22,6 +53,41 @@ abstract final class Olcu {
         ? Duration.zero
         : Duration(milliseconds: kisa);
   }
+}
+
+/// Büyük sayıyı kısaltır: 999 ve altı olduğu gibi, üstü "1,2k" biçiminde.
+String kisaSayi(int n) {
+  if (n.abs() < 1000) return '$n';
+  final bin = n.abs() / 1000;
+  final metin = bin >= 100 || bin == bin.roundToDouble()
+      ? bin.round().toString()
+      : bin.toStringAsFixed(1).replaceAll('.', ',');
+  return '${n < 0 ? '-' : ''}${metin}k';
+}
+
+/// Metnin yazı boyutunu KÜÇÜLTMEDEN sığdırır: önce stiller (büyükten küçüğe),
+/// her stilde adaylar (uzundan kısaya) denenir; ilk sığan döner. Hiçbiri
+/// sığmazsa son stil + son aday döner (taşan kısım ellipsis ile kesilir).
+/// Yazı boyutu hiçbir zaman verilen stillerin en küçüğünün altına inmez.
+({String metin, TextStyle stil}) siganMetin(
+  BuildContext context, {
+  required List<String> adaylar,
+  required List<TextStyle> stiller,
+  required double genislik,
+}) {
+  final olcek = MediaQuery.textScalerOf(context);
+  for (final stil in stiller) {
+    for (final aday in adaylar) {
+      final tp = TextPainter(
+        text: TextSpan(text: aday, style: stil),
+        textDirection: TextDirection.ltr,
+        textScaler: olcek,
+        maxLines: 1,
+      )..layout();
+      if (tp.width <= genislik) return (metin: aday, stil: stil);
+    }
+  }
+  return (metin: adaylar.last, stil: stiller.last);
 }
 
 const String yaziBaslik = 'Nunito';

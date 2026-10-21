@@ -1,20 +1,68 @@
+/// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
+/// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
+/// seçimi).
+/// `/mikro` rotası `mod=zayif` (zayıf noktalar), `mod=karisik&ders=<id>`
+/// (ünite sonu serpiştirilmiş tekrar) ve `mod=quiz&ders=<id>&yanlis=0,3`
+/// (ders sonu kısa quiz) parametrelerini alır.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// MaterialApp builder'ı yükleme ekranını gösterir ve metin ölçeğini
+/// [1,0 ; 1,3] aralığına kıstırır.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'durum/saglayicilar.dart';
+import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
+import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
+import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
+import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
+import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/sertifika_ekrani.dart';
+import 'ekranlar/sinav_ekrani.dart';
+import 'ekranlar/unite_ozeti_ekrani.dart';
+import 'ekranlar/yerlestirme_ekrani.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
+  // Durum yüklenince, alan değişince ya da ilk açılış akışı bitince
+  // yönlendirme yeniden değerlendirilir.
+  final yenile = ValueNotifier<int>(0);
+  ref.listen(durumProvider, (onceki, simdi) {
+    if (onceki?.value?.alan != simdi.value?.alan ||
+        onceki?.value?.ilkAcilisTamam != simdi.value?.ilkAcilisTamam ||
+        onceki?.hasValue != simdi.hasValue) {
+      yenile.value++;
+    }
+  });
   final yonlendirici = GoRouter(
     initialLocation: '/yol',
+    refreshListenable: yenile,
+    redirect: (context, state) {
+      final durum = ref.read(durumProvider).value;
+      if (durum == null) return null; // yükleniyor: ekran yükleniyor gösterir
+      // Alan seçilmemişse ya da ilk açılış akışı bitmemişse her yer alan
+      // seçimine (ilk açılışta "Hoş geldin" akışına) gider. (Alan seçiliyken
+      // /alan-sec açık kalabilir: Profil'deki "Değiştir" oraya gider; seçim
+      // sonrası alan seçim ekranı kendisi /yol'a geçer.)
+      if ((durum.alan == null || !durum.ilkAcilisTamam) &&
+          state.matchedLocation != '/alan-sec') {
+        return '/alan-sec';
+      }
+      return null;
+    },
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, kabuk) => Kabuk(kabuk: kabuk),
@@ -22,6 +70,14 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(path: '/yol', builder: (c, s) => const AnaSayfa()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/yarisma',
+                builder: (c, s) => const YarismaYerTutucu(),
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -34,23 +90,71 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
               GoRoute(path: '/profil', builder: (c, s) => const ProfilEkrani()),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/ayarlar',
-                builder: (c, s) => const AyarlarEkrani(),
-              ),
-            ],
-          ),
         ],
       ),
+      GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
+      GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
+      GoRoute(
+        path: '/hikaye/:id',
+        builder: (c, s) => HikayeEkrani(hikayeId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ornekler',
+        builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(
+        path: '/ornek/:id',
+        builder: (c, s) =>
+            OrnekDetayEkrani(ornekId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/mikro',
+        // mod=zayif: hata defterinden zayıf noktalar dersi;
+        // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar;
+        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz.
+        builder: (c, s) => MikroDersEkrani(
+          mod: s.uri.queryParameters['mod'],
+          dersId: s.uri.queryParameters['ders'],
+          yanlis: s.uri.queryParameters['yanlis'],
+        ),
+      ),
+      GoRoute(
+        path: '/yerlestirme',
+        builder: (c, s) =>
+            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+      ),
+      GoRoute(
+        path: '/sinav',
+        // kurs=<id>&unite=<indeks>: ünite ara sınavı; unite yoksa sertifika.
+        builder: (c, s) => SinavEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/unite-ozeti',
+        builder: (c, s) => UniteOzetiEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/sertifika',
+        builder: (c, s) =>
+            SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+      ),
+      GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],
   );
-  ref.onDispose(yonlendirici.dispose);
+  ref.onDispose(() {
+    yonlendirici.dispose();
+    yenile.dispose();
+  });
   return yonlendirici;
 });
 
@@ -84,7 +188,17 @@ class AdimAdimUygulama extends ConsumerWidget {
             ),
           );
         }
-        return child ?? const SizedBox.shrink();
+        // Metin ölçeği [1,0 ; 1,3] aralığına kıstırılır: ne okunmaz küçülür
+        // ne de yerleşimi bozacak kadar büyür.
+        final medya = MediaQuery.of(context);
+        final olcek = medya.textScaler
+            .scale(1.0)
+            .clamp(Olcu.metinOlcekEn, Olcu.metinOlcekEnCok)
+            .toDouble();
+        return MediaQuery(
+          data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
+          child: child ?? const SizedBox.shrink(),
+        );
       },
     );
   }

@@ -1,10 +1,18 @@
+/// Günlük XP hedef halkası: halka + ortada simge ve "12/30" metni.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Hedef dolunca renk ana renkten doğru rengine geçer (≤250 ms).
+/// Halka verilen alana LayoutBuilder ile uyar; yazı çapla orantılıdır ama 11 px
+/// altına inmez; sığmayan sayı küçültülmez, kısaltılır (1,2k).
+library;
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../tema/tema.dart';
 
-/// Günlük XP hedef halkası: halka + ortada simge ve "12/30" metni.
 class HedefHalkasi extends StatelessWidget {
   const HedefHalkasi({
     super.key,
@@ -17,7 +25,13 @@ class HedefHalkasi extends StatelessWidget {
   final int hedef;
   final double boyut;
 
+  /// Küçük halka (üst şerit): yalnızca "xp/hedef" yazar.
+  bool get kucuk => boyut < 84;
+
   bool get tamam => hedef > 0 && xp >= hedef;
+
+  /// Metin boyutunun alt sınırı (px): halka küçülse de okunur kalır.
+  static const double enKucukYazi = 11;
 
   @override
   Widget build(BuildContext context) {
@@ -26,59 +40,120 @@ class HedefHalkasi extends StatelessWidget {
     final etiket = tamam
         ? 'Günlük hedef tamamlandı: $xp / $hedef XP'
         : 'Günlük hedef: $xp / $hedef XP';
-    return Semantics(
-      label: etiket,
-      excludeSemantics: true,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: oran),
-        duration: Olcu.sure(context, 250),
-        builder: (context, deger, _) => SizedBox(
-          width: boyut,
-          height: boyut,
-          child: CustomPaint(
-            painter: _HalkaBoyaci(
-              oran: deger,
-              iz: r.kenar,
-              ilerleme: tamam ? r.dogru : r.ana,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    tamam ? Icons.check_circle : Icons.flag_outlined,
-                    size: 20,
-                    color: tamam ? r.dogru : r.ana,
+    return LayoutBuilder(
+      builder: (context, kisit) {
+        // Verilen alana sığ: istenen boyut, mevcut en/boydan büyük olamaz.
+        final cap = math.min(
+          boyut,
+          math.min(
+            kisit.maxWidth.isFinite ? kisit.maxWidth : boyut,
+            kisit.maxHeight.isFinite ? kisit.maxHeight : boyut,
+          ),
+        );
+        final kucukMu = cap < 84;
+        final yazi = Theme.of(context).textTheme;
+        // Yazı boyutu halka çapıyla orantılı; 11 px altına inmez.
+        final sayiBoyutu = math.max(enKucukYazi, cap * 0.165);
+        final altBoyut = math.max(enKucukYazi, cap * 0.115);
+        final dolgu = kucukMu ? 6.0 : 10.0;
+        final ic = cap - 2 * dolgu;
+        // Küçültmek yerine daha kısa biçim: "1234/200" → "1,2k/200" → "1,2k".
+        final sayiStili = kucukMu
+            ? yazi.labelSmall!.copyWith(fontSize: altBoyut)
+            : yazi.titleMedium!.copyWith(fontSize: sayiBoyutu);
+        final sigan = siganMetin(
+          context,
+          adaylar: [
+            '$xp/$hedef',
+            '${kisaSayi(xp)}/${kisaSayi(hedef)}',
+            kisaSayi(xp),
+          ],
+          stiller: [sayiStili],
+          genislik: ic,
+        );
+        return Semantics(
+          label: etiket,
+          excludeSemantics: true,
+          child: TweenAnimationBuilder<Color?>(
+            // Hedef dolunca renk ana renkten doğru rengine geçer.
+            tween: ColorTween(end: tamam ? r.dogru : r.ana),
+            duration: Olcu.sure(context, 250),
+            builder: (context, renk, _) => TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: oran),
+              duration: Olcu.sure(context, 250),
+              builder: (context, deger, _) => SizedBox(
+                width: cap,
+                height: cap,
+                child: CustomPaint(
+                  painter: _HalkaBoyaci(
+                    oran: deger,
+                    iz: r.kenar,
+                    ilerleme: renk ?? r.ana,
+                    kalinlik: kucukMu ? 5 : 8,
                   ),
-                  Text(
-                    '$xp/$hedef',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  child: Padding(
+                    padding: EdgeInsets.all(dolgu),
+                    child: Center(
+                      child: kucukMu
+                          ? Text(
+                              sigan.metin,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                              style: sigan.stil,
+                            )
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  tamam
+                                      ? Icons.check_circle
+                                      : Icons.flag_outlined,
+                                  size: math.max(16, cap * 0.19),
+                                  color: renk,
+                                ),
+                                Text(
+                                  sigan.metin,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: sigan.stil,
+                                ),
+                                Text(
+                                  'XP',
+                                  style: yazi.labelSmall?.copyWith(
+                                    fontSize: altBoyut,
+                                    color: r.metinIkincil,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
-                  Text(
-                    'XP',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelSmall?.copyWith(color: r.metinIkincil),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
 class _HalkaBoyaci extends CustomPainter {
-  _HalkaBoyaci({required this.oran, required this.iz, required this.ilerleme});
+  _HalkaBoyaci({
+    required this.oran,
+    required this.iz,
+    required this.ilerleme,
+    required this.kalinlik,
+  });
   final double oran;
   final Color iz;
   final Color ilerleme;
+  final double kalinlik;
 
   @override
   void paint(Canvas canvas, Size size) {
-    const kalinlik = 8.0;
     final alan = Offset.zero & size;
     final daire = alan.deflate(kalinlik / 2);
     final boya = Paint()
@@ -99,5 +174,8 @@ class _HalkaBoyaci extends CustomPainter {
 
   @override
   bool shouldRepaint(_HalkaBoyaci eski) =>
-      eski.oran != oran || eski.iz != iz || eski.ilerleme != ilerleme;
+      eski.oran != oran ||
+      eski.kalinlik != kalinlik ||
+      eski.iz != iz ||
+      eski.ilerleme != ilerleme;
 }
