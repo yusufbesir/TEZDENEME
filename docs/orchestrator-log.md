@@ -9,6 +9,7 @@
 | 2026-10-10 | skill-etkinlestir.sh betiği ve testini yaz | implementer / claude-sonnet-5-5 | 18.371 toplam | Başarılı. 2 dosya, 29 test geçti. |
 | 2026-10-10 | Skill kütüphanesi (1.409 skill) ve betiği doğrula | verifier / claude-sonnet-5-5 | 13.974 toplam | Kaldı. ComposioHQ altında 4 kapalı lisanslı (All rights reserved) skill. Orkestratör kaldırdı. |
 | 2026-10-10 | Lisans düzeltmesini yeniden doğrula (1.404 skill) | verifier / claude-sonnet-5-5 | 11.973 toplam | Geçti. |
+| 2026-10-11 | Çekirdek kart taslağı için profil notlarını özetle | scout / claude-haiku-5-5 | 29.410 toplam | Başarılı. 6 not okundu, dosya:satır referanslı özet; kişisel öğrenme, kırılganlık ve kırmızı çizgi bilgisi notlarda yok. |
 | 2026-10-15 | Adım Adım: platform/dil karşılaştırması (Flutter, RN, KMP, MAUI, Tauri) | araştırma (general-purpose) / claude-sonnet-5-5 | 101.257 toplam | Başarılı. Flutter önerildi; kaynaklar docs/KARAR-PLATFORM.md. [İP:Adım Adım öğrenme uygulaması#Dwv81f] |
 | 2026-10-15 | Adım Adım: deneyim kalıpları, renk bilimi, tipografi araştırması | araştırma (general-purpose) / claude-sonnet-5-5 | 106.517 toplam | Başarılı. Petrol/teal OKLCH paleti, Nunito+Inter; docs/TASARIM.md. |
 | 2026-10-15 | Adım Adım: motor (seviye, seri, Leitner, cevap kontrolü) ve DosyaDepo | implementer / claude-sonnet-5-5 | 60.121 toplam | Başarılı. 74 test geçti, analyze temiz. |
