@@ -40,6 +40,12 @@ class SahteBildirim implements BildirimServisi {
   }
 
   @override
+  Future<bool> tekrarBildirimi(int sayi) async {
+    cagrilar.add('tekrar:$sayi');
+    return izin;
+  }
+
+  @override
   Future<void> iptal() async => cagrilar.add('iptal');
 }
 

@@ -1,13 +1,14 @@
 /// Öğrenci durumu: XP, seri, aralıklı tekrar kartları (yarı ömür), hata defteri,
 /// haftalık hedef, tamamlanan dersler, son açılan ders, öğrenme günlüğü,
-/// kelime notları (kişisel mnemonikler), günün bilmecesi cevabı ve ilk açılış
-/// akışının tamamlanma bayrağı.
+/// kelime notları (kişisel mnemonikler), günün bilmecesi cevabı, ilk açılış
+/// akışının tamamlanma bayrağı ve açılıştaki "bekleyen tekrar" bildiriminin
+/// ayarı/son gösterim günü.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
-/// ilk açılış akışını görmez).
+/// ilk açılış akışını görmez; tekrar bildirimi açık ve hiç gösterilmemiş).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -164,6 +165,7 @@ class GunlukKayit {
   static const String turYarisma = 'yarisma';
   static const String turQuiz = 'quiz';
   static const String turBilmece = 'bilmece';
+  static const String turHikaye = 'hikaye';
   static const List<String> turler = [
     turDers,
     turMikro,
@@ -171,6 +173,7 @@ class GunlukKayit {
     turYarisma,
     turQuiz,
     turBilmece,
+    turHikaye,
   ];
 
   /// En çok saklanan kayıt sayısı; en eskisi düşer.
@@ -182,7 +185,7 @@ class GunlukKayit {
   /// Kaydın günü 'YYYY-MM-DD'.
   final String gun;
 
-  /// 'ders' | 'mikro' | 'tekrar' | 'yarisma' | 'quiz' | 'bilmece'.
+  /// 'ders' | 'mikro' | 'tekrar' | 'yarisma' | 'quiz' | 'bilmece' | 'hikaye'.
   final String tur;
 
   /// Ders kimliği (ders, quiz) ya da kategori (yarışma); diğerlerinde null.
@@ -270,6 +273,9 @@ class OgrenciDurumu {
     this.kelimeNotlari = const {},
     this.bilmece,
     bool? ilkAcilisTamam,
+    this.sonTekrarBildirimGunu,
+    this.tekrarBildirimiAcik = true,
+    this.tamamlananHikayeler = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -319,6 +325,16 @@ class OgrenciDurumu {
   /// İlk açılış akışının ("Hoş geldin") açıkça kaydedilmiş sonucu; null:
   /// belirtilmemiş (eski kayıt ya da doğrudan kurulmuş durum).
   final bool? _ilkAcilisTamam;
+
+  /// Açılıştaki "bekleyen tekrar" bildiriminin en son gösterildiği gün
+  /// 'YYYY-MM-DD'; null: hiç gösterilmedi. Günde en çok bir kez gösterilir.
+  final String? sonTekrarBildirimGunu;
+
+  /// Açılışta bekleyen tekrar sayısı bildirilsin mi? Varsayılan true.
+  final bool tekrarBildirimiAcik;
+
+  /// Okuma hikâyeleri: hikâye kimliği -> kaç kez tamamlandı (eski kayıtta boş).
+  final Map<String, int> tamamlananHikayeler;
 
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
@@ -370,6 +386,9 @@ class OgrenciDurumu {
     Map<String, String>? kelimeNotlari,
     BilmeceDurumu? bilmece,
     bool? ilkAcilisTamam,
+    String? sonTekrarBildirimGunu,
+    bool? tekrarBildirimiAcik,
+    Map<String, int>? tamamlananHikayeler,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -394,6 +413,10 @@ class OgrenciDurumu {
       kelimeNotlari: kelimeNotlari ?? this.kelimeNotlari,
       bilmece: bilmece ?? this.bilmece,
       ilkAcilisTamam: ilkAcilisTamam ?? _ilkAcilisTamam,
+      sonTekrarBildirimGunu:
+          sonTekrarBildirimGunu ?? this.sonTekrarBildirimGunu,
+      tekrarBildirimiAcik: tekrarBildirimiAcik ?? this.tekrarBildirimiAcik,
+      tamamlananHikayeler: tamamlananHikayeler ?? this.tamamlananHikayeler,
     );
   }
 
@@ -419,6 +442,9 @@ class OgrenciDurumu {
     'kelimeNotlari': kelimeNotlari,
     'bilmece': bilmece?.toJson(),
     'ilkAcilisTamam': ilkAcilisTamam,
+    'sonTekrarBildirimGunu': sonTekrarBildirimGunu,
+    'tekrarBildirimiAcik': tekrarBildirimiAcik,
+    'tamamlananHikayeler': tamamlananHikayeler,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -482,6 +508,7 @@ class OgrenciDurumu {
         ? gunluk.sublist(gunluk.length - GunlukKayit.enCok)
         : gunluk;
     final sonDers = j['sonDersId'];
+    final sonTekrarGunu = j['sonTekrarBildirimGunu'];
     // Kelime notları: anahtar kart kimliği ('#' içerir), değer boş olmayan
     // metin (en çok notEnCokKarakter); fazlası ve bozuk girdiler atlanır.
     final notlar = <String, String>{};
@@ -537,6 +564,19 @@ class OgrenciDurumu {
       ilkAcilisTamam: j['ilkAcilisTamam'] is bool
           ? j['ilkAcilisTamam'] as bool
           : null,
+      // Eski kayıtta yoksa: hiç gösterilmedi, bildirim açık.
+      sonTekrarBildirimGunu:
+          (sonTekrarGunu is String && gunGecerli(sonTekrarGunu))
+          ? sonTekrarGunu
+          : null,
+      tekrarBildirimiAcik: j['tekrarBildirimiAcik'] is bool
+          ? j['tekrarBildirimiAcik'] as bool
+          : true,
+      // Eski kayıtta yoksa boş; anahtar hikâye kimliği ('#' içermez).
+      tamamlananHikayeler: sayac(
+        j['tamamlananHikayeler'],
+        (k) => !k.contains('#'),
+      ),
     );
   }
 }

@@ -1,7 +1,8 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
 /// ders" düğmesi, "Kaldığın yerden devam" kartı (DevamKarti), dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
 /// ses, "Kartlara ekle"; kaydırılabilir alanda), her alanda hemen altında
-/// "Günün bilmecesi" kartı (BilmeceKarti) ve alan kurslarının tek
+/// "Günün bilmecesi" kartı (BilmeceKarti), dil alanında hemen altında
+/// "Okuma hikâyeleri" kartı (HikayeKarti) ve alan kurslarının tek
 /// doğrusal basamak yolu. Seri göstergesinin altında "Bu hafta 3/5 gün"
 /// haftalık hedef satırı bulunur.
 /// Yerleşim kullanılabilir genişliğe göre seçilir (LayoutBuilder): yan panel
@@ -22,6 +23,7 @@ import '../bilesenler/basamak.dart';
 import '../bilesenler/bilmece_karti.dart';
 import '../bilesenler/devam_karti.dart';
 import '../bilesenler/hedef_halkasi.dart';
+import '../bilesenler/hikaye_karti.dart';
 import '../bilesenler/profil_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -288,6 +290,12 @@ class _YolListesi extends StatelessWidget {
       // Günün bilmecesi her alanda; Secim alıştırması yoksa kendisi boş çizer.
       if (Motor.bilmeceSec(kurslar, bugun) != null) ...[
         BilmeceKarti(durum: durum, kurslar: kurslar, bugun: bugun),
+        const SizedBox(height: Olcu.b3),
+      ],
+      // Okuma hikâyeleri yalnız dil alanında, bilmecenin altında; aktif
+      // kurslarda hikâye yoksa kendisi boş çizer.
+      if (durum.alan == 'dil' && HikayeKarti.grupla(kurslar).isNotEmpty) ...[
+        HikayeKarti(durum: durum, kurslar: kurslar),
         const SizedBox(height: Olcu.b3),
       ],
     ];

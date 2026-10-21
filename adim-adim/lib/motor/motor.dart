@@ -355,6 +355,58 @@ abstract final class Motor {
     );
   }
 
+  /// Okuma hikâyesinin kazandıracağı XP: doğru başına 2 + bilinmeyen kelime
+  /// sayısı kadar bonus (öğrenilen kelime), en çok [hikayeEnCokXp].
+  static const int hikayeEnCokXp = 15;
+  static int hikayeXp(int dogru, int toplam, int bilinmeyen) {
+    final t = toplam < 0 ? 0 : toplam;
+    final dg = dogru < 0 ? 0 : (dogru > t ? t : dogru);
+    final bonus = bilinmeyen < 0 ? 0 : bilinmeyen;
+    final xp = dg * 2 + bonus;
+    return xp > hikayeEnCokXp ? hikayeEnCokXp : xp;
+  }
+
+  /// Kelime ön testi sonucu: bilinen / toplam, yüzde (0..100, yuvarlanmış).
+  /// Toplam 0 ise 0.
+  static int kelimeBilgisiYuzde(int bilinen, int toplam) {
+    if (toplam <= 0) return 0;
+    final b = bilinen < 0 ? 0 : (bilinen > toplam ? toplam : bilinen);
+    return (b * 100 / toplam).round();
+  }
+
+  /// Hikâye bitişi: XP/seri işlenir (kartlar, `tamamlanan` ve `sonDersId`
+  /// değişmez), `tamamlananHikayeler[id]` bir artar, günlüğe 'hikaye' kaydı
+  /// (id = hikâye kimliği) eklenir. Toplam 0 ise durum değişmez.
+  static OgrenciDurumu hikayeBitir(
+    OgrenciDurumu d,
+    String hikayeId,
+    int dogru,
+    int toplam,
+    int bilinmeyen,
+    String bugun,
+  ) {
+    if (toplam <= 0) return d;
+    final xp = hikayeXp(dogru, toplam, bilinmeyen);
+    final dg = dogru < 0 ? 0 : (dogru > toplam ? toplam : dogru);
+    final yeni = _kazancIsle(d, xp, bugun).copyWith(
+      tamamlananHikayeler: {
+        ...d.tamamlananHikayeler,
+        hikayeId: (d.tamamlananHikayeler[hikayeId] ?? 0) + 1,
+      },
+    );
+    return gunlukEkle(
+      yeni,
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turHikaye,
+        id: hikayeId,
+        dogru: dg,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
   /// Günün bilmecesinin doğru cevaba XP'si.
   static const int bilmeceXp = 2;
 
@@ -861,6 +913,17 @@ abstract final class Motor {
             return c != 0 ? c : x.key.compareTo(y.key);
           });
     return [for (final e in liste) e.key];
+  }
+
+  /// Açılışta "bekleyen tekrar" bildirimi gösterilmeli mi? Gösterilecek
+  /// sayıyı, gösterilmemeliyse null döndürür: ayar kapalıysa, bugün bekleyen
+  /// kart yoksa ya da bildirim bugün zaten gösterildiyse null (günde en çok
+  /// bir kez). Saf işlevdir; servis çağrısı sağlayıcıda yapılır.
+  static int? tekrarBildirimiGerekli(OgrenciDurumu d, String bugun) {
+    if (!d.tekrarBildirimiAcik) return null;
+    if (d.sonTekrarBildirimGunu == bugun) return null;
+    final sayi = tekrarBekleyen(d, bugun).length;
+    return sayi > 0 ? sayi : null;
   }
 
   /// Serbest yazı karşılaştırması için normalleştirir.

@@ -2,6 +2,8 @@
 /// Durum yazımları (ders, mikro ders, yarışma, tekrar oturumu, kart, ayarlar;
 /// hata defteri, öğrenme günlüğü, kelime notu, haftalık hedef, kısa quiz ve
 /// günün bilmecesi dahil) tek yerden, `DurumNotifier` üzerinden yapılır.
+/// Açılışta bugün bekleyen tekrar varsa (ayar açık, bugün gösterilmemiş)
+/// hemen bir bildirim gösterilir (ÖZELLİK 29; Windows'ta widget yerine).
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
@@ -93,6 +95,25 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             .catchError((_) => false),
       );
     }
+    // Açılışta bekleyen tekrar bildirimi: karar Motor'da (saf), günde en çok
+    // bir kez. Gün, gösterim denemesiyle işaretlenir (başarısız olsa da aynı
+    // gün yeniden denenmez; ertesi gün yine gösterilir) ve hemen kaydedilir.
+    final bugun = ref.read(bugunProvider);
+    final sayi = Motor.tekrarBildirimiGerekli(d, bugun);
+    if (sayi != null) {
+      d = d.copyWith(sonTekrarBildirimGunu: bugun);
+      try {
+        await ref.read(depoProvider).kaydet(d);
+      } catch (e) {
+        debugPrint('Tekrar bildirimi günü kaydedilemedi: $e');
+      }
+      unawaited(
+        ref
+            .read(bildirimProvider)
+            .tekrarBildirimi(sayi)
+            .catchError((_) => false),
+      );
+    }
     return d;
   }
 
@@ -175,6 +196,19 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.quizBitir(d, dersId, dogru, toplam, bugun));
   }
 
+  /// Okuma hikâyesi bitişi: XP/seri, `tamamlananHikayeler` ve 'hikaye' kaydı.
+  Future<OgrenciDurumu> hikayeBitir(
+    String hikayeId,
+    int dogru,
+    int toplam,
+    int bilinmeyen,
+  ) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => Motor.hikayeBitir(d, hikayeId, dogru, toplam, bilinmeyen, bugun),
+    );
+  }
+
   /// Günün bilmecesini cevaplar; aynı gün ikinci cevap durumu değiştirmez.
   Future<OgrenciDurumu> bilmeceCevapla(bool dogruMu) {
     final bugun = ref.read(bugunProvider);
@@ -197,7 +231,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
       _uygula((d) => Motor.notYaz(d, kartId, metin));
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
-  /// `hatirlatmaSil`: hatırlatmayı kapat. Hatırlatma açılırken bildirim izni
+  /// `hatirlatmaSil`: hatırlatmayı kapat; `tekrarBildirimiAcik`: açılıştaki
+  /// bekleyen tekrar bildirimi. Hatırlatma açılırken bildirim izni
   /// verilmezse hatırlatma geri kapatılır ve false döner.
   Future<bool> ayarGuncelle({
     String? ad,
@@ -208,6 +243,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     int? haftalikHedefGun,
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
+    bool? tekrarBildirimiAcik,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -222,6 +258,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         ),
         hatirlatmaSaati: hatirlatmaSaati,
         hatirlatmaSil: hatirlatmaSil,
+        tekrarBildirimiAcik: tekrarBildirimiAcik,
       ),
     );
     final bildirim = ref.read(bildirimProvider);

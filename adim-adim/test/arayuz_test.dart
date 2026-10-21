@@ -125,7 +125,10 @@ void main() {
     await dokun(tester, find.byType(SwitchListTile).first);
     expect((await depo.yukle()).sesAcik, false);
 
-    await dokun(tester, find.byType(SwitchListTile).last);
+    await dokun(
+      tester,
+      find.widgetWithText(SwitchListTile, 'Günlük hatırlatma'),
+    );
     expect((await depo.yukle()).hatirlatmaSaati, '20:00');
     expect(bildirim.cagrilar, ['kur:20:00']);
 
@@ -185,11 +188,18 @@ void main() {
     final bildirim = SahteBildirim()..izin = false;
     await uygulamayiAc(tester, depo, bildirim: bildirim);
     await ayarlariAc(tester);
-    await dokun(tester, find.byType(SwitchListTile).last);
+    await dokun(
+      tester,
+      find.widgetWithText(SwitchListTile, 'Günlük hatırlatma'),
+    );
     expect(find.text('Bildirim izni verilmedi'), findsOneWidget);
     expect((await depo.yukle()).hatirlatmaSaati, isNull);
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile).last).value,
+      tester
+          .widget<SwitchListTile>(
+            find.widgetWithText(SwitchListTile, 'Günlük hatırlatma'),
+          )
+          .value,
       false,
     );
   });

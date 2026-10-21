@@ -1,5 +1,5 @@
-/// Ayarlar ekranı: ad, görünüm, ses, günlük ve haftalık hedef, hatırlatma,
-/// veri sıfırlama.
+/// Ayarlar ekranı: ad, görünüm, ses, günlük ve haftalık hedef, hatırlatma
+/// (günlük saat ve açılıştaki bekleyen tekrar bildirimi), veri sıfırlama.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -384,6 +384,16 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                     onPressed: () => _saatSec(durum.hatirlatmaSaati),
                   ),
                 ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.repeat_outlined, color: r.ana),
+                title: const Text('Açılışta bekleyen tekrar bildirimi'),
+                subtitle: const Text(
+                  'Uygulama açılırken bugün bekleyen tekrar sayısını bildirir',
+                ),
+                value: durum.tekrarBildirimiAcik,
+                onChanged: (v) => notifier.ayarGuncelle(tekrarBildirimiAcik: v),
+              ),
               bolum('Veriler'),
               Text(
                 'Tüm verilerin yalnızca bu cihazda saklanır.',
