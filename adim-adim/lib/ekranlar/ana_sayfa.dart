@@ -376,7 +376,8 @@ class _YolListesi extends StatelessWidget {
         );
         ogeler.add(const SizedBox(height: Olcu.b2));
       }
-      for (final unite in kurs.uniteler) {
+      for (var ui = 0; ui < kurs.uniteler.length; ui++) {
+        final unite = kurs.uniteler[ui];
         final biten = unite.dersler
             .where((d) => Motor.dersBitmis(durum, d.id))
             .length;
@@ -453,6 +454,70 @@ class _YolListesi extends StatelessWidget {
             ),
           );
         }
+        if (Motor.araSinavAcik(durum, kurs, ui)) {
+          final sonuc = durum.araSinavlar[unite.id];
+          ogeler.add(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                key: ValueKey('ara-sinav-${unite.id}'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(48, 48),
+                ),
+                onPressed: () => context.push(
+                  '/sinav?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                ),
+                icon: Icon(
+                  Motor.araSinavGecildi(durum, unite)
+                      ? Icons.check_circle
+                      : Icons.quiz_outlined,
+                ),
+                label: Text(
+                  sonuc == null
+                      ? 'Ara sınav'
+                      : 'Ara sınav (en iyi %${sonuc.yuzde})',
+                ),
+              ),
+            ),
+          );
+        }
+        ogeler.add(const SizedBox(height: Olcu.b2));
+      }
+      if (Motor.sertifikaSinaviAcik(durum, kurs)) {
+        ogeler.add(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: Olcu.b1,
+              runSpacing: Olcu.b1,
+              children: [
+                OutlinedButton.icon(
+                  key: ValueKey('sertifika-sinavi-${kurs.id}'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                  ),
+                  onPressed: () => context.push(
+                    '/sinav?kurs=${Uri.encodeComponent(kurs.id)}',
+                  ),
+                  icon: const Icon(Icons.workspace_premium),
+                  label: const Text('Seviye sertifika sınavı'),
+                ),
+                if (Motor.sertifikaVar(durum, kurs))
+                  FilledButton.icon(
+                    key: ValueKey('sertifika-gor-${kurs.id}'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(48, 48),
+                    ),
+                    onPressed: () => context.push(
+                      '/sertifika?kurs=${Uri.encodeComponent(kurs.id)}',
+                    ),
+                    icon: const Icon(Icons.verified),
+                    label: const Text('Sertifikayı gör'),
+                  ),
+              ],
+            ),
+          ),
+        );
         ogeler.add(const SizedBox(height: Olcu.b2));
       }
     }
