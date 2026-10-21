@@ -29,6 +29,7 @@ import '../bilesenler/profil_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../motor/ders_meta.dart';
 import '../motor/motor.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
@@ -430,6 +431,8 @@ class _YolListesi extends StatelessWidget {
                 durum: bd,
                 alistirmaSayisi: ders.alistirmalar.length,
                 tekrarSayisi: kez,
+                tahminiDakika: DersMeta.dersDakika(ders),
+                temel: DersMeta.dersTemelMi(ders),
                 onTap: bd == BasamakDurumu.kilitli
                     ? () => ScaffoldMessenger.of(context)
                         ..hideCurrentSnackBar()

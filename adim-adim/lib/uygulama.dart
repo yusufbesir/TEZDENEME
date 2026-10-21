@@ -22,6 +22,7 @@ import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
+import 'ekranlar/ders_ogeleri_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
@@ -98,6 +99,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ders-ogeleri/:id',
+        builder: (c, s) =>
+            DersOgeleriEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
         path: '/hikaye/:id',

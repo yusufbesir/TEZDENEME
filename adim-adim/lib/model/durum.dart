@@ -7,7 +7,8 @@
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
 /// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme;
 /// `araSinavlar`/`sertifikalar`: ünite ara sınavı ve seviye sertifika sınavı
-/// en iyi sonuçları, boş harita)
+/// en iyi sonuçları, boş harita; `dersEnIyi`/`dersSureSn`: ders başına en iyi
+/// puan yüzdesi ve toplam çalışma süresi, boş harita)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -284,6 +285,8 @@ class OgrenciDurumu {
     this.calismaPlani,
     this.araSinavlar = const {},
     this.sertifikalar = const {},
+    this.dersEnIyi = const {},
+    this.dersSureSn = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -365,6 +368,11 @@ class OgrenciDurumu {
   /// sonuç (eski kayıtta boş). Geçilmiş sonuç sertifika hakkı verir.
   final Map<String, SinavSonucu> sertifikalar;
 
+  /// Ders başına en iyi puan (yüzde 0..100; eski kayıtta boş) ve toplam
+  /// çalışma süresi (saniye; eski kayıtta boş). Ustalık: Motor/DersMeta.
+  final Map<String, int> dersEnIyi;
+  final Map<String, int> dersSureSn;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -424,6 +432,8 @@ class OgrenciDurumu {
     bool calismaPlaniSil = false,
     Map<String, SinavSonucu>? araSinavlar,
     Map<String, SinavSonucu>? sertifikalar,
+    Map<String, int>? dersEnIyi,
+    Map<String, int>? dersSureSn,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -459,6 +469,8 @@ class OgrenciDurumu {
           : (calismaPlani ?? this.calismaPlani),
       araSinavlar: araSinavlar ?? this.araSinavlar,
       sertifikalar: sertifikalar ?? this.sertifikalar,
+      dersEnIyi: dersEnIyi ?? this.dersEnIyi,
+      dersSureSn: dersSureSn ?? this.dersSureSn,
     );
   }
 
@@ -496,6 +508,8 @@ class OgrenciDurumu {
     'sertifikalar': {
       for (final e in sertifikalar.entries) e.key: e.value.toJson(),
     },
+    'dersEnIyi': dersEnIyi,
+    'dersSureSn': dersSureSn,
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -647,6 +661,15 @@ class OgrenciDurumu {
       // Eski kayıtta yoksa boş; bozuk girdiler atlanır.
       araSinavlar: SinavSonucu.haritaCoz(j['araSinavlar']),
       sertifikalar: SinavSonucu.haritaCoz(j['sertifikalar']),
+      // Eski kayıtta yoksa boş: ders başına en iyi puan (0..100) ve toplam
+      // çalışma süresi (saniye).
+      dersEnIyi: Map.unmodifiable({
+        for (final e in sayac(j['dersEnIyi'], (k) => !k.contains('#')).entries)
+          if (e.value <= 100) e.key: e.value,
+      }),
+      dersSureSn: Map.unmodifiable(
+        sayac(j['dersSureSn'], (k) => !k.contains('#')),
+      ),
     );
   }
 }

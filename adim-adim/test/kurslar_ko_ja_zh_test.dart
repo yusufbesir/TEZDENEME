@@ -521,7 +521,7 @@ void main() {
       // Kurs başlıkları tembel listede olduğundan sayfayı sonuna kadar kaydır.
       final liste = find.byType(Scrollable).first;
       final gorulen = <String>{};
-      for (var i = 0; i < 80; i++) {
+      for (var i = 0; i < 140; i++) {
         for (final k in _yediDilKursu) {
           if (find.text(k.ad).evaluate().isNotEmpty) gorulen.add(k.id);
         }

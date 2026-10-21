@@ -141,9 +141,16 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return yeni;
   }
 
-  Future<OgrenciDurumu> dersBitir(String dersId, int dogru, int toplam) {
+  Future<OgrenciDurumu> dersBitir(
+    String dersId,
+    int dogru,
+    int toplam, {
+    int sureSn = 0,
+  }) {
     final bugun = ref.read(bugunProvider);
-    return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
+    return _uygula(
+      (d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun, sureSn: sureSn),
+    );
   }
 
   /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri
@@ -259,6 +266,19 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> kartEkle(String kartId) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartEkle(d, kartId, bugun));
+  }
+
+  /// Birden çok kartı tek yazımda tekrar kümesine ekler (toplu ekleme).
+  Future<OgrenciDurumu> kartlarEkle(Iterable<String> kartIdleri) {
+    final bugun = ref.read(bugunProvider);
+    final idler = kartIdleri.toSet();
+    return _uygula((d) {
+      var yeni = d;
+      for (final id in idler) {
+        yeni = Motor.kartEkle(yeni, id, bugun);
+      }
+      return yeni;
+    });
   }
 
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.

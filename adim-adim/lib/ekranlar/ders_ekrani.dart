@@ -15,8 +15,11 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
 import '../bilesenler/dilbilgisi_notu_karti.dart';
+import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
+import '../motor/ders_meta.dart';
+import '../motor/ders_ogeleri.dart';
 import '../motor/motor.dart';
 import '../tema/tema.dart';
 
@@ -32,6 +35,9 @@ class DersEkrani extends ConsumerStatefulWidget {
 class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
+
+  /// Ders ekranı açıldığından beri geçen süre (ustalık için çalışma süresi).
+  final Stopwatch _sure = Stopwatch()..start();
 
   /// Ders başındaki dilbilgisi notu kartı geçildi mi?
   bool _notGecildi = false;
@@ -50,6 +56,16 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   /// Bu ders ünitesinin son dersiyse ve önceki ünite alıştırması varsa true.
   bool _karisikVar(Ders ders) =>
       Motor.serpistirmeSec(ref.read(kurslarProvider), ders.id).isNotEmpty;
+
+  /// Bu dersten türetilen tekrar öğesi var mı ("Bu dersin öğeleri" düğmesi)?
+  bool _ogeVar(Ders ders) {
+    for (final k in ref.read(kurslarProvider)) {
+      if (k.dersBul(ders.id) != null) {
+        return !DersOgeleri.uret(ders, alan: k.alan).bos;
+      }
+    }
+    return false;
+  }
 
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
 
@@ -88,7 +104,7 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     _kaydediliyor = true;
     final yeni = await ref
         .read(durumProvider.notifier)
-        .dersBitir(ders.id, dogru, toplam);
+        .dersBitir(ders.id, dogru, toplam, sureSn: _sure.elapsed.inSeconds);
     if (!mounted) return;
     setState(
       () => _ozet = (
@@ -109,6 +125,19 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
       for (var i = 0; i < ders.alistirmalar.length; i++)
         if (acik || ders.alistirmalar[i] is! Soyle) i,
     ];
+  }
+
+  Widget? _ustalik(Ders ders) {
+    final d = ref.watch(durumProvider).value;
+    if (d == null) return null;
+    return UstalikKarti(
+      ustalik: DersMeta.dersUstalik(d, ders.id),
+      enIyiPuan: DersMeta.enIyiPuan(d, ders.id),
+      calismaSn: DersMeta.calismaSaniye(d, ders.id),
+      tahminiDk: DersMeta.dersDakika(ders),
+      temel: DersMeta.dersTemelMi(ders),
+      dagilim: DersMeta.dagilim(ders),
+    );
   }
 
   @override
@@ -145,6 +174,13 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                     : null,
                 ek2Etiket: 'Kısa quiz (${Motor.quizAdet} soru)',
                 onEk2: () => context.push(_quizRotasi(ders)),
+                ek3Etiket: _ogeVar(ders) ? 'Bu dersin öğeleri' : null,
+                onEk3: _ogeVar(ders)
+                    ? () => context.push(
+                        '/ders-ogeleri/${Uri.encodeComponent(ders.id)}',
+                      )
+                    : null,
+                bilgi: _ustalik(ders),
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final i in idx) ders.alistirmalar[i]],

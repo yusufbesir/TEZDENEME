@@ -182,12 +182,19 @@ abstract final class Motor {
     String dersId,
     int dogru,
     int toplam,
-    String bugun,
-  ) {
+    String bugun, {
+    int sureSn = 0,
+  }) {
     final xp = dersXp(dogru, toplam);
+    // Ustalık verisi: en iyi puan yüzdesi (düşmez) ve toplam çalışma süresi.
+    final puan = toplam > 0 ? (dogru * 100 ~/ toplam).clamp(0, 100) : 0;
+    final eskiPuan = d.dersEnIyi[dersId] ?? 0;
+    final sure = sureSn.clamp(0, 3600);
     final yeni = _kazancIsle(d, xp, bugun).copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
       sonDersId: dersId,
+      dersEnIyi: {...d.dersEnIyi, dersId: puan > eskiPuan ? puan : eskiPuan},
+      dersSureSn: {...d.dersSureSn, dersId: (d.dersSureSn[dersId] ?? 0) + sure},
     );
     return gunlukEkle(
       yeni,

@@ -12,10 +12,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../icerik/hikayeler.dart';
 import '../model/hikaye.dart';
 import '../model/icerik.dart';
+import '../motor/ders_meta.dart';
 import '../motor/motor.dart';
 import '../tema/tema.dart';
 
@@ -63,6 +65,7 @@ class UniteOzetiEkrani extends ConsumerWidget {
         ),
       );
     }
+    final unite = kurs.uniteler[uniteIndeks];
     final ozet = Motor.uniteOzeti(kurs, uniteIndeks);
     Hikaye? hikaye;
     for (final h in tumHikayeler) {
@@ -87,6 +90,14 @@ class UniteOzetiEkrani extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(ozet.uniteAd, style: yazi.headlineSmall),
+                const SizedBox(height: Olcu.b2),
+                UstalikKarti(
+                  ustalik: DersMeta.uniteUstalik(durum, unite),
+                  enIyiPuan: DersMeta.uniteEnIyiPuan(durum, unite),
+                  calismaSn: DersMeta.uniteSaniye(durum, unite),
+                  tahminiDk: DersMeta.uniteDakika(unite),
+                  temel: unite.dersler.any(DersMeta.dersTemelMi),
+                ),
                 if (ozet.kelimeler.isNotEmpty) ...[
                   baslik(ozet.kelimeBasligi),
                   for (final k in ozet.kelimeler)
