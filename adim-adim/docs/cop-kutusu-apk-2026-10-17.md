@@ -1,0 +1,193 @@
+---
+description: D:\Programlar\apk klasöründen Windows Geri Dönüşüm Kutusu'na taşınan 37 APK'nın listesi (Yusuf kararı, 2026-10-17 13:17). Dosyalar kalıcı silinmedi; çöp kutusundan geri yüklenebilir.
+sahip: Yusuf (yusufbesir)
+yazan: "[İP:Adım Adım öğrenme uygulaması#cihaz] Claude (Opus 5.5)"
+degistirme: Bu liste silinmez; geri yükleme ya da yeni taşıma tarihli bölüm olarak sona eklenir.
+---
+
+# Geri Dönüşüm Kutusu'na taşınan APK'lar (2026-10-17)
+
+## Özet
+- Karar: Yusuf, "tarama yapmakta başarılı olduğun apk dosyalarını sil" (2026-10-17 13:17).
+- Yöntem: Yalnız Windows Geri Dönüşüm Kutusu'na taşıma (`Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile` + `SendToRecycleBin`). Kalıcı silme yok.
+- Taşınan: **37 dosya, yaklaşık 1772 MB**. Taşıma sonrası çöp kutusunda 37 .apk doğrulandı; eksik yok.
+- Klasörde kalan: 60 dosya. Bunlar 57 `uptodown-*` kopyası (Trivia Crack dahil), bozuk `english-dictionary-offline-10-0-1-1q61p.apk` ve yinelenen `cplusplus-programming-1-0-5 (1).apk`. Bunlara dokunulmadı; karar Yusuf'ta.
+- Not: Grasshopper, Cake, Kotlin Language, Lichess 8.0, English Pronunciation ve U-Dictionary Çarşamba emülatör denemesi listesindeydi. Gerekirse çöp kutusundan geri yüklenebilir.
+
+## Liste (SHA256 ilk 16 karakter, boyut, dosya)
+| SHA256 (ilk 16) | MB | Dosya |
+|---|---|---|
+| F7068BCAE59472DF | 39.3 | ankidroid-2-25-2.apk |
+| FC9592F71F7446EE | 7.6 | bbc-learning-english-1-5-0.apk |
+| 882D8B98ECF110C2 | 268.7 | buddy-ai-english-for-kids-6-31-0.apk |
+| 648B43D695A96423 | 39.8 | cake-6-9-3.apk |
+| E78068C7268A1721 | 8.3 | cplusplus-programming-1-0-5.apk |
+| 2879446658EA7118 | 121.7 | dualreads-0-2-0.apk |
+| E5F33EFD98EBE2DB | 11.8 | edx-6-4-1.apk |
+| FE3839E30AB5714C | 5.3 | english-pronunciation-3-3-35.apk |
+| 7D9261166E3F3A61 | 16.3 | grasshopper-3-03-01.apk |
+| 40C02EE6F5F680C6 | 35.9 | kotlin-language-0-1-1.apk |
+| 7A7B7C9A6ABA4B3B | 1 | learn-c-programming-2-1-1.apk |
+| AE2D7318A3BC0B42 | 48.7 | learn-drawing-7-5.apk |
+| 89741B61C774D452 | 49.2 | lichess-8-0-0.apk |
+| 8997CCB33F4C75ED | 18.2 | memrise-2-9-3719864-release.apk |
+| 0599FCC7214207E6 | 6.7 | old-maps-1-1-5.apk |
+| 8D8F35A15115EFCF | 64.7 | pydroid-3-8-6-arm64.apk |
+| AC2571DC42793A9A | 23.7 | qpython3-3-0-0.apk |
+| 72469AFCEC3412D3 | 28 | sayhi-translate-5-0-20.apk |
+| 13F08B3FB26B8CF0 | 26.6 | scratchjr-1-5-11.apk |
+| 17E05B70063A5DB5 | 11.1 | socratic-by-google-1-3-0-337156962.apk |
+| 76620AD658CD9750 | 50.1 | tachiyomi-0-15-3.apk |
+| 47E646332906A31D | 0.2 | tinkercad-4.apk |
+| C4FF47FD767E5F1E | 66.5 | u-dictionary-6-7-5.apk |
+| EAF1AC8E147A10BD | 165 | kitap ve çizgi roman\audible-26-41-07.apk |
+| FF25FB797EED6A61 | 82.2 | kitap ve çizgi roman\bilibili-3-83-1.apk |
+| 6FD0FBA80889173A | 142.5 | kitap ve çizgi roman\comics-4-0-12-1-3-300684-0-comics.apk |
+| 2BAEB5621E273124 | 7.6 | kitap ve çizgi roman\english-turkish-dictionary-free-3-10-0.apk |
+| 9E313C97F14680BE | 18.7 | kitap ve çizgi roman\goodnovel-1000-0-0-br2203.apk |
+| A1B10EE79843DFAD | 52.4 | kitap ve çizgi roman\google-translate-10-39-34-995726622-4-release.apk |
+| 87B153AD66D6E50D | 6.1 | kitap ve çizgi roman\manga-master-1-3-3.apk |
+| 788B2075F3C8BF05 | 49.6 | kitap ve çizgi roman\manga-rock-3-9-8-world.apk |
+| 0A0C5957B6862558 | 99.1 | kitap ve çizgi roman\manhuaren-mini-7-4-3.apk |
+| 9160532ADC69723E | 64.9 | kitap ve çizgi roman\mihon-0-21-2.apk |
+| 554E44CC42B93DEF | 60 | kitap ve çizgi roman\tachiyomij2k-1-8-1.apk |
+| 6FAF6A3E4C4AF25D | 8.2 | kitap ve çizgi roman\viz-manga-4-14-6.apk |
+| 171EF6128A6F395E | 50.8 | kitap ve çizgi roman\webcomics-3-9-51.apk |
+| 86F0D199681A72D2 | 15.7 | kitap ve çizgi roman\z-lib-1-11-4.apk |
+
+Tam SHA256 değerleri cihazda: `D:\YusufII\Projeler\TEZDENEME\.apk-cop-kaydi-2026-10-17.txt` (depoya alınmadı).
+
+## İkinci taşıma ve yeniden indirilecek uygulamalar (2026-10-17 13:22)
+
+### İkinci taşıma
+- Karar: Yusuf, "onları da at" (13:22). Taşınan: **61 dosya, yaklaşık 1.042 MB**; 57 `uptodown-*` kopyası, bozuk `english-dictionary-offline-10-0-1-1q61p.apk`, yinelenen `cplusplus-programming-1-0-5 (1).apk` ve **yanlışlıkla** `com.etermax.trivia.preguntados2_1.169.2-359…_apkmirror.com.apk` (gerçek Trivia Crack 2; listeleme ile taşıma arasında indirilmiş, tüm klasör taşındığı için gitti).
+- Taşıma sonrası klasörde dosya kalmadı; klasör silinmedi.
+
+### Olay notu
+- 13:20 ve 13:23'te taşınan 37 + 61 dosyanın Geri Dönüşüm Kutusu'nda olduğu doğrulandı. Trivia dosyasını geri yüklemek için bakıldığında (yaklaşık 13:30) **çöp kutusu tamamen boştu** (D:\$Recycle.Bin içinde yalnız desktop.ini). Claude çöp kutusunu boşaltmadı; boşaltan bilinmiyor (kullanıcı, başka bir oturum ya da Windows Depolama Algısı olabilir). 98 dosya geri yüklenemez.
+- Ders: Bundan sonra taşıma yalnız önceden çıkarılmış ad listesindeki dosyalara yapılır; klasörün tamamı toplu taşınmaz.
+- Öneri (Yusuf'a): Depolama Algısı'nın çöp kutusunu otomatik boşaltma ayarı kontrol edilsin; ayara dokunulmadı.
+
+### Yeniden indirilecek uygulamalar
+Önerilen kaynak: APKMirror (imza doğrulamalı); açık kaynaklar için F-Droid ya da GitHub sürümleri (Pocket Code: GitHub/F-Droid). Uptodown kullanılırsa "Older versions" altından; 14,8 MB'lık dosya yine yanlıştır. "?" işaretli adlar paket adından tahmindir. Aynı liste cihazda: `D:\Programlar\apk\INDIRILECEK-UYGULAMALAR-2026-10-17.md`.
+
+## Dil öğrenme (17)
+1. Duolingo (com.duolingo)
+2. Busuu (com.busuu.android.enc)
+3. Drops (com.languagedrops.drops.international)
+4. Drops Korece (com.languagedrops.drops.learn…korean.hangul.words)
+5. Mondly (com.atistudios.mondly.languages)
+6. EWA (com.ewa.ewaapp)
+7. HelloTalk (com.hellotalk)
+8. Praktika (ai.praktika.android)
+9. Pingo AI (com.oversea.pingo)
+10. Pingo Learn ? (com.pingolearn.languages)
+11. Simpler (ru.zengalt.simpler)
+12. Beelinguapp (com.david.android.languageswitch)
+13. Catch It Korean (com.catchitplay.catchitkorean)
+14. Seyahat için Korece ? (com.breboucas.coreanoparaviajar)
+15. Issen ? (com.issen.app)
+16. Shaguf Bites ? (com.shaguf.shaguf_bites)
+17. Zatpat ? (com.zatpatmobile)
+## Sözlük ve çeviri (8)
+18. Tureng (com.tureng.sozluk)
+19. WordReference (com.wordreference)
+20. Oxford Dictionary of English (com.mobisystems.msdict…oxford.dictionaryofenglish)
+21. Naver Dictionary (com.nhn.android.naverdic)
+22. DeepL (com.deepl.mobiletranslator)
+23. iTranslate (at.nk.tools.iTranslate)
+24. Sesli çevirmen ? (translate.speech.text.translation.voicetranslator)
+25. English Dictionary Offline (dosya bozuk inmişti: english-dictionary-offline-10-0-1)
+## Kodlama (12)
+26. Mimo (com.getmimo)
+27. Sololearn (com.sololearn)
+28. Learn Java – Programming Hub ? (com.freeit.java)
+29. Java Programming ? (ab.java.programming)
+30. Encode (com.upskew.encode)
+31. Mammoth Coding (com.mammotheducation.mammothcoding)
+32. AI Tutor – Codeway (com.codeway.aitutor)
+33. Master Learn AI ? (com.master.learn.ai)
+34. Acad AI ? (com.mycompany.acadai)
+35. Mobile Game Engine ? (com.mikeytronix.mobilegameengine)
+36. Pocket Code (org.catrobat.catroid)
+37. Scratch ? (org.scratch)
+38. Arduino Projeler ve Dersler (com.caneryildirim.arduinoprojelervedersler)
+## Genel eğitim (8)
+39. Khan Academy (org.khanacademy.android)
+40. Udemy (com.udemy.android)
+41. Quizlet (com.quizlet.quizletandroid)
+42. StudySmarter (com.studysmarter)
+43. Flashcards ? (flashcards.study.tool)
+44. Derslig (com.derslig.app)
+45. Anatomy Learning 3D (com.AnatomyLearning.Anatomy3DViewer3)
+46. SkyView Lite (com.t11.skyviewfree)
+## Oyun (3)
+47. Chess.com (com.chess)
+48. Trivia Crack Lite (com.etermax.preguntados.lite)
+49. Checkmate ? (com.splendapps.checkmate; satranç değil, yapılacaklar uygulaması olabilir)
+## Okuma, sesli kitap, çizgi roman (8)
+50. Moon+ Reader (com.flyersoft.moonreader)
+51. Nextory (com.gtl.nextory)
+52. Storytel (grit.storytel.app)
+53. Lezhin Comics (com.lezhin.comics)
+54. Ktoon ? (com.manga.ktoon)
+55. MANGA Plus (jp.co.shueisha.mangaplus)
+56. MangaToon Novel – Portekizce (mobi.mangatoon.novel.portuguese)
+57. Iqra ? (com.mmmoussa.iqra)
+## Not
+- Trivia Crack 2 (com.etermax.trivia.preguntados2) — APKMirror 1.169.2, yanlışlıkla taşınan dosya
+
+## Üçüncü taşıma (2026-10-17 13:37): Trivia Crack 2, tarama sonrası
+- Karar: Yusuf, "tarama yaptıktan sonra silebilirsin" (13:27). Tarama 4980ab3 ile belgelendi, ardından **yalnız bu dosya adıyla** taşındı; klasördeki başka dosyaya dokunulmadı.
+- Dosya: `D:\Programlar\apk\com.etermax.trivia.preguntados2_1.191.4-405_minAPI22(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk`, 167,9 MB, SHA256 `257529B2EC4AB4A4C54BF6CDD32154CBFB71DE60F3333F085F51B366E4528782` (taşımadan önce eşleşti).
+- Taşıma sonrası Geri Dönüşüm Kutusu'nda görüldü (1 öğe). Not: Çöp kutusu daha önce dışarıdan boşaltıldığı için kalıcılığı garanti değil.
+
+## Dördüncü taşıma (2026-10-17 13:45): Busuu, tarama sonrası
+- Tarama 303b2b9 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
+- Dosya: `D:\Programlar\apk\com.busuu.android.enc_32.49.1(1783745)-1783745_4arch_7dpi_069d30e563faa95e4bb1888fb8574e6f_apkmirror.com.apkm`, 71.7 MB, SHA256 `DDEC20877BE1B1A230EFD6B4075DC5ACF3914875EDD282B105F5E6C9D35BD152` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
+
+
+## Beşinci taşıma (2026-10-17 13:40): Duolingo, tarama sonrası
+- Tarama cc4c720 ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
+- Dosya: `D:\Programlar\apk\com.duolingo_6.101.1-2475_4arch_6dpi_63fb3322e92449b34c6dfc6d1899def1_apkmirror.com.apkm`, 164.4 MB, SHA256 `41F7DE0C86CA9545B5FDABDE0945DEEC14EF7CBDAC275A1962C9C883EA945A0A` (taşımadan önce eşleşti). Taşıma sonrası çöp kutusunda görüldü.
+
+
+## Altıncı taşıma (2026-10-17 13:47): Chess.com ve Drops, tarama sonrası
+- Tarama 7f27b66 ile belgelendi; ardından yalnız bu iki dosya adıyla taşındı.
+- `D:\Programlar\apk\com.chess_4.10.20-googleplay-280085_4arch_7dpi_24lang_16fe58ce79eddcd4be78b76fe31cfcc6_apkmirror.com.apkm`, 235.5 MB, SHA256 `2D24FDAA4A988A6219E37DD907798CCC51C17B056B041A1DDF907482454E887C` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
+- `D:\Programlar\apk\com.languagedrops.drops.international_39.18-110391800_4arch_7dpi_24lang_d6cd34d10f4f8e1ed5c65a6b8c9336e0_apkmirror.com`, 138.2 MB, SHA256 `793AAB5FA305E02820C763A5CEAB1F5AB6088FB9B9278E8E246C7677617E10C7` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
+
+
+## Yedinci taşıma (2026-10-17 13:55): Mondly, tarama sonrası
+- Tarama b7ea26c ile belgelendi; ardından yalnız bu dosya adıyla taşındı.
+- `D:\Programlar\apk\com.atistudios.mondly.languages_10.41.5-83888_4arch_7dpi_1ded193401a9f79719739de8b1081529_apkmirror.com.apkm`, 179.2 MB, SHA256 `056071F8E1CD675FF423A9BE36D19CB74FF5C515D3449C763AD5180D3B4879FB` (eşleşti; taşıma sonrası çöp kutusunda görüldü).
+
+
+## Sekizinci taşıma (2026-10-17 14:45): toplu tarama sonrası 22 dosya
+- Tarama 8a37c85 ile belgelendi; ardından yalnız bu 22 dosya adlarıyla taşındı (toplam yaklaşık 1.203 MB). Taşıma sonrası 22'si de çöp kutusunda görüldü. Tam SHA256 değerleri cihazdaki kayıt dosyasında.
+
+| SHA256 (ilk 16) | MB | Dosya |
+|---|---|---|
+| CAFB0F60CE94649B | 222.7 | com.etermax.preguntados.lite_3.391.1-4101_3arch_7dpi_24lang_be6b7d9431f49377651810bc29895a84_apkmirror.com.apkm |
+| 26E7520B004DAFB6 | 28.6 | com.freeit.java_5.2.69-369_4arch_6dpi_1lang_b48fd325064b71f46bc6b1207b2c47f8_apkmirror.com.apkm |
+| CF2A3F44F91095ED | 147.5 | com.hellotalk_6.4.20-11674_1arch_2dpi_6a916da70ee05e8ac393e6e5d543eba1_apkmirror.com (1).apkm |
+| 033917E09D179CF8 | 66.5 | com.hellotalk_6.4.20-11674_1arch_2dpi_6a916da70ee05e8ac393e6e5d543eba1_apkmirror.com.apkm |
+| 267D5AC3A75BA3F7 | 11.5 | com.hitechrush.codegym_1.0.82-100082_1arch_2dpi_340b6b07c27f13ec6a8465e15ad45c15_apkmirror.com.apkm |
+| 5661D17399EE2840 | 35.2 | com.ichi2.anki_2.25.2-122502300_minAPI24(armeabi-v7a)(nodpi)_apkmirror.com.apk |
+| 85C2576520273065 | 24.1 | com.learnprogramming.codecamp_2.8.0-417_1arch_2dpi_24lang_050fbec9d7de54c9a116010372d20fd1_apkmirror.com.apkm |
+| 849AFDEA0B0BF08B | 82.1 | com.mobisystems.msdict.embedded.wireless.oxford.dictionaryofenglish_16.5.1183-1183_3arch_7dpi_24lang_d2030f6b4228b98b55c1ea5ced23f07e_apkmirror.com.apkm |
+| 063983F6983B4EF2 | 40 | com.nhn.android.naverdic_3.0.7-307_minAPI23(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk |
+| 3B8C368FCD4DCA2E | 38.3 | com.quizlet.quizletandroid_8.42.1-2601532_minAPI26(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk |
+| F74C766761A0645E | 31.2 | com.sololearn_4.130.11-2073_1arch_2dpi_24b166ffb96ba541529ad1f9aab6396b_apkmirror.com.apkm |
+| C113A9010432AFF9 | 34.7 | com.upskew.encode_6.23.0-197_1arch_2dpi_24lang_8ce324da40b87a9cfad104abd4f4e15b_apkmirror.com.apkm |
+| D2BB16D12B5ADC7A | 11 | com.wordreference_4.0.83-4083_minAPI21(nodpi)_apkmirror.com.apk |
+| 2C4F575F172505AB | 18.1 | cpp.programming_4.2.89-189_1arch_2dpi_1lang_f03734bc1a9e51ffc3cc548300404108_apkmirror.com.apkm |
+| E31D7023181BD0F1 | 28.9 | html.programming.learn.web.html5.website.development_4.2.89-189_4arch_6dpi_1lang_31389a93bc02189f9c22047ca7eda0e7_apkmirror.com.apkm |
+| 6A90D4D4832435F1 | 18.1 | js.javascript.web.coding.programming.learn.development_4.2.89-189_1arch_2dpi_1lang_2b10411e97dd76fe3900b899edfd0cfc_apkmirror.com.apkm |
+| 5BC15FEC10B30E5B | 60.8 | livio.pack.lang.en_US_10.0.1-1q61p-1001_minAPI23(nodpi)_apkmirror.com.apk |
+| 18D728FD605B62C8 | 202.1 | net.imaios.eanatomy_8.10.0-2319_4arch_7dpi_7d0a1ded7e266291d135926a52bae5ff_apkmirror.com.apkm |
+| E0F0B280E68CA5B1 | 33.7 | org.brilliant.android_10.15.0-1080_4arch_6dpi_24lang_f227b150c0e3d543d59b44ada956dd90_apkmirror.com.apkm |
+| 41F45FE54ED14D81 | 20.6 | org.khanacademy.android_8.5.0-104773_1arch_3dpi_f101589586b7a52718c3b48e4df045ca_apkmirror.com.apkm |
+| A13B897AF8AFDBEE | 18.3 | python.programming.coding.python3.development_4.2.89-189_1arch_2dpi_1lang_a2637fde1992276d3627af3cbfe0cd1b_apkmirror.com.apkm |
+| CEF48086076EE6B9 | 29 | sql.database.programming.coding.db.dbms_4.2.89-189_4arch_6dpi_1lang_10512d3c8811e0e33d29e9b24c5c0444_apkmirror.com.apkm |
+
