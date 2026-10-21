@@ -89,11 +89,20 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'name' 'neym' diye okunur ve 'ad' demektir; 'game' (oyun) ile karıştırma, 'my name is' kendini tanıtma kalıbıdır.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'Good morning, nice to meet you.',
+              ceviri: 'Günaydın, tanıştığımıza memnun oldum.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
           id: 'ingilizce-1.u1.d2',
           ad: 'Kendini tanıtmak',
+          dilbilgisiNotu:
+              'Be fiili özneye göre değişir: I am, you are, he/she/it is, '
+              'we are, they are. Kısaltma: I\'m, you\'re, she\'s.',
           alistirmalar: [
             Secim(
               soru: '"Where are you from?" ne demektir?',
@@ -101,10 +110,10 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 0,
               aciklama: 'Where nerede/nereden, from -den/-dan demektir.',
             ),
-            Bosluk(
-              soru: 'She ___ a teacher.',
-              secenekler: ['is', 'am', 'are'],
-              dogru: 0,
+            Isaretle(
+              soru: 'Cümledeki be fiilini işaretle.',
+              cumle: 'She is a teacher.',
+              dogru: [1],
               aciklama: 'She, he, it ile is kullanılır.',
             ),
             Bosluk(
@@ -141,15 +150,18 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   'Bunlar özne zamirleridir; be fiilinin biçimini belirlerler.',
             ),
-            Secim(
-              soru: '"He is my friend." cümlesinin anlamı nedir?',
-              secenekler: [
-                'O benim arkadaşım.',
-                'Ben onun arkadaşıyım.',
-                'Biz arkadaşız.',
+            Tablo(
+              soru: 'Be fiili çekim tablosunu tamamla.',
+              baslik: ['Özne', 'Be fiili'],
+              satirlar: [
+                ['I', 'am'],
+                ['you', 'are'],
+                ['she', 'is'],
+                ['we', 'are'],
               ],
-              dogru: 0,
-              aciklama: 'He o (erkek), my benim, friend arkadaş demektir.',
+              bos: [(satir: 0, sutun: 1), (satir: 2, sutun: 1)],
+              secenekler: ['am', 'is', 'are'],
+              aciklama: 'I ile am, she/he/it ile is kullanılır.',
             ),
             Yaz(
               soru: 'İngilizceye çevir: Türkiye\'denim.',
@@ -178,6 +190,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 2,
               aciklama:
                   "'Spain' 'speyn' gibi okunur; 'from' sözcüğü 'nereden' anlamına gelir ve 'she is from' kalıbı kökeni söyler.",
+            ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'I am from Turkey.',
+              ceviri: "Türkiye'denim.",
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
             ),
           ],
         ),
@@ -261,6 +279,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'seven' 'sevın' gibi okunur; 'I have' 'sahibim' demektir ve 'cats' sonundaki s sesiyle çoğul olur.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'I have six cats.',
+              ceviri: 'Altı kedim var.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
@@ -339,6 +363,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 1,
               aciklama:
                   "'blue' 'blu:' diye okunur, 'car' ise 'ka:r' gibi; cümle arabanın mavi olduğunu söyler.",
+            ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'My bag is black.',
+              ceviri: 'Çantam siyah.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
             ),
           ],
         ),
@@ -427,6 +457,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'brother' 'bradhır' gibi okunur (th sesi dil uçtadır); 'tall' boyu uzun anlamına gelir.",
             ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'This is my sister.',
+              ceviri: 'Bu benim kız kardeşim.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
+            ),
           ],
         ),
         Ders(
@@ -505,6 +541,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 2,
               aciklama:
                   "'kitchen' 'kiçın' gibi okunur; 'small' 'smol' diye okunur ve 'küçük' demektir.",
+            ),
+            Soyle(
+              soru: 'Cümleyi yüksek sesle söyle.',
+              metin: 'The table is in the kitchen.',
+              ceviri: 'Masa mutfakta.',
+              aciklama: 'Yavaş ve net söyle; kelimelerin sonlarını yutma.',
             ),
           ],
         ),

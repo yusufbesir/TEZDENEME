@@ -15,7 +15,8 @@ import '../model/icerik.dart';
 import 'kok.dart';
 import 'siklik.dart';
 
-/// Tek bir sözlük maddesi. `dil`: 'en' (İngilizce) ya da 'kod' (HTML/CSS/JS).
+/// Tek bir sözlük maddesi. `dil`: 'en' (İngilizce), 'ko' (Korece), 'ja'
+/// (Japonca), 'zh' (Çince) ya da 'kod' (HTML/CSS/JS).
 class SozlukMaddesi {
   const SozlukMaddesi({
     required this.kelime,
@@ -156,7 +157,8 @@ class Sozluk {
     }
 
     for (final kurs in kurslar) {
-      final dil = kurs.alan == KursAlani.kod ? 'kod' : 'en';
+      if (kurs.alan == KursAlani.oyun) continue; // Oyun kurslarında sözlük yok.
+      final dil = kursDili(kurs);
       for (final ders in kurs.tumDersler) {
         for (var i = 0; i < ders.alistirmalar.length; i++) {
           final a = ders.alistirmalar[i];
@@ -195,6 +197,19 @@ class Sozluk {
       }
     }
     return Sozluk(sonuc);
+  }
+
+  /// Kursun sözlük dili: kod kursu 'kod'; Korece 'ko', Japonca 'ja', Çince
+  /// 'zh' (kurs kimliğinin önekinden); diğer dil kursları 'en'.
+  static String kursDili(Kurs kurs) {
+    if (kurs.alan == KursAlani.kod) return 'kod';
+    return switch (kurs.id.split('-').first) {
+      'almanca' => 'de',
+      'korece' => 'ko',
+      'japonca' => 'ja',
+      'cince' => 'zh',
+      _ => 'en',
+    };
   }
 
   /// Arama için normalize: küçük harf, Türkçe harfler sadeleştirilir,
@@ -245,7 +260,7 @@ class Sozluk {
   /// duyarsız eşleşme; İngilizce maddelerde sorgunun kökü madde köküne
   /// eşitse de başlangıç eşleşmesi sayılır ("went" → "go"). Önce başlangıç,
   /// sonra içerik eşleşmeleri; her grup sıklık, sonra alfabetik sıralıdır.
-  /// [dil] verilirse yalnız o dildeki maddeler ('en' | 'kod').
+  /// [dil] verilirse yalnız o dildeki maddeler ('en' | 'ko' | 'ja' | 'zh' | 'kod').
   List<SozlukMaddesi> ara(String sorgu, {String? dil}) {
     final kaynak = dil == null
         ? maddeler

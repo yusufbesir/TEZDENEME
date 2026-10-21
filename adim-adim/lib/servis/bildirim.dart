@@ -9,6 +9,10 @@ abstract class BildirimServisi {
   /// İzin verilmez ya da kurulamazsa false döner.
   /// [izinIste] false ise izin penceresi açılmaz; izin yoksa false döner.
   Future<bool> gunlukHatirlatma(String saat, {bool izinIste = true});
+
+  /// Hemen gösterilen (zamanlanmamış) bildirim: bugün bekleyen tekrar sayısı.
+  /// İzin yoksa ya da başlatılamadıysa false; hata fırlatmaz.
+  Future<bool> tekrarBildirimi(int sayi);
   Future<void> iptal();
 }
 
@@ -19,6 +23,8 @@ class GercekBildirim implements BildirimServisi {
   Future<bool> gunlukHatirlatma(String saat, {bool izinIste = true}) =>
       Bildirim.gunlukHatirlatma(saat, izinIste: izinIste);
   @override
+  Future<bool> tekrarBildirimi(int sayi) => Bildirim.tekrarBildirimi(sayi);
+  @override
   Future<void> iptal() => Bildirim.iptal();
 }
 
@@ -28,7 +34,19 @@ abstract final class Bildirim {
   static final FlutterLocalNotificationsPlugin _eklenti =
       FlutterLocalNotificationsPlugin();
   static bool _hazir = false;
+
+  /// Günlük hatırlatmanın kimliği (zamanlanmış).
   static const int _kimlik = 1;
+
+  /// Açılıştaki "bekleyen tekrar" bildiriminin kimliği; hatırlatmadan ayrı
+  /// tutulur ki onu ezmesin (aynı kimlik Windows/Android'de üzerine yazar).
+  static const int _tekrarKimlik = 2;
+
+  /// Windows toast etkinleştirme geri çağrısını tanımlayan GUID. Sabit
+  /// olmalı: Windows, bildirimi uygulamayla bu GUID (ve appUserModelId) ile
+  /// eşler; her açılışta değişseydi gösterilen bildirimler sahipsiz kalır ve
+  /// tıklama uygulamaya dönmezdi. Uygulamaya özgüdür, bir kez üretildi.
+  static const String _windowsGuid = '3f1c6b2e-8a4d-4c9b-9e7f-2d5a1b0c7e41';
 
   static Future<bool> _baslat() async {
     if (_hazir) return true;
@@ -38,6 +56,13 @@ abstract final class Bildirim {
         iOS: DarwinInitializationSettings(),
         macOS: DarwinInitializationSettings(),
         linux: LinuxInitializationSettings(defaultActionName: 'Aç'),
+        // Windows: flutter_local_notifications 20.x, WinRT toast. Verilmezse
+        // initialize Windows'ta ArgumentError fırlatır ve hatırlatma kurulmaz.
+        windows: WindowsInitializationSettings(
+          appName: 'Adım Adım',
+          appUserModelId: 'YusufBesir.AdimAdim',
+          guid: _windowsGuid,
+        ),
       );
       await _eklenti.initialize(settings: ayar);
       _hazir = true;
@@ -74,6 +99,8 @@ abstract final class Bildirim {
       }
       final u = hedef.toUtc();
       final zaman = tz.TZDateTime.utc(u.year, u.month, u.day, u.hour, u.minute);
+      // Gövde sabittir: zamanlanmış bildirimde o günkü tekrar sayısı
+      // bilinemez; sayı, açılıştaki `tekrarBildirimi` ile verilir.
       await _eklenti.zonedSchedule(
         id: _kimlik,
         title: 'Adım Adım',
@@ -97,6 +124,39 @@ abstract final class Bildirim {
       return false;
     }
   }
+
+  /// Bugün bekleyen tekrar sayısını hemen gösterir (zamanlanmaz). İzin
+  /// penceresi açmaz; izin verilmemişse ya da başlatılamadıysa false.
+  /// Windows'ta `show` izin gerektirmez; Android 13+/iOS/macOS'ta izin daha
+  /// önce verilmediyse sistem bildirimi sessizce düşürür.
+  static Future<bool> tekrarBildirimi(int sayi) async {
+    try {
+      if (sayi <= 0) return false;
+      if (!await _baslat()) return false;
+      await _eklenti.show(
+        id: _tekrarKimlik,
+        title: 'Adım Adım',
+        body: tekrarMetni(sayi),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'bekleyen_tekrar',
+            'Bekleyen tekrar',
+            channelDescription: 'Açılışta bugün bekleyen tekrar sayısı',
+          ),
+          iOS: DarwinNotificationDetails(),
+          macOS: DarwinNotificationDetails(),
+          windows: WindowsNotificationDetails(),
+        ),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Tekrar bildirimi gösterilemedi: $e');
+      return false;
+    }
+  }
+
+  /// Bildirim gövdesi: 'Bugün N tekrar bekliyor'.
+  static String tekrarMetni(int sayi) => 'Bugün $sayi tekrar bekliyor';
 
   static Future<bool> _izinIste() async {
     final android = _eklenti

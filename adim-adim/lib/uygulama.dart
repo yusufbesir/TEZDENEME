@@ -1,8 +1,9 @@
 /// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
 /// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
 /// seçimi).
-/// `/mikro` rotası `mod=zayif` (zayıf noktalar) ve `mod=karisik&ders=<id>`
-/// (ünite sonu serpiştirilmiş tekrar) parametrelerini alır.
+/// `/mikro` rotası `mod=zayif` (zayıf noktalar), `mod=karisik&ders=<id>`
+/// (ünite sonu serpiştirilmiş tekrar) ve `mod=quiz&ders=<id>&yanlis=0,3`
+/// (ders sonu kısa quiz) parametrelerini alır.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -19,20 +20,29 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
+import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
 import 'ekranlar/yarisma_ekrani.dart';
+import 'ekranlar/sertifika_ekrani.dart';
+import 'ekranlar/sinav_ekrani.dart';
+import 'ekranlar/unite_ozeti_ekrani.dart';
+import 'ekranlar/yerlestirme_ekrani.dart';
 import 'tema/tema.dart';
 
 final yonlendiriciProvider = Provider<GoRouter>((ref) {
-  // Durum yüklenince ya da alan değişince yönlendirme yeniden değerlendirilir.
+  // Durum yüklenince, alan değişince ya da ilk açılış akışı bitince
+  // yönlendirme yeniden değerlendirilir.
   final yenile = ValueNotifier<int>(0);
   ref.listen(durumProvider, (onceki, simdi) {
     if (onceki?.value?.alan != simdi.value?.alan ||
+        onceki?.value?.ilkAcilisTamam != simdi.value?.ilkAcilisTamam ||
         onceki?.hasValue != simdi.hasValue) {
       yenile.value++;
     }
@@ -43,10 +53,12 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final durum = ref.read(durumProvider).value;
       if (durum == null) return null; // yükleniyor: ekran yükleniyor gösterir
-      // Alan seçilmemişse her yer alan seçimine gider. (Alan seçiliyken
+      // Alan seçilmemişse ya da ilk açılış akışı bitmemişse her yer alan
+      // seçimine (ilk açılışta "Hoş geldin" akışına) gider. (Alan seçiliyken
       // /alan-sec açık kalabilir: Profil'deki "Değiştir" oraya gider; seçim
       // sonrası alan seçim ekranı kendisi /yol'a geçer.)
-      if (durum.alan == null && state.matchedLocation != '/alan-sec') {
+      if ((durum.alan == null || !durum.ilkAcilisTamam) &&
+          state.matchedLocation != '/alan-sec') {
         return '/alan-sec';
       }
       return null;
@@ -81,19 +93,60 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
+      GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
       GoRoute(path: '/sozluk', builder: (c, s) => const SozlukEkrani()),
       GoRoute(
         path: '/ders/:id',
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
+        path: '/hikaye/:id',
+        builder: (c, s) => HikayeEkrani(hikayeId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/ornekler',
+        builder: (c, s) => const OrnekProgramlarEkrani(),
+      ),
+      GoRoute(
+        path: '/ornek/:id',
+        builder: (c, s) =>
+            OrnekDetayEkrani(ornekId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
         path: '/mikro',
         // mod=zayif: hata defterinden zayıf noktalar dersi;
-        // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar.
+        // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar;
+        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz.
         builder: (c, s) => MikroDersEkrani(
           mod: s.uri.queryParameters['mod'],
           dersId: s.uri.queryParameters['ders'],
+          yanlis: s.uri.queryParameters['yanlis'],
         ),
+      ),
+      GoRoute(
+        path: '/yerlestirme',
+        builder: (c, s) =>
+            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+      ),
+      GoRoute(
+        path: '/sinav',
+        // kurs=<id>&unite=<indeks>: ünite ara sınavı; unite yoksa sertifika.
+        builder: (c, s) => SinavEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/unite-ozeti',
+        builder: (c, s) => UniteOzetiEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/sertifika',
+        builder: (c, s) =>
+            SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

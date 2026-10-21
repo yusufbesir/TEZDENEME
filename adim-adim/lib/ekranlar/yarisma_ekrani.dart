@@ -104,7 +104,12 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
                     ),
                     const SizedBox(height: Olcu.b2),
                     if (liste.isEmpty)
-                      Text('Önce bir alan seç.', style: yazi.bodyLarge)
+                      Text(
+                        alan.isEmpty
+                            ? 'Önce bir alan seç.'
+                            : 'Bu alanda henüz yarışma yok.',
+                        style: yazi.bodyLarge,
+                      )
                     else ...[
                       // Dar pencerede segmentler yatay kaydırılır (kesilmez).
                       SingleChildScrollView(

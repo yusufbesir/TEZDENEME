@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'depo/depo.dart';
 import 'durum/saglayicilar.dart';
 import 'guncelleme/eski_surum_temizleyici.dart';
+import 'servis/konusma_sherpa.dart';
 import 'uygulama.dart';
 import 'yarisma/depo.dart';
 import 'yarisma/saglayicilar.dart';
@@ -35,6 +36,9 @@ Future<void> main() async {
       overrides: [
         depoProvider.overrideWithValue(depo),
         yarismaDepoProvider.overrideWithValue(yarismaDepo),
+        // Çevrimdışı konuşma tanıma yalnız Windows'ta; model yoksa hazır değil.
+        if (Platform.isWindows)
+          konusmaProvider.overrideWithValue(SherpaKonusma()),
       ],
       child: const AdimAdimUygulama(),
     ),

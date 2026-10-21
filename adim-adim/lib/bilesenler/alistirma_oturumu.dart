@@ -67,8 +67,26 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
     for (var i = 0; i < _ipucuAdim; i++) Motor.ipucuUret(_simdiki, i),
   ];
 
+  /// Bant açıklaması: yanlış cevaba özel mesaj (Hamle türünde
+  /// `hataMesajlari`) varsa önce o, sonra alıştırmanın açıklaması.
+  String? get _aciklama {
+    final ozel = _dogruMu ? null : Motor.hataMesaji(_simdiki, _cevap);
+    final genel = _simdiki.aciklama;
+    if (ozel == null || ozel.isEmpty) return genel;
+    return (genel == null || genel.isEmpty) ? ozel : '$ozel\n$genel';
+  }
+
+  /// "Bu alıştırmayı atla" ile geçilen konuşma alıştırması sayısı.
+  int _atlanan = 0;
+
   void _kontrol() {
     if (_cevap == null || _kontrolEdildi) return;
+    if (_cevap is SoyleAtlandi) {
+      // Nötr geçiş: onSonuc çağrılmaz, doğru sayacı ve SRS değişmez.
+      _atlanan++;
+      _devam();
+      return;
+    }
     final dogru = Motor.cevapDogruMu(_simdiki, _cevap);
     final ilk = !_bildirildi;
     setState(() {
@@ -94,7 +112,9 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
 
   void _devam() {
     if (_son) {
-      widget.onBitti(_dogru, widget.alistirmalar.length);
+      // Atlanan alıştırmalar toplamdan düşer (en az 1).
+      final toplam = widget.alistirmalar.length - _atlanan;
+      widget.onBitti(_dogru, toplam < 1 ? 1 : toplam);
       return;
     }
     setState(() {
@@ -178,7 +198,7 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
         if (_kontrolEdildi)
           GeriBildirimBandi(
             dogruMu: _dogruMu,
-            aciklama: _simdiki.aciklama,
+            aciklama: _aciklama,
             dogruCevap: dogruCevapMetni(_simdiki),
             ipuclari: _ipuclar,
             not: not,

@@ -28,7 +28,8 @@ List<YarismaSorusu> sorulariBul(String alan, String kursId) => [
     if (s.alan == alan && s.seviyeKursId == kursId) s,
 ];
 
-/// Alanın seviyeleri; bilinmeyen alan için boş liste.
+/// Alanın seviyeleri; bilinmeyen alan için boş liste. 'oyun' alanında henüz
+/// yarışma sorusu yok: boş liste (ekran "bu alanda yarışma yok" der).
 List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
   'dil' => const [
     YarismaSeviye(kursId: 'ingilizce-1', etiket: 'A1'),
@@ -41,5 +42,6 @@ List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
     YarismaSeviye(kursId: 'css-1', etiket: 'CSS'),
     YarismaSeviye(kursId: 'js-1', etiket: 'JS'),
   ],
+  'oyun' => const [],
   _ => const [],
 };

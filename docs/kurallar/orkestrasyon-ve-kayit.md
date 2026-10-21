@@ -34,3 +34,10 @@ Kullanıcı açık kaynak Archify skill'inin (projeyi tarayıp mimari haritaya �
 
 ## Emek illüzyonu tasarımı
 Bu kural yola bağlı kural olarak taşındı: [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) (arayüz dosyaları açılınca yüklenir). İçerik değişmedi.
+
+## REA her zaman çalışır durumda (kullanıcının kuralı, 2026-10-17)
+Yusuf: "rea bundan sonra hep çalışır halde olsun". REA (APK/ikili yapı analizi MCP sunucusu ve skill'i) cihazda sürekli kullanılabilir tutulur:
+- Araç yolları `C:\Users\TAA PF60V67C\.claude.json` REA bölümünde D:\Programlar altını gösterir (`REA_APKTOOL_COMMAND`, `REA_JADX_MCP_JAR`, `GHIDRA_INSTALL_DIR`). Araçlar taşınırsa aynı gün bu üç değer güncellenir; Yusuf bu düzeltme için izin verdi (2026-10-17 14:21).
+- Her cihaz oturumunun başında, REA'ya iş verilecekse önce `inspect_apktool_client` ile sağlık kontrolü yapılır; "capability_unavailable" dönerse iş başlamadan neden bulunup düzeltilir ve Yusuf'a tek satırla bildirilir.
+- REA'nın ortam değişkenleri yalnız sunucu başlarken okunur; ayar değişince REA yeniden bağlanır (yeni oturum ya da /mcp Reconnect). Koordinatör cihaz oturumunu yeniden başlatarak bunu kendisi yapabilir.
+- APK taramaları REA (apktool + JADX) ile yapılır; REA çalışmıyorsa yalnız geçici olarak doğrudan apktool'a düşülür ve rapora "REA çalışmadı, sebep" yazılır.

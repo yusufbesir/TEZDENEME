@@ -33,7 +33,8 @@ class SozlukEkrani extends ConsumerStatefulWidget {
 class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   final _sorgu = TextEditingController();
 
-  /// null: Tümü; 'en': İngilizce; 'kod': Kod.
+  /// null: Tümü; 'en': İngilizce; 'ko' | 'ja' | 'zh': Korece, Japonca, Çince;
+  /// 'kod': Kod.
   String? _dil;
 
   /// Seçili kelime paketinin ünite kimliği (null: paket süzgeci yok).
@@ -59,6 +60,14 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
     switch (ad) {
       case 'ingilizce':
         return 'İng.$no';
+      case 'almanca':
+        return 'Alm.$no';
+      case 'korece':
+        return 'Kor.$no';
+      case 'japonca':
+        return 'Jap.$no';
+      case 'cince':
+        return 'Çin.$no';
       case 'html':
         return 'HTML$no';
       case 'css':
@@ -130,14 +139,25 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                   ),
                 ),
               ),
-              Padding(
+              // Dil çipleri tek satırda yatay kayar: 6 çip dar ekranda (480 px,
+              // 1,5 ölçek) birkaç satıra sarılıp listeyi aşağı itiyordu.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: Olcu.b3),
-                child: Wrap(
-                  spacing: Olcu.b1,
-                  runSpacing: Olcu.b1,
+                child: Row(
                   children: [
                     cip('Tümü', null),
+                    const SizedBox(width: Olcu.b1),
                     cip('İngilizce', 'en'),
+                    const SizedBox(width: Olcu.b1),
+                    cip('Almanca', 'de'),
+                    const SizedBox(width: Olcu.b1),
+                    cip('Korece', 'ko'),
+                    const SizedBox(width: Olcu.b1),
+                    cip('Japonca', 'ja'),
+                    const SizedBox(width: Olcu.b1),
+                    cip('Çince', 'zh'),
+                    const SizedBox(width: Olcu.b1),
                     cip('Kod', 'kod'),
                   ],
                 ),
@@ -209,6 +229,21 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   }
 }
 
+/// Sözlük dil kodundan TTS dili ('ko' → 'ko-KR'); bilinmeyen 'en-US'.
+String _sesDili(String dil) => switch (dil) {
+  'de' => 'de-DE',
+  'ko' => 'ko-KR',
+  'ja' => 'ja-JP',
+  'zh' => 'zh-CN',
+  _ => 'en-US',
+};
+
+/// Okunacak metin: Korece/Japonca/Çince maddelerde sondaki "(romanizasyon)"
+/// atılır; yalnız hedef yazı okunur.
+String _okunacakMetin(SozlukMaddesi m) => m.dil == 'en'
+    ? m.kelime
+    : m.kelime.replaceAll(RegExp(r'\s*\([^)]*\)\s*$'), '').trim();
+
 class _MaddeSatiri extends ConsumerWidget {
   const _MaddeSatiri({required this.madde});
   final SozlukMaddesi madde;
@@ -218,6 +253,7 @@ class _MaddeSatiri extends ConsumerWidget {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
     final ingilizce = madde.dil == 'en';
+    final sesli = madde.dil != 'kod';
     final kartId = madde.kartKimligi;
     final kartlarda = ref.watch(
       durumProvider.select(
@@ -229,11 +265,13 @@ class _MaddeSatiri extends ConsumerWidget {
     );
     return ListTile(
       dense: false,
-      leading: ingilizce
+      leading: sesli
           ? IconButton(
               icon: const Icon(Icons.volume_up_outlined),
               tooltip: 'Oku',
-              onPressed: () => ref.read(sesProvider).oku(madde.kelime),
+              onPressed: () => ref
+                  .read(sesProvider)
+                  .oku(_okunacakMetin(madde), dil: _sesDili(madde.dil)),
             )
           : const SizedBox(width: Olcu.hedef, child: Icon(Icons.code)),
       title: Text(

@@ -59,10 +59,16 @@ void main() {
   test('dil filtresi çalışır', () {
     expect(sozluk.ara('', dil: 'en').every((m) => m.dil == 'en'), isTrue);
     expect(sozluk.ara('', dil: 'kod').every((m) => m.dil == 'kod'), isTrue);
-    expect(
-      sozluk.ara('', dil: 'en').length + sozluk.ara('', dil: 'kod').length,
-      sozluk.maddeler.length,
-    );
+    // Diller: en, ko, ja, zh, kod (Korece/Japonca/Çince ÖZELLİK 67 ile geldi).
+    final toplam = [
+      'en',
+      'de',
+      'ko',
+      'ja',
+      'zh',
+      'kod',
+    ].map((d) => sozluk.ara('', dil: d).length).reduce((a, b) => a + b);
+    expect(toplam, sozluk.maddeler.length);
   });
 
   test('başlangıç eşleşmeleri içerik eşleşmelerinden önce gelir', () {

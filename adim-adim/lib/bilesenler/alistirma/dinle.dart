@@ -29,7 +29,9 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
   bool _sesHatasi = false;
 
   Future<void> _oku() async {
-    final tamam = await ref.read(sesProvider).oku(widget.alistirma.okunacak);
+    final tamam = await ref
+        .read(sesProvider)
+        .oku(widget.alistirma.okunacak, dil: widget.alistirma.dil);
     if (!tamam && mounted && !_sesHatasi) setState(() => _sesHatasi = true);
   }
 

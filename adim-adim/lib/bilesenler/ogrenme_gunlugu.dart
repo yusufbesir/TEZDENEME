@@ -35,10 +35,10 @@ String gunEtiketi(String gun) {
   return '$g ${_aylar[ay - 1]}';
 }
 
-/// Bir günün tür sayılarını kısa metne çevirir: "2 ders, 1 tekrar, 1 yarışma".
-/// Mikro dersler "ders" sayısına katılır.
+/// Bir günün tür sayılarını kısa metne çevirir: "2 ders, 1 tekrar, 1 yarışma,
+/// 1 quiz, 1 bilmece, 1 hikâye". Mikro dersler "ders" sayısına katılır.
 String gunlukTurMetni(OgrenciDurumu d, String gun) {
-  var ders = 0, tekrar = 0, yarisma = 0;
+  var ders = 0, tekrar = 0, yarisma = 0, quiz = 0, bilmece = 0, hikaye = 0;
   for (final k in d.gunluk) {
     if (k.gun != gun) continue;
     switch (k.tur) {
@@ -49,12 +49,21 @@ String gunlukTurMetni(OgrenciDurumu d, String gun) {
         tekrar++;
       case GunlukKayit.turYarisma:
         yarisma++;
+      case GunlukKayit.turQuiz:
+        quiz++;
+      case GunlukKayit.turBilmece:
+        bilmece++;
+      case GunlukKayit.turHikaye:
+        hikaye++;
     }
   }
   final parcalar = <String>[
     if (ders > 0) '$ders ders',
     if (tekrar > 0) '$tekrar tekrar',
     if (yarisma > 0) '$yarisma yarışma',
+    if (quiz > 0) '$quiz quiz',
+    if (bilmece > 0) '$bilmece bilmece',
+    if (hikaye > 0) '$hikaye hikâye',
   ];
   return parcalar.join(', ');
 }

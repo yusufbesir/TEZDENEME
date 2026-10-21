@@ -76,6 +76,7 @@ Future<void> _oyunAc(WidgetTester tester, Size boyut, double olcek) async {
         yarismaDepoProvider.overrideWithValue(BellekYarismaDepo()),
         kurslarProvider.overrideWithValue([sahteKurs, sahteKodKurs]),
         bugunProvider.overrideWithValue('2026-10-15'),
+        bildirimProvider.overrideWithValue(SahteBildirim()),
       ],
       child: MaterialApp(
         theme: acikTema(),
