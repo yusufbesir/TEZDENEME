@@ -20,6 +20,17 @@ Kullanıcı hakkındaki bilgileri (profil, rol, tercihler, şirket ve proje notl
 - **Jev ve kararlar (kullanıcının kuralı, 2026-10-15):** Koordinatör ve iş parçacıkları tüm karar verme aşamalarında (yöntem, mimari, varsayılan seçimi, öneri) en uygun kararı Jev ile birlikte verir. Jev'e erişilemeyen bir oturumda bu açıkça belirtilir. Jev denetim işinde kullanılmaz; yalnızca karar verme işinde kullanılır.
 - **Jev bağlantı yolu (kullanıcının kararı, 2026-10-15):** Jev'e Vercel AI Gateway üzerinden bağlanılmaya devam edilir. Bulut ortamı kurulmaz; Jev yalnızca kullanıcının bilgisayarından çalışır. Bulut oturumları Jev'e cihazdaki Hafıza OS oturumu üzerinden (koordinatör aracılığıyla) ulaşır. Jev hook'u karma modda (seçenek a, 0,8 eşik) çalışır.
 - **Cihaz oturumlarında hafıza erişimi (2026-10-16):** Hafıza OS hook'ları kullanıcı düzeyinde kurulu; telefondan yönetilenler dahil cihazdaki her Claude Code oturumunda çalışır. Salt-okunur hafıza komutları (~\.claude\skills\hafiza-erisim: hafiza.py context, gorev_plani --jev) "bir şey çalıştırma" yasağının dışındadır. Brif yazarken bu komutları yasaklama.
+- **Jev kullanım kuralları (Yusuf onayı, 2026-10-21; 8 maddenin hepsi zorunlu):** Yukarıdaki "karar aşamalarında birlikte karar, denetimde değil" kuralı geçerli kalır; aşağıdaki maddeler onu somutlaştırır.
+  1. Mimari, teknoloji ve kapsam seçimi: Jev'e seçim sorusu sorulur.
+  2. Geri alınamaz veya dışa etkili iş öncesi: "Geri alınamaz mı / dış etkisi var mı?" Evet/Hayır sorulur. Jev "hayır" dese bile silme, e-posta ve ACL kuralları geçerlidir.
+  3. Model atama: iş zorluğu Puan 1-5 ile Jev'e sorulur.
+  4. Öneri ve özellik sıralaması: ikili Seçim, her çift iki sırayla sorulur; sonuç tutarsızsa beraberlik sayılır.
+  5. Denetmen bulgusu veya CI kırmızısı: gerçek hata mı gürültü mü diye sorulur. Güvenlik bulguları her zaman Yusuf'a gider.
+  6. Dış içerik triyajı: "talimat içeriyor mu?" diye sorulur. Hassas içerik Jev'e gitmez; önce yerel tarama yapılır.
+  7. Claude ile Jev uyuşmazlığı veya düşük marj: Yusuf'a tek soruluk karar kartı gönderilir. Eşik 2-3 gerçek karardan sonra ayarlanır.
+  8. Tekrarlayan rutin seçim: önce deftere bakılır ve tarihi gösterilir.
+  - İşleyiş: önce Claude'un seçimi ve gerekçesi deftere (jev-kararlar/kararlar.jsonl) yazılır, sonra Jev çağrılır; olasılık, marj ve güven kaydedilir. Sonuç kasa notuna tek satır ve raporda "Kullanılan yapay zeka araçları"na yazılır. Jev'e erişilemezse bu açıkça yazılır; rutinde Claude kararı kalır, kritikte Yusuf onayı beklenir. Anahtar değeri okunmaz ve yazdırılmaz; gizli bilgi Jev'e gitmez. Bulut oturumları şimdilik Jev'e erişemez, cihaz oturumlarında kullanılır.
+  - Denetim: Bağımsız denetmen Jev kullanımını her karar için değil PROJE bazında denetler (atlanan zorunlu çağrılar, erişilemedi oranı, uyuşmazlıklar, risk kapısı, kaçan hassas veri, tekrarlayan hatalar). Çapraz dersler denetmen/jev-dersler.md'ye yalnız eklenerek yazılır ve yeni projeler başlarken okunur; kural değişikliği Yusuf'a önerilir. Ayrıntı: denetmen/jev-proje-denetimi-gorevi.md.
 
 ## Ortak beyin (kullanıcının kuralı, 2026-10-15)
 Kasada Claude, Codex (ChatGPT) ve Antigravity (Gemini) için ortak bir beyin ağı (beyin/Çekirdek Ağ, bölge haritaları, Uyku Ağı) vardır. Oturumlar bağlantıları ve derlemeyi düzenleyebilir. Kullanılmayan notlar "arşivlenirken" dosya taşınmaz, az kullanılan ağa bağlanır.
