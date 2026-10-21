@@ -3,7 +3,7 @@
 > **Özet:** Değişen durum bilgisi (açık iş, bekleyen karar, sıradaki adım). Kalıcı kural değildir; kurallar `docs/kurallar/` ve `.claude/rules/` altındadır. Her oturum bitirdiği adımı buraya ekler, kesintiden sonra buradan devam edilir. Eski satırlar silinmez, "Tamamlandı" bölümüne taşınır. [İP:Talimat düzeni#zkd4TM]
 
 ## Şu an açık
-- Talimat düzeni: açık PR turu (2026-10-21). Birleşenler #8, #7, #14, #18 (yalnız kural/günlük). Büyük uygulama PR'ları #12, #19, #15 ve taslak #26 Yusuf'un birleştirme onayını bekliyor; Adım Adım PR'larına (#32) dokunulmadı. [İP:Talimat düzeni#zkd4TM]
+- Talimat düzeni: açık PR turu bitti (2026-10-21 16:25). Yusuf'un yetkisiyle #8, #7, #14, #18, #33, #15, #26, #19 birleşti; #12'yi sahibi birleştirdi. Açık kalan yalnız Adım Adım #32 (dokunulmadı). [İP:Talimat düzeni#zkd4TM]
 
 ## Bekleyen kullanıcı kararları
 - Adım Adım: 20 yeni içerik önerisinden (adim-adim/docs/ONERILER-2026-10-17-YENI-ICERIK.md) hangileri ve hangi sırayla yapılsın? Önerilen ilk üç: sözlük, Python 3 düzey, HTML/CSS/JS orta-ileri.
@@ -32,7 +32,7 @@
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
 - 2026-10-16: Yola bağlı kurallar, boyut testi, yerleşim tablosu (PR #21) ve skill'ler (PR #22) birleşti.
-- 2026-10-21: PR #8, #7, #14, #18 ana dala alındı; eski `.claude/orchestrator-log.md` satırları ve CLAUDE.md eklemeleri `docs/` altındaki yerlerine taşındı, içerik kaybı yok.
+- 2026-10-21: PR #8, #7, #14, #18, ardından Yusuf'un PR yetkisiyle #15, #26, #19 ana dala alındı (#12'yi sahibi birleştirdi); eski `.claude/orchestrator-log.md` satırları ve CLAUDE.md eklemeleri `docs/` altındaki yerlerine taşındı, içerik kaybı yok.
 
 ## Devir notu (2026-10-21 14:xx, içerik dalgası: 2, 3, 4, 5 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Birleşik dalda tam paket 720 test geçti (önceki devirdeki 641/675 sayıları eskiydi; 7b23e38'de ölçülen 676 idi). flutter analyze temiz.

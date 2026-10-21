@@ -284,3 +284,4 @@
 | 2026-10-16 | Pırıl: Denetmen bulguları PRL-4 (ws özel API) ve PRL-5 (Başlat menüsü kısayolu) [İP:Bluey projesi incelemesi#Tazzd6] | implementer / claude-sonnet-5-5 | 66.859 toplam | Tamam: 174 test geçti |
 | 2026-10-16 | Pırıl: PRL-2 package-lock dosyaları (pc, android) ve npm ci [İP:Bluey projesi incelemesi#Tazzd6] | orchestrator (kendim) / claude-sonnet-5-5 | tahmini 5.000 toplam | Tamam |
 | 2026-10-16 | Pırıl: PRL-4/5 doğrulaması [İP:Bluey projesi incelemesi#Tazzd6] | verifier / claude-sonnet-5-5 | tahmini 50.000 toplam | Geçti: 174/174 |
+| 2026-10-21 | PR yetkisi sonrası: #15, #26 (taslaktan çıkarıldı), #19 (.gitignore iki taraf, 12 Pırıl günlük satırı docs'a) birleştirildi [İP:Talimat düzeni#zkd4TM] | ana oturum / claude-fable-5-1 (alt ajan yok) | tahmini ~25k | Tamamlandı; boyut testleri geçti. |
