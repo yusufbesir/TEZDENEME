@@ -2,7 +2,9 @@
 ///
 /// Alıştırma türleri (eski HTML sürümünün şemasıyla uyumlu):
 /// secim, bosluk, yaz, sirala, eslestir, dinle (yeni: metin okunur, kullanıcı
-/// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur).
+/// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur),
+/// tablo (yeni: çekim tablosundaki boş hücreleri doldurur), isaretle (yeni:
+/// cümlede doğru kelime(ler)e dokunur).
 library;
 
 /// Dinle/Soyle alıştırmalarında konuşma ve tanıma dili (BCP-47) varsayılanı.
@@ -107,6 +109,30 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           dil: j['dil'] as String? ?? 'html',
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'tablo':
+        return Tablo(
+          soru: soru,
+          baslik: metinler('baslik'),
+          satirlar: (j['satirlar'] as List)
+              .map((r) => (r as List).map((e) => e as String).toList())
+              .toList(),
+          bos: (j['bos'] as List)
+              .map((c) => (satir: (c as List)[0] as int, sutun: c[1] as int))
+              .toList(),
+          secenekler: j['secenekler'] == null
+              ? const []
+              : metinler('secenekler'),
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'isaretle':
+        return Isaretle(
+          soru: soru,
+          cumle: j['cumle'] as String,
+          dogru: (j['dogru'] as List).map((e) => e as int).toList(),
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -336,10 +362,88 @@ class Kod extends Alistirma {
   };
 }
 
+/// Tablo tamamlama: `satirlar` tam (doğru) hücre metinlerini içerir; `bos`
+/// listesindeki (satır, sütun) hücreleri kullanıcı doldurur. Satır başlığı
+/// 0. sütundadır; `baslik` sütun başlıklarıdır (satirlar ile aynı genişlik).
+/// `secenekler` doluysa boşluklar seçenekten, boşsa yazarak doldurulur.
+/// Cevap: `bos` sırasıyla [List<String>]; karşılaştırma [Motor.cevapDogruMu]
+/// içinde Yaz türünün normalizasyonuyla yapılır.
+class Tablo extends Alistirma {
+  const Tablo({
+    required super.soru,
+    required this.baslik,
+    required this.satirlar,
+    required this.bos,
+    this.secenekler = const [],
+    super.aciklama,
+    super.ipuclari,
+  });
+  final List<String> baslik;
+  final List<List<String>> satirlar;
+  final List<({int satir, int sutun})> bos;
+  final List<String> secenekler;
+
+  /// Boş hücrenin doğru metni.
+  String hucre(({int satir, int sutun}) b) => satirlar[b.satir][b.sutun];
+
+  @override
+  String get tur => 'tablo';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'baslik': baslik,
+    'satirlar': satirlar,
+    'bos': bos.map((b) => [b.satir, b.sutun]).toList(),
+    if (secenekler.isNotEmpty) 'secenekler': secenekler,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Cümlede işaretleme: `cumle` boşluklardan kelimelere bölünür; `dogru`
+/// doğru kelimelerin indeksleridir (birden çok olabilir). Cevap: dokunulan
+/// indekslerin [List<int>]'i (sıra önemsiz).
+class Isaretle extends Alistirma {
+  const Isaretle({
+    required super.soru,
+    required this.cumle,
+    required this.dogru,
+    super.aciklama,
+    super.ipuclari,
+  });
+  final String cumle;
+  final List<int> dogru;
+
+  /// Cümlenin kelimeleri (boşluğa göre).
+  List<String> get kelimeler =>
+      cumle.trim().split(RegExp(r'\s+')).where((k) => k.isNotEmpty).toList();
+  @override
+  String get tur => 'isaretle';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'cumle': cumle,
+    'dogru': dogru,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
 class Ders {
-  const Ders({required this.id, required this.ad, required this.alistirmalar});
+  const Ders({
+    required this.id,
+    required this.ad,
+    required this.alistirmalar,
+    this.dilbilgisiNotu,
+  });
   final String id; // ör. ingilizce-1.u1.d1
   final String ad;
+
+  /// İsteğe bağlı kısa dilbilgisi notu; varsa ders başında ayrı bir kartta
+  /// gösterilir (yoksa kart yok).
+  final String? dilbilgisiNotu;
   final List<Alistirma> alistirmalar; // her ders 8-10 alıştırma
 
   /// Aralıklı tekrar kart kimliği: dersId#indeks

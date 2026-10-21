@@ -34,10 +34,15 @@ const Kurs js1 = Kurs(
               dogru: 0,
               aciklama: 'Tırnaksız sayı number türündedir.',
             ),
-            Secim(
-              soru: '"42" hangi türdedir?',
-              secenekler: ['number', 'boolean', 'object', 'string'],
-              dogru: 3,
+            Tablo(
+              soru: 'Değer-tür tablosunu tamamla.',
+              baslik: ['Değer', 'Tür'],
+              satirlar: [
+                ['12', 'number'],
+                ['"42"', 'string'],
+                ['true', 'boolean'],
+              ],
+              bos: [(satir: 1, sutun: 1), (satir: 2, sutun: 1)],
               aciklama: 'Tırnak içindeki değer metindir (string).',
             ),
             Bosluk(
@@ -73,11 +78,11 @@ const Kurs js1 = Kurs(
               ],
               aciklama: 'Her değerin bir türü vardır.',
             ),
-            Secim(
-              soru: 'typeof 7 ifadesinin sonucu nedir?',
-              secenekler: ['"number"', '"seven"', '"digit"', '"int"'],
-              dogru: 0,
-              aciklama: 'typeof türün adını metin olarak verir.',
+            Isaretle(
+              soru: 'let adet = 3; satırında değişken adını işaretle.',
+              cumle: 'let adet = 3;',
+              dogru: [1],
+              aciklama: 'let anahtar sözcüktür; adet değişkenin adıdır.',
             ),
             Kod(
               soru: 'Değeri sonradan değişecek değişkeni tanımla.',

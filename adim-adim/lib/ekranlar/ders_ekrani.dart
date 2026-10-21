@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
+import '../bilesenler/dilbilgisi_notu_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
@@ -31,6 +32,9 @@ class DersEkrani extends ConsumerStatefulWidget {
 class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
+
+  /// Ders başındaki dilbilgisi notu kartı geçildi mi?
+  bool _notGecildi = false;
 
   /// Bu oturumda ilk cevabı yanlış olan alıştırma indeksleri (sırayla).
   final List<int> _yanlislar = [];
@@ -115,6 +119,15 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
       body: SafeArea(
         child: ders == null || idx.isEmpty
             ? _Bulunamadi(onGeri: _cik)
+            : (ders.dilbilgisiNotu?.trim().isNotEmpty ?? false) &&
+                  !_notGecildi &&
+                  _ozet == null
+            ? DilbilgisiNotuKarti(
+                dersAdi: ders.ad,
+                not: ders.dilbilgisiNotu!.trim(),
+                onBasla: () => setState(() => _notGecildi = true),
+                onKapat: _cik,
+              )
             : _ozet != null
             ? DersOzeti(
                 baslik: 'Ders tamamlandı',

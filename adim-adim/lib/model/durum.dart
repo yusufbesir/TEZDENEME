@@ -5,7 +5,9 @@
 /// ayarı/son gösterim günü.
 /// Değiştirilemez (immutable); motor yeni kopya döndürür.
 /// Eski kayıtlar geriye uyumlu okunur: yeni alanlar yoksa varsayılan değer
-/// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme)
+/// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme;
+/// `araSinavlar`/`sertifikalar`: ünite ara sınavı ve seviye sertifika sınavı
+/// en iyi sonuçları, boş harita)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -280,6 +282,8 @@ class OgrenciDurumu {
     this.tamamlananHikayeler = const {},
     this.atlananDersler = const {},
     this.calismaPlani,
+    this.araSinavlar = const {},
+    this.sertifikalar = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -353,6 +357,14 @@ class OgrenciDurumu {
   /// (eski kayıtlar). Haftalık hedefle (`haftalikHedefGun`) ayrı tutulur.
   final CalismaPlani? calismaPlani;
 
+  /// Ünite ara sınavlarının en iyi sonucu: ünite kimliği -> sonuç (eski
+  /// kayıtta boş = hiç girilmemiş).
+  final Map<String, SinavSonucu> araSinavlar;
+
+  /// Seviye (kurs) sertifika sınavlarının en iyi sonucu: kurs kimliği ->
+  /// sonuç (eski kayıtta boş). Geçilmiş sonuç sertifika hakkı verir.
+  final Map<String, SinavSonucu> sertifikalar;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -410,6 +422,8 @@ class OgrenciDurumu {
     Set<String>? atlananDersler,
     CalismaPlani? calismaPlani,
     bool calismaPlaniSil = false,
+    Map<String, SinavSonucu>? araSinavlar,
+    Map<String, SinavSonucu>? sertifikalar,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -443,6 +457,8 @@ class OgrenciDurumu {
       calismaPlani: calismaPlaniSil
           ? null
           : (calismaPlani ?? this.calismaPlani),
+      araSinavlar: araSinavlar ?? this.araSinavlar,
+      sertifikalar: sertifikalar ?? this.sertifikalar,
     );
   }
 
@@ -474,6 +490,12 @@ class OgrenciDurumu {
     'tamamlananHikayeler': tamamlananHikayeler,
     'atlananDersler': atlananDersler.toList()..sort(),
     'calismaPlani': calismaPlani?.toJson(),
+    'araSinavlar': {
+      for (final e in araSinavlar.entries) e.key: e.value.toJson(),
+    },
+    'sertifikalar': {
+      for (final e in sertifikalar.entries) e.key: e.value.toJson(),
+    },
   };
 
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
@@ -620,7 +642,62 @@ class OgrenciDurumu {
       }),
       // Eski kayıtta yoksa ya da bozuksa null (plan yok).
       calismaPlani: CalismaPlani.fromJson(j['calismaPlani']),
+      // Eski kayıtta yoksa boş; bozuk girdiler atlanır.
+      araSinavlar: SinavSonucu.haritaCoz(j['araSinavlar']),
+      sertifikalar: SinavSonucu.haritaCoz(j['sertifikalar']),
     );
+  }
+}
+
+/// Bir sınavın (ünite ara sınavı ya da seviye sertifika sınavı) en iyi
+/// sonucu: [dogru]/[toplam] ve sonucun alındığı gün. Geçme eşiği Motor'dadır.
+class SinavSonucu {
+  const SinavSonucu({
+    required this.dogru,
+    required this.toplam,
+    required this.gun,
+  });
+
+  final int dogru;
+  final int toplam;
+
+  /// En iyi sonucun alındığı gün 'YYYY-MM-DD'.
+  final String gun;
+
+  /// Yüzde puan (aşağı yuvarlanır; eşik karşılaştırması tam sayıyla kesindir).
+  int get yuzde => toplam <= 0 ? 0 : dogru * 100 ~/ toplam;
+
+  Map<String, Object?> toJson() => {
+    'dogru': dogru,
+    'toplam': toplam,
+    'gun': gun,
+  };
+
+  static SinavSonucu? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final d = j['dogru'];
+    final t = j['toplam'];
+    final g = j['gun'];
+    if (t is! int || t < 1 || t > 100) return null;
+    if (d is! int || d < 0 || d > t) return null;
+    if (g is! String || !OgrenciDurumu.gunGecerli(g)) return null;
+    return SinavSonucu(dogru: d, toplam: t, gun: g);
+  }
+
+  /// Kimlik -> sonuç haritası; geçersiz anahtar/değer sessizce atılır.
+  static Map<String, SinavSonucu> haritaCoz(Object? v) {
+    final m = <String, SinavSonucu>{};
+    if (v is Map) {
+      for (final e in v.entries) {
+        final k = e.key;
+        if (k is! String || k.isEmpty || k.length > 120 || k.contains('#')) {
+          continue;
+        }
+        final s = fromJson(e.value);
+        if (s != null) m[k] = s;
+      }
+    }
+    return Map.unmodifiable(m);
   }
 }
 

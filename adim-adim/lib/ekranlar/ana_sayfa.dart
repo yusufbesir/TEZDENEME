@@ -376,7 +376,8 @@ class _YolListesi extends StatelessWidget {
         );
         ogeler.add(const SizedBox(height: Olcu.b2));
       }
-      for (final unite in kurs.uniteler) {
+      for (var ui = 0; ui < kurs.uniteler.length; ui++) {
+        final unite = kurs.uniteler[ui];
         final biten = unite.dersler
             .where((d) => Motor.dersBitmis(durum, d.id))
             .length;
@@ -453,6 +454,92 @@ class _YolListesi extends StatelessWidget {
             ),
           );
         }
+        final sinavAcik = Motor.araSinavAcik(durum, kurs, ui);
+        final ozetAcik =
+            Motor.uniteBitmis(durum, unite) && !Motor.uniteOzeti(kurs, ui).bos;
+        if (sinavAcik || ozetAcik) {
+          final sonuc = durum.araSinavlar[unite.id];
+          ogeler.add(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: Olcu.b1,
+                runSpacing: Olcu.b1,
+                children: [
+                  if (sinavAcik)
+                    OutlinedButton.icon(
+                      key: ValueKey('ara-sinav-${unite.id}'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => context.push(
+                        '/sinav?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                      ),
+                      icon: Icon(
+                        Motor.araSinavGecildi(durum, unite)
+                            ? Icons.check_circle
+                            : Icons.quiz_outlined,
+                      ),
+                      label: Text(
+                        sonuc == null
+                            ? 'Ara sınav'
+                            : 'Ara sınav (en iyi %${sonuc.yuzde})',
+                      ),
+                    ),
+                  if (ozetAcik)
+                    OutlinedButton.icon(
+                      key: ValueKey('unite-ozeti-${unite.id}'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () => context.push(
+                        '/unite-ozeti?kurs=${Uri.encodeComponent(kurs.id)}&unite=$ui',
+                      ),
+                      icon: const Icon(Icons.summarize_outlined),
+                      label: const Text('Ünite özeti'),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }
+        ogeler.add(const SizedBox(height: Olcu.b2));
+      }
+      if (Motor.sertifikaSinaviAcik(durum, kurs)) {
+        ogeler.add(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: Olcu.b1,
+              runSpacing: Olcu.b1,
+              children: [
+                OutlinedButton.icon(
+                  key: ValueKey('sertifika-sinavi-${kurs.id}'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                  ),
+                  onPressed: () => context.push(
+                    '/sinav?kurs=${Uri.encodeComponent(kurs.id)}',
+                  ),
+                  icon: const Icon(Icons.workspace_premium),
+                  label: const Text('Seviye sertifika sınavı'),
+                ),
+                if (Motor.sertifikaVar(durum, kurs))
+                  FilledButton.icon(
+                    key: ValueKey('sertifika-gor-${kurs.id}'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(48, 48),
+                    ),
+                    onPressed: () => context.push(
+                      '/sertifika?kurs=${Uri.encodeComponent(kurs.id)}',
+                    ),
+                    icon: const Icon(Icons.verified),
+                    label: const Text('Sertifikayı gör'),
+                  ),
+              ],
+            ),
+          ),
+        );
         ogeler.add(const SizedBox(height: Olcu.b2));
       }
     }

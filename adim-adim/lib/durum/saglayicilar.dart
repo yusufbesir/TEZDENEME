@@ -151,6 +151,27 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> yerlestirmeUygula(Kurs kurs, List<int> gecilen) =>
       _uygula((d) => Motor.yerlestirmeUygula(d, kurs, gecilen));
 
+  /// Ünite ara sınavı ya da seviye sertifika sınavı bitişi (XP/seri yok;
+  /// en iyi sonuç kaydı, kalınca yanlış kartlar tekrar destesine).
+  Future<OgrenciDurumu> sinavBitir({
+    required String anahtar,
+    required bool sertifika,
+    required List<({int unite, String kartId, Alistirma alistirma})> sorular,
+    required List<bool> dogrular,
+  }) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula(
+      (d) => Motor.sinavBitir(
+        d,
+        anahtar: anahtar,
+        sertifika: sertifika,
+        sorular: sorular,
+        dogrular: dogrular,
+        bugun: bugun,
+      ),
+    );
+  }
+
   /// Alan seçimi: yalnızca 'dil' ya da 'kod'. [ilkAcilisTamam] verilirse
   /// ilk açılış bayrağı da yazılır (akışın 1. adımı false yazar ki uygulama
   /// kapanıp açılınca akış sürsün).

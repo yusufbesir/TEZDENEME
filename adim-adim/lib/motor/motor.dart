@@ -351,6 +351,38 @@ abstract final class Motor {
   static bool _uniteAcik(OgrenciDurumu d, Unite u) =>
       u.dersler.any((ders) => !dersBitmis(d, ders.id));
 
+  /// [dersler]den dersler arası dönerek en çok [adet] mevcut alıştırma
+  /// (konuşma hariç); her dersin kuyruğu [tohum]+[ui] ile karıştırılır.
+  static List<({int unite, String kartId, Alistirma alistirma})> _uniteSorulari(
+    Kurs kurs,
+    int ui,
+    List<Ders> dersler,
+    int adet,
+    int tohum,
+  ) {
+    final kuyruklar = [
+      for (final ders in dersler)
+        [
+          for (var i = 0; i < ders.alistirmalar.length; i++)
+            if (ders.alistirmalar[i] is! Soyle)
+              (
+                unite: ui,
+                kartId: ders.kartKimligi(i),
+                alistirma: ders.alistirmalar[i],
+              ),
+        ]..shuffle(math.Random(tohum + ui)),
+    ];
+    final sonuc = <({int unite, String kartId, Alistirma alistirma})>[];
+    while (sonuc.length < adet && kuyruklar.any((k) => k.isNotEmpty)) {
+      for (final k in kuyruklar) {
+        if (sonuc.length >= adet) break;
+        if (k.isEmpty) continue;
+        sonuc.add(k.removeAt(0));
+      }
+    }
+    return sonuc;
+  }
+
   /// Seviye belirleme sınavı soruları: [kurs]un henüz tamamlanmamış
   /// ünitelerinden, ünite sırasıyla (artan zorluk). Her üniteden dersleri
   /// dolaşarak 3..5 mevcut alıştırma; toplam en çok [yerlestirmeEnCok] (çok
@@ -375,31 +407,18 @@ abstract final class Motor {
     for (final ui in kullanilan) {
       // Ünitenin bitmemiş derslerinden havuz; dersler arası dönerek (her
       // dersten sırayla) alınır ki sınav üniteyi bütün olarak yoklasın.
-      final dersler = [
-        for (final ders in kurs.uniteler[ui].dersler)
-          if (!dersBitmis(d, ders.id)) ders,
-      ];
-      final kuyruklar = [
-        for (final ders in dersler)
+      sonuc.addAll(
+        _uniteSorulari(
+          kurs,
+          ui,
           [
-            for (var i = 0; i < ders.alistirmalar.length; i++)
-              if (ders.alistirmalar[i] is! Soyle)
-                (
-                  unite: ui,
-                  kartId: ders.kartKimligi(i),
-                  alistirma: ders.alistirmalar[i],
-                ),
-          ]..shuffle(math.Random(tohum + ui)),
-      ];
-      var alinan = 0;
-      while (alinan < adet && kuyruklar.any((k) => k.isNotEmpty)) {
-        for (final k in kuyruklar) {
-          if (alinan >= adet) break;
-          if (k.isEmpty) continue;
-          sonuc.add(k.removeAt(0));
-          alinan++;
-        }
-      }
+            for (final ders in kurs.uniteler[ui].dersler)
+              if (!dersBitmis(d, ders.id)) ders,
+          ],
+          adet,
+          tohum,
+        ),
+      );
     }
     return sonuc;
   }
@@ -454,6 +473,133 @@ abstract final class Motor {
 
   /// Kurs ünitesi (indeks) tümüyle bitmiş ya da atlanmış mı?
   static bool uniteBitmis(OgrenciDurumu d, Unite u) => !_uniteAcik(d, u);
+
+  /// Ünite ara sınavı: soru sayısı ve geçme oranı (%70).
+  static const int araSinavAdet = 10;
+  static const double araSinavEsik = 0.7;
+
+  /// Seviye (kurs) sertifika sınavı: soru sayısı ve geçme oranı (%80).
+  static const int sertifikaAdet = 20;
+  static const double sertifikaEsik = 0.8;
+
+  /// Ünite ara sınavı soruları: ünitenin TÜM derslerinden (ders sırasıyla
+  /// dönerek) en çok [araSinavAdet] mevcut alıştırma; konuşma hariç. Aynı
+  /// [tohum] aynı sonucu verir. Geçersiz indekste boş liste.
+  static List<({int unite, String kartId, Alistirma alistirma})> araSinavSec(
+    Kurs kurs,
+    int uniteIndeks, {
+    int tohum = 0,
+  }) {
+    if (uniteIndeks < 0 || uniteIndeks >= kurs.uniteler.length) return const [];
+    return _uniteSorulari(
+      kurs,
+      uniteIndeks,
+      kurs.uniteler[uniteIndeks].dersler,
+      araSinavAdet,
+      tohum,
+    );
+  }
+
+  /// Ara sınav açık mı: ünitenin tüm dersleri bitmiş (ya da atlanmış) ve
+  /// sınavda sorulabilecek en az bir alıştırma var.
+  static bool araSinavAcik(OgrenciDurumu d, Kurs kurs, int uniteIndeks) =>
+      uniteIndeks >= 0 &&
+      uniteIndeks < kurs.uniteler.length &&
+      uniteBitmis(d, kurs.uniteler[uniteIndeks]) &&
+      araSinavSec(kurs, uniteIndeks).isNotEmpty;
+
+  /// Sonuç eşiği geçiyor mu (tam sayı karşılaştırması, kayan nokta hatası yok).
+  static bool sinavGecti(SinavSonucu? s, double esik) =>
+      s != null && s.toplam > 0 && s.dogru >= esik * s.toplam - 1e-9;
+
+  /// Ünitenin ara sınavı geçilmiş mi?
+  static bool araSinavGecildi(OgrenciDurumu d, Unite u) =>
+      sinavGecti(d.araSinavlar[u.id], araSinavEsik);
+
+  /// Sınavı olan (en az bir sorulabilir alıştırması bulunan) ünite indeksleri.
+  static List<int> _sinavliUniteler(Kurs kurs) => [
+    for (var i = 0; i < kurs.uniteler.length; i++)
+      if (araSinavSec(kurs, i).isNotEmpty) i,
+  ];
+
+  /// Sertifika sınavı açık mı: kursun sınavı olan tüm ünitelerinin ara sınavı
+  /// geçilmiş (ve en az bir ünite sınavlı).
+  static bool sertifikaSinaviAcik(OgrenciDurumu d, Kurs kurs) {
+    final u = _sinavliUniteler(kurs);
+    return u.isNotEmpty && u.every((i) => araSinavGecildi(d, kurs.uniteler[i]));
+  }
+
+  /// Sertifika kazanılmış mı (sertifika sınavı geçilmiş)?
+  static bool sertifikaVar(OgrenciDurumu d, Kurs kurs) =>
+      sinavGecti(d.sertifikalar[kurs.id], sertifikaEsik);
+
+  /// Sertifika sınavı soruları: sınavlı ünitelerden dönerek en çok
+  /// [sertifikaAdet] alıştırma (her ünite yaklaşık eşit), ünite sırasıyla
+  /// karışık. Aynı [tohum] aynı sonucu verir.
+  static List<({int unite, String kartId, Alistirma alistirma})> sertifikaSec(
+    Kurs kurs, {
+    int tohum = 0,
+  }) {
+    final kuyruklar = [
+      for (final ui in _sinavliUniteler(kurs))
+        _uniteSorulari(
+          kurs,
+          ui,
+          kurs.uniteler[ui].dersler,
+          sertifikaAdet,
+          tohum,
+        ),
+    ];
+    final sonuc = <({int unite, String kartId, Alistirma alistirma})>[];
+    while (sonuc.length < sertifikaAdet && kuyruklar.any((k) => k.isNotEmpty)) {
+      for (final k in kuyruklar) {
+        if (sonuc.length >= sertifikaAdet) break;
+        if (k.isEmpty) continue;
+        sonuc.add(k.removeAt(0));
+      }
+    }
+    return sonuc;
+  }
+
+  /// Sınav bitişi: en iyi sonucu [anahtar] altında [sertifika] ? sertifikalar :
+  /// araSinavlar haritasına yazar (daha iyi değilse eski sonuç ve tarihi
+  /// korunur). XP, seri ve günlük DEĞİŞMEZ. Eşik altında kalındıysa yanlış
+  /// yapılan alıştırmaların kartları mevcut yanlış-cevap akışıyla
+  /// ([kartIsle]) tekrar destesine ve hata defterine eklenir.
+  static OgrenciDurumu sinavBitir(
+    OgrenciDurumu d, {
+    required String anahtar,
+    required bool sertifika,
+    required List<({int unite, String kartId, Alistirma alistirma})> sorular,
+    required List<bool> dogrular,
+    required String bugun,
+  }) {
+    final n = math.min(sorular.length, dogrular.length);
+    if (n == 0) return d;
+    final dogru = dogrular.take(n).where((x) => x).length;
+    final yeni = SinavSonucu(dogru: dogru, toplam: n, gun: bugun);
+    final esik = sertifika ? sertifikaEsik : araSinavEsik;
+    final harita = sertifika ? d.sertifikalar : d.araSinavlar;
+    final eski = harita[anahtar];
+    // Çapraz çarpım: yeni oran eskisinden kesin büyükse güncellenir.
+    final daha =
+        eski == null || yeni.dogru * eski.toplam > eski.dogru * yeni.toplam;
+    var sonuc = d;
+    if (daha) {
+      final h = {...harita, anahtar: yeni};
+      sonuc = sertifika
+          ? sonuc.copyWith(sertifikalar: h)
+          : sonuc.copyWith(araSinavlar: h);
+    }
+    if (!sinavGecti(yeni, esik)) {
+      for (var i = 0; i < n; i++) {
+        if (!dogrular[i]) {
+          sonuc = kartIsle(sonuc, sorular[i].kartId, false, bugun);
+        }
+      }
+    }
+    return sonuc;
+  }
 
   /// Mikro dersin kazandıracağı XP: 5 + doğru*2 (+3 tam puan).
   /// Sınırlar dersXp ile aynıdır; toplam 0 ise tam puan bonusu yok.
@@ -942,6 +1088,8 @@ abstract final class Motor {
     Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
     Sirala() => a.dogru.join(' '),
     Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
+    Tablo() => a.bos.map(a.hucre).join(', '),
+    Isaretle() => [for (final i in a.dogru) a.kelimeler[i]].join(' '),
   };
 
   /// Adım 0: açıklamanın ilk cümlesi; yoksa türe göre sabit metin.
@@ -963,6 +1111,8 @@ abstract final class Motor {
       Dinle() => 'Bir kez daha dinle, sonra yaz',
       Kod() => 'Söz dizimini kontrol et',
       Soyle() => 'Önce dinle, sonra yavaş ve net söyle',
+      Tablo() => 'Satır ve sütun başlıklarındaki örüntüye bak',
+      Isaretle() => 'Cümleyi baştan oku; birden çok kelime doğru olabilir',
     };
   }
 
@@ -997,6 +1147,11 @@ abstract final class Motor {
         a.ciftler.isEmpty
             ? 'Bildiklerini önce eşle'
             : 'Bir çift: ${a.ciftler.first.sol} = ${a.ciftler.first.sag}',
+      Tablo() =>
+        a.bos.isEmpty
+            ? 'Bildiğin hücrelerle başla'
+            : uzunlukVeHarf(a.hucre(a.bos.first)),
+      Isaretle() => 'Doğru kelime sayısı: ${a.dogru.length}',
     };
   }
 
@@ -1181,6 +1336,160 @@ abstract final class Motor {
           kalan.removeAt(i);
         }
         return kalan.isEmpty;
+      case Tablo():
+        if (cevap is! List || cevap.length != a.bos.length) return false;
+        if (a.bos.isEmpty) return false;
+        for (var i = 0; i < cevap.length; i++) {
+          final e = cevap[i];
+          if (e is! String) return false;
+          final c = _normalle(e);
+          if (c.isEmpty || c != _normalle(a.hucre(a.bos[i]))) return false;
+        }
+        return true;
+      case Isaretle():
+        if (cevap is! List || cevap.isEmpty) return false;
+        final secilen = <int>{};
+        for (final e in cevap) {
+          if (e is! int) return false;
+          secilen.add(e);
+        }
+        return secilen.length == cevap.length &&
+            secilen.length == a.dogru.toSet().length &&
+            secilen.containsAll(a.dogru);
     }
+  }
+
+  static final RegExp _neDemektirOzet = RegExp(r'^"([^"]+)" ne demektir\?$');
+
+  static String _bosluguDoldur(String metin, String cevap) =>
+      metin.replaceFirst(RegExp(r'_{3,}'), cevap).trim();
+
+  /// Ünite özeti (türetilir, saklanmaz): ünitenin alıştırmalarından kelime/
+  /// terim çiftleri (Eşleştir, "X ne demektir?" seçimi), kalıp/sözdizimi
+  /// satırları (Sırala, Boşluk, Tablo; kod kurslarında Kod) ve derslerin
+  /// dilbilgisi notları. Aynı öğe tekrarlanmaz; geçersiz indekste boş özet.
+  static UniteOzeti uniteOzeti(Kurs kurs, int uniteIndeks) {
+    if (uniteIndeks < 0 || uniteIndeks >= kurs.uniteler.length) {
+      return UniteOzeti(
+        uniteAd: '',
+        kodMu: kurs.alan == KursAlani.kod,
+        kelimeler: const [],
+        kaliplar: const [],
+        notlar: const [],
+      );
+    }
+    final unite = kurs.uniteler[uniteIndeks];
+    final kelimeler = <({String kelime, String anlam})>[];
+    final kaliplar = <String>[];
+    final notlar = <({String ders, String not})>[];
+    final gorulen = <String>{};
+    void kelimeEkle(String k, String a) {
+      k = k.trim();
+      a = a.trim();
+      if (k.isEmpty || a.isEmpty) return;
+      if (gorulen.add('k\u0000$k\u0000$a')) {
+        kelimeler.add((kelime: k, anlam: a));
+      }
+    }
+
+    void kalipEkle(String k) {
+      k = k.trim();
+      if (k.isEmpty) return;
+      if (gorulen.add('p\u0000$k')) kaliplar.add(k);
+    }
+
+    for (final ders in unite.dersler) {
+      final not = ders.dilbilgisiNotu?.trim();
+      if (not != null && not.isNotEmpty) {
+        notlar.add((ders: ders.ad, not: not));
+      }
+      for (final a in ders.alistirmalar) {
+        switch (a) {
+          case Eslestir(:final ciftler):
+            for (final c in ciftler) {
+              kelimeEkle(c.sol, c.sag);
+            }
+          case Secim(:final soru, :final secenekler, :final dogru):
+            final e = _neDemektirOzet.firstMatch(soru.trim());
+            if (e != null && dogru >= 0 && dogru < secenekler.length) {
+              kelimeEkle(e.group(1)!, secenekler[dogru]);
+            }
+          case Sirala(:final dogru):
+            if (dogru.length > 1) kalipEkle(dogru.join(' '));
+          case Bosluk(:final soru, :final secenekler, :final dogru):
+            if (dogru >= 0 &&
+                dogru < secenekler.length &&
+                soru.contains('___')) {
+              kalipEkle(_bosluguDoldur(soru, secenekler[dogru]));
+            }
+          case Kod(:final kod, :final secenekler, :final dogru):
+            if (dogru >= 0 &&
+                dogru < secenekler.length &&
+                kod.contains('___')) {
+              kalipEkle(_bosluguDoldur(kod, secenekler[dogru]));
+            }
+          case Tablo(:final satirlar):
+            for (final satir in satirlar) {
+              kalipEkle(satir.where((h) => h.trim().isNotEmpty).join(' - '));
+            }
+          default:
+            break;
+        }
+      }
+    }
+    return UniteOzeti(
+      uniteAd: unite.ad,
+      kodMu: kurs.alan == KursAlani.kod,
+      kelimeler: List.unmodifiable(kelimeler),
+      kaliplar: List.unmodifiable(kaliplar),
+      notlar: List.unmodifiable(notlar),
+    );
+  }
+}
+
+/// [Motor.uniteOzeti] sonucu. Kod kurslarında kelime yerine terim, kalıp
+/// yerine sözdizimi başlıkları kullanılır.
+class UniteOzeti {
+  const UniteOzeti({
+    required this.uniteAd,
+    required this.kodMu,
+    required this.kelimeler,
+    required this.kaliplar,
+    required this.notlar,
+  });
+
+  final String uniteAd;
+  final bool kodMu;
+  final List<({String kelime, String anlam})> kelimeler;
+  final List<String> kaliplar;
+  final List<({String ders, String not})> notlar;
+
+  String get kelimeBasligi => kodMu ? 'Terimler' : 'Kelimeler';
+  String get kalipBasligi => kodMu ? 'Sözdizimi' : 'Kalıplar';
+
+  bool get bos => kelimeler.isEmpty && kaliplar.isEmpty && notlar.isEmpty;
+
+  /// Panoya kopyalanacak düz metin.
+  String metin() {
+    final b = StringBuffer('Ünite özeti: $uniteAd');
+    if (kelimeler.isNotEmpty) {
+      b.write('\n\n$kelimeBasligi');
+      for (final k in kelimeler) {
+        b.write('\n- ${k.kelime}: ${k.anlam}');
+      }
+    }
+    if (kaliplar.isNotEmpty) {
+      b.write('\n\n$kalipBasligi');
+      for (final k in kaliplar) {
+        b.write('\n- $k');
+      }
+    }
+    if (notlar.isNotEmpty) {
+      b.write('\n\nDilbilgisi notları');
+      for (final n in notlar) {
+        b.write('\n- ${n.ders}: ${n.not}');
+      }
+    }
+    return b.toString();
   }
 }
