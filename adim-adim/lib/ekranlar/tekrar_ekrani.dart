@@ -1,7 +1,8 @@
 /// Tekrar sekmesi: seçili alanın zamanı gelen (yarı ömür tabanlı) kartlarını
 /// sorar; altında "Kelime sağlığı" panosu (Zayıf/Orta/Güçlü) ve "Hata defteri"
 /// bölümü (yanlış kart ve yarışma soruları, "Zayıf noktalar dersi" düğmesi)
-/// bulunur. Oturum bitince öğrenme günlüğüne tek 'tekrar' kaydı yazılır.
+/// bulunur; "Filtreli tekrar ve takvim" ile "Pratik merkezi" düğmeleri
+/// geçici deste ve pratik ekranlarını açar. Oturum bitince öğrenme günlüğüne tek 'tekrar' kaydı yazılır.
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
@@ -132,6 +133,26 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                                     _sonuc = null;
                                   }),
                                 ),
+                        ),
+                        const SizedBox(height: Olcu.b3),
+                        Wrap(
+                          spacing: Olcu.b2,
+                          runSpacing: Olcu.b1,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            OutlinedButton.icon(
+                              key: const ValueKey('filtreli-tekrar-ac'),
+                              icon: const Icon(Icons.filter_alt_outlined),
+                              label: const Text('Filtreli tekrar ve takvim'),
+                              onPressed: () => context.push('/tekrar-filtre'),
+                            ),
+                            OutlinedButton.icon(
+                              key: const ValueKey('pratik-merkezi-ac'),
+                              icon: const Icon(Icons.fitness_center),
+                              label: const Text('Pratik merkezi'),
+                              onPressed: () => context.push('/pratik'),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: Olcu.b4),
                         KelimeSagligiPanosu(

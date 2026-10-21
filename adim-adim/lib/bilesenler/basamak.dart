@@ -15,6 +15,8 @@ class Basamak extends StatelessWidget {
     required this.durum,
     required this.alistirmaSayisi,
     this.tekrarSayisi = 0,
+    this.tahminiDakika,
+    this.temel = false,
     this.onTap,
   });
 
@@ -23,6 +25,10 @@ class Basamak extends StatelessWidget {
   final BasamakDurumu durum;
   final int alistirmaSayisi;
   final int tekrarSayisi;
+
+  /// Tahmini süre (dakika) ve temel kavram işareti (ÖZELLİK 71); null: gösterme.
+  final int? tahminiDakika;
+  final bool temel;
   final VoidCallback? onTap;
 
   String get _durumMetni => switch (durum) {
@@ -31,6 +37,10 @@ class Basamak extends StatelessWidget {
     BasamakDurumu.siradaki => 'Sıradaki ders',
     BasamakDurumu.kilitli => 'Kilitli · önceki dersi bitir',
   };
+
+  String? get _metaMetni => tahminiDakika == null
+      ? null
+      : '~$tahminiDakika dk${temel ? ' · Temel kavram' : ''}';
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +98,11 @@ class Basamak extends StatelessWidget {
                         '$_durumMetni · $alistirmaSayisi alıştırma',
                         style: yazi.bodySmall?.copyWith(color: ikincil),
                       ),
+                      if (_metaMetni != null)
+                        Text(
+                          _metaMetni!,
+                          style: yazi.bodySmall?.copyWith(color: ikincil),
+                        ),
                     ],
                   ),
                 ),
@@ -119,7 +134,9 @@ class Basamak extends StatelessWidget {
       container: true,
       button: !kilitli,
       enabled: !kilitli,
-      label: '$no. ders, $ad. $_durumMetni. $alistirmaSayisi alıştırma.',
+      label:
+          '$no. ders, $ad. $_durumMetni. $alistirmaSayisi alıştırma.'
+          '${_metaMetni == null ? '' : ' $_metaMetni.'}',
       excludeSemantics: true,
       onTap: onTap,
       child: AnimatedScale(

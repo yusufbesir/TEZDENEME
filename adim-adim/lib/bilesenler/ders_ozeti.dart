@@ -31,6 +31,10 @@ class DersOzeti extends StatelessWidget {
     this.ek2Etiket,
     this.onEk2,
     this.ek2Simge = Icons.quiz_outlined,
+    this.ek3Etiket,
+    this.onEk3,
+    this.ek3Simge = Icons.style_outlined,
+    this.bilgi,
   });
 
   final String baslik;
@@ -51,6 +55,15 @@ class DersOzeti extends StatelessWidget {
   final String? ek2Etiket;
   final VoidCallback? onEk2;
   final IconData ek2Simge;
+
+  /// Üçüncü isteğe bağlı ek eylem (ör. "Bu dersin öğeleri"); ikisi birlikte
+  /// verilir.
+  final String? ek3Etiket;
+  final VoidCallback? onEk3;
+  final IconData ek3Simge;
+
+  /// İsteğe bağlı bilgi bölümü (ör. ustalık kartı); özet kartının altında.
+  final Widget? bilgi;
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +170,10 @@ class DersOzeti extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (bilgi != null) ...[
+                      const SizedBox(height: Olcu.b2),
+                      bilgi!,
+                    ],
                     const Spacer(),
                     if (ekEtiket != null && onEk != null) ...[
                       OutlinedButton.icon(
@@ -172,6 +189,15 @@ class DersOzeti extends StatelessWidget {
                         icon: Icon(ek2Simge),
                         label: Text(ek2Etiket!),
                         onPressed: onEk2,
+                      ),
+                      const SizedBox(height: Olcu.b2),
+                    ],
+                    if (ek3Etiket != null && onEk3 != null) ...[
+                      OutlinedButton.icon(
+                        key: const Key('ozet-ek3'),
+                        icon: Icon(ek3Simge),
+                        label: Text(ek3Etiket!),
+                        onPressed: onEk3,
                       ),
                       const SizedBox(height: Olcu.b2),
                     ],

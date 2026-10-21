@@ -17,6 +17,7 @@ import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../motor/pratik.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
@@ -119,6 +120,26 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             .catchError((_) => false),
       );
     }
+    // Günün dersi hazır bildirimi (ÖZELLİK 63; ayar açıksa, günde bir kez).
+    final adet = Motor.gunDersiBildirimiGerekli(
+      d,
+      ref.read(kurslarProvider),
+      bugun,
+    );
+    if (adet != null) {
+      d = d.copyWith(sonGunDersiBildirimGunu: bugun);
+      try {
+        await ref.read(depoProvider).kaydet(d);
+      } catch (e) {
+        debugPrint('Günün dersi bildirim günü kaydedilemedi: $e');
+      }
+      unawaited(
+        ref
+            .read(bildirimProvider)
+            .gunDersiBildirimi(adet)
+            .catchError((_) => false),
+      );
+    }
     return d;
   }
 
@@ -141,9 +162,16 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return yeni;
   }
 
-  Future<OgrenciDurumu> dersBitir(String dersId, int dogru, int toplam) {
+  Future<OgrenciDurumu> dersBitir(
+    String dersId,
+    int dogru,
+    int toplam, {
+    int sureSn = 0,
+  }) {
     final bugun = ref.read(bugunProvider);
-    return _uygula((d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun));
+    return _uygula(
+      (d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun, sureSn: sureSn),
+    );
   }
 
   /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri
@@ -191,6 +219,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// İlk açılış ("Hoş geldin") akışı bitti; bir daha gösterilmez.
   Future<OgrenciDurumu> ilkAcilisTamamla() =>
       _uygula((d) => d.copyWith(ilkAcilisTamam: true));
+
+  /// Günün / haftanın / ayın dersi bitişi (Motor.donemDersiBitir).
+  Future<OgrenciDurumu> donemDersiBitir(String tur, int dogru, int toplam) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.donemDersiBitir(d, tur, dogru, toplam, bugun));
+  }
 
   Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);
@@ -255,10 +289,28 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
   }
 
+  /// Pratik merkezi eşleştirme süresi: yalnız daha iyiyse en iyi süre olur.
+  /// Kartlara, hata defterine ve XP'ye dokunmaz.
+  Future<OgrenciDurumu> eslestirmeBitir(int ms) =>
+      _uygula((d) => Pratik.eslestirmeKaydet(d, ms));
+
   /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
   Future<OgrenciDurumu> kartEkle(String kartId) {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.kartEkle(d, kartId, bugun));
+  }
+
+  /// Birden çok kartı tek yazımda tekrar kümesine ekler (toplu ekleme).
+  Future<OgrenciDurumu> kartlarEkle(Iterable<String> kartIdleri) {
+    final bugun = ref.read(bugunProvider);
+    final idler = kartIdleri.toSet();
+    return _uygula((d) {
+      var yeni = d;
+      for (final id in idler) {
+        yeni = Motor.kartEkle(yeni, id, bugun);
+      }
+      return yeni;
+    });
   }
 
   /// Kelimeye kişisel not yazar; boş/null metin notu siler.
@@ -287,6 +339,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool hatirlatmaSil = false,
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
+    bool? gunDersiBildirimiAcik,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -303,6 +356,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         hatirlatmaSil: hatirlatmaSil,
         tekrarBildirimiAcik: tekrarBildirimiAcik,
         konusmaAcik: konusmaAcik,
+        gunDersiBildirimiAcik: gunDersiBildirimiAcik,
       ),
     );
     final bildirim = ref.read(bildirimProvider);

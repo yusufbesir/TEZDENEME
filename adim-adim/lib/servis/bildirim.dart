@@ -13,6 +13,10 @@ abstract class BildirimServisi {
   /// Hemen gösterilen (zamanlanmamış) bildirim: bugün bekleyen tekrar sayısı.
   /// İzin yoksa ya da başlatılamadıysa false; hata fırlatmaz.
   Future<bool> tekrarBildirimi(int sayi);
+
+  /// Hemen gösterilen "günün dersi hazır" bildirimi ([adet]: alıştırma sayısı).
+  /// İzin yoksa ya da başlatılamadıysa false; hata fırlatmaz.
+  Future<bool> gunDersiBildirimi(int adet);
   Future<void> iptal();
 }
 
@@ -24,6 +28,8 @@ class GercekBildirim implements BildirimServisi {
       Bildirim.gunlukHatirlatma(saat, izinIste: izinIste);
   @override
   Future<bool> tekrarBildirimi(int sayi) => Bildirim.tekrarBildirimi(sayi);
+  @override
+  Future<bool> gunDersiBildirimi(int adet) => Bildirim.gunDersiBildirimi(adet);
   @override
   Future<void> iptal() => Bildirim.iptal();
 }
@@ -41,6 +47,9 @@ abstract final class Bildirim {
   /// Açılıştaki "bekleyen tekrar" bildiriminin kimliği; hatırlatmadan ayrı
   /// tutulur ki onu ezmesin (aynı kimlik Windows/Android'de üzerine yazar).
   static const int _tekrarKimlik = 2;
+
+  /// "Günün dersi" bildiriminin kimliği (öbürlerini ezmesin).
+  static const int _gunDersiKimlik = 3;
 
   /// Windows toast etkinleştirme geri çağrısını tanımlayan GUID. Sabit
   /// olmalı: Windows, bildirimi uygulamayla bu GUID (ve appUserModelId) ile
@@ -154,6 +163,37 @@ abstract final class Bildirim {
       return false;
     }
   }
+
+  /// Günün dersi hazır bildirimini hemen gösterir (zamanlanmaz); tekrar
+  /// bildirimiyle aynı kurallar (izin penceresi açmaz, hata fırlatmaz).
+  static Future<bool> gunDersiBildirimi(int adet) async {
+    try {
+      if (adet <= 0) return false;
+      if (!await _baslat()) return false;
+      await _eklenti.show(
+        id: _gunDersiKimlik,
+        title: 'Adım Adım',
+        body: gunDersiMetni(adet),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'gunun_dersi',
+            'Günün dersi',
+            channelDescription: 'Açılışta günün dersi hatırlatması',
+          ),
+          iOS: DarwinNotificationDetails(),
+          macOS: DarwinNotificationDetails(),
+          windows: WindowsNotificationDetails(),
+        ),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Günün dersi bildirimi gösterilemedi: $e');
+      return false;
+    }
+  }
+
+  /// Bildirim gövdesi: 'Günün dersi hazır: N alıştırma'.
+  static String gunDersiMetni(int adet) => 'Günün dersi hazır: $adet alıştırma';
 
   /// Bildirim gövdesi: 'Bugün N tekrar bekliyor'.
   static String tekrarMetni(int sayi) => 'Bugün $sayi tekrar bekliyor';

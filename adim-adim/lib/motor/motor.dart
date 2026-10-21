@@ -155,6 +155,7 @@ abstract final class Motor {
   static OgrenciDurumu _kazancIsle(OgrenciDurumu d, int kazanc, String bugun) {
     int yeniSeri;
     final son = d.sonGun;
+    var kopti = false;
     if (son == bugun) {
       yeniSeri = d.seri;
     } else if (son != null && gunFarki(son, bugun) == 1) {
@@ -165,6 +166,35 @@ abstract final class Motor {
       yeniSeri = d.seri + 1; // haftalık hedef tutuldu: günlük ara seriyi bozmaz
     } else {
       yeniSeri = 1;
+      kopti = son != null && gunFarki(son, bugun) > 1;
+    }
+
+    // Seri geri kazanma (ÖZELLİK 48): kopan seri saklanır; 3 gün üst üste
+    // günlük hedef tutulursa seri eski değer +3 olarak geri gelir.
+    var kirilan = d.kirilanSeri;
+    var ilerleme = d.geriKazanmaGun;
+    var ilerSon = d.geriKazanmaSon;
+    if (kopti) {
+      if (d.seri >= geriKazanmaEnAzSeri && d.seri > kirilan) kirilan = d.seri;
+      ilerleme = 0;
+    }
+    // Bir gün atlandıysa ilerleme sıfırlanır.
+    if (ilerSon != null && gunFarki(ilerSon, bugun) > 1) ilerleme = 0;
+    final bugunXp = (d.gunlukXp[bugun] ?? 0) + kazanc;
+    if (kirilan > 0 && bugunXp >= d.gunlukHedef && ilerSon != bugun) {
+      ilerleme = (ilerSon != null && gunFarki(ilerSon, bugun) == 1)
+          ? ilerleme + 1
+          : 1;
+      ilerSon = bugun;
+      if (ilerleme >= geriKazanmaGunSayisi) {
+        yeniSeri = kirilan + geriKazanmaGunSayisi;
+        kirilan = 0;
+        ilerleme = 0;
+      }
+    }
+    if (kirilan > 0 && yeniSeri >= kirilan) {
+      kirilan = 0; // yeni seri zaten eskisine yetişti
+      ilerleme = 0;
     }
     final enSeri = yeniSeri > d.enSeri ? yeniSeri : d.enSeri;
     return d.copyWith(
@@ -172,8 +202,42 @@ abstract final class Motor {
       seri: yeniSeri,
       enSeri: enSeri,
       sonGun: bugun,
-      gunlukXp: {...d.gunlukXp, bugun: (d.gunlukXp[bugun] ?? 0) + kazanc},
+      gunlukXp: {...d.gunlukXp, bugun: bugunXp},
+      kirilanSeri: kirilan,
+      geriKazanmaGun: ilerleme,
+      geriKazanmaSon: ilerSon,
     );
+  }
+
+  /// Seri geri kazanma: art arda kaç gün günlük hedef tutulmalı.
+  static const int geriKazanmaGunSayisi = 3;
+
+  /// Bu değerden kısa seriler için geri kazanma sunulmaz.
+  static const int geriKazanmaEnAzSeri = 3;
+
+  /// Gösterilecek seri geri kazanma durumu; bekleyen yoksa null. [kirilan]:
+  /// kopan serinin değeri, [ilerleme]: art arda tutulan hedef günü (0..2),
+  /// [bugunTamam]: bugünün hedefi bu ilerlemeye sayıldı mı.
+  /// Seri henüz yeni bir ders işlenmeden kopmuş görünüyorsa (gösterilen seri
+  /// 0) kopan değer `seri`den okunur. Bir gün atlanmışsa ilerleme 0 gösterilir.
+  static ({int kirilan, int ilerleme, bool bugunTamam})? geriKazanma(
+    OgrenciDurumu d,
+    String bugun,
+  ) {
+    var kir = d.kirilanSeri;
+    final sonGun = d.sonGun;
+    if (kir == 0 &&
+        sonGun != null &&
+        d.seri >= geriKazanmaEnAzSeri &&
+        gunFarki(sonGun, bugun) > 1 &&
+        gosterilenSeri(d, bugun) == 0) {
+      kir = d.seri;
+    }
+    if (kir == 0) return null;
+    final s = d.geriKazanmaSon;
+    final gecerli = s != null && gunFarki(s, bugun) <= 1;
+    final il = gecerli ? d.geriKazanmaGun : 0;
+    return (kirilan: kir, ilerleme: il, bugunTamam: gecerli && s == bugun);
   }
 
   /// Ders bitişi: XP/seri, `tamamlanan`, `sonDersId` ve günlüğe 'ders' kaydı.
@@ -182,12 +246,19 @@ abstract final class Motor {
     String dersId,
     int dogru,
     int toplam,
-    String bugun,
-  ) {
+    String bugun, {
+    int sureSn = 0,
+  }) {
     final xp = dersXp(dogru, toplam);
+    // Ustalık verisi: en iyi puan yüzdesi (düşmez) ve toplam çalışma süresi.
+    final puan = toplam > 0 ? (dogru * 100 ~/ toplam).clamp(0, 100) : 0;
+    final eskiPuan = d.dersEnIyi[dersId] ?? 0;
+    final sure = sureSn.clamp(0, 3600);
     final yeni = _kazancIsle(d, xp, bugun).copyWith(
       tamamlanan: {...d.tamamlanan, dersId: (d.tamamlanan[dersId] ?? 0) + 1},
       sonDersId: dersId,
+      dersEnIyi: {...d.dersEnIyi, dersId: puan > eskiPuan ? puan : eskiPuan},
+      dersSureSn: {...d.dersSureSn, dersId: (d.dersSureSn[dersId] ?? 0) + sure},
     );
     return gunlukEkle(
       yeni,
@@ -1331,6 +1402,149 @@ abstract final class Motor {
     if (d.sonTekrarBildirimGunu == bugun) return null;
     final sayi = tekrarBekleyen(d, bugun).length;
     return sayi > 0 ? sayi : null;
+  }
+
+  // ---- Günün / haftanın / ayın dersi (ÖZELLİK 63) ----
+
+  static const String donemGunluk = 'gunluk';
+  static const String donemHaftalik = 'haftalik';
+  static const String donemAylik = 'aylik';
+  static const List<String> donemler = [donemGunluk, donemHaftalik, donemAylik];
+
+  /// Dönem başına alıştırma sayısı: günlük 8, haftalık 12, aylık 16.
+  static int donemAdet(String tur) => switch (tur) {
+    donemHaftalik => 12,
+    donemAylik => 16,
+    _ => 8,
+  };
+
+  /// Dönem başına tamamlama XP'si: günlük +10, haftalık +25, aylık +50.
+  static int donemXp(String tur) => switch (tur) {
+    donemHaftalik => 25,
+    donemAylik => 50,
+    _ => 10,
+  };
+
+  /// Dönemin kullanıcıya görünen adı.
+  static String donemAdi(String tur) => switch (tur) {
+    donemHaftalik => 'Haftanın dersi',
+    donemAylik => 'Ayın dersi',
+    _ => 'Günün dersi',
+  };
+
+  /// Dönem anahtarı: 'g:GÜN', 'h:HAFTA-PAZARTESİ' ya da 'a:YYYY-MM'.
+  static String donemAnahtari(String tur, String bugun) => switch (tur) {
+    donemHaftalik => 'h:${haftaBaslangici(bugun)}',
+    donemAylik => 'a:${bugun.length >= 7 ? bugun.substring(0, 7) : bugun}',
+    _ => 'g:$bugun',
+  };
+
+  static bool donemTamam(OgrenciDurumu d, String tur, String bugun) =>
+      d.donemDersleri.contains(donemAnahtari(tur, bugun));
+
+  /// FNV-1a: süreçler arası kararlı sabit tohum ([String.hashCode] değil).
+  static int _kararliTohum(String metin) {
+    var h = 0x811c9dc5;
+    for (final c in metin.codeUnits) {
+      h = ((h ^ c) * 0x01000193) & 0x7fffffff;
+    }
+    return h;
+  }
+
+  /// Öğrencinin tamamladığı derslerde (Soyle hariç) en az bir alıştırma var mı?
+  static bool donemDersiVar(OgrenciDurumu d, List<Kurs> kurslar) {
+    for (final k in kurslar) {
+      for (final ders in k.tumDersler) {
+        if ((d.tamamlanan[ders.id] ?? 0) <= 0) continue;
+        if (ders.alistirmalar.any((a) => a is! Soyle)) return true;
+      }
+    }
+    return false;
+  }
+
+  /// Dönem dersi alıştırmaları: [kurslar] (alan kursları) içinde öğrencinin
+  /// tamamladığı derslerden (Soyle hariç) tarihten deterministik seçilen
+  /// karışık alıştırmalar; rastgele değil, aynı gün/hafta/ay aynı sonuç.
+  /// Ardışık aynı tür mümkünse gelmez. Tamamlanmış ders yoksa boş.
+  static List<({String kartId, Alistirma alistirma})> donemDersiSec(
+    OgrenciDurumu d,
+    List<Kurs> kurslar,
+    String tur,
+    String bugun,
+  ) {
+    final havuz = <({String kartId, Alistirma alistirma})>[];
+    for (final k in kurslar) {
+      for (final ders in k.tumDersler) {
+        if ((d.tamamlanan[ders.id] ?? 0) <= 0) continue;
+        for (var i = 0; i < ders.alistirmalar.length; i++) {
+          final a = ders.alistirmalar[i];
+          if (a is Soyle) continue;
+          havuz.add((kartId: ders.kartKimligi(i), alistirma: a));
+        }
+      }
+    }
+    havuz.shuffle(math.Random(_kararliTohum(donemAnahtari(tur, bugun))));
+    final sonuc = <({String kartId, Alistirma alistirma})>[];
+    final adet = donemAdet(tur);
+    while (sonuc.length < adet && havuz.isNotEmpty) {
+      final onceki = sonuc.isEmpty ? null : sonuc.last.alistirma.runtimeType;
+      var i = havuz.indexWhere((h) => h.alistirma.runtimeType != onceki);
+      if (i < 0) i = 0;
+      sonuc.add(havuz.removeAt(i));
+    }
+    return sonuc;
+  }
+
+  /// Dönem dersi bitişi: dönem anahtarı kaydedilir, XP ([donemXp]) ve seri
+  /// işlenir, günlüğe 'mikro' kaydı (id = 'donem-TÜR') yazılır. Aynı dönem
+  /// ikinci kez XP vermez (durum değişmeden döner); toplam 0 ise de değişmez.
+  static OgrenciDurumu donemDersiBitir(
+    OgrenciDurumu d,
+    String tur,
+    int dogru,
+    int toplam,
+    String bugun,
+  ) {
+    if (toplam <= 0 || !donemler.contains(tur)) return d;
+    final anahtar = donemAnahtari(tur, bugun);
+    if (d.donemDersleri.contains(anahtar)) return d;
+    final xp = donemXp(tur);
+    final dg = dogru < 0 ? 0 : (dogru > toplam ? toplam : dogru);
+    // En çok 400 anahtar; en eski tarihli olanlar düşer.
+    var kume = [...d.donemDersleri, anahtar]
+      ..sort((a, b) => a.substring(2).compareTo(b.substring(2)));
+    if (kume.length > 400) kume = kume.sublist(kume.length - 400);
+    return gunlukEkle(
+      _kazancIsle(d, xp, bugun).copyWith(donemDersleri: Set.unmodifiable(kume)),
+      GunlukKayit(
+        gun: bugun,
+        tur: GunlukKayit.turMikro,
+        id: 'donem-$tur',
+        dogru: dg,
+        toplam: toplam,
+        xp: xp,
+      ),
+    );
+  }
+
+  /// Açılışta "günün dersi hazır" bildirimi gerekli mi? Ayar açık, bugün
+  /// gösterilmemiş, günün dersi tamamlanmamış ve en az bir alıştırma varsa
+  /// alıştırma sayısını, yoksa null döndürür.
+  static int? gunDersiBildirimiGerekli(
+    OgrenciDurumu d,
+    List<Kurs> kurslar,
+    String bugun,
+  ) {
+    if (!d.gunDersiBildirimiAcik) return null;
+    if (d.sonGunDersiBildirimGunu == bugun) return null;
+    if (donemTamam(d, donemGunluk, bugun)) return null;
+    final n = donemDersiSec(
+      d,
+      alanKurslari(kurslar, d.alan),
+      donemGunluk,
+      bugun,
+    ).length;
+    return n > 0 ? n : null;
   }
 
   /// Serbest yazı karşılaştırması için normalleştirir.

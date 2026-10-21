@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/donem_dersleri.dart';
+import '../bilesenler/geri_kazanma_satiri.dart';
 import '../bilesenler/ogrenme_gunlugu.dart';
 import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
@@ -40,6 +42,7 @@ class ProfilEkrani extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final durum = ref.watch(durumProvider).value ?? const OgrenciDurumu();
     final bugun = ref.watch(bugunProvider);
+    final kurslar = ref.watch(alanKurslariProvider);
     final yazi = Theme.of(context).textTheme;
     final r = context.renkler;
 
@@ -87,6 +90,14 @@ class ProfilEkrani extends ConsumerWidget {
                 child: const Text('Değiştir'),
               ),
             ),
+            ListTile(
+              key: const ValueKey('profil-pratik-merkezi'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.fitness_center, color: r.ana),
+              title: const Text('Pratik merkezi'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/pratik'),
+            ),
             const SizedBox(height: Olcu.b2),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),
@@ -129,6 +140,13 @@ class ProfilEkrani extends ConsumerWidget {
                 ),
               ],
             ),
+            GeriKazanmaSatiri(durum: durum, bugun: bugun),
+            if (Motor.donemDersiVar(durum, kurslar)) ...[
+              const SizedBox(height: Olcu.b3),
+              Text('Günün, haftanın, ayın dersi', style: yazi.titleMedium),
+              const SizedBox(height: Olcu.b1),
+              DonemDersleri(durum: durum, kurslar: kurslar, bugun: bugun),
+            ],
             const SizedBox(height: Olcu.b3),
             Text('Son 7 gün (XP)', style: yazi.titleMedium),
             const SizedBox(height: Olcu.b2),

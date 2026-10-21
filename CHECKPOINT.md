@@ -34,6 +34,18 @@
 - 2026-10-16: Yola bağlı kurallar, boyut testi, yerleşim tablosu (PR #21) ve skill'ler (PR #22) birleşti.
 - 2026-10-21: PR #8, #7, #14, #18, ardından Yusuf'un PR yetkisiyle #15, #26, #19 ana dala alındı (#12'yi sahibi birleştirdi); eski `.claude/orchestrator-log.md` satırları ve CLAUDE.md eklemeleri `docs/` altındaki yerlerine taşındı, içerik kaybı yok.
 
+## Devir notu (2026-10-21 15:2x, Yusuf: "tüm önerileri uygulayacağız, bağımlıları birlikte yap") [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- Kapsam: 42–83 arası TÜM öneriler (REA-ozellik-haritasi-2026-10-17.md; Duolingo 42–51 = D1..D10, Chess.com 52–57, Drops 58–60, Mondly 61–66, toplu tarama 68–83), yapılanlar hariç: 44, 48, 62, 63, 71, 79 (PR #32, açık). Kalan: 42, 43, 45, 46, 47, 49, 50, 51, 52–57, 58–60, 61, 64, 65, 66, 68–70, 72–78, 80–83. Lig/topluluk/sosyal, ücretli karşılıklar, çevrim içi YZ yapılmaz; ağ gerektirenler çevrimdışı karşılığıyla.
+- Çalışma düzeni: bağımlı özellikler aynı implementer görevinde (örn. satranç 47+52–57 birlikte; ders/kart ekranı özellikleri 42+43+45+61+64+65+66; seri/hedef/başarım 49+50+51+ Drops 58–60; kelime/kart 68–70, 72–78, 80–83), grup başına yeni dal ya da #32'den sonra main'den dal; her grup sonrası verifier, tam paket, PR. PR #32 birleşmeden önce main'e bağımlı dalları onun üstüne aç.
+- Numara notu: 47 = satranç modülü iskeleti (D6), seri geri kazanma 48 yapıldı.
+- Ana sayfaya yeni kart ekleme (lazy liste testleri kırılgan); mevcut satıra düğme ekle. Flutter: /opt/flutter (kapsayıcıda yoksa: git clone --depth 1 -b 3.47.7 https://github.com/flutter/flutter /opt/flutter; FLUTTER_ALLOW_ROOT=1; git config --global --add safe.directory '*'). Git: sığ klonda "unpushed" uyarısı çıkarsa git fetch origin +refs/heads/<dal>:refs/remotes/origin/<dal> ve branch.<dal>.remote/merge ayarla.
+
+## Devir notu (2026-10-21 15:xx, öneriler 62, 71, 79, 44, 48, 63 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
+- PR #30 birleşti (main bd33fc3). Yeni dal claude/adim-adim-ozellik-62-71: 62 ders sonu öğeler ekranı, 71 adım meta/ustalık, 79 filtreli tekrar+takvim, 44 pratik merkezi, 48 seri geri kazanma, 63 günün/haftanın/ayın dersi; tam paket 805 test, analyze temiz, toplu verifier'dan geçti (bulunan kirilan==3 hatası düzeltildi, test eklendi).
+- Numaralama notu: Duolingo önerileri 42–51 = D1..D10; seri geri kazanma 48 (D7); 47 = D6 satranç modülü iskeleti (günlük bulmaca, mini maç, serbest tahta), YAPILMADI; Yusuf'a 47'nin satranç iskeleti olduğu söylenecek.
+- Bilinen: günün dersinde cevaplar mikro ders gibi SRS'e yazılır; Windows toast cihazda denenmedi; günün dersi bildirimi varsayılan kapalı.
+- Sıradaki: Yusuf'un seçimi (42–83 kalanlar; öneri: 47 satranç iskeleti, 43 efsanevi zor tekrar, 49 aylık meydan okuma, 50 kolaylaştırma, 51 yıl/ay özeti).
+
 ## Devir notu (2026-10-21 14:xx, içerik dalgası: 2, 3, 4, 5 YAPILDI) [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Birleşik dalda tam paket 720 test geçti (önceki devirdeki 641/675 sayıları eskiydi; 7b23e38'de ölçülen 676 idi). flutter analyze temiz.
 - Eklenenler (PR #30): Python 1-3 (24 ders), HTML/CSS/JS orta ve ileri (6 kurs, 48 ders), Almanca A1/A2/B1 (36 ders, sözlük dili 'de'), Satranç 1-3 (alan Oyunlar, yeni Hamle alıştırması, kendi kural motoru lib/satranc, 72 hamle bulmacası python-chess ile çapraz doğrulandı).

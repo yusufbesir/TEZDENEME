@@ -22,10 +22,14 @@ import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
+import 'ekranlar/ders_ogeleri_ekrani.dart';
+import 'ekranlar/filtreli_tekrar_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
+import 'ekranlar/pratik_etkinlikleri.dart';
+import 'ekranlar/pratik_merkezi_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
@@ -100,6 +104,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         builder: (c, s) => DersEkrani(dersId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(
+        path: '/ders-ogeleri/:id',
+        builder: (c, s) =>
+            DersOgeleriEkrani(dersId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
         path: '/hikaye/:id',
         builder: (c, s) => HikayeEkrani(hikayeId: s.pathParameters['id'] ?? ''),
       ),
@@ -116,11 +125,13 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/mikro',
         // mod=zayif: hata defterinden zayıf noktalar dersi;
         // mod=karisik&ders=<id>: ünite sonu serpiştirilmiş tekrar;
-        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz.
+        // mod=quiz&ders=<id>&yanlis=0,3: ders sonu kısa quiz;
+        // mod=donem&donem=gunluk|haftalik|aylik: günün/haftanın/ayın dersi.
         builder: (c, s) => MikroDersEkrani(
           mod: s.uri.queryParameters['mod'],
           dersId: s.uri.queryParameters['ders'],
           yanlis: s.uri.queryParameters['yanlis'],
+          donem: s.uri.queryParameters['donem'],
         ),
       ),
       GoRoute(
@@ -147,6 +158,23 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/sertifika',
         builder: (c, s) =>
             SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+      ),
+      GoRoute(
+        path: '/tekrar-filtre',
+        builder: (c, s) => const FiltreliTekrarEkrani(),
+      ),
+      GoRoute(path: '/pratik', builder: (c, s) => const PratikMerkeziEkrani()),
+      GoRoute(
+        path: '/pratik/eslestirme',
+        builder: (c, s) => const EslestirmeEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/tur',
+        builder: (c, s) => const ArtanZorlukEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/kartlar',
+        builder: (c, s) => const KelimeKartlariEkrani(),
       ),
       GoRoute(path: '/alan-sec', builder: (c, s) => const AlanSecimiEkrani()),
     ],

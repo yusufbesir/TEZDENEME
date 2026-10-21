@@ -426,6 +426,18 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 onChanged: (v) => notifier.ayarGuncelle(tekrarBildirimiAcik: v),
               ),
               SwitchListTile(
+                key: const ValueKey('ayar-gun-dersi-bildirimi'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.event_available_outlined, color: r.ana),
+                title: const Text('Günün dersi bildirimi'),
+                subtitle: const Text(
+                  'Uygulama açılırken günün dersi hazırsa bildirir',
+                ),
+                value: durum.gunDersiBildirimiAcik,
+                onChanged: (v) =>
+                    notifier.ayarGuncelle(gunDersiBildirimiAcik: v),
+              ),
+              SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(Icons.mic_none, color: r.ana),
                 title: const Text('Konuşma alıştırmaları'),
