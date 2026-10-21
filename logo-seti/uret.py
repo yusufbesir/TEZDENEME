@@ -13,7 +13,7 @@ SANAT = {
  'adim-adim': dict(bg1='#FFA63D', bg2='#F26B1D', art='''
   <path fill="#fff" fill-rule="evenodd" d="M96 416V352h64v-64h64v-64h64v64h64v64h64v64z M224 416v-64h64v64z"/>
   <path fill="#fff" d="M224 224h64v-64h-64z" opacity="0"/>
-  <circle cx="256" cy="150" r="36" fill="#FFE08A"/>'''),
+  <path d="M256 224V116" stroke="#fff" stroke-width="16" stroke-linecap="round"/><path d="M264 120l64 26-64 26z" fill="#FFE08A"/>'''),
  # Dalga halkası: sürekli yenilenen (dinamik) QR. Ortada QR modülleri, çevresinde dönen çift ok.
  'dinamik-qr': dict(bg1='#13294B', bg2='#0B1830', art='''
   <g fill="#22D3A6"><rect x="196" y="196" width="52" height="52" rx="10"/><rect x="264" y="196" width="52" height="52" rx="10"/><rect x="196" y="264" width="52" height="52" rx="10"/></g>
