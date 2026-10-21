@@ -1,3 +1,5 @@
+// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Çalışma planı motor ve model testleri: günlük ders sayısı, bitiş tarihi,
 /// kalan ders (atlanan/tamamlanan düşülür), haftalık öneri, JSON uyumu.
 library;

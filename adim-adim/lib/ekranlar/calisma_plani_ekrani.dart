@@ -1,3 +1,5 @@
+// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Çalışma planı ekranı: kurs, hedef (kursun tamamı ya da bir ünite), günde
 /// dakika ve haftanın günleri seçilir; tahmini bitiş ve günlük ders sayısı
 /// canlı gösterilir. Kaydet / Planı sil. Ayarlar'dan ya da ana sayfa

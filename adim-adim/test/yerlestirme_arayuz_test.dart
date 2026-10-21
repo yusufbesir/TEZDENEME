@@ -130,4 +130,29 @@ void main() {
     await uygulamayiAc(tester, depo, kurslar: [_kurs]);
     expect(find.byKey(const ValueKey('yerlestirme-yk-1')), findsNothing);
   });
+
+  testWidgets('480x600 @1,5 ölçekte düğme, sınav ve sonuç ekranı taşmaz', (
+    tester,
+  ) async {
+    final depo = BellekDepo(const OgrenciDurumu(alan: 'dil'));
+    await uygulamayiAc(
+      tester,
+      depo,
+      kurslar: [_kurs],
+      boyut: const Size(480, 600),
+      metinOlcegi: 1.5,
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('yerlestirme-yk-1')),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(tester.takeException(), isNull);
+    await dokun(tester, find.byKey(const ValueKey('yerlestirme-yk-1')));
+    expect(find.text('1/15'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await _coz(tester, {1, 3});
+    expect(find.text('Seviye belirlendi'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

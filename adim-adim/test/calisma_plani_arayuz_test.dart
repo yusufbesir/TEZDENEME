@@ -1,3 +1,5 @@
+// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Çalışma planı arayüzü: ana sayfada "Plan oluştur" çağrısı; plan kurma,
 /// kartta bugünkü hedef/tahmini bitiş, düzenleme ve silme; Ayarlar bağlantısı.
 library;
