@@ -88,6 +88,17 @@ class DersMeta {
     return AdimMeta(zorluk: z, saniye: sn);
   }
 
+  /// Dersin ortalama zorluk puanı: adımların zorluğu kolay 1, orta 2, zor 3
+  /// olarak ortalanır; alıştırması olmayan ders 0 (ÖZELLİK 50 karşılaştırması).
+  static double dersZorlugu(Ders d) {
+    if (d.alistirmalar.isEmpty) return 0;
+    final t = d.alistirmalar.fold<int>(
+      0,
+      (s, a) => s + adim(a).zorluk.index + 1,
+    );
+    return t / d.alistirmalar.length;
+  }
+
   /// Dersin tüm alıştırmalarının tahmini süresi (saniye).
   static int dersSaniye(Ders d) =>
       d.alistirmalar.fold<int>(0, (t, a) => t + adim(a).saniye);

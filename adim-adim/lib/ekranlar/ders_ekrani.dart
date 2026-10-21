@@ -15,12 +15,14 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
 import '../bilesenler/dilbilgisi_notu_karti.dart';
+import '../bilesenler/kolaylastirma_satiri.dart';
 import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/ders_meta.dart';
 import '../motor/ders_ogeleri.dart';
+import '../motor/kolaylastirma.dart';
 import '../motor/motor.dart';
 import '../motor/satranc_calisma.dart';
 import '../tema/tema.dart';
@@ -132,7 +134,23 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   Widget? _ustalik(Ders ders) {
     final d = ref.watch(durumProvider).value;
     if (d == null) return null;
-    final kart = _ustalikKarti(d, ders);
+    final ustalik = _ustalikKarti(d, ders);
+    // Kolaylaştırma önerisi (ÖZELLİK 50): üst üste iki başarısız denemeden sonra.
+    final oneri = Kolaylastirma.oner(
+      d,
+      ref.read(kurslarProvider),
+      ref.read(bugunProvider),
+    );
+    final kart = oneri == null
+        ? ustalik
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              KolaylastirmaSatiri(oneri: oneri),
+              const SizedBox(height: Olcu.b1),
+              ustalik,
+            ],
+          );
     // Satranç dersleri: ders sonu tahta meydan okuması (ÖZELLİK 56).
     if (!SatrancCalisma.dersMeydanVar(ref.read(kurslarProvider), ders.id)) {
       return kart;

@@ -21,6 +21,7 @@ import '../bilesenler/fiil_cekim_tablosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../sozluk/dil_tanimi.dart';
 import '../sozluk/sozluk.dart';
 import '../tema/tema.dart';
 
@@ -148,18 +149,11 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                 child: Row(
                   children: [
                     cip('Tümü', null),
-                    const SizedBox(width: Olcu.b1),
-                    cip('İngilizce', 'en'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Almanca', 'de'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Korece', 'ko'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Japonca', 'ja'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Çince', 'zh'),
-                    const SizedBox(width: Olcu.b1),
-                    cip('Kod', 'kod'),
+                    // Dil çipleri dil tanımları tablosundan gelir (ÖZELLİK 60).
+                    for (final t in dilTanimlari) ...[
+                      const SizedBox(width: Olcu.b1),
+                      cip(t.ad, t.kod),
+                    ],
                   ],
                 ),
               ),
@@ -231,13 +225,10 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
 }
 
 /// Sözlük dil kodundan TTS dili ('ko' → 'ko-KR'); bilinmeyen 'en-US'.
-String _sesDili(String dil) => switch (dil) {
-  'de' => 'de-DE',
-  'ko' => 'ko-KR',
-  'ja' => 'ja-JP',
-  'zh' => 'zh-CN',
-  _ => 'en-US',
-};
+String _sesDili(String dil) {
+  final t = dilTanimi(dil);
+  return (t == null || t.ttsDili.isEmpty) ? 'en-US' : t.ttsDili;
+}
 
 /// Okunacak metin: Korece/Japonca/Çince maddelerde sondaki "(romanizasyon)"
 /// atılır; yalnız hedef yazı okunur.

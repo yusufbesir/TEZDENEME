@@ -18,13 +18,16 @@ import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
 import '../motor/efsanevi.dart';
+import '../motor/meydan.dart';
 import '../motor/motor.dart';
 import '../motor/pratik.dart';
 import '../motor/satranc_calisma.dart';
 import '../motor/senaryo.dart';
+import '../motor/sure.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
+import '../sozluk/dil_paketi.dart';
 import '../sozluk/fiil_cekimi.dart';
 import '../sozluk/sozluk.dart';
 import '../yarisma/model.dart';
@@ -57,9 +60,16 @@ final kayitHatasiProvider = NotifierProvider<KayitHatasi, String?>(
 
 final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
 
-/// Gömülü sözlük: kurs listesinden (varsayılan tumKurslar) bir kez üretilir.
+/// Dil başına sözlük veri paketleri (ÖZELLİK 60): her dilin maddeleri ayrı
+/// yükleme biriminde, ilk istendiğinde üretilir.
+final dilPaketleriProvider = Provider<DilPaketleri>(
+  (ref) => DilPaketleri(ref.watch(kurslarProvider)),
+);
+
+/// Gömülü sözlük: dil paketlerinin birleşimi (kurs listesi varsayılan
+/// tumKurslar); `Sozluk.kurslardan` ile aynı maddeleri verir.
 final sozlukProvider = Provider<Sozluk>(
-  (ref) => Sozluk.kurslardan(ref.watch(kurslarProvider)),
+  (ref) => ref.watch(dilPaketleriProvider).sozluk,
 );
 
 /// Fiil çekim sözlüğü (ÖZELLİK 61): kurs tablolarından derlenen doğrulanmış
@@ -236,6 +246,22 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.donemDersiBitir(d, tur, dogru, toplam, bugun));
   }
+
+  /// Günlük çalışma süresine [sn] saniye ekler (ÖZELLİK 59, 80; süreli oturum,
+  /// mikro ders). sn <= 0 ise hiçbir şey yazılmaz.
+  Future<OgrenciDurumu> sureEkle(int sn) async {
+    if (sn <= 0) return _simdiki;
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.sureEkle(d, bugun, sn));
+  }
+
+  /// Günlük dakika hedefini ayarlar; 0 kapatır (ÖZELLİK 80).
+  Future<OgrenciDurumu> dakikaHedefiAyarla(int dk) =>
+      _uygula((d) => Sure.hedefAyarla(d, dk));
+
+  /// Aylık meydan okuma hedefini (ders sayısı) ayarlar (ÖZELLİK 49).
+  Future<OgrenciDurumu> aylikHedefAyarla(int hedef) =>
+      _uygula((d) => Meydan.hedefAyarla(d, hedef));
 
   Future<OgrenciDurumu> mikroBitir(int dogru, int toplam) {
     final bugun = ref.read(bugunProvider);

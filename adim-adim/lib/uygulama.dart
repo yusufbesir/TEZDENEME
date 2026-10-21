@@ -24,7 +24,11 @@ import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
 import 'ekranlar/eller_serbest_ekrani.dart';
+import 'ekranlar/gorsel_kelime_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
+import 'ekranlar/meydan_ekrani.dart';
+import 'ekranlar/ozet_ekrani.dart';
+import 'ekranlar/sure_ekrani.dart';
 import 'ekranlar/senaryo_ekrani.dart';
 import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
@@ -202,6 +206,18 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
       ),
+      // Meydan okuma ve rekorlar (49), ay/yıl özeti (51), süre takibi ve süreli
+      // oturum (59, 80), görsel kelimeler (58).
+      GoRoute(path: '/meydan', builder: (c, s) => const MeydanEkrani()),
+      GoRoute(path: '/ozet', builder: (c, s) => const OzetEkrani()),
+      GoRoute(path: '/sure', builder: (c, s) => const SureEkrani()),
+      GoRoute(
+        path: '/sure/oturum',
+        builder: (c, s) => SureliOturumEkrani(
+          dakika: int.tryParse(s.uri.queryParameters['dk'] ?? '') ?? 5,
+        ),
+      ),
+      GoRoute(path: '/gorsel', builder: (c, s) => const GorselKelimeEkrani()),
       // Eller serbest sesli mod (ÖZELLİK 64), senaryolu konuşma (65) ve kelime
       // bulutu (66).
       GoRoute(

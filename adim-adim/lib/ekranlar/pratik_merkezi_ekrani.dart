@@ -15,6 +15,7 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/pratik.dart';
+import '../motor/sure.dart';
 import '../tema/tema.dart';
 
 class PratikMerkeziEkrani extends ConsumerWidget {
@@ -97,6 +98,14 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                   onTap: () => context.push('/pratik/tur'),
                 ),
                 kart(
+                  anahtar: const ValueKey('pratik-sureli'),
+                  simge: Icons.hourglass_bottom,
+                  baslik: 'Süreli kelime oturumu',
+                  ayrinti:
+                      '5, 10 ya da 15 dk · ${Sure.bugunMetni(durum, ref.watch(bugunProvider))}',
+                  onTap: () => context.push('/sure'),
+                ),
+                kart(
                   anahtar: const ValueKey('pratik-kartlar'),
                   simge: Icons.flip_outlined,
                   baslik: 'Kelime kartları',
@@ -107,6 +116,13 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                 ),
                 // Yalnız dil kurslarında: sesli etkinlikler.
                 if (durum.alan == 'dil') ...[
+                  kart(
+                    anahtar: const ValueKey('pratik-gorsel'),
+                    simge: Icons.image_outlined,
+                    baslik: 'Görsel kelimeler',
+                    ayrinti: 'Simgeli kartlar, konu oyunları',
+                    onTap: () => context.push('/gorsel'),
+                  ),
                   kart(
                     anahtar: const ValueKey('pratik-radyo'),
                     simge: Icons.radio,

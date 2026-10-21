@@ -19,7 +19,9 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/kelime_bulutu.dart';
+import '../motor/meydan.dart';
 import '../motor/motor.dart';
+import '../motor/sure.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
 
@@ -51,6 +53,7 @@ class ProfilEkrani extends ConsumerWidget {
     final degerler = [for (final g in gunler) durum.gunlukXp[g.gun] ?? 0];
     final enCok = degerler.fold<int>(0, (a, b) => a > b ? a : b);
     final bitenDers = durum.tamamlanan.values.where((v) => v > 0).length;
+    final meydan = Meydan.aylik(durum, bugun);
     final ogrenilenKelime = durum.alan == 'dil'
         ? KelimeBulutu.ogrenilenSayisi(durum, kurslar)
         : 0;
@@ -101,6 +104,31 @@ class ProfilEkrani extends ConsumerWidget {
               title: const Text('Pratik merkezi'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/pratik'),
+            ),
+            // Meydan okuma (49, 51) ve süre takibi (59, 80) satırları.
+            ListTile(
+              key: const ValueKey('profil-meydan'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.flag_outlined, color: r.ana),
+              title: const Text('Meydan okuma ve rekorlar'),
+              subtitle: Text(
+                'Bu ay ${meydan.ilerleme}/${meydan.hedef} ders',
+                key: const ValueKey('profil-meydan-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/meydan'),
+            ),
+            ListTile(
+              key: const ValueKey('profil-sure'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.timer_outlined, color: r.ana),
+              title: const Text('Süre takibi'),
+              subtitle: Text(
+                Sure.bugunMetni(durum, bugun),
+                key: const ValueKey('profil-sure-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/sure'),
             ),
             if (durum.alan == 'dil')
               ListTile(
