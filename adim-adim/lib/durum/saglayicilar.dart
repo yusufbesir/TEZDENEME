@@ -17,12 +17,15 @@ import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
+import '../motor/efsanevi.dart';
 import '../motor/motor.dart';
 import '../motor/pratik.dart';
 import '../motor/satranc_calisma.dart';
+import '../motor/senaryo.dart';
 import '../servis/bildirim.dart';
 import '../servis/konusma.dart';
 import '../servis/ses.dart';
+import '../sozluk/fiil_cekimi.dart';
 import '../sozluk/sozluk.dart';
 import '../yarisma/model.dart';
 
@@ -57,6 +60,12 @@ final kurslarProvider = Provider<List<Kurs>>((ref) => tumKurslar);
 /// Gömülü sözlük: kurs listesinden (varsayılan tumKurslar) bir kez üretilir.
 final sozlukProvider = Provider<Sozluk>(
   (ref) => Sozluk.kurslardan(ref.watch(kurslarProvider)),
+);
+
+/// Fiil çekim sözlüğü (ÖZELLİK 61): kurs tablolarından derlenen doğrulanmış
+/// çekimler; uydurma çekim yok.
+final fiilCekimleriProvider = Provider<FiilCekimleri>(
+  (ref) => FiilCekimleri.kurslardan(ref.watch(kurslarProvider)),
 );
 
 /// Bugünün günü 'YYYY-MM-DD'. Testte sabitlenebilir.
@@ -295,6 +304,17 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// Kartlara, hata defterine ve XP'ye dokunmaz.
   Future<OgrenciDurumu> eslestirmeBitir(int ms) =>
       _uygula((d) => Pratik.eslestirmeKaydet(d, ms));
+
+  /// Efsanevi zor tekrar geçildi (ÖZELLİK 43): ünite altın olur; kartlara,
+  /// hata defterine, XP'ye ve seriye dokunmaz.
+  Future<OgrenciDurumu> efsaneviGecildi(String uniteId) =>
+      _uygula((d) => Efsanevi.altinYap(d, uniteId));
+
+  /// Senaryolu konuşma bitti (ÖZELLİK 65): bitirme sayısı artar; XP, kart ve
+  /// hata defterine dokunmaz.
+  Future<OgrenciDurumu> senaryoBitir(String id) => _uygula(
+    (d) => d.copyWith(senaryolar: Senaryolar.bitirildi(d.senaryolar, id)),
+  );
 
   /// Kartı bugün sorulacak biçimde tekrar kümesine ekler; varsa dokunmaz.
   Future<OgrenciDurumu> kartEkle(String kartId) {

@@ -11,6 +11,7 @@ import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/model/icerik.dart';
 import 'package:adim_adim/servis/bildirim.dart';
+import 'package:adim_adim/servis/konusma.dart';
 import 'package:adim_adim/servis/ses.dart';
 import 'package:adim_adim/uygulama.dart';
 import 'package:adim_adim/yarisma/depo.dart';
@@ -25,6 +26,17 @@ class SahteSes extends Ses {
   final okunanlar = <String>[];
   @override
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
+    okunanlar.add(metin);
+    return true;
+  }
+
+  /// Bekleyerek okuma (eller serbest mod, radyo): anında biter.
+  @override
+  Future<bool> okuBekle(
+    String metin, {
+    String dil = 'en-US',
+    Duration enCok = const Duration(seconds: 20),
+  }) async {
     okunanlar.add(metin);
     return true;
   }
@@ -61,6 +73,7 @@ Future<ProviderContainer> uygulamayiAc(
   List<Kurs>? kurslar,
   SahteSes? ses,
   SahteBildirim? bildirim,
+  KonusmaTanima? konusma,
   Size boyut = const Size(500, 1600),
   double metinOlcegi = 1.0,
 }) async {
@@ -81,6 +94,7 @@ Future<ProviderContainer> uygulamayiAc(
         bugunProvider.overrideWithValue('2026-10-15'),
         sesProvider.overrideWithValue(ses ?? SahteSes()),
         bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
+        if (konusma != null) konusmaProvider.overrideWithValue(konusma),
       ],
       child: const AdimAdimUygulama(),
     ),
@@ -92,6 +106,10 @@ Future<ProviderContainer> uygulamayiAc(
 }
 
 Future<void> dokun(WidgetTester tester, Finder f) async {
+  // Tembel listede ilk kaydırma tahmini boyutla yapılır; yerleşince bir kez
+  // daha kaydırılır (liste uzayınca öğe alt çubuğun altında kalmasın).
+  await tester.ensureVisible(f);
+  await tester.pumpAndSettle();
   await tester.ensureVisible(f);
   await tester.tap(f);
   await tester.pumpAndSettle();

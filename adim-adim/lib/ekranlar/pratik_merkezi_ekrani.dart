@@ -105,6 +105,30 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                       : '$kelimeSayisi kelime hazır',
                   onTap: () => context.push('/pratik/kartlar'),
                 ),
+                // Yalnız dil kurslarında: sesli etkinlikler.
+                if (durum.alan == 'dil') ...[
+                  kart(
+                    anahtar: const ValueKey('pratik-radyo'),
+                    simge: Icons.radio,
+                    baslik: 'Dinleme radyosu',
+                    ayrinti: 'Kısa sesli bölümler: dinle, eşleştir, sırala',
+                    onTap: () => context.push('/radyo'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-eller-serbest'),
+                    simge: Icons.headset_mic_outlined,
+                    baslik: 'Eller serbest',
+                    ayrinti: 'Ekrana bakmadan: dinle, tekrar et',
+                    onTap: () => context.push('/eller-serbest'),
+                  ),
+                  kart(
+                    anahtar: const ValueKey('pratik-senaryo'),
+                    simge: Icons.forum_outlined,
+                    baslik: 'Senaryolu konuşma',
+                    ayrinti: 'Kısa sohbetler: seç, yaz ya da söyle',
+                    onTap: () => context.push('/senaryolar'),
+                  ),
+                ],
               ],
             ),
           ),

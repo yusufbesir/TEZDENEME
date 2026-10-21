@@ -18,6 +18,7 @@ import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/kelime_bulutu.dart';
 import '../motor/motor.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
@@ -50,6 +51,9 @@ class ProfilEkrani extends ConsumerWidget {
     final degerler = [for (final g in gunler) durum.gunlukXp[g.gun] ?? 0];
     final enCok = degerler.fold<int>(0, (a, b) => a > b ? a : b);
     final bitenDers = durum.tamamlanan.values.where((v) => v > 0).length;
+    final ogrenilenKelime = durum.alan == 'dil'
+        ? KelimeBulutu.ogrenilenSayisi(durum, kurslar)
+        : 0;
 
     return SafeArea(
       child: SayfaGovdesi(
@@ -98,6 +102,19 @@ class ProfilEkrani extends ConsumerWidget {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/pratik'),
             ),
+            if (durum.alan == 'dil')
+              ListTile(
+                key: const ValueKey('profil-kelime-bulutu'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.cloud_outlined, color: r.ana),
+                title: const Text('Kelime bulutu'),
+                subtitle: Text(
+                  '$ogrenilenKelime kelime öğrendin',
+                  key: const ValueKey('profil-kelime-sayisi'),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/kelime-bulutu'),
+              ),
             const SizedBox(height: Olcu.b2),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),

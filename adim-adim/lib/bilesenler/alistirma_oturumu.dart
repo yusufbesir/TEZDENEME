@@ -24,6 +24,8 @@ class AlistirmaOturumu extends StatefulWidget {
     required this.onKapat,
     this.notGetir,
     this.onIpucu,
+    this.ipucuAcik = true,
+    this.ust,
   });
 
   final List<Alistirma> alistirmalar;
@@ -41,6 +43,14 @@ class AlistirmaOturumu extends StatefulWidget {
 
   /// Her "İpucu al" basışında çağrılır: (alıştırma indeksi, adım 1..3).
   final void Function(int indeks, int adim)? onIpucu;
+
+  /// false: kademeli ipucu kapalı (efsanevi zor tekrar); yanlış cevaptan sonra
+  /// yalnız "Devam" görünür.
+  final bool ipucuAcik;
+
+  /// Her sorunun üstüne (alıştırma kartından önce) konan ek bileşen; ör. radyo
+  /// etkinliklerinde "dinle" düğmesi. Parametre alıştırma indeksidir.
+  final Widget? Function(int indeks)? ust;
 
   @override
   State<AlistirmaOturumu> createState() => _OturumDurumu();
@@ -61,7 +71,8 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
 
   Alistirma get _simdiki => widget.alistirmalar[_indeks];
   bool get _son => _indeks == widget.alistirmalar.length - 1;
-  bool get _ipucuKaldi => _ipucuAdim < Motor.ipucuAdimSayisi;
+  bool get _ipucuKaldi =>
+      widget.ipucuAcik && _ipucuAdim < Motor.ipucuAdimSayisi;
 
   List<String> get _ipuclar => [
     for (var i = 0; i < _ipucuAdim; i++) Motor.ipucuUret(_simdiki, i),
@@ -127,6 +138,25 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
     });
   }
 
+  /// Alıştırma kartı; [AlistirmaOturumu.ust] varsa onun altında.
+  Widget _kart() {
+    final kart = AlistirmaKarti(
+      // İpucu alınınca kart sıfırlanır: yeniden cevaplanır.
+      key: ValueKey('$_indeks-$_ipucuAdim'),
+      alistirma: _simdiki,
+      kontrolEdildi: _kontrolEdildi,
+      dogruMu: _dogruMu,
+      onCevap: (c) => setState(() => _cevap = c),
+      onGonder: _kontrol,
+    );
+    final ust = widget.ust?.call(_indeks);
+    if (ust == null) return kart;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [ust, kart],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final toplam = widget.alistirmalar.length;
@@ -182,15 +212,7 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
                 constraints: const BoxConstraints(
                   maxWidth: Olcu.icerikGenislik,
                 ),
-                child: AlistirmaKarti(
-                  // İpucu alınınca kart sıfırlanır: yeniden cevaplanır.
-                  key: ValueKey('$_indeks-$_ipucuAdim'),
-                  alistirma: _simdiki,
-                  kontrolEdildi: _kontrolEdildi,
-                  dogruMu: _dogruMu,
-                  onCevap: (c) => setState(() => _cevap = c),
-                  onGonder: _kontrol,
-                ),
+                child: _kart(),
               ),
             ),
           ),

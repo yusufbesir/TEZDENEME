@@ -45,6 +45,9 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
   _Asama _asama = _Asama.bosta;
   int _deneme = 0;
   ({double oran, List<({String kelime, bool dogru})> kelimeler})? _puan;
+
+  /// Son denemenin tahmini telaffuz puanı ve hatalı heceleri (ÖZELLİK 77).
+  TelaffuzTahmini? _tahmin;
   String? _mesaj;
   bool _sesHatasi = false;
   Completer<void>? _bitis;
@@ -172,6 +175,11 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
     final bitti = dogru || deneme >= Soyle.enCokDeneme;
     setState(() {
       _puan = puan;
+      _tahmin = telaffuzTahmini(
+        widget.alistirma.metin,
+        soylenen,
+        dil: widget.alistirma.dil,
+      );
       _deneme = deneme;
       _asama = bitti ? _Asama.bitti : _Asama.bosta;
     });
@@ -309,6 +317,7 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
             deneme: _deneme,
             bitti: bitti,
             metin: a.metin,
+            tahmin: _tahmin,
             dogruRenk: r.dogru,
             hataRenk: r.hata,
           ),
@@ -354,6 +363,7 @@ class _Sonuc extends StatelessWidget {
     required this.deneme,
     required this.bitti,
     required this.metin,
+    required this.tahmin,
     required this.dogruRenk,
     required this.hataRenk,
   });
@@ -361,6 +371,7 @@ class _Sonuc extends StatelessWidget {
   final int deneme;
   final bool bitti;
   final String metin;
+  final TelaffuzTahmini? tahmin;
   final Color dogruRenk;
   final Color hataRenk;
 
@@ -413,12 +424,56 @@ class _Sonuc extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+          if (tahmin != null) ...[
+            const SizedBox(height: Olcu.b1),
+            TelaffuzPuaniGorunumu(tahmin: tahmin!, hataRenk: hataRenk),
+          ],
           if (bitti && !gecti) ...[
             const SizedBox(height: Olcu.b1),
             Text('Doğru söylenişi: $metin', style: yazi.bodyLarge),
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Tahmini telaffuz puanı (0-100) ve hatalı heceler. "Tahmini" etiketi bilerek
+/// görünür: puan, konuşma tanıma çıktısının hedefle benzerliğinden hesaplanır.
+class TelaffuzPuaniGorunumu extends StatelessWidget {
+  const TelaffuzPuaniGorunumu({
+    super.key,
+    required this.tahmin,
+    required this.hataRenk,
+  });
+  final TelaffuzTahmini tahmin;
+  final Color hataRenk;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tahmini telaffuz puanı: ${tahmin.puan}/100',
+          key: const Key('soyle-puan'),
+          style: yazi.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        if (tahmin.hataliHeceler.isNotEmpty)
+          Text(
+            'Hatalı hece: ${tahmin.hataliHeceler.join(', ')}',
+            key: const Key('soyle-hece'),
+            style: yazi.bodyMedium?.copyWith(color: hataRenk),
+          ),
+        Text(
+          'Puan, konuşma tanımanın duyduğu metne göre tahmindir; heceler '
+          'yaklaşıktır.',
+          key: const Key('soyle-puan-not'),
+          style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+        ),
+      ],
     );
   }
 }

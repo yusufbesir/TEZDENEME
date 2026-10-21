@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/fiil_cekim_tablosu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -263,8 +264,13 @@ class _MaddeSatiri extends ConsumerWidget {
     final not = ref.watch(
       durumProvider.select((d) => d.value?.kelimeNotlari[kartId]),
     );
+    // Fiil maddesi (ÖZELLİK 61): doğrulanmış çekimi varsa dokununca tablo açılır.
+    final cekim = ref.watch(fiilCekimleriProvider).bul(madde.kelime, madde.dil);
     return ListTile(
       dense: false,
+      onTap: cekim == null
+          ? null
+          : () => fiilCekimiGoster(context, cekim, anlam: madde.anlam),
       leading: sesli
           ? IconButton(
               icon: const Icon(Icons.volume_up_outlined),
@@ -283,6 +289,21 @@ class _MaddeSatiri extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(madde.anlam),
+          if (cekim != null)
+            Row(
+              key: ValueKey('fiil-cekim-${madde.kelime}'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.table_chart_outlined, size: 16, color: r.ana),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    'Çekim tablosu için dokun',
+                    style: yazi.bodySmall?.copyWith(color: r.ana),
+                  ),
+                ),
+              ],
+            ),
           if (ingilizce && madde.kokFarkli)
             Text(
               'kök: ${madde.kok}',

@@ -23,6 +23,10 @@ import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
+import 'ekranlar/eller_serbest_ekrani.dart';
+import 'ekranlar/kelime_bulutu_ekrani.dart';
+import 'ekranlar/senaryo_ekrani.dart';
+import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
@@ -30,6 +34,7 @@ import 'ekranlar/kabuk.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/pratik_etkinlikleri.dart';
 import 'ekranlar/pratik_merkezi_ekrani.dart';
+import 'ekranlar/radyo_ekrani.dart';
 import 'ekranlar/profil_ekrani.dart';
 import 'ekranlar/sozluk_ekrani.dart';
 import 'ekranlar/tekrar_ekrani.dart';
@@ -37,6 +42,7 @@ import 'ekranlar/yarisma_ekrani.dart';
 import 'ekranlar/sertifika_ekrani.dart';
 import 'ekranlar/sinav_ekrani.dart';
 import 'ekranlar/unite_ozeti_ekrani.dart';
+import 'ekranlar/unite_rehberi_ekrani.dart';
 import 'ekranlar/yerlestirme_ekrani.dart';
 import 'ekranlar/satranc/araclar.dart';
 import 'ekranlar/satranc/bulmacalar.dart';
@@ -160,6 +166,21 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/unite-rehberi',
+        builder: (c, s) => UniteRehberiEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
+        path: '/efsanevi',
+        // kurs=<id>&unite=<indeks>: efsanevi zor tekrar (ipucusuz, süreli).
+        builder: (c, s) => EfsaneviEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
+      ),
+      GoRoute(
         path: '/sertifika',
         builder: (c, s) =>
             SertifikaEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
@@ -180,6 +201,34 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
+      ),
+      // Eller serbest sesli mod (ÖZELLİK 64), senaryolu konuşma (65) ve kelime
+      // bulutu (66).
+      GoRoute(
+        path: '/eller-serbest',
+        builder: (c, s) => const EllerSerbestEkrani(),
+      ),
+      GoRoute(
+        path: '/senaryolar',
+        builder: (c, s) => const SenaryoListesiEkrani(),
+      ),
+      GoRoute(
+        path: '/senaryo/:id',
+        builder: (c, s) =>
+            SenaryoEkrani(senaryoId: s.pathParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: '/kelime-bulutu',
+        builder: (c, s) => const KelimeBulutuEkrani(),
+      ),
+      // Dinleme radyosu (ÖZELLİK 46).
+      GoRoute(path: '/radyo', builder: (c, s) => const RadyoListesiEkrani()),
+      GoRoute(
+        path: '/radyo/bolum',
+        builder: (c, s) => RadyoBolumEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          uniteIndeks: int.tryParse(s.uri.queryParameters['unite'] ?? '') ?? -1,
+        ),
       ),
       // Satranç modülü (ÖZELLİK 47, 52-57).
       GoRoute(

@@ -33,3 +33,14 @@ Yayın imzası: Android release derlemesi `%USERPROFILE%\.anahtar\key.properties
 - `lib/servis` ses (metin okuma) ve bildirim
 - `test` birim ve arayüz testleri
 - `SOZLESME.md` geliştiriciler arası arayüz sözleşmesi
+
+## Dil ve pratik özellikleri (kapsam ve sınırlar)
+- Ünite rehber kitapçığı (42): yalnız ünite verisinden (kalıplar, örnek cümleler, kelimeler, süre); CEFR yalnız kurs adında A1–C2 geçiyorsa gösterilir. Üniteye özel diyalog verisi yoktur; senaryo varsa bağlantı verilir.
+- Efsanevi zor tekrar (43): biten üniteyi ipucusuz ve süreli (soru başına 15 sn, geçme %90) tekrar; geçerse ünite "altın" (`altinUniteler`). Başarısızlıkta SRS, hata defteri ve XP değişmez.
+- Dinleme radyosu (46): yalnız dil kurslarının ünite cümleleri (≥3 cümlesi olan üniteler); cihaz TTS; dinle-eşleştir, dinle-tanı, sırala.
+- Fiil çekim sözlüğü (61): YALNIZ kurs tablolarında doğrulanmış çekimler; kural ile üretim yok. Kapsam: Almanca dürfen, gehen, haben, kommen, können, lernen, machen, möchten, müssen, sehen, sein, werden, wollen (zamanlar tablolara göre kısmi: Präsens, Präteritum, Konjunktiv II, Perfekt biçimi); İngilizce be (Present: I, you, she, we). Kodlama, Korece, Japonca, Çince ve diğer fiiller için tablo yoktur.
+- Eller serbest sesli mod (64): TTS okur, kullanıcı tekrar eder, konuşma tanıma kontrol eder; tanıma modeli/izin yoksa yalnız dinleme kipine düşer (8.7 kalıbı).
+- Senaryolu konuşma (65): çevrimdışı, dallanan, iki taraflı balonlu sohbetler; cevap seç, yaz ya da söyle. İngilizce 3, Almanca 3, Korece 2 senaryo (Korece cümleler anadil denetiminden geçmedi).
+- Kelime bulutu (66) ve profilde öğrenilen kelime sayısı: bitmiş ders ya da kartı olan kelimeler; boyut kartın yarı ömründen.
+- Telaffuz puanı (77): 0–100, hatalı heceyi gösterir; konuşma tanıma çıktısıyla hedef metnin harf benzerliğinden hesaplanır, bu yüzden "tahmini" etiketlidir (sesin kendisi ölçülmez). Hece bölme sezgiseldir.
+- Gerçek mikrofon ve TTS cihazda denenmedi; testlerde sahte ses/tanıma kullanıldı.

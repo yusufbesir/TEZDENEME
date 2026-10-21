@@ -33,6 +33,9 @@
 - 2026-10-16: Ayrıntılı kurallar `docs/kurallar/` altına taşındı, talimat kutusu 2.912 karaktere indi (PR #20).
 - 2026-10-16: Orkestratör günlüğü `docs/orchestrator-log.md` altına taşındı.
 
+## Kapsam notu (dil ve pratik özellikleri 42, 43, 46, 61, 64, 65, 66, 77)
+- Ayrıntı ve sınırlar `adim-adim/README.md` "Dil ve pratik özellikleri" bölümünde. Fiil çekim sözlüğü yalnız kurs tablolarındaki doğrulanmış çekimleri gösterir (Almanca 13 fiil, İngilizce yalnız be; kısmi kişi/zaman). Senaryolar: en 3, de 3, ko 2 (Korece anadil denetimi yok). Telaffuz puanı metin benzerliğine dayalı tahmindir. Gerçek mikrofon/TTS cihazda denenmedi.
+
 ## Devir notu (2026-10-21 15:2x, Yusuf: "tüm önerileri uygulayacağız, bağımlıları birlikte yap") [İP:Adım Adım öğrenme uygulaması#Dwv81f]
 - Kapsam: 42–83 arası TÜM öneriler (REA-ozellik-haritasi-2026-10-17.md; Duolingo 42–51 = D1..D10, Chess.com 52–57, Drops 58–60, Mondly 61–66, toplu tarama 68–83), yapılanlar hariç: 44, 48, 62, 63, 71, 79 (PR #32, açık). Kalan: 42, 43, 45, 46, 47, 49, 50, 51, 52–57, 58–60, 61, 64, 65, 66, 68–70, 72–78, 80–83. Lig/topluluk/sosyal, ücretli karşılıklar, çevrim içi YZ yapılmaz; ağ gerektirenler çevrimdışı karşılığıyla.
 - Çalışma düzeni: bağımlı özellikler aynı implementer görevinde (örn. satranç 47+52–57 birlikte; ders/kart ekranı özellikleri 42+43+45+61+64+65+66; seri/hedef/başarım 49+50+51+ Drops 58–60; kelime/kart 68–70, 72–78, 80–83), grup başına yeni dal ya da #32'den sonra main'den dal; her grup sonrası verifier, tam paket, PR. PR #32 birleşmeden önce main'e bağımlı dalları onun üstüne aç.

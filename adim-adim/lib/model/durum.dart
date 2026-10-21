@@ -8,7 +8,9 @@
 /// (`atlananDersler`: seviye belirleme sınavında atlanan dersler, boş küme;
 /// `araSinavlar`/`sertifikalar`: ünite ara sınavı ve seviye sertifika sınavı
 /// en iyi sonuçları, boş harita; `dersEnIyi`/`dersSureSn`: ders başına en iyi
-/// puan yüzdesi ve toplam çalışma süresi, boş harita)
+/// puan yüzdesi ve toplam çalışma süresi, boş harita; `altinUniteler`:
+/// efsanevi zor tekrarı geçilen üniteler, boş küme; `senaryolar`: bitirilen
+/// senaryolu konuşmalar, boş harita)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -297,6 +299,8 @@ class OgrenciDurumu {
     this.gunDersiBildirimiAcik = false,
     this.sonGunDersiBildirimGunu,
     this.satranc = const SatrancDurumu(),
+    this.altinUniteler = const {},
+    this.senaryolar = const {},
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -411,6 +415,14 @@ class OgrenciDurumu {
   /// kartlarından ayrı tutulur (Tekrar sekmesi aralıkları bozulmaz).
   final SatrancDurumu satranc;
 
+  /// "Altın" ünitelerin kimlikleri (ÖZELLİK 43, efsanevi zor tekrar geçildi);
+  /// eski kayıtta boş. Kart aralıklarına (SRS) dokunmaz.
+  final Set<String> altinUniteler;
+
+  /// Senaryolu konuşma (ÖZELLİK 65): senaryo kimliği -> kaç kez bitirildi;
+  /// eski kayıtta boş. XP/SRS yok.
+  final Map<String, int> senaryolar;
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -480,6 +492,8 @@ class OgrenciDurumu {
     bool? gunDersiBildirimiAcik,
     String? sonGunDersiBildirimGunu,
     SatrancDurumu? satranc,
+    Set<String>? altinUniteler,
+    Map<String, int>? senaryolar,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -527,6 +541,8 @@ class OgrenciDurumu {
       sonGunDersiBildirimGunu:
           sonGunDersiBildirimGunu ?? this.sonGunDersiBildirimGunu,
       satranc: satranc ?? this.satranc,
+      altinUniteler: altinUniteler ?? this.altinUniteler,
+      senaryolar: senaryolar ?? this.senaryolar,
     );
   }
 
@@ -574,6 +590,8 @@ class OgrenciDurumu {
     'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
     'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
     'satranc': satranc.toJson(),
+    'altinUniteler': altinUniteler.toList()..sort(),
+    'senaryolar': senaryolar,
   };
 
   static final _donemDeseni = RegExp(
@@ -771,6 +789,20 @@ class OgrenciDurumu {
           : null,
       // Eski kayıtta yoksa boş satranç durumu.
       satranc: SatrancDurumu.fromJson(j['satranc']),
+      // Eski kayıtta yoksa boş; geçerli ünite kimliği ('#' içermez) olmayan
+      // girdiler atlanır.
+      altinUniteler: Set.unmodifiable({
+        if (j['altinUniteler'] is List)
+          for (final e in j['altinUniteler'] as List)
+            if (e is String &&
+                e.isNotEmpty &&
+                e.length <= 120 &&
+                !e.contains('#'))
+              e,
+      }),
+      senaryolar: Map.unmodifiable(
+        sayac(j['senaryolar'], (k) => k.isNotEmpty && !k.contains('#')),
+      ),
     );
   }
 }
