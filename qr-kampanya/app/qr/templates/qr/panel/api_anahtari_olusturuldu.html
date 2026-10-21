@@ -1,0 +1,18 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}API anahtarı oluşturuldu{% endblock %}
+{% block icerik %}
+<h1>API anahtarı oluşturuldu</h1>
+<div class="kart">
+  <p class="hata-kutu" role="alert"><strong>Bu anahtar yalnızca şimdi gösterilir.</strong> Sunucuda düz hâli saklanmaz; bu sayfadan ayrıldıktan sonra tekrar görüntülenemez. Şimdi kopyalayıp güvenli bir yere kaydedin. Kaybederseniz anahtarı iptal edip yenisini oluşturun.</p>
+  <p><strong>{{ kayit.ad }}</strong></p>
+  <div class="alan">
+    <label for="api-anahtari">Anahtar</label>
+    <input type="text" id="api-anahtari" value="{{ anahtar }}" readonly autocomplete="off" spellcheck="false">
+  </div>
+  <div class="eylemler">
+    <button type="button" class="dugme" data-kopyala="api-anahtari">Kopyala</button>
+    <a class="dugme ikincil" href="{% url 'panel:api_anahtarlari' %}">Anahtar listesine dön</a>
+  </div>
+  <p class="yardim" data-kopyalandi hidden>Panoya kopyalandı.</p>
+</div>
+{% endblock %}

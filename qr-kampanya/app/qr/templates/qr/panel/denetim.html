@@ -1,0 +1,21 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}Denetim kayıtları{% endblock %}
+{% block icerik %}
+<h1>Denetim kayıtları</h1>
+<form method="get" class="filtre">
+  <div><label for="eylem">Eylem</label><select id="eylem" name="eylem"><option value="">Tümü</option>{% for e in eylemler %}<option value="{{ e }}"{% if f.eylem == e %} selected{% endif %}>{{ e }}</option>{% endfor %}</select></div>
+  <div><label for="kullanici">Kullanıcı</label><input type="search" id="kullanici" name="kullanici" value="{{ f.kullanici }}"></div>
+  <div><button type="submit" class="dugme">Filtrele</button></div>
+</form>
+<div class="tablo-kap">
+<table>
+  <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Eylem</th><th>Nesne</th><th>Özet</th><th>IP (maskeli)</th></tr></thead>
+  <tbody>
+  {% for k in sayfa %}
+  <tr><td>{{ k.zaman|date:"d.m.Y H:i:s" }}</td><td>{{ k.kullanici_adi|default:"-" }}</td><td>{{ k.eylem }}</td><td>{{ k.nesne_turu }} {{ k.nesne_id }}</td><td>{{ k.ozet }}</td><td>{{ k.ip_maskeli }}</td></tr>
+  {% empty %}<tr><td colspan="6">Kayıt yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "qr/panel/_sayfalama.html" %}
+{% endblock %}

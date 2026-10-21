@@ -1,0 +1,47 @@
+{% extends "qr/genel/taban.html" %}
+{% block baslik %}{{ sayfa.seo_baslik|default:sayfa.baslik }}{% endblock %}
+{% block aciklama %}{% if sayfa.seo_aciklama %}{{ sayfa.seo_aciklama }}{% else %}{{ sayfa.aciklama|truncatechars:155 }}{% endif %}{% endblock %}
+{% block robots %}{% if onizleme or sayfa.durum != "yayinda" %}<meta name="robots" content="noindex, nofollow">{% endif %}{% endblock %}
+{% block govde_sinifi %}tema-{{ sayfa.renk_tema }}{% endblock %}
+{% block icerik %}
+{% if onizleme %}<div class="onizleme-bant">ÖNİZLEME - Durum: {{ sayfa.get_durum_display }}. Bu görünüm yalnızca yönetim panelinde açıktır.</div>{% endif %}
+<main class="kap">
+  <header class="baslik-alani">
+    {% if sayfa.logo %}<img class="logo" src="{{ sayfa.logo.url }}" alt="{{ ayar.marka_adi }} logosu">{% endif %}
+    <h1>{{ sayfa.baslik }}</h1>
+    {% if sayfa.urun_kodu %}<div class="urun-kodu">Ürün kodu: {{ sayfa.urun_kodu }}</div>{% endif %}
+    {% if sayfa.fiyat %}<div class="fiyat">{{ sayfa.fiyat }}</div>{% endif %}
+  </header>
+
+  {% if zaman_durumu == "baslamadi" %}
+    <div class="durum-bant">Bu kampanya henüz başlamadı.{% if sayfa.baslangic %} Başlangıç: {{ sayfa.baslangic|date:"d.m.Y H:i" }}{% endif %}</div>
+  {% elif zaman_durumu == "bitti" %}
+    <div class="durum-bant">Bu kampanya sona erdi. İlginiz için teşekkür ederiz.</div>
+  {% endif %}
+
+  {% if sayfa.kapak_gorseli %}<img class="kapak" src="{{ sayfa.kapak_gorseli.url }}" alt="{{ sayfa.baslik }}">{% endif %}
+
+  {% if sayfa.aciklama %}<section class="kart">{{ sayfa.aciklama|linebreaks }}</section>{% endif %}
+
+  {% if sayfa.gorseller.all %}
+  <section class="galeri" aria-label="Görseller">
+    {% for g in sayfa.gorseller.all %}<img src="{{ g.gorsel.url }}" alt="{{ g.aciklama|default:sayfa.baslik }}" loading="lazy">{% endfor %}
+  </section>
+  {% endif %}
+
+  {% if sayfa.baslangic or sayfa.bitis %}
+  <section class="kart">
+    <h2>Kampanya süresi</h2>
+    <p>{% if sayfa.baslangic %}Başlangıç: {{ sayfa.baslangic|date:"d.m.Y H:i" }}{% endif %}{% if sayfa.baslangic and sayfa.bitis %}<br>{% endif %}{% if sayfa.bitis %}Bitiş: {{ sayfa.bitis|date:"d.m.Y H:i" }}{% endif %}</p>
+  </section>
+  {% endif %}
+
+  {% if sayfa.kosullar %}<section class="kart"><h2>Kampanya koşulları</h2>{{ sayfa.kosullar|linebreaks }}</section>{% endif %}
+
+  {% if zaman_durumu == "gecerli" and sayfa.buton_metni and sayfa.buton_url %}
+    <a class="buton" href="{{ sayfa.buton_url }}" rel="noopener noreferrer nofollow">{{ sayfa.buton_metni }}</a>
+  {% endif %}
+
+  <footer class="alt">{{ ayar.marka_adi }}</footer>
+</main>
+{% endblock %}

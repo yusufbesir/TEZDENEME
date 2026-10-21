@@ -1,0 +1,18 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}{{ baslik }}{% endblock %}
+{% block icerik %}
+<div class="kart giris-kutu">
+  <h1>{{ baslik }}</h1>
+  <p>Doğrulama uygulamanızdaki 6 haneli kodu girin.</p>
+  {% if hata %}<div class="hata-kutu" role="alert">{{ hata }}</div>{% endif %}
+  <form method="post" action="{{ eylem }}">
+    {% csrf_token %}
+    <div class="alan">
+      <label for="id_kod">Doğrulama kodu</label>
+      <input type="text" name="kod" id="id_kod" inputmode="numeric" pattern="[0-9 ]*" autocomplete="one-time-code" maxlength="10" autofocus required>
+    </div>
+    <button type="submit" class="dugme">Doğrula</button>
+    {% if geri %}<a class="dugme ikincil" href="{% url geri %}">Vazgeç</a>{% else %}<a class="dugme ikincil" href="{% url 'panel:giris' %}">Girişe dön</a>{% endif %}
+  </form>
+</div>
+{% endblock %}

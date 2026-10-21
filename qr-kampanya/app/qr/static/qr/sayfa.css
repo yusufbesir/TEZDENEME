@@ -1,0 +1,50 @@
+/* Halka açık sayfalar (kampanya sayfası, bilgi, hata). Mobil öncelikli; satır içi stil yok (CSP). */
+:root { --zemin: #111; --yazi: #e8dcc4; --vurgu: #b08d57; --kart: #1b1b1b; --kart-yazi: #f5efe2; --cizgi: #2e2a22; --buton-yazi: #111; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; background: var(--zemin); color: var(--yazi); }
+/* Temalar */
+body.tema-siyah-bej { --zemin: #111; --yazi: #e8dcc4; --vurgu: #b08d57; --kart: #1b1b1b; --kart-yazi: #f5efe2; --cizgi: #2e2a22; --buton-yazi: #111; }
+body.tema-beyaz-gold { --zemin: #fff; --yazi: #222; --vurgu: #b08d57; --kart: #faf6ec; --kart-yazi: #222; --cizgi: #e6dcc3; --buton-yazi: #fff; }
+body.tema-sade { --zemin: #fff; --yazi: #1a1a1a; --vurgu: #1a1a1a; --kart: #f6f6f6; --kart-yazi: #1a1a1a; --cizgi: #e2e2e2; --buton-yazi: #fff; }
+.kap { max-width: 720px; margin: 0 auto; padding: 1rem; }
+.baslik-alani { text-align: center; padding: 1.5rem 0 .5rem; }
+.logo { max-height: 64px; max-width: 60%; height: auto; margin-bottom: .75rem; }
+.kapak { width: 100%; max-height: 360px; object-fit: cover; border-radius: 12px; display: block; margin-bottom: 1rem; }
+h1 { font-size: 1.7rem; line-height: 1.25; margin: .25rem 0 .5rem; color: var(--vurgu); }
+.fiyat { font-size: 1.4rem; font-weight: 700; margin: .25rem 0 1rem; }
+.urun-kodu { color: var(--vurgu); font-size: .9rem; }
+.kart { background: var(--kart); color: var(--kart-yazi); border: 1px solid var(--cizgi); border-radius: 12px; padding: 1rem 1.1rem; margin: 1rem 0; }
+.kart h2 { margin-top: 0; font-size: 1.1rem; color: var(--vurgu); }
+.galeri { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; margin: 1rem 0; }
+.galeri img { width: 100%; height: auto; border-radius: 10px; display: block; }
+.buton { display: block; text-align: center; background: var(--vurgu); color: var(--buton-yazi); text-decoration: none; font-weight: 700; padding: .9rem 1.2rem; border-radius: 10px; margin: 1.25rem 0; }
+.buton:hover { filter: brightness(1.1); }
+.durum-bant { border: 1px solid var(--vurgu); border-radius: 10px; padding: .8rem 1rem; margin: 1rem 0; text-align: center; }
+.onizleme-bant { background: var(--vurgu); color: var(--buton-yazi); text-align: center; padding: .4rem; font-weight: 700; }
+.alt { text-align: center; color: var(--vurgu); font-size: .85rem; padding: 2rem 0 1rem; }
+.ortala { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1.5rem; }
+.hata-kodu { font-size: 4rem; font-weight: 800; color: var(--vurgu); margin: 0; }
+a { color: var(--vurgu); }
+@media (min-width: 640px) { .galeri { grid-template-columns: repeat(3, 1fr); } h1 { font-size: 2.1rem; } }
+/* İstatistik sayfası (/k/<kod>+) ve SVG grafik: renkler CSS sınıflarıyla (satır içi stil yok) */
+.buyuk-sayi { font-size: 2.4rem; font-weight: 800; margin: 0; color: var(--vurgu); }
+.sessiz { opacity: .75; font-size: .9rem; margin: .25rem 0 0; }
+.grafik svg { width: 100%; height: auto; display: block; }
+.grafik-cubuk { fill: var(--vurgu); }
+.grafik-eksen { stroke: var(--cizgi); stroke-width: 1; }
+.grafik-yazi { fill: var(--kart-yazi); font-size: 11px; font-family: inherit; }
+.ozet-tablo { width: 100%; border-collapse: collapse; }
+.ozet-tablo td { padding: .3rem .2rem; border-bottom: 1px solid var(--cizgi); overflow-wrap: anywhere; }
+.ozet-tablo td.sayi { text-align: right; white-space: nowrap; }
+.kisa-url { overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
+/* Link ağacı (/l/<slug>): tema sınıfları; vurgu rengi /l/<slug>/stil.css ile gelir (CSP: satır içi stil yok) */
+body.agac { --vurgu: #2563eb; --buton-yazi: #fff; }
+body.agac.tema-acik { --zemin: #f5f6f8; --yazi: #1a1a1a; --kart: #fff; --kart-yazi: #1a1a1a; --cizgi: #e2e2e2; }
+body.agac.tema-koyu { --zemin: #101216; --yazi: #eceff4; --kart: #1a1d23; --kart-yazi: #eceff4; --cizgi: #2a2e36; }
+.agac-kap { max-width: 480px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+.agac-baslik { text-align: center; padding-bottom: 1rem; }
+.agac-baslik h1 { color: var(--yazi); font-size: 1.6rem; }
+.agac-baslik p { margin: 0; opacity: .85; overflow-wrap: anywhere; }
+.agac-liste { display: flex; flex-direction: column; gap: .8rem; }
+.agac-dugme { display: block; text-align: center; background: var(--vurgu); color: var(--buton-yazi); text-decoration: none; font-weight: 600; padding: .95rem 1.2rem; border-radius: 12px; overflow-wrap: anywhere; }
+.agac-dugme:hover, .agac-dugme:focus { filter: brightness(1.1); }
