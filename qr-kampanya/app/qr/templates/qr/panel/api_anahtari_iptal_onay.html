@@ -1,0 +1,13 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}API anahtarını iptal et{% endblock %}
+{% block icerik %}
+<h1>API anahtarını iptal et</h1>
+<form method="post" class="kart">
+  {% csrf_token %}
+  <p><strong>{{ kayit.ad }}</strong> (<code>qrk_{{ kayit.onek }}</code>, sahibi {{ kayit.kullanici.username }}) anahtarı iptal edilecek. Bu anahtarı kullanan programlar hemen erişimini kaybeder; iptal geri alınamaz. Emin misiniz?</p>
+  <div class="eylemler">
+    <button type="submit" class="dugme tehlike">Evet, iptal et</button>
+    <a class="dugme ikincil" href="{% url 'panel:api_anahtarlari' %}">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

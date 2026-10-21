@@ -5,8 +5,6 @@ __pycache__/
 .env.*
 !.env.example
 *.key
-*.jks
-key.properties
 kararlar.jsonl
 *.oturum.jsonl
 *.log.jsonl
@@ -21,3 +19,11 @@ yerel-asistan/pc/dist/
 yerel-asistan/pc/cekirdek/
 yerel-asistan/pc/protokol/
 yerel-asistan/pc/arayuz/
+# Yayın imza anahtarları hiçbir alt klasörden depoya girmez (depo herkese açık).
+*.jks
+*.keystore
+**/key.properties
+**/*.p12
+
+# Ajan geçici çalışma ağaçları (worktree); depoya girmez
+.claude/worktrees/

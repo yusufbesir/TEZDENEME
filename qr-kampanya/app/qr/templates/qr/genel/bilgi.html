@@ -1,0 +1,10 @@
+{% extends "qr/genel/taban.html" %}
+{% block baslik %}{{ baslik }}{% if ayar.marka_adi %} - {{ ayar.marka_adi }}{% endif %}{% endblock %}
+{% block aciklama %}{{ mesaj|truncatechars:150 }}{% endblock %}
+{% block icerik %}
+<main class="ortala">
+  <h1>{{ baslik }}</h1>
+  <p>{{ mesaj|linebreaksbr }}</p>
+  {% if ayar.marka_adi %}<p class="alt">{{ ayar.marka_adi }}</p>{% endif %}
+</main>
+{% endblock %}

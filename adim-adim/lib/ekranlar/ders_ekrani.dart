@@ -1,9 +1,20 @@
+/// Ders ekranı: alıştırmalar -> özet (doğru sayısı, XP, seri). Ünitenin son
+/// dersinde özetin altında "Karışık tekrar (5 soru)" önerisi çıkar
+/// (önceki ünitelerden serpiştirilmiş 5 alıştırma; XP mikro ders gibi).
+/// Her dersin sonunda ayrıca "Kısa quiz (3 soru)" düğmesi bulunur: bu
+/// oturumda yanlış yapılanlar önce, `/mikro?mod=quiz&ders=<id>&yanlis=0,3`.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
-import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ders_ozeti.dart';
+import '../bilesenler/dilbilgisi_notu_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
@@ -22,6 +33,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Ders başındaki dilbilgisi notu kartı geçildi mi?
+  bool _notGecildi = false;
+
+  /// Bu oturumda ilk cevabı yanlış olan alıştırma indeksleri (sırayla).
+  final List<int> _yanlislar = [];
+
   Ders? _dersBul() {
     for (final k in ref.read(kurslarProvider)) {
       final d = k.dersBul(widget.dersId);
@@ -30,7 +47,18 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     return null;
   }
 
+  /// Bu ders ünitesinin son dersiyse ve önceki ünite alıştırması varsa true.
+  bool _karisikVar(Ders ders) =>
+      Motor.serpistirmeSec(ref.read(kurslarProvider), ders.id).isNotEmpty;
+
   void _cik() => context.canPop() ? context.pop() : context.go('/yol');
+
+  /// Kısa quiz rotası: ders kimliği ve yanlış indeksleri sorgu parametresinde.
+  String _quizRotasi(Ders ders) {
+    final yanlis = _yanlislar.join(',');
+    return '/mikro?mod=quiz&ders=${Uri.encodeComponent(ders.id)}'
+        '${yanlis.isEmpty ? '' : '&yanlis=$yanlis'}';
+  }
 
   Future<void> _kapatOnayi() async {
     final cik = await showDialog<bool>(
@@ -72,20 +100,66 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     );
   }
 
+  /// Dersin gösterilecek alıştırmalarının özgün indeksleri. Ayarlarda konuşma
+  /// alıştırmaları kapalıysa [Soyle] olanlar çıkarılır (kart kimliği ve quiz
+  /// için özgün indeks korunur).
+  List<int> _gosterilenler(Ders ders) {
+    final acik = ref.watch(durumProvider).value?.konusmaAcik ?? true;
+    return [
+      for (var i = 0; i < ders.alistirmalar.length; i++)
+        if (acik || ders.alistirmalar[i] is! Soyle) i,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final ders = _dersBul();
+    final idx = ders == null ? const <int>[] : _gosterilenler(ders);
     return Scaffold(
       body: SafeArea(
-        child: ders == null || ders.alistirmalar.isEmpty
+        child: ders == null || idx.isEmpty
             ? _Bulunamadi(onGeri: _cik)
+            : (ders.dilbilgisiNotu?.trim().isNotEmpty ?? false) &&
+                  !_notGecildi &&
+                  _ozet == null
+            ? DilbilgisiNotuKarti(
+                dersAdi: ders.ad,
+                not: ders.dilbilgisiNotu!.trim(),
+                onBasla: () => setState(() => _notGecildi = true),
+                onKapat: _cik,
+              )
             : _ozet != null
-            ? _Ozet(ozet: _ozet!, onDon: _cik, dersAdi: ders.ad)
+            ? DersOzeti(
+                baslik: 'Ders tamamlandı',
+                altBaslik: ders.ad,
+                dogru: _ozet!.dogru,
+                toplam: _ozet!.toplam,
+                xp: _ozet!.xp,
+                seri: _ozet!.seri,
+                onDon: _cik,
+                ekEtiket: _karisikVar(ders) ? 'Karışık tekrar (5 soru)' : null,
+                onEk: _karisikVar(ders)
+                    ? () => context.push(
+                        '/mikro?mod=karisik&ders=${Uri.encodeComponent(ders.id)}',
+                      )
+                    : null,
+                ek2Etiket: 'Kısa quiz (${Motor.quizAdet} soru)',
+                onEk2: () => context.push(_quizRotasi(ders)),
+              )
             : AlistirmaOturumu(
-                alistirmalar: ders.alistirmalar,
-                onSonuc: (i, dogru) => ref
-                    .read(durumProvider.notifier)
-                    .kartIsle(ders.kartKimligi(i), dogru),
+                alistirmalar: [for (final i in idx) ders.alistirmalar[i]],
+                // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
+                notGetir: (i) => ref
+                    .read(durumProvider)
+                    .value
+                    ?.kelimeNotlari[ders.kartKimligi(idx[i])],
+                onSonuc: (i, dogru) {
+                  final ozgun = idx[i];
+                  if (!dogru) _yanlislar.add(ozgun);
+                  ref
+                      .read(durumProvider.notifier)
+                      .kartIsle(ders.kartKimligi(ozgun), dogru);
+                },
                 onBitti: (d, t) => _bitir(ders, d, t),
                 onKapat: _kapatOnayi,
               ),
@@ -115,89 +189,6 @@ class _Bulunamadi extends StatelessWidget {
             ),
             const SizedBox(height: Olcu.b2),
             FilledButton(onPressed: onGeri, child: const Text('Yola dön')),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Ozet extends StatelessWidget {
-  const _Ozet({required this.ozet, required this.onDon, required this.dersAdi});
-  final ({int dogru, int toplam, int xp, int seri}) ozet;
-  final VoidCallback onDon;
-  final String dersAdi;
-
-  @override
-  Widget build(BuildContext context) {
-    final r = context.renkler;
-    final yazi = Theme.of(context).textTheme;
-    final tam = ozet.dogru == ozet.toplam;
-    Widget satir(IconData simge, Color renk, String baslik, String deger) =>
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: Olcu.b1),
-          child: Semantics(
-            label: '$baslik: $deger',
-            excludeSemantics: true,
-            child: Row(
-              children: [
-                Icon(simge, color: renk, size: 32),
-                const SizedBox(width: Olcu.b2),
-                Expanded(child: Text(baslik, style: yazi.bodyLarge)),
-                Text(deger, style: yazi.titleLarge),
-              ],
-            ),
-          ),
-        );
-    return SayfaGovdesi(
-      child: Padding(
-        padding: const EdgeInsets.all(Olcu.b3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Spacer(),
-            Icon(
-              tam ? Icons.emoji_events : Icons.check_circle,
-              size: 64,
-              color: tam ? r.vurgu : r.dogru,
-            ),
-            const SizedBox(height: Olcu.b2),
-            Text(
-              'Ders tamamlandı',
-              textAlign: TextAlign.center,
-              style: yazi.headlineMedium,
-            ),
-            const SizedBox(height: Olcu.b1),
-            Text(
-              dersAdi,
-              textAlign: TextAlign.center,
-              style: yazi.bodyLarge?.copyWith(color: r.metinIkincil),
-            ),
-            const SizedBox(height: Olcu.b3),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(Olcu.b2),
-                child: Column(
-                  children: [
-                    satir(
-                      Icons.check_circle_outline,
-                      r.dogru,
-                      'Doğru',
-                      '${ozet.dogru}/${ozet.toplam}',
-                    ),
-                    satir(Icons.bolt, r.vurgu, 'Kazanılan XP', '+${ozet.xp}'),
-                    satir(
-                      Icons.local_fire_department,
-                      r.vurgu,
-                      'Seri',
-                      '${ozet.seri} gün',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Spacer(),
-            FilledButton(onPressed: onDon, child: const Text('Yola dön')),
           ],
         ),
       ),

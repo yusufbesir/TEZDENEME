@@ -1,0 +1,19 @@
+{% extends "qr/genel/taban.html" %}
+{% block baslik %}{{ agac.baslik }}{% endblock %}
+{% block aciklama %}{{ agac.aciklama|default:agac.baslik }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block ek_bas %}<link rel="stylesheet" href="{{ stil_adresi }}">{% endblock %}
+{% block govde_sinifi %}agac tema-{{ agac.tema }}{% endblock %}
+{% block icerik %}
+{% if onizleme %}<div class="onizleme-bant">ÖNİZLEME - Durum: {{ agac.get_durum_display }}. Bu görünüm yalnızca yönetim panelinde açıktır.</div>{% endif %}
+<main class="agac-kap">
+  <header class="agac-baslik">
+    <h1>{{ agac.baslik }}</h1>
+    {% if agac.aciklama %}<p>{{ agac.aciklama }}</p>{% endif %}
+  </header>
+  <nav class="agac-liste" aria-label="Bağlantılar">
+    {% for oge in ogeler %}<a class="agac-dugme" href="{{ oge.qr.kisa_url }}" rel="noopener">{{ oge.etiket }}</a>
+    {% empty %}<p class="sessiz">Henüz bağlantı yok.</p>{% endfor %}
+  </nav>
+</main>
+{% endblock %}

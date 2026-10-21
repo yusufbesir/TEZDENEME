@@ -1,0 +1,19 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}{{ baslik }}{% endblock %}
+{% block icerik %}
+<div class="kart giris-kutu">
+  <h1>{{ baslik }}</h1>
+  <p>Bir doğrulama uygulamasıyla (ör. Google Authenticator, Microsoft Authenticator) bu QR kodu okutun, ardından uygulamanın gösterdiği 6 haneli kodu girin.</p>
+  <p><img src="{{ qr_veri }}" alt="Doğrulama uygulaması için QR kod" width="220" height="220"></p>
+  <p>QR kodu okutamıyorsanız anahtarı elle girin:<br><code>{{ gizli_anahtar }}</code></p>
+  {% if hata %}<div class="hata-kutu" role="alert">{{ hata }}</div>{% endif %}
+  <form method="post" action="{{ eylem }}">
+    {% csrf_token %}
+    <div class="alan">
+      <label for="id_kod">Doğrulama kodu</label>
+      <input type="text" name="kod" id="id_kod" inputmode="numeric" pattern="[0-9 ]*" autocomplete="one-time-code" maxlength="10" autofocus required>
+    </div>
+    <button type="submit" class="dugme">Doğrula ve etkinleştir</button>
+  </form>
+</div>
+{% endblock %}

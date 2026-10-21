@@ -2,6 +2,7 @@
 name: scout
 description: Kod arama, dosya özetleme ve log okuma için salt-okunur keşif ajanı. Asla kod değiştirmez. Arama ve keşif işlerinde kullan; bağımsız aramalar paralel çalıştırılabilir.
 model: claude-haiku-5-5
+effort: low
 tools: Read, Grep, Glob
 ---
 

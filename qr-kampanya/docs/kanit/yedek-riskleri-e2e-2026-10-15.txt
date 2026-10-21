@@ -1,0 +1,953 @@
+E2E8 ham çıktı (proje qre2e8, HTTP 8088, HTTPS 8448); anahtar desenleri maskelenir
+
+====================================================================================================
+## 1) kurulum.sh (etkileşimli: alan adı boş, anahtar sorusuna EVET)
+====================================================================================================
+$ bash scripts/kurulum.sh  (stdout/stderr; terminal ayrı)   [pty=evet]
+.env oluşturuldu (izinler 600). Bu dosyayı kimseyle paylaşmayın, Git'e eklemeyin.
+ Image qr-kampanya-app:e2e8 Building 
+ Image qr-kampanya-app:e2e8 Building 
+ Image qr-kampanya-yedek:e2e8 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.83kB 0.0s done
+#1 DONE 0.0s
+
+#2 [yedek internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.16kB 0.1s done
+#2 DONE 0.1s
+
+#3 [hazirlik internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.83kB 0.1s done
+#3 DONE 0.1s
+
+#4 [hazirlik] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 1.1s
+
+#5 [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#6 DONE 0.8s
+
+#7 [hazirlik internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#7 ...
+
+#8 [yedek internal] load .dockerignore
+#8 transferring context: 2B done
+#8 DONE 0.0s
+
+#9 [yedek internal] load build context
+#9 transferring context: 184B done
+#9 DONE 0.0s
+
+#10 [yedek stage-0 1/2] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#10 resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 0.0s done
+#10 DONE 0.0s
+
+#11 [yedek stage-0 2/2] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#11 CACHED
+
+#7 [hazirlik internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#7 DONE 1.0s
+
+#12 [hazirlik internal] load .dockerignore
+#12 transferring context: 84B done
+#12 DONE 0.0s
+
+#13 [app internal] load build context
+#13 DONE 0.0s
+
+#14 [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
+#14 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#14 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#14 DONE 0.0s
+
+#15 [yedek] exporting to image
+#15 exporting layers done
+#15 exporting manifest sha256:9d3fb8880a9032d1409d58fc61b6532889fe67cb51918f62bb8c7e79f9fd5a5e done
+#15 exporting config sha256:0093cfed73234812e7e068c2f3db0955f77d2e211a4d12e39d71266affd9d39b done
+#15 exporting attestation manifest sha256:6f2a6b28fa4d72a7c2cb3f3f7bd0af8026cba16960830bb8481cdebaacd4efce done
+#15 exporting manifest list sha256:59ce216dcfb0cb9d41cf66b7bd97b8fd12273eb16b943ecde7a7ad2fe729ac20 done
+#15 naming to docker.io/library/qr-kampanya-yedek:e2e8 done
+#15 unpacking to docker.io/library/qr-kampanya-yedek:e2e8 0.0s done
+#15 DONE 0.1s
+
+#13 [hazirlik internal] load build context
+#13 transferring context: 54.56kB 0.0s done
+#13 DONE 0.0s
+
+#16 [hazirlik stage-0 2/7] WORKDIR /app
+#16 CACHED
+
+#17 [hazirlik stage-0 3/7] COPY requirements.txt .
+#17 CACHED
+
+#18 [yedek] resolving provenance for metadata file
+#18 DONE 0.0s
+
+#19 [hazirlik stage-0 4/7] RUN --mount=type=bind,source=.,target=/baglam     if [ -d /baglam/tekerlekler ]; then       pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt;     else       pip install --require-hashes --no-deps -r requirements.txt;     fi
+#19 3.255 Looking in links: /baglam/tekerlekler
+#19 3.264 Processing /baglam/tekerlekler/argon2_cffi-25.1.0-py3-none-any.whl (from -r requirements.txt (line 8))
+#19 3.278 Processing /baglam/tekerlekler/argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (from -r requirements.txt (line 12))
+#19 3.285 Processing /baglam/tekerlekler/asgiref-3.12.1-py3-none-any.whl (from -r requirements.txt (line 55))
+#19 3.289 Processing /baglam/tekerlekler/cffi-2.1.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r requirements.txt (line 59))
+#19 3.515 Processing /baglam/tekerlekler/django-5.2.18-py3-none-any.whl (from -r requirements.txt (line 161))
+#19 4.714 Processing /baglam/tekerlekler/et_xmlfile-2.0.0-py3-none-any.whl (from -r requirements.txt (line 165))
+#19 4.718 Processing /baglam/tekerlekler/gunicorn-26.2.0-py3-none-any.whl (from -r requirements.txt (line 169))
+#19 4.740 Processing /baglam/tekerlekler/openpyxl-3.1.5-py2.py3-none-any.whl (from -r requirements.txt (line 173))
+#19 4.756 Processing /baglam/tekerlekler/pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r requirements.txt (line 177))
+#19 5.884 Processing /baglam/tekerlekler/psycopg-3.3.6-py3-none-any.whl (from -r requirements.txt (line 266))
+#19 5.888 Processing /baglam/tekerlekler/psycopg_binary-3.3.6-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r requirements.txt (line 270))
+#19 6.320 Processing /baglam/tekerlekler/pycparser-3.11-py3-none-any.whl (from -r requirements.txt (line 338))
+#19 6.324 Processing /baglam/tekerlekler/pyotp-2.10.0-py3-none-any.whl (from -r requirements.txt (line 342))
+#19 6.326 Processing /baglam/tekerlekler/segno-1.6.6-py3-none-any.whl (from -r requirements.txt (line 346))
+#19 6.329 Processing /baglam/tekerlekler/sqlparse-0.6.0-py3-none-any.whl (from -r requirements.txt (line 350))
+#19 6.331 Processing /baglam/tekerlekler/whitenoise-6.12.0-py3-none-any.whl (from -r requirements.txt (line 354))
+#19 6.447 Installing collected packages: whitenoise, sqlparse, segno, pyotp, pycparser, psycopg-binary, psycopg, pillow, openpyxl, gunicorn, et-xmlfile, django, cffi, asgiref, argon2-cffi-bindings, argon2-cffi
+#19 17.70 
+#19 17.70 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#19 17.70 Successfully installed argon2-cffi-25.1.0 argon2-cffi-bindings-26.1.0 asgiref-3.12.1 cffi-2.1.1 django-5.2.18 et-xmlfile-2.0.0 gunicorn-26.2.0 openpyxl-3.1.5 pillow-12.3.0 psycopg-3.3.6 psycopg-binary-3.3.6 pycparser-3.11 pyotp-2.10.0 segno-1.6.6 sqlparse-0.6.0 whitenoise-6.12.0
+#19 DONE 18.5s
+
+#20 [app stage-0 5/7] RUN useradd --system --uid 10001 --home /app uygulama     && mkdir -p /veri/medya /veri/static     && chown -R uygulama /veri
+#20 0.255 useradd warning: uygulama's uid 10001 is greater than SYS_UID_MAX 999
+#20 DONE 0.3s
+
+#21 [app stage-0 6/7] COPY . .
+#21 DONE 0.1s
+
+#22 [hazirlik stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 755 /app/baslat.sh
+#22 DONE 2.5s
+
+#23 [app] exporting to image
+#23 exporting layers
+#23 exporting layers 4.7s done
+#23 exporting manifest sha256:f1d27f1a2f52541fc32a269bcecbc02ac14df51c3fda23e7998b7fa5bf6ab5eb done
+#23 exporting config sha256:59755cf669b3f90d47c8b70ce7816f0b8f204fe20e6852625a6e37d7dc6f2710 done
+#23 exporting attestation manifest sha256:11f4439c98fa97449913e54b31e063616730ae726e2f15a0a428d89b713121ae done
+#23 exporting manifest list sha256:7b1e2a61694ec0d472db050d222deeb28ebc38480d4b9fb72c76d2565b684fa2 done
+#23 naming to docker.io/library/qr-kampanya-app:e2e8 done
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e8
+#23 ...
+
+#24 [hazirlik] exporting to image
+#24 exporting layers 4.7s done
+#24 exporting manifest sha256:1bb342b00ba62046814d506ba73de3606c921404c9ee1ec4345d7febc382d452 done
+#24 exporting config sha256:25c1fca191f18231a4d0ae74592bd6972a5daae9e92a859c1f979f9700778bf8 done
+#24 exporting attestation manifest sha256:068fbe14f2f098ef08c0e36bd9a97f04d84c721f65a87405f5c354bd57e04d3e done
+#24 exporting manifest list sha256:d6ecb6ee4e73812e20f681757201747b0440cb8b879c56e6ab33dd66d96e4446 done
+#24 naming to docker.io/library/qr-kampanya-app:e2e8 done
+#24 ...
+
+#23 [app] exporting to image
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e8 15.1s done
+#23 DONE 19.8s
+
+#25 [app] resolving provenance for metadata file
+#25 DONE 0.0s
+
+#24 [hazirlik] exporting to image
+#24 unpacking to docker.io/library/qr-kampanya-app:e2e8 15.4s done
+#24 DONE 20.2s
+
+#26 [hazirlik] resolving provenance for metadata file
+#26 DONE 0.0s
+ Image qr-kampanya-app:e2e8 Built 
+ Image qr-kampanya-yedek:e2e8 Built 
+ Image qr-kampanya-app:e2e8 Built 
+Yedek şifreleme anahtarı üretiliyor...
+Public key: age1y7kvu9ugarjj905ges8e0ygfle4srl2qz80tm26ju94trvydefcqdj0lh2
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+Özel anahtar dosyası sunucudan SİLİNDİ (kullanıcı onayıyla). Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+Geri yükleme testi ve geri yükleme sırasında anahtar sizden istenecek (parola yöneticisinden yapıştırırsınız).
+ Network qre2e8_ic Creating 
+ Volume qre2e8_db-veri Creating 
+ Volume qre2e8_db-veri Creating 
+ Network qre2e8_ic Creating 
+ Volume qre2e8_db-veri Created 
+ Volume qre2e8_db-veri Created 
+ Network qre2e8_ic Created 
+ Network qre2e8_ic Created 
+ Container qre2e8-db-1 Creating 
+ Container qre2e8-db-1 Created 
+ Container qre2e8-db-1 Starting 
+ Container qre2e8-db-1 Started 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+ Container qre2e8-db-1 Running 
+ Network qre2e8_web Creating 
+ Network qre2e8_web Creating 
+ Volume qre2e8_caddy-ayar Creating 
+ Volume qre2e8_caddy-ayar Creating 
+ Volume qre2e8_yedek-durum Creating 
+ Volume qre2e8_yedek-durum Creating 
+ Container qre2e8-hazirlik-1 Creating 
+ Volume qre2e8_caddy-veri Creating 
+ Volume qre2e8_caddy-veri Creating 
+ Volume qre2e8_medya Creating 
+ Volume qre2e8_medya Creating 
+ Volume qre2e8_caddy-ayar Created 
+ Volume qre2e8_caddy-ayar Created 
+ Volume qre2e8_yedek-durum Created 
+ Volume qre2e8_yedek-durum Created 
+ Volume qre2e8_caddy-veri Created 
+ Volume qre2e8_caddy-veri Created 
+ Volume qre2e8_medya Created 
+ Volume qre2e8_medya Created 
+ Container qre2e8-yedek-1 Creating 
+ Network qre2e8_web Created 
+ Network qre2e8_web Created 
+ Container qre2e8-hazirlik-1 Created 
+ Container qre2e8-app-1 Creating 
+ Container qre2e8-yedek-1 Created 
+ Container qre2e8-app-1 Created 
+ Container qre2e8-caddy-1 Creating 
+ Container qre2e8-caddy-1 Created 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-hazirlik-1 Starting 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-yedek-1 Starting 
+ Container qre2e8-hazirlik-1 Started 
+ Container qre2e8-hazirlik-1 Waiting 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-yedek-1 Started 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-hazirlik-1 Exited 
+ Container qre2e8-app-1 Starting 
+ Container qre2e8-app-1 Started 
+ Container qre2e8-app-1 Waiting 
+ Container qre2e8-app-1 Healthy 
+ Container qre2e8-caddy-1 Starting 
+ Container qre2e8-caddy-1 Started 
+Servisler başlatılıyor...
+ Container qre2e8-caddy-1 Recreate 
+ Container qre2e8-caddy-1 Recreated 
+ Container qre2e8-caddy-1 Starting 
+ Container qre2e8-caddy-1 Started 
+NAME             IMAGE                    COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+qre2e8-app-1     qr-kampanya-app:e2e8     "/app/baslat.sh guni…"   app       20 seconds ago   Up 9 seconds (healthy)    8000/tcp
+qre2e8-caddy-1   caddy:2.10.2-alpine      "caddy run --config …"   caddy     1 second ago     Up Less than a second     2019/tcp, 0.0.0.0:8088->80/tcp, 0.0.0.0:8448->443/tcp, 0.0.0.0:8448->443/udp
+qre2e8-db-1      postgres:17.6-alpine     "docker-entrypoint.s…"   db        31 seconds ago   Up 31 seconds (healthy)   5432/tcp
+qre2e8-yedek-1   qr-kampanya-yedek:e2e8   "/bin/sh /betikler/y…"   yedek     20 seconds ago   Up 19 seconds             5432/tcp
+Kurulum tamam. Panel: http://localhost/panel/
+(çıkış kodu: 0)
+[GEÇTİ] kurulum çıkış kodu 0 rc=0
+[GEÇTİ] anahtar terminalde (/dev/tty) tam bir kez gösterildi adet=1
+[GEÇTİ] anahtar betiğin stdout/stderr çıktısına (tee/günlüğe) DÜŞMEDİ 
+[GEÇTİ] gizli/yedek-anahtari.txt kaldırıldı 
+[GEÇTİ] .env içinde YEDEK_ALICI kaldı 
+[GEÇTİ] sunucu silme mesajı 
+
+====================================================================================================
+## 2) yedek-al.sh: şifreli yedek (özel anahtar sunucuda yokken)
+====================================================================================================
+$ docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261015-203539.dump.age
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al çıkış kodu 0 rc=0
+[GEÇTİ] db-*.dump.age oluştu ve age başlığı var 
+[GEÇTİ] medya-*.tar.gz.age ve sha256-*.txt var 
+
+====================================================================================================
+## 3) geri-yukleme-testi.sh: anahtar dosyası yok -> gizli giriş (read -s, /dev/tty)
+====================================================================================================
+$ bash scripts/geri-yukleme-testi.sh   [pty=evet]
+== Geri yükleme testi 2026-10-15T17:35:40+00:00 ==
+Test edilen yedek: <scratch>/e2e8/qr-kampanya/yedekler/db-20261015-203539.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-203539.dump.age: OK
+medya-20261015-203539.tar.gz.age: OK
+Özel anahtar dosyası bu sunucuda yok (beklenen durum: anahtar parola yöneticinizde).
+Özel anahtar: gizli girişle alındı, bellekte tutuluyor, iş bitince silinecek (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|0|0
+hedefgecmisi|0|0
+kampanya|0|0
+kullanici|0|0
+qrkod|0|0
+sayfa|0|0
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 1 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-173540.log
+(çıkış kodu: 0)
+[GEÇTİ] SONUÇ: GEÇTİ rc=0
+[GEÇTİ] anahtar terminalde yankılanmadı (read -s) 
+[GEÇTİ] anahtar stdout/stderr'e düşmedi 
+[GEÇTİ] geri-yukleme-testi günlüğünde anahtar yok 
+[GEÇTİ] /dev/shm geçici anahtar dosyası kalmadı []
+[GEÇTİ] gizli/yedek-anahtari.txt hâlâ yok 
+[GEÇTİ] konteyner kalmadı 
+
+====================================================================================================
+## 3b) yanlış (ama biçimi geçerli) anahtar -> BAŞARISIZ ve geçici dosya silinir
+====================================================================================================
+$ bash scripts/geri-yukleme-testi.sh (yanlış anahtar)   [pty=evet]
+== Geri yükleme testi 2026-10-15T17:35:47+00:00 ==
+Test edilen yedek: <scratch>/e2e8/qr-kampanya/yedekler/db-20261015-203539.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-203539.dump.age: OK
+medya-20261015-203539.tar.gz.age: OK
+Özel anahtar dosyası bu sunucuda yok (beklenen durum: anahtar parola yöneticinizde).
+Özel anahtar: gizli girişle alındı, bellekte tutuluyor, iş bitince silinecek (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+age: error: no identity matched any of the recipients
+age: report unexpected or unhelpful errors at https://filippo.io/age/report
+SONUÇ: BAŞARISIZ - yedek çözülemedi/yüklenemedi (anahtar yanlış olabilir).
+(çıkış kodu: 1)
+[GEÇTİ] yanlış anahtarda BAŞARISIZ (rc != 0) rc=1
+[GEÇTİ] yanlışta da /dev/shm kalıntısı yok 
+
+====================================================================================================
+## 4) guncelle.sh: anahtar yokken YENİ ANAHTAR ÜRETİLMEMELİ; app --no-deps; Caddyfile doğrulaması; RestartCount 0
+====================================================================================================
+$ bash scripts/guncelle.sh   [pty=evet]
+1/6 İmajlar çekiliyor ve derleniyor...
+ Image caddy:2.10.2-alpine Pulling 
+ Image postgres:17.6-alpine Pulling 
+ Image caddy:2.10.2-alpine Error unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+ Image postgres:17.6-alpine Interrupted 
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+UYARI: db/caddy imajları çekilemedi (kayıt erişilemiyor olabilir). Etiketler sabit olduğundan yerel imajlarla devam ediliyor.
+ Image qr-kampanya-yedek:e2e8 Building 
+ Image qr-kampanya-app:e2e8 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.81kB done
+#1 DONE 0.0s
+
+#2 [yedek internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.16kB done
+#2 DONE 0.0s
+
+#3 [app internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.83kB done
+#3 DONE 0.0s
+
+#4 [app] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 0.5s
+
+#5 [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#6 ...
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 DONE 0.2s
+
+#8 [yedek internal] load .dockerignore
+#8 transferring context: 2B done
+#8 DONE 0.0s
+
+#9 [yedek internal] load build context
+#9 transferring context: 184B done
+#9 DONE 0.0s
+
+#10 [yedek stage-0 1/2] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#10 resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 0.0s done
+#10 DONE 0.0s
+
+#11 [yedek stage-0 2/2] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#11 CACHED
+
+#12 [yedek] exporting to image
+#12 exporting layers done
+#12 exporting manifest sha256:9d3fb8880a9032d1409d58fc61b6532889fe67cb51918f62bb8c7e79f9fd5a5e done
+#12 exporting config sha256:0093cfed73234812e7e068c2f3db0955f77d2e211a4d12e39d71266affd9d39b done
+#12 exporting attestation manifest sha256:50b3d5895ba878ec28f288b83e1a28f92d1c0794cbbc708660255b1d22ec0c84 done
+#12 exporting manifest list sha256:c94a04ea004a224d53c73f3aa9a59284636b2f39de8cce8a4c41dadbf364146a done
+#12 naming to docker.io/library/qr-kampanya-yedek:e2e8 done
+#12 unpacking to docker.io/library/qr-kampanya-yedek:e2e8 done
+#12 DONE 0.1s
+
+#6 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#6 ...
+
+#13 [yedek] resolving provenance for metadata file
+#13 DONE 0.0s
+
+#6 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#6 DONE 0.8s
+
+#14 [app internal] load .dockerignore
+#14 transferring context: 84B done
+#14 DONE 0.0s
+
+#15 [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
+#15 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#15 DONE 0.0s
+
+#16 [app internal] load build context
+#16 transferring context: 5.98kB done
+#16 DONE 0.0s
+
+#17 [app stage-0 4/7] RUN --mount=type=bind,source=.,target=/baglam     if [ -d /baglam/tekerlekler ]; then       pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt;     else       pip install --require-hashes --no-deps -r requirements.txt;     fi
+#17 CACHED
+
+#18 [app stage-0 5/7] RUN useradd --system --uid 10001 --home /app uygulama     && mkdir -p /veri/medya /veri/static     && chown -R uygulama /veri
+#18 CACHED
+
+#19 [app stage-0 6/7] COPY . .
+#19 CACHED
+
+#20 [app stage-0 3/7] COPY requirements.txt .
+#20 CACHED
+
+#21 [app stage-0 2/7] WORKDIR /app
+#21 CACHED
+
+#22 [app stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 755 /app/baslat.sh
+#22 CACHED
+
+#23 [app] exporting to image
+#23 exporting layers done
+#23 exporting manifest sha256:f1d27f1a2f52541fc32a269bcecbc02ac14df51c3fda23e7998b7fa5bf6ab5eb done
+#23 exporting config sha256:59755cf669b3f90d47c8b70ce7816f0b8f204fe20e6852625a6e37d7dc6f2710 done
+#23 exporting attestation manifest sha256:a06757d6cbdd71aae4546d75e2ed2b733d6102c41c380b8a77b735d44c735046 done
+#23 exporting manifest list sha256:edadeb62ef7a01a94ef76f0db9fa0159993d146fd0e8d90b9ceba7ff1944de5d done
+#23 naming to docker.io/library/qr-kampanya-app:e2e8 done
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e8 done
+#23 DONE 0.1s
+
+#24 [app] resolving provenance for metadata file
+#24 DONE 0.0s
+ Image qr-kampanya-app:e2e8 Built 
+ Image qr-kampanya-yedek:e2e8 Built 
+2/6 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+ Container qre2e8-db-1 Running 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/6 Güncelleme öncesi şifreli yedek alınıyor...
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+ Container qre2e8-yedek-1 Running 
+Yedek tamam (şifreli): /yedekler/db-20261015-203556.dump.age
+4/6 Hazırlık (migrasyonlar, qr_sahip ile) çalıştırılıyor; başarısı beklenir, eski app'e henüz dokunulmaz...
+ Container qre2e8-hazirlik-1 Recreate 
+ Container qre2e8-hazirlik-1 Recreated 
+Attaching to hazirlik-1
+ Container qre2e8-hazirlik-1 Starting 
+ Container qre2e8-hazirlik-1 Started 
+hazirlik-1  | Operations to perform:
+hazirlik-1  |   Apply all migrations: auth, contenttypes, qr, sessions
+hazirlik-1  | Running migrations:
+hazirlik-1  |   No migrations to apply.
+hazirlik-1  | Cache table 'onbellek' already exists.
+hazirlik-1  | Roller güncellendi.
+hazirlik-1  | Hazırlık tamamlandı.
+
+[Khazirlik-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+ Container qre2e8-hazirlik-1 Stopping 
+ Container qre2e8-hazirlik-1 Stopped 
+5/6 Yeni uygulama başlatılıyor...
+ Container qre2e8-app-1 Recreate 
+ Container qre2e8-app-1 Recreated 
+ Container qre2e8-app-1 Starting 
+ Container qre2e8-app-1 Started 
+Uygulama sağlıklı.
+6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)...
+ Container qre2e8-caddy-run-82b292535a3f Creating 
+ Container qre2e8-caddy-run-82b292535a3f Created 
+{"level":"info","ts":1792085769.6658633,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+{"level":"warn","ts":1792085769.6663218,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"warn","ts":1792085769.6666417,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"info","ts":1792085769.6670773,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792085769.6675446,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv0","http_port":80}
+{"level":"info","ts":1792085769.6677055,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc0004f3e80"}
+{"level":"info","ts":1792085769.6684897,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0xc0004f3e80"}
+{"level":"info","ts":1792085769.66858,"logger":"http","msg":"servers shutting down with eternal grace period"}
+Valid configuration
+ Container qre2e8-caddy-1 Recreate 
+ Container qre2e8-caddy-1 Recreated 
+ Container qre2e8-caddy-1 Starting 
+ Container qre2e8-caddy-1 Started 
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0).
+Güncelleme tamamlandı.
+(çıkış kodu: 0)
+[GEÇTİ] guncelle çıkış kodu 0 rc=0
+[GEÇTİ] 'Yeni anahtar ÜRETİLMEDİ' yazdı 
+[GEÇTİ] anahtar dosyası yeniden oluşmadı 
+[GEÇTİ] YEDEK_ALICI değişmedi (tek satır, aynı değer) 
+[GEÇTİ] terminalde anahtar gösterilmedi 
+[GEÇTİ] Caddyfile doğrulaması çalıştı ('Valid configuration') 
+[GEÇTİ] RestartCount 0 mesajı 
+[GEÇTİ] güncelleme tamamlandı 
+[GEÇTİ] docker inspect RestartCount == 0 0
+[GEÇTİ] guncelle yedeği şifreli alındı 
+
+====================================================================================================
+## 5) geçersiz yeni Caddyfile -> doğrulama başarısız, eski Caddy'ye DOKUNULMAZ
+====================================================================================================
+$ bash scripts/guncelle.sh   [pty=evet]
+1/6 İmajlar çekiliyor ve derleniyor...
+ Image caddy:2.10.2-alpine Pulling 
+ Image postgres:17.6-alpine Pulling 
+ Image postgres:17.6-alpine Pulled 
+ Image caddy:2.10.2-alpine Error unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/caddy:2.10.2-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/caddy/manifests/2.10.2-alpine: 429 Too Many Requests
+UYARI: db/caddy imajları çekilemedi (kayıt erişilemiyor olabilir). Etiketler sabit olduğundan yerel imajlarla devam ediliyor.
+ Image qr-kampanya-app:e2e8 Building 
+ Image qr-kampanya-yedek:e2e8 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.81kB done
+#1 DONE 0.0s
+
+#2 [yedek internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.16kB done
+#2 DONE 0.0s
+
+#3 [app internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.83kB done
+#3 DONE 0.0s
+
+#4 [app] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 0.1s
+
+#5 [app] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#6 DONE 0.1s
+
+#7 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#7 ...
+
+#8 [yedek internal] load .dockerignore
+#8 transferring context: 2B done
+#8 DONE 0.0s
+
+#9 [yedek internal] load build context
+#9 transferring context: 184B done
+#9 DONE 0.0s
+
+#10 [yedek stage-0 1/2] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#10 resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 0.0s done
+#10 DONE 0.0s
+
+#11 [yedek stage-0 2/2] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#11 CACHED
+
+#12 [yedek] exporting to image
+#12 exporting layers done
+#12 exporting manifest sha256:9d3fb8880a9032d1409d58fc61b6532889fe67cb51918f62bb8c7e79f9fd5a5e done
+#12 exporting config sha256:0093cfed73234812e7e068c2f3db0955f77d2e211a4d12e39d71266affd9d39b done
+#12 exporting attestation manifest sha256:6a28307eaefd32391ff2f5139b914dad3680e9cfef0ee5068d2facc7e2bbe31b done
+#12 exporting manifest list sha256:642221807d2cf998c1ddf5a8e9e0e7acad0703b9c946e889310ff4a8d9255b66 done
+#12 naming to docker.io/library/qr-kampanya-yedek:e2e8 done
+#12 unpacking to docker.io/library/qr-kampanya-yedek:e2e8 0.0s done
+#12 DONE 0.1s
+
+#13 [yedek] resolving provenance for metadata file
+#13 DONE 0.0s
+
+#7 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#7 DONE 0.4s
+
+#14 [app internal] load .dockerignore
+#14 transferring context: 84B done
+#14 DONE 0.0s
+
+#15 [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
+#15 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#15 DONE 0.0s
+
+#16 [app internal] load build context
+#16 transferring context: 5.98kB done
+#16 DONE 0.0s
+
+#17 [app stage-0 5/7] RUN useradd --system --uid 10001 --home /app uygulama     && mkdir -p /veri/medya /veri/static     && chown -R uygulama /veri
+#17 CACHED
+
+#18 [app stage-0 6/7] COPY . .
+#18 CACHED
+
+#19 [app stage-0 3/7] COPY requirements.txt .
+#19 CACHED
+
+#20 [app stage-0 2/7] WORKDIR /app
+#20 CACHED
+
+#21 [app stage-0 4/7] RUN --mount=type=bind,source=.,target=/baglam     if [ -d /baglam/tekerlekler ]; then       pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt;     else       pip install --require-hashes --no-deps -r requirements.txt;     fi
+#21 CACHED
+
+#22 [app stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 755 /app/baslat.sh
+#22 CACHED
+
+#23 [app] exporting to image
+#23 exporting layers done
+#23 exporting manifest sha256:f1d27f1a2f52541fc32a269bcecbc02ac14df51c3fda23e7998b7fa5bf6ab5eb done
+#23 exporting config sha256:59755cf669b3f90d47c8b70ce7816f0b8f204fe20e6852625a6e37d7dc6f2710 done
+#23 exporting attestation manifest sha256:e2b401abea1b4b685294481dedece5d9960552f3bf94be3af35da5f0996b447b done
+#23 exporting manifest list sha256:cee8505a839210405a692034c21f3f897ef7f70d040fbf957f61950a334bd4ac done
+#23 naming to docker.io/library/qr-kampanya-app:e2e8 done
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e8 done
+#23 DONE 0.1s
+
+#24 [app] resolving provenance for metadata file
+#24 DONE 0.0s
+ Image qr-kampanya-app:e2e8 Built 
+ Image qr-kampanya-yedek:e2e8 Built 
+2/6 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+ Container qre2e8-db-1 Running 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/6 Güncelleme öncesi şifreli yedek alınıyor...
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+ Container qre2e8-yedek-1 Running 
+Yedek tamam (şifreli): /yedekler/db-20261015-203618.dump.age
+4/6 Hazırlık (migrasyonlar, qr_sahip ile) çalıştırılıyor; başarısı beklenir, eski app'e henüz dokunulmaz...
+ Container qre2e8-hazirlik-1 Recreate 
+ Container qre2e8-hazirlik-1 Recreated 
+Attaching to hazirlik-1
+ Container qre2e8-hazirlik-1 Starting 
+ Container qre2e8-hazirlik-1 Started 
+hazirlik-1  | Operations to perform:
+hazirlik-1  |   Apply all migrations: auth, contenttypes, qr, sessions
+hazirlik-1  | Running migrations:
+hazirlik-1  |   No migrations to apply.
+hazirlik-1  | Cache table 'onbellek' already exists.
+hazirlik-1  | Roller güncellendi.
+hazirlik-1  | Hazırlık tamamlandı.
+
+[Khazirlik-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+ Container qre2e8-hazirlik-1 Stopping 
+ Container qre2e8-hazirlik-1 Stopped 
+5/6 Yeni uygulama başlatılıyor...
+ Container qre2e8-app-1 Running 
+Uygulama sağlıklı.
+6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)...
+ Container qre2e8-caddy-run-8f6abf4d05c5 Creating 
+ Container qre2e8-caddy-run-8f6abf4d05c5 Created 
+{"level":"info","ts":1792085785.9221642,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: syntax error: unexpected token '{', expecting '}', at /etc/caddy/Caddyfile:64 import chain: ['']
+
+
+HATA: yeni Caddyfile GEÇERSİZ. Eski Caddy'ye DOKUNULMADI; eski yapılandırmayla çalışmaya devam eder.
+Yeni uygulama (app) zaten başlatıldı. Caddyfile'ı düzeltip tekrar çalıştırın: bash scripts/guncelle.sh
+Güncelleme öncesi alınan yedek: ./yedekler/db-20261015-203618.dump.age
+Gerekirse dönüş: bash scripts/geri-yukle.sh ./yedekler/db-20261015-203618.dump.age [--medya]
+(çıkış kodu: 1)
+[GEÇTİ] guncelle hata verdi (rc != 0) rc=1
+[GEÇTİ] hata mesajı 'Caddyfile GEÇERSİZ' ve 'Eski Caddy'ye DOKUNULMADI' diyor 
+[GEÇTİ] eski Caddy konteyneri aynı ve yeniden başlatılmadı 
+[GEÇTİ] eski Caddy çalışıyor 
+
+====================================================================================================
+## 6) geri-yukle.sh (anahtar dosyası yok -> gizli giriş; EVET stdin'den)
+====================================================================================================
+$ bash scripts/geri-yukle.sh yedekler/db-20261015-203618.dump.age --medya   [pty=evet]
+== Bütünlük (sha256) doğrulaması
+db-20261015-203618.dump.age: OK
+medya-20261015-203618.tar.gz.age: OK
+Özel anahtar dosyası bu sunucuda yok (beklenen durum: anahtar parola yöneticinizde).
+== Şifre çözme denemesi (anahtar doğru mu, dosya bozuk mu?)
+Canlı veritabanı 'yedekler/db-20261015-203618.dump.age' ile DEĞİŞTİRİLECEK ve görseller geri yüklenecek. Bu işlem geri alınamaz.
+Güvenlik için önce mevcut durumun yedeği alınıyor...
+Yedek tamam (şifreli): /yedekler/db-20261015-203627.dump.age
+ Container qre2e8-caddy-1 Stopping 
+ Container qre2e8-caddy-1 Stopped 
+ Container qre2e8-app-1 Stopping 
+ Container qre2e8-app-1 Stopped 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+ Container qre2e8-db-1 Running 
+ Container qre2e8-hazirlik-1 Recreate 
+ Container qre2e8-hazirlik-1 Recreated 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-hazirlik-1 Starting 
+ Container qre2e8-hazirlik-1 Started 
+ Container qre2e8-db-1 Running 
+ Container qre2e8-hazirlik-1 Running 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-db-1 Waiting 
+ Container qre2e8-hazirlik-1 Waiting 
+ Container qre2e8-db-1 Healthy 
+ Container qre2e8-hazirlik-1 Exited 
+ Container qre2e8-app-1 Starting 
+ Container qre2e8-app-1 Started 
+ Container qre2e8-caddy-1 Recreate 
+ Container qre2e8-caddy-1 Recreated 
+ Container qre2e8-caddy-1 Starting 
+ Container qre2e8-caddy-1 Started 
+Görseller geri yükleniyor...
+Geri yükleme tamamlandı.
+(çıkış kodu: 0)
+[GEÇTİ] geri yükleme tamamlandı rc=0
+[GEÇTİ] anahtar çıktıda/terminalde yankılanmadı 
+[GEÇTİ] /dev/shm kalıntısı yok (geri-yukle) 
+$ curl -s -o /dev/null -w HTTP %{http_code} http://localhost:8088/saglik   [pty=hayır]
+HTTP 502
+(çıkış kodu: 0)
+[KALDI] geri yükleme sonrası site sağlıklı (HTTP 200) 
+
+====================================================================================================
+## 6b) geri-yukle.sh iptal (EVET yazılmadı): geçici anahtar silinir
+====================================================================================================
+$ bash scripts/geri-yukle.sh yedekler/db-20261015-203618.dump.age   [pty=evet]
+== Bütünlük (sha256) doğrulaması
+db-20261015-203618.dump.age: OK
+Özel anahtar dosyası bu sunucuda yok (beklenen durum: anahtar parola yöneticinizde).
+== Şifre çözme denemesi (anahtar doğru mu, dosya bozuk mu?)
+Canlı veritabanı 'yedekler/db-20261015-203618.dump.age' ile DEĞİŞTİRİLECEK. Bu işlem geri alınamaz.
+İptal edildi.
+(çıkış kodu: 1)
+[GEÇTİ] iptalde rc != 0 ve /dev/shm temiz 
+
+====================================================================================================
+## 7) tty yokken (cron benzeri): anahtar sorulamaz, anlaşılır hata
+====================================================================================================
+$ bash scripts/geri-yukleme-testi.sh   [pty=hayır]
+== Geri yükleme testi 2026-10-15T17:36:35+00:00 ==
+Test edilen yedek: <scratch>/e2e8/qr-kampanya/yedekler/db-20261015-203627.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261015-203627.dump.age: OK
+medya-20261015-203627.tar.gz.age: OK
+Özel anahtar dosyası bu sunucuda yok (beklenen durum: anahtar parola yöneticinizde).
+HATA: özel anahtar sunucuda yok ve etkileşimli terminal de yok; anahtar sorulamaz.
+Anahtarı SSH ile terminalden (ssh -t) çalıştırın veya --anahtar DOSYA / YEDEK_ANAHTAR_DOSYASI verin.
+SONUÇ: BAŞARISIZ - özel anahtar alınamadı.
+(çıkış kodu: 1)
+[GEÇTİ] tty yokken anlaşılır hata 
+
+====================================================================================================
+## ÖZET
+====================================================================================================
+  [GEÇTİ] kurulum çıkış kodu 0
+  [GEÇTİ] anahtar terminalde (/dev/tty) tam bir kez gösterildi
+  [GEÇTİ] anahtar betiğin stdout/stderr çıktısına (tee/günlüğe) DÜŞMEDİ
+  [GEÇTİ] gizli/yedek-anahtari.txt kaldırıldı
+  [GEÇTİ] .env içinde YEDEK_ALICI kaldı
+  [GEÇTİ] sunucu silme mesajı
+  [GEÇTİ] yedek-al çıkış kodu 0
+  [GEÇTİ] db-*.dump.age oluştu ve age başlığı var
+  [GEÇTİ] medya-*.tar.gz.age ve sha256-*.txt var
+  [GEÇTİ] SONUÇ: GEÇTİ
+  [GEÇTİ] anahtar terminalde yankılanmadı (read -s)
+  [GEÇTİ] anahtar stdout/stderr'e düşmedi
+  [GEÇTİ] geri-yukleme-testi günlüğünde anahtar yok
+  [GEÇTİ] /dev/shm geçici anahtar dosyası kalmadı
+  [GEÇTİ] gizli/yedek-anahtari.txt hâlâ yok
+  [GEÇTİ] konteyner kalmadı
+  [GEÇTİ] yanlış anahtarda BAŞARISIZ (rc != 0)
+  [GEÇTİ] yanlışta da /dev/shm kalıntısı yok
+  [GEÇTİ] guncelle çıkış kodu 0
+  [GEÇTİ] 'Yeni anahtar ÜRETİLMEDİ' yazdı
+  [GEÇTİ] anahtar dosyası yeniden oluşmadı
+  [GEÇTİ] YEDEK_ALICI değişmedi (tek satır, aynı değer)
+  [GEÇTİ] terminalde anahtar gösterilmedi
+  [GEÇTİ] Caddyfile doğrulaması çalıştı ('Valid configuration')
+  [GEÇTİ] RestartCount 0 mesajı
+  [GEÇTİ] güncelleme tamamlandı
+  [GEÇTİ] docker inspect RestartCount == 0
+  [GEÇTİ] guncelle yedeği şifreli alındı
+  [GEÇTİ] guncelle hata verdi (rc != 0)
+  [GEÇTİ] hata mesajı 'Caddyfile GEÇERSİZ' ve 'Eski Caddy'ye DOKUNULMADI' diyor
+  [GEÇTİ] eski Caddy konteyneri aynı ve yeniden başlatılmadı
+  [GEÇTİ] eski Caddy çalışıyor
+  [GEÇTİ] geri yükleme tamamlandı
+  [GEÇTİ] anahtar çıktıda/terminalde yankılanmadı
+  [GEÇTİ] /dev/shm kalıntısı yok (geri-yukle)
+  [KALDI] geri yükleme sonrası site sağlıklı (HTTP 200)
+  [GEÇTİ] iptalde rc != 0 ve /dev/shm temiz
+  [GEÇTİ] tty yokken anlaşılır hata
+TOPLAM: 37/38 geçti
+
+====================================================================================================
+## 6c) geri yükleme sonrası site sağlığı (geri-yukle app'i beklemeden başlatır; hazır olana dek yoklanır)
+====================================================================================================
+[GEÇTİ] geri yükleme sonrası site sağlıklı (HTTP 200) deneme=1
+
+====================================================================================================
+## 8) yedek-anahtari-hazirla.sh: yeni anahtar üretimi — EVET dışı yanıt, tty yok, --goster-ve-kaldir (ayrı klasör, aynı imaj)
+====================================================================================================
+$ bash scripts/yedek-anahtari-hazirla.sh   [pty=hayır]
+Yedek şifreleme anahtarı üretiliyor...
+Public key: age12halvgknzvh3z5tujsnpjm69rg7cvzz6tm8g9a5ytpejuzzrwqlqn43ah8
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+BİLGİ: etkileşimli terminal yok; anahtar gösterilmedi ve sunucudan silinmedi.
+
+####################################################################################
+ UYARI: ÖZEL ANAHTAR HÂLÂ SUNUCUDA (gizli/yedek-anahtari.txt)
+ SUNUCU ELE GEÇİRİLİRSE YEDEKLER AÇILABİLİR.
+ Anahtarı parola yöneticinize kopyaladıysanız dosyayı kaldırmak için:
+     bash scripts/yedek-anahtari-hazirla.sh --goster-ve-kaldir
+ (yedekleme açık anahtarla sürer; özel anahtar yalnızca geri yüklemede gerekir)
+####################################################################################
+(çıkış kodu: 0)
+[GEÇTİ] tty yok: anahtar dosyası KALDI + büyük harfli uyarı 
+[GEÇTİ] tty yok: çıktıda anahtar yok 
+[GEÇTİ] tty yok: dosya izni 600 
+[GEÇTİ] tty yok: .env'ye YEDEK_ALICI eklendi 
+$ bash scripts/yedek-anahtari-hazirla.sh   [pty=evet]
+Yedek şifreleme anahtarı üretiliyor...
+Public key: age1sph8z3d9tp26986tstuq53lw4vgqvp05yz7gpt0exw3529jnggcq0jdurr
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+Onay verilmedi; özel anahtar dosyası sunucuda KALDI.
+
+####################################################################################
+ UYARI: ÖZEL ANAHTAR HÂLÂ SUNUCUDA (gizli/yedek-anahtari.txt)
+ SUNUCU ELE GEÇİRİLİRSE YEDEKLER AÇILABİLİR.
+ Anahtarı parola yöneticinize kopyaladıysanız dosyayı kaldırmak için:
+     bash scripts/yedek-anahtari-hazirla.sh --goster-ve-kaldir
+ (yedekleme açık anahtarla sürer; özel anahtar yalnızca geri yüklemede gerekir)
+####################################################################################
+(çıkış kodu: 0)
+[GEÇTİ] EVET yazılmadı: dosya KALDI + 'Onay verilmedi' + büyük harfli uyarı 
+[GEÇTİ] EVET yazılmadı: anahtar stdout'a düşmedi, terminalde 1 kez 
+$ bash scripts/yedek-anahtari-hazirla.sh --goster-ve-kaldir   [pty=evet]
+Özel anahtar dosyası sunucudan SİLİNDİ (kullanıcı onayıyla). Açık anahtar YEDEK_ALICI .env içinde kaldı; yedekleme etkilenmedi.
+Geri yükleme testi ve geri yükleme sırasında anahtar sizden istenecek (parola yöneticisinden yapıştırırsınız).
+(çıkış kodu: 0)
+[GEÇTİ] --goster-ve-kaldir + EVET: dosya silindi 
+[GEÇTİ] --goster-ve-kaldir: YEDEK_ALICI .env'de kaldı 
+$ bash scripts/yedek-anahtari-hazirla.sh   [pty=evet]
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+(çıkış kodu: 0)
+[GEÇTİ] kaldırıldıktan sonra hazirla: Yeni anahtar ÜRETİLMEDİ, dosya yok, .env aynı 
+
+====================================================================================================
+## ÖZET (faz2)
+====================================================================================================
+  [GEÇTİ] geri yükleme sonrası site sağlıklı (HTTP 200)
+  [GEÇTİ] tty yok: anahtar dosyası KALDI + büyük harfli uyarı
+  [GEÇTİ] tty yok: çıktıda anahtar yok
+  [GEÇTİ] tty yok: dosya izni 600
+  [GEÇTİ] tty yok: .env'ye YEDEK_ALICI eklendi
+  [GEÇTİ] EVET yazılmadı: dosya KALDI + 'Onay verilmedi' + büyük harfli uyarı
+  [GEÇTİ] EVET yazılmadı: anahtar stdout'a düşmedi, terminalde 1 kez
+  [GEÇTİ] --goster-ve-kaldir + EVET: dosya silindi
+  [GEÇTİ] --goster-ve-kaldir: YEDEK_ALICI .env'de kaldı
+  [GEÇTİ] kaldırıldıktan sonra hazirla: Yeni anahtar ÜRETİLMEDİ, dosya yok, .env aynı
+TOPLAM faz2: 10/10 geçti
+
+
+====================================================================================================
+## 9) disari-kopyala.sh, GERÇEK rclone v1.75.0 ile
+====================================================================================================
+rclone v1.75.0
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=<scratch>/e2e8/rclone-deneme/baska-klasor)   [pty=hayır]
+UYARI: YEDEK_UZAK_HEDEF ((yerel-yol)) bu sunucudaki bir klasör görünüyor; sunucu dışı SAYILMADI.
+       Dosyalar kopyalanır ama HİÇBİR yerel yedek silinmez ve panel uyarısı sürer. Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın.
+2026/10/15 17:38:09 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 0 differences found
+2026/10/15 17:38:09 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 6 matching files
+2026-10-15T17:38:09+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → (yerel-yol); yerel yedek SİLİNMEDİ
+Yerel hedef nedeniyle silme yapılmadı.
+(çıkış kodu: 0)
+[GEÇTİ] yerel hedef (mutlak yol): eski üçlü SİLİNMEDİ eski_dosya=3
+[GEÇTİ] yerel hedef (mutlak yol): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null {"zaman": null, "son_deneme": "2026-10-15T17:38:09+00:00", "hedef": "(yerel-yol)", "yontem": "ozet", "not": "yerel hedef, sunucu dışı sayılmadı", "dogrulanan": []}
+[GEÇTİ] yerel hedef (mutlak yol): dosyalar yine de kopyalandı 
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=yerel:<scratch>/e2e8/rclone-deneme/baska-klasor)   [pty=hayır]
+UYARI: YEDEK_UZAK_HEDEF (yerel) bu sunucudaki bir klasör görünüyor; sunucu dışı SAYILMADI.
+       Dosyalar kopyalanır ama HİÇBİR yerel yedek silinmez ve panel uyarısı sürer. Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın.
+2026/10/15 17:38:09 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 0 differences found
+2026/10/15 17:38:09 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 6 matching files
+2026-10-15T17:38:09+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → yerel; yerel yedek SİLİNMEDİ
+Yerel hedef nedeniyle silme yapılmadı.
+(çıkış kodu: 0)
+[GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): eski üçlü SİLİNMEDİ eski_dosya=3
+[GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null {"zaman": null, "son_deneme": "2026-10-15T17:38:09+00:00", "hedef": "yerel", "yontem": "ozet", "not": "yerel hedef, sunucu dışı sayılmadı", "dogrulanan": []}
+[GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): dosyalar yine de kopyalandı 
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=takma:)   [pty=hayır]
+UYARI: YEDEK_UZAK_HEDEF (takma) bu sunucudaki bir klasör görünüyor; sunucu dışı SAYILMADI.
+       Dosyalar kopyalanır ama HİÇBİR yerel yedek silinmez ve panel uyarısı sürer. Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın.
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 0 differences found
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 6 matching files
+2026-10-15T17:38:10+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → takma; yerel yedek SİLİNMEDİ
+Yerel hedef nedeniyle silme yapılmadı.
+(çıkış kodu: 0)
+[GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): eski üçlü SİLİNMEDİ eski_dosya=3
+[GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null {"zaman": null, "son_deneme": "2026-10-15T17:38:10+00:00", "hedef": "takma", "yontem": "ozet", "not": "yerel hedef, sunucu dışı sayılmadı", "dogrulanan": []}
+[GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): dosyalar yine de kopyalandı 
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=:local:<scratch>/e2e8/rclone-deneme/baska-klasor)   [pty=hayır]
+UYARI: YEDEK_UZAK_HEDEF ((adsız)) bu sunucudaki bir klasör görünüyor; sunucu dışı SAYILMADI.
+       Dosyalar kopyalanır ama HİÇBİR yerel yedek silinmez ve panel uyarısı sürer. Gerçek bir uzak hedef (B2, SFTP, S3...) tanımlayın.
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 0 differences found
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 6 matching files
+2026-10-15T17:38:10+00:00 dışarı kopyalama: yerel hedef, sunucu dışı sayılmadı → (adsız); yerel yedek SİLİNMEDİ
+Yerel hedef nedeniyle silme yapılmadı.
+(çıkış kodu: 0)
+[GEÇTİ] yerel hedef (bağlantı dizesi :local:): eski üçlü SİLİNMEDİ eski_dosya=3
+[GEÇTİ] yerel hedef (bağlantı dizesi :local:): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null {"zaman": null, "son_deneme": "2026-10-15T17:38:10+00:00", "hedef": "(adsız)", "yontem": "ozet", "not": "yerel hedef, sunucu dışı sayılmadı", "dogrulanan": []}
+[GEÇTİ] yerel hedef (bağlantı dizesi :local:): dosyalar yine de kopyalandı 
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=<scratch>/e2e8/rclone-deneme/baska-klasor)   [pty=hayır]
+UYARI: YEDEK_YEREL_HEDEF_IZIN=1: yerel bir hedef sunucu dışı gibi işlenecek. Bu YALNIZCA DENEME içindir; üretimde kullanmayın.
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 0 differences found
+2026/10/15 17:38:10 NOTICE: Local file system at <scratch>/e2e8/rclone-deneme/baska-klasor: 6 matching files
+2026-10-15T17:38:10+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (ozet) → (yerel-yol)
+2026-10-15T17:38:10+00:00 SİLİNDİ yerel yedek: db-20260801-031500.dump.age (uzakta doğrulandı: (yerel-yol); saklama 14 gün)
+2026-10-15T17:38:10+00:00 SİLİNDİ yerel yedek: medya-20260801-031500.tar.gz.age (uzakta doğrulandı: (yerel-yol); saklama 14 gün)
+2026-10-15T17:38:10+00:00 SİLİNDİ yerel yedek: sha256-20260801-031500.txt (uzakta doğrulandı: (yerel-yol); saklama 14 gün)
+2026-10-15T17:38:10+00:00 tamam: 3 yerel dosya silindi.
+(çıkış kodu: 0)
+[GEÇTİ] YEDEK_YEREL_HEDEF_IZIN=1 (yalnızca deneme): uyarı basıldı, doğrulanan eski üçlü silindi 
+
+====================================================================================================
+## 9b) Gerçek SFTP hedefi (rclone serve sftp) -> ortak özet yok -> uyarı + otomatik --download
+====================================================================================================
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=sf:yedek)   [pty=hayır]
+2026/10/15 17:38:12 NOTICE: sf{u0_JO}: No host key validation is being performed. Set known_hosts_file (to "none" to silence this notice) or use --sftp-pin-host-key to enable it. See: https://rclone.org/sftp/#host-key-validation
+2026/10/15 17:38:12 NOTICE: sf{u0_JO}: No host key validation is being performed. Set known_hosts_file (to "none" to silence this notice) or use --sftp-pin-host-key to enable it. See: https://rclone.org/sftp/#host-key-validation
+2026/10/15 17:38:12 ERROR : No common hash found - not using a hash for checks
+2026/10/15 17:38:12 NOTICE: sftp://deneme@127.0.0.1:2299/yedek: 0 differences found
+2026/10/15 17:38:12 NOTICE: sftp://deneme@127.0.0.1:2299/yedek: 6 hashes could not be checked
+2026/10/15 17:38:12 NOTICE: sftp://deneme@127.0.0.1:2299/yedek: 6 matching files
+UYARI: bu uzak hedefle ortak özet (hash) yok; rclone check yalnızca BOYUT karşılaştırdı. Bu, silme için yeterli sayılmaz.
+       Otomatik olarak verinin tamamı indirilip birebir karşılaştırılıyor (--download; yedekler küçüktür ama ağ trafiği harcar).
+2026/10/15 17:38:12 NOTICE: sf{u0_JO}: No host key validation is being performed. Set known_hosts_file (to "none" to silence this notice) or use --sftp-pin-host-key to enable it. See: https://rclone.org/sftp/#host-key-validation
+2026/10/15 17:38:13 NOTICE: sftp://deneme@127.0.0.1:2299/yedek: 0 differences found
+2026/10/15 17:38:13 NOTICE: sftp://deneme@127.0.0.1:2299/yedek: 6 matching files
+2026-10-15T17:38:13+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (indirerek-ozet-yok) → sf
+2026-10-15T17:38:13+00:00 SİLİNDİ yerel yedek: db-20260801-031500.dump.age (uzakta doğrulandı: sf; saklama 14 gün)
+2026-10-15T17:38:13+00:00 SİLİNDİ yerel yedek: medya-20260801-031500.tar.gz.age (uzakta doğrulandı: sf; saklama 14 gün)
+2026-10-15T17:38:13+00:00 SİLİNDİ yerel yedek: sha256-20260801-031500.txt (uzakta doğrulandı: sf; saklama 14 gün)
+2026-10-15T17:38:13+00:00 tamam: 3 yerel dosya silindi.
+(çıkış kodu: 0)
+[GEÇTİ] SFTP: çıkış kodu 0 rc=0
+[GEÇTİ] SFTP: 'ortak özet (hash) yok' uyarısı ve rclone 'No common hash found' 
+[GEÇTİ] SFTP: otomatik --download ile doğrulandı (yöntem kaydı) {"zaman": "2026-10-15T17:38:13+00:00", "son_deneme": "2026-10-15T17:38:13+00:00", "hedef": "sf", "yontem": "indirerek-ozet-yok", "not": "", "dogrulanan": ["db-20260801-031500.dump.age", "db-20261015-203627.dump.age", "medya-20260801-031500.tar.gz.age", "medya-20261015-203627.tar.gz.age", "sha256-20260801-031500.txt", "sha256-20261015-203627.txt"]}
+[GEÇTİ] SFTP: indirerek doğrulanan eski üçlü silindi, en yeni kaldı 
+[GEÇTİ] SFTP: uzak taraf sunucu dışı sayıldı (zaman dolu) 
+$ bash scripts/disari-kopyala.sh   (YEDEK_UZAK_HEDEF=sf:yedek)   [pty=hayır]
+2026/10/15 17:38:14 NOTICE: sf{u0_JO}: No host key validation is being performed. Set known_hosts_file (to "none" to silence this notice) or use --sftp-pin-host-key to enable it. See: https://rclone.org/sftp/#host-key-validation
+2026/10/15 17:38:25 CRITICAL: Failed to create file system for "sf:yedek": NewFs: couldn't connect SSH: dial tcp 127.0.0.1:2299: connect: connection refused
+(çıkış kodu: 1)
+[GEÇTİ] SFTP erişilemezken: silme yok rc=1
+
+====================================================================================================
+## ÖZET (faz3)
+====================================================================================================
+  [GEÇTİ] yerel hedef (mutlak yol): eski üçlü SİLİNMEDİ
+  [GEÇTİ] yerel hedef (mutlak yol): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null
+  [GEÇTİ] yerel hedef (mutlak yol): dosyalar yine de kopyalandı
+  [GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): eski üçlü SİLİNMEDİ
+  [GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null
+  [GEÇTİ] yerel hedef (rclone 'local' türü uzak (yerel:)): dosyalar yine de kopyalandı
+  [GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): eski üçlü SİLİNMEDİ
+  [GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null
+  [GEÇTİ] yerel hedef (alias -> yerel yol (takma:)): dosyalar yine de kopyalandı
+  [GEÇTİ] yerel hedef (bağlantı dizesi :local:): eski üçlü SİLİNMEDİ
+  [GEÇTİ] yerel hedef (bağlantı dizesi :local:): uyarı + json 'yerel hedef, sunucu dışı sayılmadı', zaman null
+  [GEÇTİ] yerel hedef (bağlantı dizesi :local:): dosyalar yine de kopyalandı
+  [GEÇTİ] YEDEK_YEREL_HEDEF_IZIN=1 (yalnızca deneme): uyarı basıldı, doğrulanan eski üçlü silindi
+  [GEÇTİ] SFTP: çıkış kodu 0
+  [GEÇTİ] SFTP: 'ortak özet (hash) yok' uyarısı ve rclone 'No common hash found'
+  [GEÇTİ] SFTP: otomatik --download ile doğrulandı (yöntem kaydı)
+  [GEÇTİ] SFTP: indirerek doğrulanan eski üçlü silindi, en yeni kaldı
+  [GEÇTİ] SFTP: uzak taraf sunucu dışı sayıldı (zaman dolu)
+  [GEÇTİ] SFTP erişilemezken: silme yok
+TOPLAM faz3: 19/19 geçti

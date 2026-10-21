@@ -1,0 +1,1426 @@
+E2E11 ham çıktı (proje qre2e11, HTTP 8092, HTTPS 8452); sır/anahtar/parola maskelenir
+
+==========================================================================================
+## 0) güncel ağacı kopyala
+==========================================================================================
+$ bash -c diff -rq /home/claude/TEZDENEME/qr-kampanya . -x .env -x yedekler -x gizli -x __pycache__ -x staticfiles | head -5; echo diff-bitti   [pty=hayır]
+diff-bitti
+(çıkış kodu: 0)
+
+==========================================================================================
+## 1a) kurulum.sh TTY'siz (stdin pipe): yönetici sorulmamalı
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=evet]
+       Bu anahtar kaybolursa MFA kayıtları çözülemez. .env yedeğini parola yöneticinizde saklayın (docs/YEDEKLEME.md).
+Geri yükleme testi ve geri yükleme sırasında anahtar sizden istenecek (parola yöneticisinden yapıştırırsınız).
+BİLGİ: Etkileşimli terminal (tty) yok; yönetici hesabı oluşturulmadı. Bir terminalde şunu çalıştırın:
+       docker compose exec app python manage.py yonetici_olustur
+(çıkış kodu: 0)
+[GEÇTİ] tty'siz kurulum rc 0 rc=0
+[GEÇTİ] tty yok bilgi mesajı + komut yazdırıldı 
+$ bash -c docker compose exec -T app python manage.py shell --no-imports -c 'from django.contrib.auth import get_user_model as g;print(g().objects.count())' | tail -1   [pty=hayır]
+0
+(çıkış kodu: 0)
+[GEÇTİ] tty'siz çalışmada hiç kullanıcı oluşmadı 0
+
+==========================================================================================
+## 1b) kurulum.sh GERÇEK tty (pty): createsuperuser sorulmalı
+==========================================================================================
+$ bash scripts/kurulum.sh  (ikinci çalıştırma, tty var)   [pty=evet, stdin/stdout tty]
+.env zaten var; dokunulmadı.
+[1A[1B[0G[?25l[+] Building 0.0s (0/1)                                                         
+ => [internal] load local bake definitions                                 0.0s
+[?25h[1A[1A[0G[?25l[+] Building 0.2s (3/4)                                                         
+[34m => [internal] load local bake definitions                                 0.0s
+[0m[34m => => reading from stdin 1.84kB                                           0.0s
+[0m[34m => [app internal] load build definition from Dockerfile                   0.0s
+[0m[34m => => transferring dockerfile: 2.32kB                                     0.0s
+[0m[34m => [yedek internal] load build definition from Dockerfile                 0.0s
+[0m[34m => => transferring dockerfile: 3.34kB                                     0.0s
+[0m => [hazirlik] resolve image config for docker-image://docker.io/docker/d  0.2s
+[?25h[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.4s (3/4)                                                         
+[34m => [internal] load local bake definitions                                 0.0s
+[0m[34m => => reading from stdin 1.84kB                                           0.0s
+[0m[34m => [app internal] load build definition from Dockerfile                   0.0s
+[0m[34m => => transferring dockerfile: 2.32kB                                     0.0s
+[0m[34m => [yedek internal] load build definition from Dockerfile                 0.0s
+[0m[34m => => transferring dockerfile: 3.34kB                                     0.0s
+[0m => [hazirlik] resolve image config for docker-image://docker.io/docker/d  0.3s
+[?25h[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.4s (3/5)                                                         
+[34m => [internal] load local bake definitions                                 0.0s
+[0m[34m => => reading from stdin 1.84kB                                           0.0s
+[0m[34m => [app internal] load build definition from Dockerfile                   0.0s
+[0m[34m => => transferring dockerfile: 2.32kB                                     0.0s
+[0m[34m => [yedek internal] load build definition from Dockerfile                 0.0s
+[0m[34m => => transferring dockerfile: 3.34kB                                     0.0s
+[0m => [app] resolve image config for docker-image://docker.io/docker/docker  0.4s
+[?25h[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.5s (5/6)                                                         
+[34m => [app internal] load build definition from Dockerfile                   0.0s
+[0m[34m => => transferring dockerfile: 2.32kB                                     0.0s
+[0m[34m => [yedek internal] load build definition from Dockerfile                 0.0s
+[0m[34m => => transferring dockerfile: 3.34kB                                     0.0s
+[0m[34m => [yedek] resolve image config for docker-image://docker.io/docker/dock  0.4s
+[0m[34m => CACHED [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4e  0.0s
+[0m[34m => => resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906  0.0s
+[0m => [app internal] load metadata for docker.io/library/python:3.13-slim-b  0.0s
+[?25h[1A[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.6s (19/23)                                                       
+[34m => CACHED [hazirlik stage-0 4/7] RUN --mount=type=bind,source=.,target=/  0.0s
+[0m[34m => CACHED [hazirlik stage-0 5/7] RUN groupadd --gid 10001 uygulama     &  0.0s
+[0m[34m => CACHED [hazirlik stage-0 6/7] COPY . .                                 0.0s
+[0m[34m => CACHED [hazirlik stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 75  0.0s
+[0m => [hazirlik] exporting to image                                          0.0s
+ => => exporting layers                                                    0.0s
+ => [app] exporting to image                                               0.0s
+ => => exporting layers                                                    0.0s
+[?25h[1A[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.7s (24/24)                                                       
+[34m => [yedek] exporting to image                                             0.1s
+[0m[34m => => exporting layers                                                    0.0s
+[0m[34m => => exporting manifest sha256:c68c6712f787b9c2a9e1a6712fcf707cc2d82a0d  0.0s
+[0m[34m => => exporting config sha256:c3fc72e4407ba8e5933777f1f69d3f944964e407b2  0.0s
+[0m[34m => => exporting attestation manifest sha256:133c2995aad82106c9b03df07a88  0.0s
+[0m[34m => => exporting manifest list sha256:ff88d8f206624ee31f40ab7fe19234a3956  0.0s
+[0m[34m => => naming to docker.io/library/qr-kampanya-yedek:e2e11                 0.0s
+[0m[34m => => unpacking to docker.io/library/qr-kampanya-yedek:e2e11              0.0s
+[0m[?25h[1A[1A[1A[1A[1A[1A[1A[1A[1A[0G[?25l[+] Building 0.8s (27/27) FINISHED                                              
+[34m => [internal] load local bake definitions                                 0.0s
+[0m[34m => => reading from stdin 1.84kB                                           0.0s
+[0m[34m => [app internal] load build definition from Dockerfile                   0.0s
+[0m[34m => => transferring dockerfile: 2.32kB                                     0.0s
+[0m[34m => [yedek internal] load build definition from Dockerfile                 0.0s
+[0m[34m => => transferring dockerfile: 3.34kB                                     0.0s
+[0m[34m => [yedek] resolve image config for docker-image://docker.io/docker/dock  0.4s
+[0m[34m => CACHED [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4e  0.0s
+[0m[34m => => resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906  0.0s
+[0m[34m => [app internal] load metadata for docker.io/library/python:3.13-slim-b  0.0s
+[0m[34m => [yedek internal] load metadata for docker.io/library/postgres:17.6-al  0.0s
+[0m[34m => [hazirlik internal] load .dockerignore                                 0.0s
+[0m[34m => => transferring context: 84B                                           0.0s
+[0m[34m => [yedek internal] load .dockerignore                                    0.0s
+[0m[34m => => transferring context: 2B                                            0.0s
+[0m[34m => [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sh  0.0s
+[0m[34m => => resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e2  0.0s
+[0m[34m => [hazirlik internal] load build context                                 0.0s
+[0m[34m => => transferring context: 6.72kB                                        0.0s
+[0m[34m => [yedek internal] load build context                                    0.0s
+[0m[34m => => transferring context: 184B                                          0.0s
+[0m[34m => [yedek stage-0 1/3] FROM docker.io/library/postgres:17.6-alpine@sha25  0.0s
+[0m[34m => => resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e  0.0s
+[0m[34m => CACHED [hazirlik stage-0 2/7] WORKDIR /app                             0.0s
+[0m[34m => CACHED [hazirlik stage-0 3/7] COPY requirements.txt .                  0.0s
+[0m[34m => CACHED [hazirlik stage-0 4/7] RUN --mount=type=bind,source=.,target=/  0.0s
+[0m[34m => CACHED [hazirlik stage-0 5/7] RUN groupadd --gid 10001 uygulama     &  0.0s
+[0m[34m => CACHED [hazirlik stage-0 6/7] COPY . .                                 0.0s
+[0m[34m => CACHED [hazirlik stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 75  0.0s
+[0m[34m => [hazirlik] exporting to image                                          0.1s
+[0m[34m => => exporting layers                                                    0.0s
+[0m[34m => => exporting manifest sha256:ef424abcb203bfbc208ed0e68bccd89222a59fbd  0.0s
+[0m[34m => => exporting config sha256:daaa97a833c13282a8155fd137ef5ec3a63a705def  0.0s
+[0m[34m => => exporting attestation manifest sha256:91b08880ac537c8f9150eb5891c5  0.0s
+[0m[34m => => exporting manifest list sha256:00a053e0bec7ea92849ffe44d2fb647a9c5  0.0s
+[0m[34m => => naming to docker.io/library/qr-kampanya-app:e2e11                   0.0s
+[0m[34m => => unpacking to docker.io/library/qr-kampanya-app:e2e11                0.0s
+[0m[34m => [app] exporting to image                                               0.1s
+[0m[34m => => exporting layers                                                    0.0s
+[0m[34m => => exporting manifest sha256:17aaa39846776a971725125794573ecde36fd6ad  0.0s
+[0m[34m => => exporting config sha256:b666714a9e37430daf0b074eb93ea48982cd65ef48  0.0s
+[0m[34m => => exporting attestation manifest sha256:d8a0d9c7d139d7184b4132da4c5c  0.0s
+[0m[34m => => exporting manifest list sha256:a6a2fc246a17df4605445b292fdfa8411c7  0.0s
+[0m[34m => => naming to docker.io/library/qr-kampanya-app:e2e11                   0.0s
+[0m[34m => => unpacking to docker.io/library/qr-kampanya-app:e2e11                0.0s
+[0m[34m => CACHED [yedek stage-0 2/3] RUN --mount=type=bind,source=paketler,targ  0.0s
+[0m[34m => CACHED [yedek stage-0 3/3] RUN addgroup -g 10002 -S yedek     && addu  0.0s
+[0m[34m => [yedek] exporting to image                                             0.1s
+[0m[34m => => exporting layers                                                    0.0s
+[0m[34m => => exporting manifest sha256:c68c6712f787b9c2a9e1a6712fcf707cc2d82a0d  0.0s
+[0m[34m => => exporting config sha256:c3fc72e4407ba8e5933777f1f69d3f944964e407b2  0.0s
+[0m[34m => => exporting attestation manifest sha256:133c2995aad82106c9b03df07a88  0.0s
+[0m[34m => => exporting manifest list sha256:ff88d8f206624ee31f40ab7fe19234a3956  0.0s
+[0m[34m => => naming to docker.io/library/qr-kampanya-yedek:e2e11                 0.0s
+[0m[34m => => unpacking to docker.io/library/qr-kampanya-yedek:e2e11              0.0s
+[0m[34m => [hazirlik] resolving provenance for metadata file                      0.0s
+[0m[34m => [app] resolving provenance for metadata file                           0.0s
+[0m[34m => [yedek] resolving provenance for metadata file                         0.0s
+[0m[?25h[?25l[0G[2K[+] build 1/2
+[2K [33m⠏[0m Image qr-kampanya-yedek:e2e11 Building                                   [34m1.0s[0m
+[2K [32m✔[0m Image qr-kampanya-app:e2e11   [32mBuilt[0m                                      [34m0.9s[0m
+[?25h[?25l[3A[0G[2K[+] build 2/2
+[2K [32m✔[0m Image qr-kampanya-yedek:e2e11 [32mBuilt[0m                                      [34m1.0s[0m
+
+[?25hContainer qre2e11-yedek-run-4141be42dc95 [32mCreating[0m 
+Container qre2e11-yedek-run-4141be42dc95 [32mCreated[0m 
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:10001 kip 2750, app yalnızca okur).
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+[?25l[0G[2K[+] up 1/1
+[2K [32m✔[0m Container qre2e11-db-1 [32mRunning[0m                                           [34m0.0s[0m
+[?25h10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+[?25l[0G[2K[+] up 3/4
+[2K [32m✔[0m Container qre2e11-db-1       [32mRunning[0m                                     [34m0.0s[0m
+[2K [32m✔[0m Container qre2e11-caddy-1    [32mRunning[0m                                     [34m0.0s[0m
+[2K [32m✔[0m Container qre2e11-yedek-1    [32mRunning[0m                                     [34m0.0s[0m
+[2K [33m⠋[0m Container qre2e11-hazirlik-1 Recreate                                    [34m0.0s[0m
+[?25h[?25l[5A[0G[2K[+] up 4/5
+
+
+
+[2K [32m✔[0m Container qre2e11-hazirlik-1 [32mRecreated[0m                                   [34m0.1s[0m
+[2K [33m⠋[0m Container qre2e11-app-1      Recreate                                    [34m0.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Recreate                                    [34m0.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Recreate                                    [34m0.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Recreate                                    [34m0.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Recreate                                    [34m0.4s[0m
+[?25h[?25l[6A[0G
+[2K [33m⠦[0m Container qre2e11-db-1       Waiting                                     [34m0.6s[0m
+
+
+
+[2K [32m✔[0m Container qre2e11-app-1      [32mRecreated[0m                                   [34m0.5s[0m
+[?25h[?25l[6A[0G
+[2K [33m⠧[0m Container qre2e11-db-1       Waiting                                     [34m0.7s[0m
+
+
+
+
+[?25h[?25l[6A[0G
+[2K [33m⠇[0m Container qre2e11-db-1       Waiting                                     [34m0.8s[0m
+
+
+
+
+[?25h[?25l[6A[0G
+[2K [33m⠏[0m Container qre2e11-db-1       Waiting                                     [34m0.9s[0m
+
+
+
+
+[?25h[?25l[6A[0G
+[2K [33m⠋[0m Container qre2e11-db-1       Waiting                                     [34m1.0s[0m
+
+
+
+
+[?25h[?25l[6A[0G
+[2K [32m✔[0m Container qre2e11-db-1       [32mHealthy[0m                                     [34m1.1s[0m
+
+
+[2K [33m⠙[0m Container qre2e11-hazirlik-1 Starting                                    [34m1.1s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠹[0m Container qre2e11-hazirlik-1 Starting                                    [34m1.2s[0m
+
+[?25h[?25l[6A[0G[2K[+] up 3/5
+[2K [33m⠸[0m Container qre2e11-db-1       Waiting                                     [34m1.3s[0m
+
+
+[2K [33m⠸[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.3s[0m
+
+[?25h[?25l[6A[0G
+[2K [33m⠼[0m Container qre2e11-db-1       Waiting                                     [34m1.4s[0m
+
+
+[2K [33m⠼[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.4s[0m
+
+[?25h[?25l[6A[0G
+[2K [33m⠴[0m Container qre2e11-db-1       Waiting                                     [34m1.5s[0m
+
+
+[2K [33m⠴[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.5s[0m
+
+[?25h[?25l[6A[0G
+[2K [33m⠦[0m Container qre2e11-db-1       Waiting                                     [34m1.6s[0m
+
+
+[2K [33m⠦[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.6s[0m
+
+[?25h[?25l[6A[0G
+[2K [33m⠧[0m Container qre2e11-db-1       Waiting                                     [34m1.7s[0m
+
+
+[2K [33m⠧[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.7s[0m
+
+[?25h[?25l[6A[0G[2K[+] up 4/5
+[2K [32m✔[0m Container qre2e11-db-1       [32mHealthy[0m                                     [34m1.7s[0m
+
+
+[2K [33m⠇[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.8s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠏[0m Container qre2e11-hazirlik-1 Waiting                                     [34m1.9s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠋[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.0s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠙[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.1s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠹[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.2s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠸[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.3s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠼[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.4s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠴[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.5s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠦[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.6s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠧[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.7s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠇[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.8s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠏[0m Container qre2e11-hazirlik-1 Waiting                                     [34m2.9s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠋[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.0s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠙[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.1s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠹[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.2s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠸[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.3s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠼[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.4s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠴[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.5s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠦[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.6s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠧[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.7s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠇[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.8s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠏[0m Container qre2e11-hazirlik-1 Waiting                                     [34m3.9s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠋[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.0s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠙[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.1s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠹[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.2s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠸[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.3s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠼[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.4s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠴[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.5s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠦[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.6s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠧[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.7s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠇[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.8s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠏[0m Container qre2e11-hazirlik-1 Waiting                                     [34m4.9s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠋[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.0s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠙[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.1s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠹[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.2s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠸[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.3s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠼[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.4s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠴[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.5s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠦[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.6s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [33m⠧[0m Container qre2e11-hazirlik-1 Waiting                                     [34m5.7s[0m
+
+[?25h[?25l[6A[0G
+
+
+
+[2K [32m✔[0m Container qre2e11-hazirlik-1 [32mExited[0m                                      [34m5.7s[0m
+[2K [33m⠧[0m Container qre2e11-app-1      Starting                                    [34m5.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Starting                                    [34m5.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                     [34m5.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                     [34m6.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                     [34m6.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                     [34m6.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                     [34m6.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                     [34m6.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                     [34m6.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                     [34m6.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                     [34m6.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                     [34m6.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                     [34m6.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                     [34m7.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                     [34m7.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                     [34m7.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                     [34m7.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                     [34m7.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                     [34m7.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                     [34m7.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                     [34m7.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                     [34m7.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                     [34m7.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                     [34m8.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                     [34m8.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                     [34m8.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                     [34m8.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                     [34m8.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                     [34m8.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                     [34m8.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                     [34m8.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                     [34m8.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                     [34m8.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                     [34m9.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                     [34m9.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                     [34m9.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                     [34m9.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                     [34m9.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                     [34m9.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                     [34m9.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                     [34m9.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                     [34m9.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                     [34m9.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                    [34m10.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                    [34m10.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                    [34m10.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                    [34m10.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                    [34m10.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                    [34m10.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                    [34m10.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                    [34m10.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                    [34m10.8s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠏[0m Container qre2e11-app-1      Waiting                                    [34m10.9s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠋[0m Container qre2e11-app-1      Waiting                                    [34m11.0s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠙[0m Container qre2e11-app-1      Waiting                                    [34m11.1s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠹[0m Container qre2e11-app-1      Waiting                                    [34m11.2s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠸[0m Container qre2e11-app-1      Waiting                                    [34m11.3s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠼[0m Container qre2e11-app-1      Waiting                                    [34m11.4s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠴[0m Container qre2e11-app-1      Waiting                                    [34m11.5s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠦[0m Container qre2e11-app-1      Waiting                                    [34m11.6s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠧[0m Container qre2e11-app-1      Waiting                                    [34m11.7s[0m
+[?25h[?25l[6A[0G
+
+
+
+
+[2K [33m⠇[0m Container qre2e11-app-1      Waiting                                    [34m11.8s[0m
+[?25h[?25l[6A[0G[2K[+] up 5/5
+
+
+
+
+[2K [32m✔[0m Container qre2e11-app-1      [32mHealthy[0m                                    [34m11.9s[0m
+[?25hServisler başlatılıyor...
+[?25l[0G[2K[+] up 0/1
+[2K [33m⠋[0m Container qre2e11-caddy-1 Recreate                                       [34m0.0s[0m
+[?25h[?25l[2A[0G
+[2K [33m⠙[0m Container qre2e11-caddy-1 Recreate                                       [34m0.1s[0m
+[?25h[?25l[2A[0G
+[2K [33m⠹[0m Container qre2e11-caddy-1 Recreate                                       [34m0.2s[0m
+[?25h[?25l[2A[0G
+[2K [33m⠸[0m Container qre2e11-caddy-1 Recreate                                       [34m0.3s[0m
+[?25h[?25l[2A[0G
+[2K [33m⠼[0m Container qre2e11-caddy-1 Starting                                       [34m0.4s[0m
+[?25h[?25l[2A[0G
+[2K [33m⠴[0m Container qre2e11-caddy-1 Starting                                       [34m0.5s[0m
+[?25h[?25l[2A[0G[2K[+] up 1/1
+[2K [32m✔[0m Container qre2e11-caddy-1 [32mStarted[0m                                        [34m0.6s[0m
+[?25hNAME              IMAGE                                                                                          COMMAND                  SERVICE   CREATED                  STATUS                    PORTS
+qre2e11-app-1     qr-kampanya-app:e2e11                                                                          "/app/baslat.sh guni…"   app       13 seconds ago           Up 7 seconds (healthy)    8000/tcp
+qre2e11-caddy-1   caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d    "caddy run --config …"   caddy     Less than a second ago   Up Less than a second     2019/tcp, 0.0.0.0:8092->80/tcp, 0.0.0.0:8452->443/tcp, 0.0.0.0:8452->443/udp
+qre2e11-db-1      postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94   "docker-entrypoint.s…"   db        42 seconds ago           Up 42 seconds (healthy)   5432/tcp
+qre2e11-yedek-1   sha256:b604d10ae518e2764d4745238ba85c2aea1fa27fb546979c6cf8f1b82d20eb18                        "/bin/sh /betikler/y…"   yedek     31 seconds ago           Up 30 seconds             5432/tcp
+İlk yönetici hesabını oluşturun (parola en az 12 karakter; ilk girişte MFA kurulumu zorunludur):
+Roller güncellendi.
+Kullanıcı adı (leave blank to use 'uygulama'): admin
+E-posta adresi: admin@example.com
+Password: 
+Password (again): 
+Superuser created successfully.
+admin Yönetici rolüne eklendi. İlk girişte doğrulama uygulaması (MFA) kurulumu istenir.
+BİLGİ: Sunucu dışı yedek kopyası için .env'e YEDEK_UZAK_HEDEF=uzakadi:klasor ekleyin; eski yerel yedeklerin silinmesi için ayrıca
+       YEDEK_UZAK_ONAYLI_HEDEF=uzakadi (':' öncesi ad) ile hedefin gerçekten başka bir makine/bulut olduğunu onaylayın (docs/YEDEKLEME.md).
+Kurulum tamam. Panel: http://localhost/panel/
+
+(çıkış kodu: 0; verilen yanıt sayısı 4/4)
+[GEÇTİ] tty'li kurulum rc 0 rc=0
+[GEÇTİ] yönetici istemleri soruldu (4 istem yanıtlandı) yanıt=4
+[GEÇTİ] 'Superuser created successfully'/oluşturuldu + Yönetici rolüne eklendi 
+[GEÇTİ] parola ekrana yankılanmadı 
+$ bash -c docker compose exec -T app python manage.py shell --no-imports -c 'from django.contrib.auth import get_user_model as g;u=g().objects.get(username="admin");print("SU", u.is_superuser, u.groups.values_list("name",flat=True).first())' | tail -1   [pty=hayır]
+SU True Yönetici
+(çıkış kodu: 0)
+[GEÇTİ] admin süper kullanıcı SU True Yönetici
+
+==========================================================================================
+## 1c) kurulum.sh tty'siz üçüncü kez (stdin /dev/null): 'zaten var', yeni hesap yok
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=hayır]
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+Yönetici hesabı zaten var; yeniden sorulmadı.
+(çıkış kodu: 0)
+[GEÇTİ] üçüncü kurulum rc 0 ve 'zaten var' rc=0
+$ bash -c docker compose exec -T app python manage.py shell --no-imports -c 'from django.contrib.auth import get_user_model as g;print(g().objects.count())' | tail -1   [pty=hayır]
+1
+(çıkış kodu: 0)
+[GEÇTİ] kullanıcı sayısı hâlâ 1 1
+
+==========================================================================================
+## 1d) MFA: parola sonrası kurulum ekranı, MFA'sız panele giriş yok
+==========================================================================================
+[GEÇTİ] parola sonrası MFA kurulum ekranı http://localhost:8092/panel/mfa/kurulum
+[GEÇTİ] MFA'sız /panel/ erişimi: panel içeriği yok (yönlendirildi) http://localhost:8092/panel/giris?next=/panel/
+[GEÇTİ] TOTP kurulumundan sonra panele girildi http://localhost:8092/panel/
+
+==========================================================================================
+## 2) servis durumu
+==========================================================================================
+$ bash -c docker compose ps -a --format '{{.Service}} {{.State}} {{.Health}}'   [pty=hayır]
+app running healthy
+caddy running 
+db running healthy
+hazirlik exited 
+yedek running
+(çıkış kodu: 0)
+[GEÇTİ] app healthy 
+
+==========================================================================================
+## 3) (b) GID 10001
+==========================================================================================
+$ bash -c docker run --rm --entrypoint id $(docker compose images app -q | head -1) uygulama; docker compose exec -T app id uygulama; docker inspect -f 'User={{.Config.User}} GroupAdd={{.HostConfig.GroupAdd}}' $(docker compose ps -q yedek)   [pty=hayır]
+uid=10001(uygulama) gid=10001(uygulama) groups=10001(uygulama)
+uid=10001(uygulama) gid=10001(uygulama) groups=10001(uygulama)
+User=10002:10002 GroupAdd=[10001]
+(çıkış kodu: 0)
+[GEÇTİ] app imajı: uygulama gid=10001 uid=10001(uygulama) gid=10001(uygulama) groups=10001(uygulama)
+uid=10001(uygulama) gid=10001(uygulama) groups=10001(uygulama)
+User=10002:10002 GroupAdd=[10001]
+[GEÇTİ] yedek GroupAdd [10001] 
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8092/medya/sayfa/2026/10/7ded7ebc1a544c49968abbaeb7341b43.png; ls -ln --time-style=+ $(docker volume inspect -f '{{.Mountpoint}}' qre2e11_medya 2>/dev/null)/ | head -3   [pty=hayır]
+200total 4
+drwxrwxrwx 3 10001 10001 4096  sayfa
+(çıkış kodu: 0)
+[GEÇTİ] yayındaki medya Caddy'den 200 200total 4
+drwxrwxrwx 3 10001 
+$ docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-031530.dump.age
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al rc 0 
+$ bash scripts/geri-yukleme-testi.sh /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-age.key   [pty=evet]
+== Geri yükleme testi 2026-10-16T00:15:31+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler/db-20261016-031530.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261016-031530.dump.age: OK
+medya-20261016-031530.tar.gz.age: OK
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-age.key (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|3|3
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|1|1
+qrkod|1|1
+sayfa|1|1
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 5 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261016-001530.log
+(çıkış kodu: 0)
+[GEÇTİ] geri-yukleme-testi SONUÇ: GEÇTİ rc=0
+
+==========================================================================================
+## 4) (c) Q1 saldırı senaryosu
+==========================================================================================
+$ bash -c ls -lnd yedekler; ls -ln yedekler | head -5; id   [pty=hayır]
+drwx------ 2 10002 10002 4096 Oct 16 00:15 yedekler
+total 208
+-rw------- 1 10002 10002 92056 Oct 16 00:15 db-20261016-031500.dump.age
+-rw------- 1 10002 10002 93456 Oct 16 00:15 db-20261016-031530.dump.age
+-rw-r--r-- 1     0     0   845 Oct 16 00:15 geri-yukleme-testi-20261016-001530.log
+-rw------- 1 10002 10002   301 Oct 16 00:15 medya-20261016-031500.tar.gz.age
+uid=0(root) gid=0(root) groups=0(root)
+(çıkış kodu: 0)
+$ bash -c docker inspect -f '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}' $(docker compose ps -q yedek)   [pty=hayır]
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/scripts -> /betikler
+/var/lib/docker/volumes/qre2e11_yedek-durum/_data -> /yedek-durum
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler -> /yedekler
+/var/lib/docker/volumes/qre2e11_medya/_data -> /veri/medya
+/var/lib/docker/volumes/6f4795cf1b77603e46913915502d64b8c7f73a62b8e820f5e3f0b882f290437d/_data -> /var/lib/postgresql/data
+(çıkış kodu: 0)
+$ bash -c setpriv --reuid=10002 --regid=10002 --clear-groups -- sh -c 'cd /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler && rm -f yedek-gunlugu.log uzak-dogrulama.json && ln -s /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt yedek-gunlugu.log && ln -s /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt uzak-dogrulama.json'; ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama'   [pty=hayır]
+sh: 1: cd: can't cd to /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler
+-rw------- 1 10002 10002   214 Oct 16 00:15 yedek-gunlugu.log
+(çıkış kodu: 0)
+[KALDI] saldırı hazır: iki sembolik bağlantı 10002 tarafından kondu sh: 1: cd: can't cd to /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler
+-rw------- 1 10002 10002   214 Oct 16 00:15 yedek-gunlugu.log
+$ bash scripts/disari-kopyala.sh   [pty=hayır]
+################################################################################
+ UYARI: YEDEK_YEREL_HEDEF_IZIN=yerel KULLANILDI
+ Yerel/belirsiz bir hedef SUNUCU DIŞI gibi işlenecek; eski yerel yedekler SİLİNEBİLİR.
+ Neden yerel sayıldığı: rclone local türü
+ Bu YALNIZCA DENEME içindir; üretimde KULLANMAYIN. Hedef gerçekten başka makinede değilse yedek kaybedebilirsiniz.
+################################################################################
+2026-10-16T00:15:37+00:00 YEREL HEDEF İZNİ KULLANILDI: yerel
+2026/10/16 00:15:37 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-hedef: 0 differences found
+2026/10/16 00:15:37 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-hedef: 6 matching files
+2026-10-16T00:15:37+00:00 dışarı kopyalama: 6 dosya uzakta doğrulandı (ozet) → yerel
+Korundu (henüz 14 günden eski değil): 20261016-031500
+2026-10-16T00:15:37+00:00 tamam: 0 yerel dosya silindi.
+(çıkış kodu: 0)
+(disari-kopyala rc: 0 )
+[GEÇTİ] korunan.txt içeriği değişmedi 
+[GEÇTİ] korunan.txt sahibi/kipi/mtime değişmedi (root, 600) 0 0o600
+[GEÇTİ] uzak-dogrulama.json artık sembolik bağlantı değil, düzenli dosya 
+[GEÇTİ] uzak-dogrulama.json sahibi 10002 (kip 600) uid=10002 kip=0o600
+$ bash -c cat /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler/uzak-dogrulama.json | head -12; ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama|tmp'; ls -a /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'dogrulama.json\.' || echo 'tmp-kalinti-yok'   [pty=hayır]
+{
+  "zaman": "2026-10-16T00:15:37+00:00",
+  "son_deneme": "2026-10-16T00:15:37+00:00",
+  "hedef": "yerel",
+  "yontem": "ozet",
+  "not": "",
+  "dogrulanan": ["db-20261016-031500.dump.age", "db-20261016-031530.dump.age", "medya-20261016-031500.tar.gz.age", "medya-20261016-031530.tar.gz.age", "sha256-20261016-031500.txt", "sha256-20261016-031530.txt"]
+}
+-rw------- 1 10002 10002   353 Oct 16 00:15 uzak-dogrulama.json
+-rw------- 1 10002 10002   369 Oct 16 00:15 yedek-gunlugu.log
+tmp-kalinti-yok
+(çıkış kodu: 0)
+[GEÇTİ] tmp kalıntı yok 
+[GEÇTİ] günlük bağlantısı izlenip korunan'a YAZILMADI ('UYARI: günlüğe yazılamadı' ya da bağlantı korunan'a yazmadı) 
+[GEÇTİ] disari-kopyala rc 0 ve doğrulama yazıldı rc=0
+disari-kopyala çıktısında günlük uyarısı: []
+[GEÇTİ] saldırı sonrası yedek-al rc 0 rc=0
+$ bash -c ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama'; cat /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt   [pty=hayır]
+-rw------- 1 10002 10002   353 Oct 16 00:15 uzak-dogrulama.json
+-rw------- 1 10002 10002   476 Oct 16 00:15 yedek-gunlugu.log
+DOKUNULMAMALI
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al günlüğü: yedek-gunlugu.log hâlâ bağlantı olabilir ama korunan.txt değişmedi/ya da yedek kendi yazdı (bilgi) -rw------- 1 10002 10002   353 Oct 16 00:15 uzak-dogrulama.json
+-rw------- 1 10002 10002   476 Oct 16 00:15 yedek-gunlugu.log
+DOKUNULMAMALI
+panel yedek bölümü:  Son yedek: 2026-10-16T03:15:37+03:00 Durum: basarili Dosya: db-20261016-031537.dump.age · Boyut: 91.3 KB Sunucudaki yedek sayısı: 3 · En eski: 2026-10-16 Sunucu dışı kopya son doğrulama: 2026-10-16T00:15:37+00:00 
+[KALDI] panel yedek durumu bozulmadı (bölüm var, başarılı) 
+[GEÇTİ] panelde uzak doğrulama/dışarı kopya bilgisi 
+
+==========================================================================================
+## 5) (e) hız sınırı işçiler arası tutarlı
+==========================================================================================
+$ bash -c docker top $(docker compose ps -q app) -o pid,args | grep -c 'gunicorn.*config.wsgi'   [pty=hayır]
+4
+(çıkış kodu: 0)
+[GEÇTİ] gunicorn çok işçi 4
+30 istek: {'302': 5, '429': 25} 302 302 302 302 302 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429
+[GEÇTİ] tam 5×302, kalanı 429 {'302': 5, '429': 25}
+
+==========================================================================================
+## ÖZET (faz A)
+==========================================================================================
+  [GEÇTİ] tty'siz kurulum rc 0
+  [GEÇTİ] tty yok bilgi mesajı + komut yazdırıldı
+  [GEÇTİ] tty'siz çalışmada hiç kullanıcı oluşmadı
+  [GEÇTİ] tty'li kurulum rc 0
+  [GEÇTİ] yönetici istemleri soruldu (4 istem yanıtlandı)
+  [GEÇTİ] 'Superuser created successfully'/oluşturuldu + Yönetici rolüne eklendi
+  [GEÇTİ] parola ekrana yankılanmadı
+  [GEÇTİ] admin süper kullanıcı
+  [GEÇTİ] üçüncü kurulum rc 0 ve 'zaten var'
+  [GEÇTİ] kullanıcı sayısı hâlâ 1
+  [GEÇTİ] parola sonrası MFA kurulum ekranı
+  [GEÇTİ] MFA'sız /panel/ erişimi: panel içeriği yok (yönlendirildi)
+  [GEÇTİ] TOTP kurulumundan sonra panele girildi
+  [GEÇTİ] app healthy
+  [GEÇTİ] app imajı: uygulama gid=10001
+  [GEÇTİ] yedek GroupAdd [10001]
+  [GEÇTİ] yayındaki medya Caddy'den 200
+  [GEÇTİ] yedek-al rc 0
+  [GEÇTİ] geri-yukleme-testi SONUÇ: GEÇTİ
+  [KALDI] saldırı hazır: iki sembolik bağlantı 10002 tarafından kondu
+  [GEÇTİ] korunan.txt içeriği değişmedi
+  [GEÇTİ] korunan.txt sahibi/kipi/mtime değişmedi (root, 600)
+  [GEÇTİ] uzak-dogrulama.json artık sembolik bağlantı değil, düzenli dosya
+  [GEÇTİ] uzak-dogrulama.json sahibi 10002 (kip 600)
+  [GEÇTİ] tmp kalıntı yok
+  [GEÇTİ] günlük bağlantısı izlenip korunan'a YAZILMADI ('UYARI: günlüğe yazılamadı' ya da bağlantı korunan'a yazmadı)
+  [GEÇTİ] disari-kopyala rc 0 ve doğrulama yazıldı
+  [GEÇTİ] saldırı sonrası yedek-al rc 0
+  [GEÇTİ] yedek-al günlüğü: yedek-gunlugu.log hâlâ bağlantı olabilir ama korunan.txt değişmedi/ya da yedek kendi yazdı (bilgi)
+  [KALDI] panel yedek durumu bozulmadı (bölüm var, başarılı)
+  [GEÇTİ] panelde uzak doğrulama/dışarı kopya bilgisi
+  [GEÇTİ] gunicorn çok işçi
+  [GEÇTİ] tam 5×302, kalanı 429
+
+
+# FAZ A2: Q1 senaryosu (konteyner kullanıcısı olarak bağlantı) + hız sınırı; faz A'daki setpriv adımı yol erişimi nedeniyle uygulanamadı (10002 /tmp/claude-0'a giremiyor)
+
+==========================================================================================
+## 4) (c) Q1 saldırı senaryosu
+==========================================================================================
+$ bash -c ls -lnd yedekler; ls -ln yedekler | head -5; id   [pty=hayır]
+drwx------ 2 10002 10002 4096 Oct 16 00:15 yedekler
+total 312
+-rw------- 1 10002 10002 92056 Oct 16 00:15 db-20261016-031500.dump.age
+-rw------- 1 10002 10002 93456 Oct 16 00:15 db-20261016-031530.dump.age
+-rw------- 1 10002 10002 93456 Oct 16 00:15 db-20261016-031537.dump.age
+-rw-r--r-- 1     0     0   845 Oct 16 00:15 geri-yukleme-testi-20261016-001530.log
+uid=0(root) gid=0(root) groups=0(root)
+(çıkış kodu: 0)
+$ bash -c docker inspect -f '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}' $(docker compose ps -q yedek)   [pty=hayır]
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/scripts -> /betikler
+/var/lib/docker/volumes/qre2e11_yedek-durum/_data -> /yedek-durum
+/tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler -> /yedekler
+/var/lib/docker/volumes/qre2e11_medya/_data -> /veri/medya
+/var/lib/docker/volumes/6f4795cf1b77603e46913915502d64b8c7f73a62b8e820f5e3f0b882f290437d/_data -> /var/lib/postgresql/data
+(çıkış kodu: 0)
+$ bash -c docker compose exec -T yedek sh -c 'id; cd /yedekler && rm -f yedek-gunlugu.log uzak-dogrulama.json && ln -s /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt yedek-gunlugu.log && ln -s /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt uzak-dogrulama.json'; ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama'   [pty=hayır]
+uid=10002(yedek) gid=10002(yedek) groups=10001,10002(yedek)
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 uzak-dogrulama.json -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+(çıkış kodu: 0)
+[GEÇTİ] saldırı hazır: iki sembolik bağlantı 10002 tarafından kondu uid=10002(yedek) gid=10002(yedek) groups=10001,10002(yedek)
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 uzak-dogrulama.json -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 yedek-gunlugu.log -> /tmp/
+$ bash scripts/disari-kopyala.sh   [pty=hayır]
+################################################################################
+ UYARI: YEDEK_YEREL_HEDEF_IZIN=yerel KULLANILDI
+ Yerel/belirsiz bir hedef SUNUCU DIŞI gibi işlenecek; eski yerel yedekler SİLİNEBİLİR.
+ Neden yerel sayıldığı: rclone local türü
+ Bu YALNIZCA DENEME içindir; üretimde KULLANMAYIN. Hedef gerçekten başka makinede değilse yedek kaybedebilirsiniz.
+################################################################################
+2026-10-16T00:16:31+00:00 YEREL HEDEF İZNİ KULLANILDI: yerel
+tee: ./yedekler/yedek-gunlugu.log: Permission denied
+UYARI: günlüğe yazılamadı: ./yedekler/yedek-gunlugu.log
+2026/10/16 00:16:31 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-hedef: 0 differences found
+2026/10/16 00:16:31 NOTICE: Local file system at /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-hedef: 9 matching files
+2026-10-16T00:16:31+00:00 dışarı kopyalama: 9 dosya uzakta doğrulandı (ozet) → yerel
+tee: ./yedekler/yedek-gunlugu.log: Permission denied
+UYARI: günlüğe yazılamadı: ./yedekler/yedek-gunlugu.log
+Korundu (henüz 14 günden eski değil): 20261016-031500
+Korundu (henüz 14 günden eski değil): 20261016-031530
+2026-10-16T00:16:31+00:00 tamam: 0 yerel dosya silindi.
+(çıkış kodu: 0)
+(disari-kopyala rc: 0 )
+[GEÇTİ] korunan.txt içeriği değişmedi 
+[GEÇTİ] korunan.txt sahibi/kipi/mtime değişmedi (root, 600) 0 0o600
+[GEÇTİ] uzak-dogrulama.json artık sembolik bağlantı değil, düzenli dosya 
+[GEÇTİ] uzak-dogrulama.json sahibi 10002 (kip 600) uid=10002 kip=0o600
+$ bash -c cat /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler/uzak-dogrulama.json | head -12; ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama|tmp'; ls -a /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'dogrulama.json\.' || echo 'tmp-kalinti-yok'   [pty=hayır]
+{
+  "zaman": "2026-10-16T00:16:31+00:00",
+  "son_deneme": "2026-10-16T00:16:31+00:00",
+  "hedef": "yerel",
+  "yontem": "ozet",
+  "not": "",
+  "dogrulanan": ["db-20261016-031500.dump.age", "db-20261016-031530.dump.age", "db-20261016-031537.dump.age", "medya-20261016-031500.tar.gz.age", "medya-20261016-031530.tar.gz.age", "medya-20261016-031537.tar.gz.age", "sha256-20261016-031500.txt", "sha256-20261016-031530.txt", "sha256-20261016-031537.txt"]
+}
+-rw------- 1 10002 10002   450 Oct 16 00:16 uzak-dogrulama.json
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+tmp-kalinti-yok
+(çıkış kodu: 0)
+[GEÇTİ] tmp kalıntı yok 
+[GEÇTİ] günlük bağlantısı izlenip korunan'a YAZILMADI ('UYARI: günlüğe yazılamadı' ya da bağlantı korunan'a yazmadı) 
+[GEÇTİ] disari-kopyala rc 0 ve doğrulama yazıldı rc=0
+disari-kopyala çıktısında günlük uyarısı: ['UYARI: günlüğe yazılamadı: ./yedekler/yedek-gunlugu.log', 'UYARI: günlüğe yazılamadı: ./yedekler/yedek-gunlugu.log']
+[GEÇTİ] saldırı sonrası yedek-al rc 0 rc=0
+$ bash -c ls -ln /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11/qr-kampanya/yedekler | grep -E 'gunlugu|dogrulama'; cat /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt   [pty=hayır]
+-rw------- 1 10002 10002   450 Oct 16 00:16 uzak-dogrulama.json
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+DOKUNULMAMALI
+(çıkış kodu: 0)
+[GEÇTİ] yedek-al günlüğü: yedek-gunlugu.log hâlâ bağlantı olabilir ama korunan.txt değişmedi/ya da yedek kendi yazdı (bilgi) -rw------- 1 10002 10002   450 Oct 16 00:16 uzak-dogrulama.json
+lrwxrwxrwx 1 10002 10002   102 Oct 16 00:16 yedek-gunlugu.log -> /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-korunan.txt
+DOKUNULMAMALI
+panel yedek bölümü:  Son yedek: 2026-10-16T03:16:31+03:00 Durum: basarili Dosya: db-20261016-031631.dump.age · Boyut: 91.5 KB Sunucudaki yedek sayısı: 4 · En eski: 2026-10-16 Sunucu dışı kopya son doğrulama: 2026-10-16T00:16:31+00:00 
+[KALDI] panel yedek durumu bozulmadı (bölüm var, başarılı) 
+[GEÇTİ] panelde uzak doğrulama/dışarı kopya bilgisi 
+
+==========================================================================================
+## 5) (e) hız sınırı işçiler arası tutarlı
+==========================================================================================
+$ bash -c docker top $(docker compose ps -q app) -o pid,args | grep -c 'gunicorn.*config.wsgi'   [pty=hayır]
+4
+(çıkış kodu: 0)
+[GEÇTİ] gunicorn çok işçi 4
+30 istek: {'302': 5, '429': 25} 302 302 302 302 302 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429
+[GEÇTİ] tam 5×302, kalanı 429 {'302': 5, '429': 25}
+
+==========================================================================================
+## ÖZET (faz A)
+==========================================================================================
+  [GEÇTİ] saldırı hazır: iki sembolik bağlantı 10002 tarafından kondu
+  [GEÇTİ] korunan.txt içeriği değişmedi
+  [GEÇTİ] korunan.txt sahibi/kipi/mtime değişmedi (root, 600)
+  [GEÇTİ] uzak-dogrulama.json artık sembolik bağlantı değil, düzenli dosya
+  [GEÇTİ] uzak-dogrulama.json sahibi 10002 (kip 600)
+  [GEÇTİ] tmp kalıntı yok
+  [GEÇTİ] günlük bağlantısı izlenip korunan'a YAZILMADI ('UYARI: günlüğe yazılamadı' ya da bağlantı korunan'a yazmadı)
+  [GEÇTİ] disari-kopyala rc 0 ve doğrulama yazıldı
+  [GEÇTİ] saldırı sonrası yedek-al rc 0
+  [GEÇTİ] yedek-al günlüğü: yedek-gunlugu.log hâlâ bağlantı olabilir ama korunan.txt değişmedi/ya da yedek kendi yazdı (bilgi)
+  [KALDI] panel yedek durumu bozulmadı (bölüm var, başarılı)
+  [GEÇTİ] panelde uzak doğrulama/dışarı kopya bilgisi
+  [GEÇTİ] gunicorn çok işçi
+  [GEÇTİ] tam 5×302, kalanı 429
+
+
+##########################################################################################
+# FAZ B: 3f3ca44 -> güncel ağaç, guncelle.sh yükseltmesi (proje qre2e11u, HTTP 8093, HTTPS 8453)
+##########################################################################################
+$ bash -c cd /home/claude/TEZDENEME && git archive 3f3ca44 qr-kampanya | tar -x -C /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11u   [pty=hayır]
+
+(çıkış kodu: 0)
+[GEÇTİ] eski ağaç 3f3ca44 (group_add 999) 
+
+==========================================================================================
+## B1) eski sürümle kurulum
+==========================================================================================
+$ bash scripts/kurulum.sh   [pty=evet]
+Kurulum tamam. Panel: http://localhost/panel/
+(çıkış kodu: 0)
+[GEÇTİ] eski kurulum rc 0 rc=0
+$ bash -c docker compose exec -T app sh -c 'id uygulama; ls -lnR /veri/medya | head -12'   [pty=hayır]
+uid=10001(uygulama) gid=999(uygulama) groups=999(uygulama)
+/veri/medya:
+total 4
+drwxrwxrwx 3 10001 999 4096 Oct 16 00:18 sayfa
+
+/veri/medya/sayfa:
+total 4
+drwxrwxrwx 3 10001 999 4096 Oct 16 00:18 2026
+
+/veri/medya/sayfa/2026:
+total 4
+drwxrwxrwx 2 10001 999 4096 Oct 16 00:18 10
+(çıkış kodu: 0)
+[KALDI] eski imaj: uygulama gid=999 ve medya dosyaları grup 999 
+$ bash -c docker compose exec -T yedek sh /betikler/yedek-al.sh; echo rc=$?   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-031825.dump.age
+rc=0
+(çıkış kodu: 0)
+[GEÇTİ] eski sürümde yedek-al rc 0 
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8093/medya/sayfa/2026/10/c0f6f6f7ac5f48849988910d2bee7c18.png   [pty=hayır]
+200
+(çıkış kodu: 0)
+[GEÇTİ] eski sürümde medya 200 
+
+==========================================================================================
+## B2) güncel ağacı üstüne kopyala (.env, gizli, yedekler korunur) ve guncelle.sh
+==========================================================================================
+[GEÇTİ] yeni ağaç yerinde (group_add 10001) 
+$ bash scripts/guncelle.sh   [pty=evet]
+1/6 İmajlar çekiliyor ve derleniyor...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2/6 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/6 Güncelleme öncesi şifreli yedek alınıyor...
+BİLGİ: .env içinde YEDEK_ALICI var ama gizli/yedek-anahtari.txt bu sunucuda yok. Bu güvenlidir ve beklenen durumdur
+       (özel anahtarı parola yöneticinizde tutuyorsunuz). Yeni anahtar ÜRETİLMEDİ.
+Yedek dizini sahipliği hazır (yedekler: 10002:10002 kip 700; yedek-durum: 10002:10001 kip 2750, app yalnızca okur).
+Medya birimi: grup 10001 olarak ayarlandı, gruba okuma izni eklendi (sahiplik/silme yok, sembolik bağlantı izlenmedi).
+Yedek tamam (şifreli): /yedekler/db-20261016-031841.dump.age
+4/6 Hazırlık (migrasyonlar, qr_sahip ile) çalıştırılıyor; başarısı beklenir, eski app'e henüz dokunulmaz...
+Attaching to hazirlik-1
+hazirlik-1  | Operations to perform:
+hazirlik-1  |   Apply all migrations: auth, contenttypes, qr, sessions
+hazirlik-1  | Running migrations:
+hazirlik-1  |   No migrations to apply.
+hazirlik-1  | Cache table 'onbellek' already exists.
+hazirlik-1  | Roller güncellendi.
+hazirlik-1  | Hazırlık tamamlandı.
+
+[Khazirlik-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+5/6 Yeni uygulama başlatılıyor...
+Uygulama sağlıklı.
+6/6 Caddy: yeni Caddyfile doğrulanıyor, sonra yeniden oluşturulur (güncel Caddyfile'ın yüklendiği doğrulanır)...
+{"level":"info","ts":1792109934.974284,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+{"level":"warn","ts":1792109934.9748862,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"warn","ts":1792109934.9753428,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-Proto: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"info","ts":1792109934.9758925,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792109934.976476,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv0","http_port":80}
+{"level":"info","ts":1792109934.976686,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc000147180"}
+{"level":"info","ts":1792109934.9769516,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0xc000147180"}
+{"level":"info","ts":1792109934.9769669,"logger":"http","msg":"servers shutting down with eternal grace period"}
+Valid configuration
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti, RestartCount 0).
+Güncelleme tamamlandı.
+(çıkış kodu: 0)
+[GEÇTİ] guncelle.sh rc 0 rc=0
+[GEÇTİ] 'Güncelleme tamamlandı.' 
+[GEÇTİ] medya-izni-hazirla çıktısı grup 10001 
+$ bash -c docker compose exec -T app sh -c 'id uygulama; ls -lnR /veri/medya | head -12'; docker compose ps -a --format '{{.Service}} {{.State}} {{.Health}}'; docker inspect -f 'GroupAdd={{.HostConfig.GroupAdd}}' $(docker compose ps -q yedek); ls -lnd yedekler   [pty=hayır]
+uid=10001(uygulama) gid=10001(uygulama) groups=10001(uygulama)
+/veri/medya:
+total 4
+drwxrwxrwx 3 10001 10001 4096 Oct 16 00:18 sayfa
+
+/veri/medya/sayfa:
+total 4
+drwxrwxrwx 3 10001 10001 4096 Oct 16 00:18 2026
+
+/veri/medya/sayfa/2026:
+total 4
+drwxrwxrwx 2 10001 10001 4096 Oct 16 00:18 10
+
+app running healthy
+caddy running 
+db running healthy
+hazirlik exited 
+yedek running 
+GroupAdd=[10001]
+drwx------ 2 10002 10002 4096 Oct 16 00:18 yedekler
+(çıkış kodu: 0)
+[GEÇTİ] app gid=10001 
+[KALDI] medya dosyaları ve dizinleri grup 10001 (grup 999 kalmadı) 
+[GEÇTİ] app healthy 
+[GEÇTİ] yedek GroupAdd [10001] 
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8093/medya/sayfa/2026/10/c0f6f6f7ac5f48849988910d2bee7c18.png   [pty=hayır]
+200
+(çıkış kodu: 0)
+[GEÇTİ] medya Caddy'den 200 
+$ docker compose exec -T yedek sh /betikler/yedek-al.sh   [pty=hayır]
+Yedek tamam (şifreli): /yedekler/db-20261016-031901.dump.age
+(çıkış kodu: 0)
+[GEÇTİ] yükseltme sonrası yedek-al rc 0 (okunamayan dosya yok) rc=0
+$ bash scripts/geri-yukleme-testi.sh /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-age-b.key   [pty=evet]
+== Geri yükleme testi 2026-10-16T00:19:02+00:00 ==
+Test edilen yedek: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11u/qr-kampanya/yedekler/db-20261016-031901.dump.age
+-- 1/4 Bütünlük (sha256) doğrulaması
+db-20261016-031901.dump.age: OK
+medya-20261016-031901.tar.gz.age: OK
+Özel anahtar dosyası: /tmp/claude-0/-home-claude-TEZDENEME/4516935b-4c0f-56b2-ae1e-d4e3dc97b242/scratchpad/e2e11-age-b.key (içeriği yazılmaz)
+-- 2/4 Şifre çözme ve pg_restore (geçici konteyner içinde; düz döküm yalnızca bellekte)
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|1|1
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|0|0
+qrkod|1|1
+sayfa|1|1
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 5 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261016-001902.log
+(çıkış kodu: 0)
+[GEÇTİ] geri yükleme testi SONUÇ: GEÇTİ rc=0
+$ bash -c curl -s -o /dev/null -w '%{http_code}' http://localhost:8093/k/E2E011   [pty=hayır]
+302
+(çıkış kodu: 0)
+[GEÇTİ] yönlendirme 302 302
+
+==========================================================================================
+## ÖZET (faz B)
+==========================================================================================
+  [GEÇTİ] eski ağaç 3f3ca44 (group_add 999)
+  [GEÇTİ] eski kurulum rc 0
+  [KALDI] eski imaj: uygulama gid=999 ve medya dosyaları grup 999
+  [GEÇTİ] eski sürümde yedek-al rc 0
+  [GEÇTİ] eski sürümde medya 200
+  [GEÇTİ] yeni ağaç yerinde (group_add 10001)
+  [GEÇTİ] guncelle.sh rc 0
+  [GEÇTİ] 'Güncelleme tamamlandı.'
+  [GEÇTİ] medya-izni-hazirla çıktısı grup 10001
+  [GEÇTİ] app gid=10001
+  [KALDI] medya dosyaları ve dizinleri grup 10001 (grup 999 kalmadı)
+  [GEÇTİ] app healthy
+  [GEÇTİ] yedek GroupAdd [10001]
+  [GEÇTİ] medya Caddy'den 200
+  [GEÇTİ] yükseltme sonrası yedek-al rc 0 (okunamayan dosya yok)
+  [GEÇTİ] geri yükleme testi SONUÇ: GEÇTİ
+  [GEÇTİ] yönlendirme 302

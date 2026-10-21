@@ -1,0 +1,304 @@
+# Eski sürümden yükseltme testi ham çıktısı (2. koşu, Caddy yenileme düzeltmesinden sonra)
+# Etiket: [İP:Dinamik QR ve kampanya sistemi#tnmy6Q]
+# Tarih: 2026-10-15. Ortam: bulut geliştirme ortamı, Docker Compose yığını qre2e7.
+# Senaryo: f7f3828 kuruldu (QR, yayındaki ve taslak sayfa görseli), taslak görsel anonim 200 (eski açık) görüldü; yeni kod üzerine kopyalanıp bash scripts/guncelle.sh çalıştırıldı; sonra taslak 404. Ayrıca kasıtlı başarısız migrasyonla hata yolu denendi.
+# Çalıştıran: implementer ajanı (claude-sonnet-5-5). Parola/özel anahtar içermez.
+
+== ESKI SURUM (f7f3828) oncesi
+sayfa/2026/10/cceae235ac5348c8b0859f0581c3fb2f.png:yayin -> 200
+sayfa/2026/10/d7794e94c3f54fb9abb7f855a8f21744.png:taslak -> 200
+/k/E2E007 302
+== YUKSELTME: guncelle.sh
+.env dosyasının SONUNA eksik anahtar eklendi: POSTGRES_SAHIP_PAROLA (diğer satırlar değiştirilmedi).
+.env dosyasının SONUNA eksik anahtar eklendi: POSTGRES_UYGULAMA_PAROLA (diğer satırlar değiştirilmedi).
+1/6 İmajlar çekiliyor ve derleniyor...
+ Image postgres:17.6-alpine Pulling 
+ Image caddy:2.10.2-alpine Pulling 
+ Image postgres:17.6-alpine Error unknown: failed to resolve reference "docker.io/library/postgres:17.6-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/postgres/manifests/17.6-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/postgres:17.6-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/postgres/manifests/17.6-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/postgres:17.6-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/postgres/manifests/17.6-alpine: 429 Too Many Requests
+Error response from daemon: unknown: failed to resolve reference "docker.io/library/postgres:17.6-alpine": unexpected status from HEAD request to https://registry-1.docker.io/v2/library/postgres/manifests/17.6-alpine: 429 Too Many Requests
+UYARI: db/caddy imajları çekilemedi (kayıt erişilemiyor olabilir). Etiketler sabit olduğundan yerel imajlarla devam ediliyor.
+ Image qr-kampanya-app:e2e7 Building 
+ Image qr-kampanya-yedek:e2e7 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.81kB done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.83kB done
+#2 DONE 0.0s
+
+#3 [yedek internal] load build definition from Dockerfile
+#3 transferring dockerfile: 2.16kB done
+#3 DONE 0.0s
+
+#4 [yedek] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 0.2s
+
+#5 [yedek] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [app internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#6 DONE 0.2s
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 ...
+
+#8 [app internal] load .dockerignore
+#8 transferring context: 84B done
+#8 DONE 0.0s
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 ...
+
+#9 [app stage-0 1/7] FROM docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641
+#9 resolve docker.io/library/python:3.13-slim-bookworm@sha256:a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641 0.0s done
+#9 DONE 0.0s
+
+#10 [app internal] load build context
+#10 ...
+
+#7 [yedek internal] load metadata for docker.io/library/postgres:17.6-alpine
+#7 DONE 1.2s
+
+#11 [yedek internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.0s
+
+#10 [app internal] load build context
+#10 transferring context: 22.18MB 0.9s done
+#10 DONE 1.0s
+
+#12 [yedek internal] load build context
+#12 ...
+
+#13 [app stage-0 2/7] WORKDIR /app
+#13 CACHED
+
+#14 [app stage-0 3/7] COPY requirements.txt .
+#14 CACHED
+
+#15 [yedek stage-0 1/2] FROM docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+#15 resolve docker.io/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 0.1s done
+#15 DONE 0.1s
+
+#12 [yedek internal] load build context
+#12 transferring context: 37.19MB 0.8s done
+#12 DONE 0.8s
+
+#16 [yedek stage-0 2/2] RUN --mount=type=bind,source=paketler,target=/paketler     set -eu;     MIMARI="amd64";     if [ -z "$MIMARI" ]; then       case "$(uname -m)" in x86_64) MIMARI=amd64;; aarch64) MIMARI=arm64;; *) echo "Desteklenmeyen mimari: $(uname -m)"; exit 1;; esac;     fi;     case "$MIMARI" in       amd64) BEKLENEN="cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10";;       arm64) BEKLENEN="6b8dc4333c53a5a57c9e5834e3a48f92605d7154014cd07269ff3327db5d37f4";;       *) echo "Desteklenmeyen mimari: $MIMARI"; exit 1;;     esac;     DOSYA="age-v1.3.2-linux-${MIMARI}.tar.gz";     mkdir -p /tmp/age-kur;     if [ -f "/paketler/$DOSYA" ]; then       echo "age arşivi yerel paketlerden alınıyor: $DOSYA";       cp "/paketler/$DOSYA" "/tmp/age-kur/$DOSYA";     else       echo "age arşivi indiriliyor: $DOSYA";       wget -q -O "/tmp/age-kur/$DOSYA" "https://github.com/FiloSottile/age/releases/download/v1.3.2/${DOSYA}";     fi;     echo "${BEKLENEN}  /tmp/age-kur/${DOSYA}" | sha256sum -c -;     tar -xzf "/tmp/age-kur/$DOSYA" -C /tmp/age-kur age/age age/age-keygen;     install -m 0755 /tmp/age-kur/age/age /tmp/age-kur/age/age-keygen /usr/local/bin/;     rm -rf /tmp/age-kur;     age --version
+#16 CACHED
+
+#17 [yedek] exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:5f039e874917263df0eff5721867ccdeaa2d9478e2e7788e5260f8d3fa628349 done
+#17 exporting config sha256:41ef59fdc206d6de800153a41753583331a845a473da56a17f52e459f015d504 done
+#17 exporting attestation manifest sha256:dc24e3616959b7ee5039254d8404a05791edb9bb077b6eca46d5875ef1b2e97f done
+#17 exporting manifest list sha256:770a4d9b63efcbb060a57f48a2681038f12dd8c9111f4e6569c6690f15efd2a8 done
+#17 naming to docker.io/library/qr-kampanya-yedek:e2e7 done
+#17 unpacking to docker.io/library/qr-kampanya-yedek:e2e7 done
+#17 DONE 0.1s
+
+#18 [yedek] resolving provenance for metadata file
+#18 DONE 0.0s
+
+#19 [app stage-0 4/7] RUN --mount=type=bind,source=.,target=/baglam     if [ -d /baglam/tekerlekler ]; then       pip install --require-hashes --no-deps --no-index --find-links /baglam/tekerlekler -r requirements.txt;     else       pip install --require-hashes --no-deps -r requirements.txt;     fi
+#19 1.629 Looking in links: /baglam/tekerlekler
+#19 1.634 Processing /baglam/tekerlekler/argon2_cffi-25.1.0-py3-none-any.whl (from -r requirements.txt (line 8))
+#19 1.643 Processing /baglam/tekerlekler/argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (from -r requirements.txt (line 12))
+#19 1.649 Processing /baglam/tekerlekler/asgiref-3.12.1-py3-none-any.whl (from -r requirements.txt (line 55))
+#19 1.652 Processing /baglam/tekerlekler/cffi-2.1.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r requirements.txt (line 59))
+#19 1.654 Processing /baglam/tekerlekler/django-5.2.18-py3-none-any.whl (from -r requirements.txt (line 161))
+#19 1.714 Processing /baglam/tekerlekler/et_xmlfile-2.0.0-py3-none-any.whl (from -r requirements.txt (line 165))
+#19 1.715 Processing /baglam/tekerlekler/gunicorn-26.2.0-py3-none-any.whl (from -r requirements.txt (line 169))
+#19 1.720 Processing /baglam/tekerlekler/openpyxl-3.1.5-py2.py3-none-any.whl (from -r requirements.txt (line 173))
+#19 1.724 Processing /baglam/tekerlekler/pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (from -r requirements.txt (line 177))
+#19 1.761 Processing /baglam/tekerlekler/psycopg-3.3.6-py3-none-any.whl (from -r requirements.txt (line 266))
+#19 1.765 Processing /baglam/tekerlekler/psycopg_binary-3.3.6-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (from -r requirements.txt (line 270))
+#19 1.775 Processing /baglam/tekerlekler/pycparser-3.11-py3-none-any.whl (from -r requirements.txt (line 338))
+#19 1.777 Processing /baglam/tekerlekler/pyotp-2.10.0-py3-none-any.whl (from -r requirements.txt (line 342))
+#19 1.779 Processing /baglam/tekerlekler/segno-1.6.6-py3-none-any.whl (from -r requirements.txt (line 346))
+#19 1.781 Processing /baglam/tekerlekler/sqlparse-0.6.0-py3-none-any.whl (from -r requirements.txt (line 350))
+#19 1.784 Processing /baglam/tekerlekler/whitenoise-6.12.0-py3-none-any.whl (from -r requirements.txt (line 354))
+#19 1.861 Installing collected packages: whitenoise, sqlparse, segno, pyotp, pycparser, psycopg-binary, psycopg, pillow, openpyxl, gunicorn, et-xmlfile, django, cffi, asgiref, argon2-cffi-bindings, argon2-cffi
+#19 7.067 
+#19 7.069 Successfully installed argon2-cffi-25.1.0 argon2-cffi-bindings-26.1.0 asgiref-3.12.1 cffi-2.1.1 django-5.2.18 et-xmlfile-2.0.0 gunicorn-26.2.0 openpyxl-3.1.5 pillow-12.3.0 psycopg-3.3.6 psycopg-binary-3.3.6 pycparser-3.11 pyotp-2.10.0 segno-1.6.6 sqlparse-0.6.0 whitenoise-6.12.0
+#19 7.069 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#19 DONE 7.3s
+
+#20 [app stage-0 5/7] RUN useradd --system --uid 10001 --home /app uygulama     && mkdir -p /veri/medya /veri/static     && chown -R uygulama /veri
+#20 0.182 useradd warning: uygulama's uid 10001 is greater than SYS_UID_MAX 999
+#20 DONE 0.2s
+
+#21 [app stage-0 6/7] COPY . .
+#21 DONE 0.1s
+
+#22 [app stage-0 7/7] RUN chmod -R a+rX,go-w /app && chmod 755 /app/baslat.sh
+#22 DONE 0.3s
+
+#23 [app] exporting to image
+#23 exporting layers
+#23 exporting layers 3.1s done
+#23 exporting manifest sha256:2fb68ce1d9b159f578a7947123fd0e1f2912bfff3c4a15941e8a11e4bb913694 done
+#23 exporting config sha256:f08dafc8332779a56eb187627d5a06feb101c98d38cfc08aef8476609ebf5211 done
+#23 exporting attestation manifest sha256:1552a4d8bbdd87a41eeea19f0289cb264d0e641bd1adce2eaaecd877ec75d6f0 done
+#23 exporting manifest list sha256:dd329fd27636217470e0d9cd91f459ea5c1d9e291271bf994a682eea95911b63 done
+#23 naming to docker.io/library/qr-kampanya-app:e2e7 done
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e7
+#23 unpacking to docker.io/library/qr-kampanya-app:e2e7 2.9s done
+#23 DONE 6.0s
+
+#24 [app] resolving provenance for metadata file
+#24 DONE 0.0s
+ Image qr-kampanya-yedek:e2e7 Built 
+ Image qr-kampanya-app:e2e7 Built 
+2/6 Veritabanı ve roller (qr_sahip, qr_uygulama) hazırlanıyor...
+ Container qre2e7-db-1 Recreate 
+ Container qre2e7-db-1 Recreated 
+ Container qre2e7-db-1 Starting 
+ Container qre2e7-db-1 Started 
+10-roller: roller ve yetkiler uygulanıyor...
+10-roller: tamam.
+3/6 Güncelleme öncesi şifreli yedek alınıyor...
+Yedek şifreleme anahtarı üretiliyor...
+Public key: age1lpzg66w9sx6xysrws2fs36v8fpg50lsz9xq3majs36cgkjef35zqme0msr
+.env dosyasının SONUNA eklendi: YEDEK_ALICI (açık anahtar; gizli değildir). Diğer satırlar değiştirilmedi.
+
+====================================================================================
+ ÇOK ÖNEMLİ - YEDEK ANAHTARI
+ Yedekleriniz şifrelidir. Özel anahtar dosyası:   gizli/yedek-anahtari.txt
+ -> Bu dosyanın içeriğini ŞİMDİ parola yöneticinize (Bitwarden, 1Password vb.) kopyalayın
+    ve sunucu dışında bir yerde de saklayın.
+ -> Bu dosya kaybolursa yedekleriniz ASLA açılamaz. Kimse kurtaramaz.
+ -> Dosyayı kimseyle paylaşmayın, e-postayla göndermeyin, Git'e eklemeyin.
+ -> Sunucuyu kurduktan sonra dosyayı sunucudan silmeniz önerilir (yedek servisi ona ihtiyaç duymaz;
+    yalnızca geri yükleme sırasında gerekir). Böylece sunucu ele geçirilse bile yedekler açılamaz.
+====================================================================================
+ Container qre2e7-yedek-1 Recreate 
+ Container qre2e7-yedek-1 Recreated 
+ Container qre2e7-yedek-1 Starting 
+ Container qre2e7-yedek-1 Started 
+Yedek tamam (şifreli): /yedekler/db-20261015-193053.dump.age
+4/6 Hazırlık (migrasyonlar, qr_sahip ile) çalıştırılıyor; başarısı beklenir, eski app'e henüz dokunulmaz...
+ Container qre2e7-hazirlik-1 Creating 
+ Container qre2e7-hazirlik-1 Created 
+Attaching to hazirlik-1
+ Container qre2e7-hazirlik-1 Starting 
+ Container qre2e7-hazirlik-1 Started 
+hazirlik-1  | Operations to perform:
+hazirlik-1  |   Apply all migrations: auth, contenttypes, qr, sessions
+hazirlik-1  | Running migrations:
+hazirlik-1  |   Applying qr.0005_uygulama_rolu_yetkileri... OK
+hazirlik-1  | Cache table 'onbellek' already exists.
+hazirlik-1  | Roller güncellendi.
+hazirlik-1  | Hazırlık tamamlandı.
+[Khazirlik-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+ Container qre2e7-hazirlik-1 Stopping 
+ Container qre2e7-hazirlik-1 Stopped 
+5/6 Yeni uygulama başlatılıyor...
+ Container qre2e7-db-1 Running 
+ Container qre2e7-app-1 Recreate 
+ Container qre2e7-app-1 Recreated 
+ Container qre2e7-db-1 Waiting 
+ Container qre2e7-db-1 Healthy 
+ Container qre2e7-hazirlik-1 Starting 
+ Container qre2e7-hazirlik-1 Started 
+ Container qre2e7-hazirlik-1 Waiting 
+ Container qre2e7-db-1 Waiting 
+ Container qre2e7-db-1 Healthy 
+ Container qre2e7-hazirlik-1 Exited 
+ Container qre2e7-app-1 Starting 
+ Container qre2e7-app-1 Started 
+Uygulama sağlıklı.
+6/6 Caddy yeniden oluşturuluyor (güncel Caddyfile'ın yüklendiği doğrulanır)...
+ Container qre2e7-caddy-1 Recreate 
+ Container qre2e7-caddy-1 Recreated 
+ Container qre2e7-caddy-1 Starting 
+ Container qre2e7-caddy-1 Started 
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti).
+Güncelleme tamamlandı.
+cikis=0
+== SONRA (yeni surum)
+yayin gorsel anonim -> 200
+taslak gorsel anonim -> 404
+/ic/medya-yetki dis -> 404
+/k/E2E007 -> 302
+== rol-dogrulama
+GEÇTİ  UPDATE qr_denetimkaydi SET ...: reddedildi (InsufficientPrivilege)
+GEÇTİ  CREATE TABLE ...: reddedildi (InsufficientPrivilege)
+GEÇTİ  SELECT çalışıyor
+SONUÇ: GEÇTİ
+rol cikis=0
+== hazirlik logu
+hazirlik-1  |   Applying qr.0005_uygulama_rolu_yetkileri... OK
+hazirlik-1  | Hazırlık tamamlandı.
+hazirlik-1  | Hazırlık tamamlandı.
+== geri-yukleme-testi
+-- 3/4 Tablo sayıları
+Tablo | yedekte | canlıda
+denetim|1|1
+hedefgecmisi|1|1
+kampanya|0|0
+kullanici|0|0
+qrkod|1|1
+sayfa|2|2
+-- 4/4 Görsel arşivi
+Görsel arşivi çözüldü ve tar ile listelendi: 6 girdi.
+SONUÇ: GEÇTİ - yedek geri yüklendi, sayılar canlı veriyle aynı.
+Günlük: ./yedekler/geri-yukleme-testi-20261015-163128.log
+gyt cikis=0
+== SENARYO: hazirlik basarisiz (kasitli 0006 migrasyonu)
+-- oncesi app:
+qre2e7-app-1 running healthy imaj=qr-kampanya-app:e2e7
+app baslangic=2026-10-15T16:31:09.482756384Z id=6c3ee0764a0481911e279ad16fa4d4d75ac5e39af9
+hazirlik-1  |   File "/usr/local/lib/python3.13/site-packages/django/db/migrations/executor.py", line 167, in _migrate_all_forwards
+hazirlik-1  |     state = self.apply_migration(
+hazirlik-1  |         state, migration, fake=fake, fake_initial=fake_initial
+hazirlik-1  |     )
+hazirlik-1  |   File "/usr/local/lib/python3.13/site-packages/django/db/migrations/executor.py", line 255, in apply_migration
+hazirlik-1  |     state = migration.apply(state, schema_editor)
+hazirlik-1  |   File "/usr/local/lib/python3.13/site-packages/django/db/migrations/migration.py", line 132, in apply
+hazirlik-1  |     operation.database_forwards(
+hazirlik-1  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+hazirlik-1  |         self.app_label, schema_editor, old_state, project_state
+hazirlik-1  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+hazirlik-1  |     )
+hazirlik-1  |     ^
+hazirlik-1  |   File "/usr/local/lib/python3.13/site-packages/django/db/migrations/operations/special.py", line 196, in database_forwards
+hazirlik-1  |     self.code(from_state.apps, schema_editor)
+hazirlik-1  |     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+hazirlik-1  |   File "/app/qr/migrations/0006_kasitli_hata.py", line 5, in hata
+hazirlik-1  |     raise RuntimeError("KASITLI test hatasi (e2e7 hazirlik basarisizlik senaryosu)")
+hazirlik-1  | RuntimeError: KASITLI test hatasi (e2e7 hazirlik basarisizlik senaryosu)
+hazirlik-1  |   Applying qr.0006_kasitli_hata...
+[Khazirlik-1 exited with code 1
+ Compose Stopping Aborting on container exit...
+ Container qre2e7-hazirlik-1 Stopping 
+ Container qre2e7-hazirlik-1 Stopped 
+
+
+HATA: hazırlık (veritabanı migrasyonu) BAŞARISIZ oldu. Eski uygulama (app) ve Caddy'ye dokunulmadı; çalışıyorsa çalışmaya devam eder.
+Günlük: docker compose logs hazirlik --tail 100
+Güncelleme öncesi alınan yedek: ./yedekler/db-20261015-193211.dump.age
+Gerekirse dönüş: bash scripts/geri-yukle.sh ./yedekler/db-20261015-193211.dump.age [--medya]
+guncelle cikis=1
+-- sonrasi app:
+qre2e7-app-1 running healthy
+qre2e7-caddy-1 running 
+app baslangic=2026-10-15T16:31:09.482756384Z id=6c3ee0764a0481911e279ad16fa4d4d75ac5e39af9
+site: /k -> 302
+== TOPARLAMA: kasitli migrasyon kaldirildi, guncelle.sh yeniden
+Uygulama sağlıklı.
+6/6 Caddy yeniden oluşturuluyor (güncel Caddyfile'ın yüklendiği doğrulanır)...
+ Container qre2e7-caddy-1 Recreate 
+ Container qre2e7-caddy-1 Recreated 
+ Container qre2e7-caddy-1 Starting 
+ Container qre2e7-caddy-1 Started 
+Caddy güncel yapılandırmayla çalışıyor (Caddyfile özeti eşleşti).
+Güncelleme tamamlandı.
+cikis=0
+/k -> 302
+taslak -> 404

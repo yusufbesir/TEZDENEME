@@ -1,11 +1,23 @@
+/// Profil sekmesi: alan satırı, istatistikler, son 7 gün XP grafiği ve
+/// "Öğrenme günlüğü" bölümü (son 7 gün, "Tümü" ile tam liste); Ayarlar
+/// sağ üstteki dişliyle açılır.
+/// Grafik yüksekliği metin ölçeğiyle büyür; gün etiketleri tek satırdır.
+///
+/// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
+/// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../bilesenler/ogrenme_gunlugu.dart';
 import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/motor.dart';
+import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
 
 const _gunAdlari = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
@@ -41,11 +53,41 @@ class ProfilEkrani extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(Olcu.b3),
           children: [
-            Semantics(
-              header: true,
-              child: Text('Profil', style: yazi.headlineMedium),
+            Row(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    child: Text('Profil', style: yazi.headlineMedium),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: 'Ayarlar',
+                  constraints: const BoxConstraints(
+                    minWidth: Olcu.hedef,
+                    minHeight: Olcu.hedef,
+                  ),
+                  onPressed: () => context.push('/ayarlar'),
+                ),
+              ],
             ),
-            const SizedBox(height: Olcu.b3),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                AlanRenkleri.simge(durum.alan),
+                color: AlanRenkleri.renk(
+                  durum.alan,
+                  Theme.of(context).brightness,
+                ),
+              ),
+              title: Text('Alan: ${AlanRenkleri.ad(durum.alan)}'),
+              trailing: TextButton(
+                onPressed: () => context.push('/alan-sec'),
+                child: const Text('Değiştir'),
+              ),
+            ),
+            const SizedBox(height: Olcu.b2),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),
             Row(
@@ -94,7 +136,10 @@ class ProfilEkrani extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(Olcu.b2),
                 child: SizedBox(
-                  height: 160,
+                  // Etiketler büyüyünce grafik de uzar (kesilmez).
+                  height:
+                      160 +
+                      60 * (MediaQuery.textScalerOf(context).scale(1) - 1),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -113,6 +158,8 @@ class ProfilEkrani extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: Olcu.b3),
+            OgrenmeGunlugu(durum: durum, bugun: bugun),
           ],
         ),
       ),
@@ -182,7 +229,24 @@ class _Cubuk extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text('$deger', style: yazi.labelMedium),
+          LayoutBuilder(
+            builder: (context, k) {
+              // Küçültme yok: labelMedium (12), sonra labelSmall (11), sonra "1,2k".
+              final sigan = siganMetin(
+                context,
+                adaylar: ['$deger', kisaSayi(deger)],
+                stiller: [yazi.labelMedium!, yazi.labelSmall!],
+                genislik: k.maxWidth,
+              );
+              return Text(
+                sigan.metin,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: sigan.stil,
+              );
+            },
+          ),
           const SizedBox(height: 4),
           Flexible(
             child: TweenAnimationBuilder<double>(
@@ -201,6 +265,9 @@ class _Cubuk extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             ad,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
             style: yazi.labelSmall?.copyWith(
               color: bugunMu ? r.metin : r.metinIkincil,
               fontWeight: bugunMu ? FontWeight.w800 : FontWeight.w400,

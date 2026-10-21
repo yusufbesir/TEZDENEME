@@ -1,0 +1,13 @@
+{% extends "qr/panel/taban.html" %}
+{% block baslik %}MFA sıfırla{% endblock %}
+{% block icerik %}
+<h1>MFA sıfırla</h1>
+<form method="post" class="kart">
+  {% csrf_token %}
+  <p><strong>{{ hedef.username }}</strong> kullanıcısının iki adımlı doğrulaması sıfırlanacak. Cihaz kaydı silinir; kullanıcı yeniden kurulum yapmalıdır. Emin misiniz?</p>
+  <div class="eylemler">
+    <button type="submit" class="dugme">Evet, sıfırla</button>
+    <a class="dugme ikincil" href="{% url 'panel:kullanici_liste' %}">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{# Paylaşım kutusu. Bağlam: kisa_url, paylasim (wa/eposta/x bağlantıları), png_adresi, kutu_no. Harici betik yok; yalnızca bağlantılar. #}
+<div class="paylasim">
+  <label for="kisa-link-{{ kutu_no }}">Kısa link</label>
+  <input type="text" id="kisa-link-{{ kutu_no }}" value="{{ kisa_url }}" readonly autocomplete="off" spellcheck="false">
+  <div class="eylemler">
+    <button type="button" class="dugme kucuk" data-kopyala="kisa-link-{{ kutu_no }}">Kopyala</button>
+    <a class="dugme ikincil kucuk" href="{{ paylasim.whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp ile paylaş</a>
+    <a class="dugme ikincil kucuk" href="{{ paylasim.eposta }}">E-posta ile paylaş</a>
+    <a class="dugme ikincil kucuk" href="{{ paylasim.x }}" target="_blank" rel="noopener noreferrer">X'te paylaş</a>
+    <a class="dugme ikincil kucuk" href="{{ png_adresi }}?indir=1">QR PNG indir</a>
+  </div>
+  <p class="yardim" data-kopyalandi hidden>Panoya kopyalandı.</p>
+</div>
