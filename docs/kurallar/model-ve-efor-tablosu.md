@@ -3,6 +3,7 @@
 > **Özet:** Görev türüne göre model ve efor (düşünme derinliği) seçimi bu tabloya göre yapılır. Kaynak: 2026-10-22 web araştırması + kendi bilgim. Sahibi: Yusuf. Değişiklik yalnızca kullanıcının isteğiyle yapılır; kural silinmez, yalnız eklenir. Fable (claude-fable-5-1) yalnız Yusuf açıkça isterse kullanılır (2026-10-21 kuralı geçerli). [İP:Model ve efor seçimi]
 
 ## Nasıl kullanılır
+0. **Efor tavanı high'dır** (Yusuf, 2026-10-22): xhigh ve max kullanılmaz. Limit ve token tasarrufu için her işe en düşük eforla (low) başlanır; sonuç yetersizse medium, sonra high. High'da da yetmezse bir üst modele geçilir.
 1. Görevi aşağıdaki türlerden birine eşle; modeli ve eforu tablodan al.
 2. Her zaman en düşük yeterli modelle ve eforla başla. Sonuç yetersizse önce eforu bir kademe artır, olmazsa bir üst modele geç (Haiku, Sonnet, Opus).
 3. Alt ajanda model her zaman açık yazılır; efor da tabloda varsayılandan farklıysa yazılır.
@@ -14,8 +15,8 @@
 | low | Basit sorgu, sınıflandırma, çıkarma, yönlendirme, yüksek hacimli işler | En az token; hız öncelikli |
 | medium | Rutin düzenleme, özet, belge, standart kodlama | Limiti uzatır; Opus 5.5 ve Haiku 5.5 Claude Code'da varsayılanı budur |
 | high | Dengeli kalite/hız; çok dosyalı değişiklik, hata ayıklama | API'de çoğu modelin varsayılanı; Fable 5.1 varsayılanı |
-| xhigh | Uzun süren kodlama ve ajan işleri | Opus 4.7 ve yenilerinde var; Anthropic: kodlamada xhigh ile başla |
-| max | Doğruluğun maliyetten önemli olduğu en zor işler | Küçük kazanç için çok token harcar; yalnız gerekçeyle |
+| xhigh | Uzun süren kodlama ve ajan işleri | **Bu projede kullanılmaz** (Yusuf 2026-10-22: tavan high). Anthropic kodlamada xhigh önerir, ama limiti hızla tüketir |
+| max | Doğruluğun maliyetten önemli olduğu en zor işler | **Bu projede kullanılmaz** (tavan high); küçük kazanç için çok token harcar |
 
 ## Görev türü, model ve efor
 | Görev türü | Model | Efor | Gerekçe |
@@ -28,13 +29,14 @@
 | Kod incelemesi, doğrulama (verifier), PR kontrolü | claude-sonnet-5-5 | medium | Salt okuma ve test; derin akıl yürütme çoğu zaman gereksiz |
 | Ofis işi: belge, sunum, tablo üretimi | claude-sonnet-5-5 | medium | Anthropic Sonnet 5.5'i rutin kodlama ve ofis işi için konumlandırıyor |
 | Çok dosyalı refactor, bilinmeyen kod tabanı, karmaşık hata ayıklama | claude-opus-5-5 | high | Zor kodlamada Opus; önce high |
-| Mimari karar, güvenlik incelemesi, veri bütünlüğü, çok adımlı analiz | claude-opus-5-5 | high-xhigh | Hatanın bedeli yüksek; xhigh uzun ajan işlerinde |
-| Orkestrasyon (beyin), planlama, uzun ajan oturumu | claude-opus-5-5 | xhigh | Uzun kodlama ve ajan işi için önerilen seviye |
-| Geri alınamaz/riskli işlem (üretim, toplu silme, taşıma) planı | claude-opus-5-5 | xhigh-max | Doğruluk maliyetten önemli |
-| Opus xhigh'ta da çözülemeyen açık uçlu çok zor sorun | claude-fable-5-1 | high-xhigh | Yalnız Yusuf açıkça isterse; Opus 5.5'ten ~2,5 kat pahalı, haftalık limitin %50 tavanına yazılır |
+| Mimari karar, güvenlik incelemesi, veri bütünlüğü, çok adımlı analiz | claude-opus-5-5 | high | Hatanın bedeli yüksek; low ile başla, gerekirse high |
+| Orkestrasyon (beyin), planlama, uzun ajan oturumu | claude-opus-5-5 | medium-high | Tavan high; uzun oturumlarda bağlam 150k'da parçalanır |
+| Geri alınamaz/riskli işlem (üretim, toplu silme, taşıma) planı | claude-opus-5-5 | high | Doğruluk önemli; tavan high, kullanıcı onayı şart |
+| Opus high'da da çözülemeyen açık uçlu çok zor sorun, ilk seferde doğru olması gereken kritik teslimat | claude-fable-5-1 | medium-high | Yalnız Yusuf açıkça isterse; Opus 5.5'ten ~2,5 kat pahalı ($10/$50 ve $4/$20 milyon token), haftalık limitin %50 tavanına yazılır. Düşünme her eforda açık; varsayılanı high olduğundan eforu elle medium'a çek, low'da bile Opus'tan iyi olabilir |
+| Fable 5.1 ile uzun otonom ajan koşusu (depo çapında kodlama) | claude-fable-5-1 | high | Yalnız Yusuf isterse; bağlamı küçük tut, `[1m]` kullanma |
 | Çok uzun belge/bağlam okuma ve karşılaştırma | claude-sonnet-5-5 veya Opus 5.5 | medium-high | Claude 4.6+ 1M bağlam; yine de bağlam 150k'da parçalanır (proje kuralı) |
 | Görsel/video/ses ağırlıklı çok kipli iş | Gemini (beklemede) | - | Kaynaklarda Gemini çok kiplilikte öne çıkıyor; projede Gemini beklemede olduğundan yalnız öneri |
-| Hızlı yinelemeli depo düzenlemesi, ikinci görüş | Codex (kurulu) | orta | Bazı kıyaslarda Terminal-Bench'te önde; ikinci görüş için |
+| Hızlı yinelemeli depo düzenlemesi, ikinci görüş | Codex (kurulu) | medium | Bazı kıyaslarda Terminal-Bench'te önde; ikinci görüş için |
 
 ## Önemli notlar
 - Kaynakların çoğu üçüncü taraf bloglar; model adları ve sayılar birbirini tutmuyor. Sayısal kıyas yerine genel örüntü kullanıldı: Haiku ucuz yüksek hacimli işler, Sonnet çoğu kodlama, Opus zor/mimari iş ve orkestrasyon.
