@@ -61,3 +61,4 @@
 | 2026-10-21 | Gündem brifi 21.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 114.607 toplam | Başarılı: 10 haber, teknoloji bölümü boş; e-posta gönderildi |
 | 2026-10-21 | Haftalık rehber taraması (19 Ekim'den kalan) [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-sonnet-5-5 | 102.464 toplam | Başarılı: 2026-10-21-tarama.md, 3 öneri; Jev'e erişilemedi |
 | 2026-10-22 | Yapay zeka brifi 22.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 114.924 toplam | Başarılı: 9 haber, Türkiye için doğrulanabilir haber yok |
+| 2026-10-22 | Gündem brifi 22.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 103.844 toplam | Kısmen: alt ajan 0 haber buldu; ana oturum 2 kaynaktan 9 madde derledi, Türkiye/spor boş, e-posta gönderildi |
