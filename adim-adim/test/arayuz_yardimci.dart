@@ -123,3 +123,16 @@ Future<void> dokun(WidgetTester tester, Finder f) async {
   await tester.tap(f);
   await tester.pumpAndSettle();
 }
+
+/// Tekrar ekranına Pratik sekmesindeki "Tekrar" kartıyla gider (Tekrar artık
+/// ayrı sekme değil, kabuk dışı `/tekrar` sayfasıdır).
+Future<void> tekrarEkraniniAc(WidgetTester tester) async {
+  final cubuk = find.byType(NavigationRail).evaluate().isNotEmpty
+      ? find.byType(NavigationRail)
+      : find.byType(NavigationBar);
+  await dokun(
+    tester,
+    find.descendant(of: cubuk, matching: find.text('Pratik')),
+  );
+  await dokun(tester, find.byKey(const ValueKey('pratik-tekrar')));
+}

@@ -71,10 +71,10 @@ Future<void> _sekme(WidgetTester tester, String ad) => dokun(
 
 void main() {
   testWidgets(
-    'Tekrar sekmesinden filtreli tekrar: takvim ve 4 filtre, taşma yok',
+    'Tekrar ekranından filtreli tekrar: takvim ve 4 filtre, taşma yok',
     (tester) async {
       await _ac(tester);
-      await _sekme(tester, 'Tekrar');
+      await tekrarEkraniniAc(tester);
       await dokun(tester, find.byKey(const ValueKey('filtreli-tekrar-ac')));
       expect(find.text('Filtreli tekrar'), findsOneWidget);
       for (final ad in [

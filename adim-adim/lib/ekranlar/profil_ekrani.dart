@@ -16,8 +16,10 @@ import '../bilesenler/geri_kazanma_satiri.dart';
 import '../bilesenler/ogrenme_gunlugu.dart';
 import '../bilesenler/profil_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ust_cubuk.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/basarimlar.dart';
 import '../motor/kelime_bulutu.dart';
 import '../motor/meydan.dart';
 import '../motor/motor.dart';
@@ -59,12 +61,15 @@ class ProfilEkrani extends ConsumerWidget {
     final ogrenilenKelime = durum.alan == 'dil'
         ? KelimeBulutu.ogrenilenSayisi(durum, kurslar)
         : 0;
+    final rozetler = Basarimlar.hesapla(durum, ref.watch(kurslarProvider));
 
     return SafeArea(
       child: SayfaGovdesi(
         child: ListView(
           padding: const EdgeInsets.all(Olcu.b3),
           children: [
+            const UstCubuk(),
+            const SizedBox(height: Olcu.b1),
             Row(
               children: [
                 Expanded(
@@ -100,12 +105,24 @@ class ProfilEkrani extends ConsumerWidget {
               ),
             ),
             ListTile(
+              key: const ValueKey('profil-basarimlar'),
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.military_tech_outlined, color: r.ana),
+              title: const Text('Başarımlar'),
+              subtitle: Text(
+                '${Basarimlar.kazanilanSayisi(rozetler)}/${rozetler.length} rozet',
+                key: const ValueKey('profil-basarim-ozet'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/basarimlar'),
+            ),
+            ListTile(
               key: const ValueKey('profil-pratik-merkezi'),
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.fitness_center, color: r.ana),
               title: const Text('Pratik merkezi'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/pratik'),
+              onTap: () => context.go('/pratik'),
             ),
             // Meydan okuma (49, 51) ve süre takibi (59, 80) satırları.
             ListTile(

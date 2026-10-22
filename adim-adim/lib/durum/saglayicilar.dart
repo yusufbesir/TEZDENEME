@@ -17,7 +17,9 @@ import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
+import '../motor/basarimlar.dart';
 import '../motor/efsanevi.dart';
+import '../motor/gorevler.dart';
 import '../motor/kod_calistirici.dart';
 import '../motor/kod_projesi.dart';
 import '../motor/meydan.dart';
@@ -269,6 +271,18 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     if (sn <= 0) return _simdiki;
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.sureEkle(d, bugun, sn));
+  }
+
+  /// Tamamlanmış görevin sabit XP ödülünü verir (Gorevler.odulAl); görev
+  /// tamam değilse ya da ödül alınmışsa durum değişmez.
+  Future<OgrenciDurumu> gorevOdulAl(Gorev gorev) =>
+      _uygula((d) => Gorevler.odulAl(d, gorev));
+
+  /// Yeni kazanılan başarım rozetlerini kalıcı kayda ekler; yenisi yoksa
+  /// hiçbir şey yazılmaz.
+  Future<OgrenciDurumu> rozetleriIsle(List<Kurs> kurslar) async {
+    if (Basarimlar.yeniKazanilan(_simdiki, kurslar).isEmpty) return _simdiki;
+    return _uygula((d) => Basarimlar.rozetleriIsle(d, kurslar));
   }
 
   /// Günlük dakika hedefini ayarlar; 0 kapatır (ÖZELLİK 80).
@@ -560,4 +574,18 @@ final durumProvider = AsyncNotifierProvider<DurumNotifier, OgrenciDurumu>(
 final alanKurslariProvider = Provider<List<Kurs>>((ref) {
   final alan = ref.watch(durumProvider).value?.alan;
   return Motor.alanKurslari(ref.watch(kurslarProvider), alan);
+});
+
+/// Seçili alandaki zamanı gelmiş (bekleyen) tekrar kartı sayısı. Pratik
+/// sekmesi rozeti, Pratik ekranı ve Görevler ekranı ortak kullanır; yalnızca
+/// seçili alanın kurslarındaki kartlar sayılır.
+final bekleyenTekrarProvider = Provider<int>((ref) {
+  final durum = ref.watch(durumProvider).value;
+  if (durum == null) return 0;
+  final alanKurslari = ref.watch(alanKurslariProvider);
+  final bugun = ref.watch(bugunProvider);
+  return Motor.tekrarBekleyen(
+    durum,
+    bugun,
+  ).where((id) => Motor.kartCoz(alanKurslari, id) != null).length;
 });

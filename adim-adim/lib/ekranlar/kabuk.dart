@@ -1,4 +1,5 @@
-/// Gezinme kabuğu: 4 sekme (Yol, Yarışma, Tekrar, Profil); Tekrar'da rozet.
+/// Gezinme kabuğu: 5 sekme (Yol, Pratik, Yarışma, Görevler, Profil); Pratik'te
+/// bekleyen tekrar kartı rozeti (Tekrar ekranına Pratik merkezinden girilir).
 /// Düzen pencere genişliğine göre seçilir (LayoutBuilder): dar < 600 alt
 /// çubuk, orta 600–899 daraltılmış rail, geniş >= 900 genişletilmiş rail.
 ///
@@ -11,17 +12,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../durum/saglayicilar.dart';
-import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 const _hedefler = <({String ad, IconData simge, IconData secili})>[
   (ad: 'Yol', simge: Icons.route_outlined, secili: Icons.route),
   (
+    ad: 'Pratik',
+    simge: Icons.fitness_center_outlined,
+    secili: Icons.fitness_center,
+  ),
+  (
     ad: 'Yarışma',
     simge: Icons.emoji_events_outlined,
     secili: Icons.emoji_events,
   ),
-  (ad: 'Tekrar', simge: Icons.replay_outlined, secili: Icons.replay),
+  (ad: 'Görevler', simge: Icons.flag_outlined, secili: Icons.flag),
   (ad: 'Profil', simge: Icons.person_outline, secili: Icons.person),
 ];
 
@@ -30,12 +35,12 @@ class Kabuk extends ConsumerWidget {
   const Kabuk({super.key, required this.kabuk});
   final StatefulNavigationShell kabuk;
 
-  static const _tekrarIndeksi = 2;
+  static const _pratikIndeksi = 1;
 
-  /// Tekrar sekmesi simgesi: bekleyen kart varsa sayı rozetiyle sarılır.
+  /// Pratik sekmesi simgesi: bekleyen tekrar kartı varsa sayı rozetiyle sarılır.
   Widget _simge(IconData simge, int i, int bekleyen) {
     final ikon = Icon(simge);
-    if (i != _tekrarIndeksi || bekleyen <= 0) return ikon;
+    if (i != _pratikIndeksi || bekleyen <= 0) return ikon;
     return Badge(label: Text('$bekleyen'), child: ikon);
   }
 
@@ -56,16 +61,8 @@ class Kabuk extends ConsumerWidget {
         );
       }
     });
-    final durum = ref.watch(durumProvider).value;
-    final alanKurslari = ref.watch(alanKurslariProvider);
-    final bugun = ref.watch(bugunProvider);
     // Yalnızca seçili alanın kurslarındaki kartlar sayılır.
-    final bekleyen = durum == null
-        ? 0
-        : Motor.tekrarBekleyen(
-            durum,
-            bugun,
-          ).where((id) => Motor.kartCoz(alanKurslari, id) != null).length;
+    final bekleyen = ref.watch(bekleyenTekrarProvider);
     return LayoutBuilder(
       builder: (context, kisit) {
         final genislik = kisit.maxWidth;

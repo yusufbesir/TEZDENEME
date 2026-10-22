@@ -1,6 +1,6 @@
-/// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
-/// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
-/// seçimi).
+/// Uygulama kökü ve yönlendirici: 5 sekmeli kabuk (Yol, Pratik, Yarışma,
+/// Görevler, Profil) ile kabuk dışı rotalar (tekrar, başarımlar, ayarlar,
+/// sözlük, ders, mikro ders, alan seçimi). `/tekrar` Pratik sekmesinden açılır.
 /// `/mikro` rotası `mod=zayif` (zayıf noktalar), `mod=karisik&ders=<id>`
 /// (ünite sonu serpiştirilmiş tekrar) ve `mod=quiz&ders=<id>&yanlis=0,3`
 /// (ders sonu kısa quiz) parametrelerini alır.
@@ -20,11 +20,13 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/basarimlar_ekrani.dart';
 import 'ekranlar/calisma_modlari_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
 import 'ekranlar/eller_serbest_ekrani.dart';
+import 'ekranlar/gorevler_ekrani.dart';
 import 'ekranlar/gorsel_kelime_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
 import 'ekranlar/meydan_ekrani.dart';
@@ -101,6 +103,14 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/pratik',
+                builder: (c, s) => const PratikMerkeziEkrani(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/yarisma',
                 builder: (c, s) => const YarismaYerTutucu(),
               ),
@@ -108,7 +118,10 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/tekrar', builder: (c, s) => const TekrarEkrani()),
+              GoRoute(
+                path: '/gorevler',
+                builder: (c, s) => const GorevlerEkrani(),
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -118,6 +131,21 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // Tekrar ekranı artık sekme değil: Pratik sekmesinden `push` ile açılır.
+      GoRoute(
+        path: '/tekrar',
+        builder: (c, s) => Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Geri',
+              onPressed: () => c.canPop() ? c.pop() : c.go('/pratik'),
+            ),
+          ),
+          body: const TekrarEkrani(),
+        ),
+      ),
+      GoRoute(path: '/basarimlar', builder: (c, s) => const BasarimlarEkrani()),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
       GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
       GoRoute(
@@ -245,7 +273,6 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/tekrar-filtre',
         builder: (c, s) => const FiltreliTekrarEkrani(),
       ),
-      GoRoute(path: '/pratik', builder: (c, s) => const PratikMerkeziEkrani()),
       GoRoute(
         path: '/pratik/eslestirme',
         builder: (c, s) => const EslestirmeEkrani(),

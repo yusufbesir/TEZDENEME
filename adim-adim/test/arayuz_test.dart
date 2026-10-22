@@ -152,7 +152,7 @@ void main() {
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(
       tester.widget<NavigationRail>(find.byType(NavigationRail)).destinations,
-      hasLength(4),
+      hasLength(5),
     );
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.byType(ProfilKarti), findsOneWidget);
@@ -285,11 +285,11 @@ void main() {
     expect(find.textContaining('Mikro Ders'), findsOneWidget);
   });
 
-  testWidgets('alt çubukta 4 hedef var, Ayarlar sekmesi yok', (tester) async {
+  testWidgets('alt çubukta 5 hedef var, Ayarlar sekmesi yok', (tester) async {
     await uygulamayiAc(tester, null, boyut: const Size(400, 800));
     final cubuk = find.byType(NavigationBar);
-    expect(find.byType(NavigationDestination), findsNWidgets(4));
-    for (final ad in ['Yol', 'Yarışma', 'Tekrar', 'Profil']) {
+    expect(find.byType(NavigationDestination), findsNWidgets(5));
+    for (final ad in ['Yol', 'Pratik', 'Yarışma', 'Görevler', 'Profil']) {
       expect(
         find.descendant(of: cubuk, matching: find.text(ad)),
         findsOneWidget,
@@ -337,13 +337,8 @@ void main() {
 
   // --- Öğrenme motoru: hata defteri, haftalık hedef, karışık tekrar ---
 
-  Future<void> tekrarSekmesineGec(WidgetTester tester) => dokun(
-    tester,
-    find.descendant(
-      of: find.byType(NavigationBar),
-      matching: find.text('Tekrar'),
-    ),
-  );
+  Future<void> tekrarSekmesineGec(WidgetTester tester) =>
+      tekrarEkraniniAc(tester);
 
   testWidgets('Tekrar sekmesinde boş hata defteri açıklama gösterir', (
     tester,

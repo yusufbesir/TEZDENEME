@@ -12,6 +12,7 @@ import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/tema/tema.dart';
+import 'package:adim_adim/uygulama.dart' show yonlendiriciProvider;
 import 'package:adim_adim/yarisma/depo.dart';
 import 'package:adim_adim/yarisma/ekranlar/oyun_ekrani.dart';
 import 'package:adim_adim/yarisma/motor.dart';
@@ -152,7 +153,13 @@ void main() {
           boyut: boyut,
           metinOlcegi: 1.5,
         );
-        for (final sekme in ['Yol', 'Yarışma', 'Tekrar', 'Profil']) {
+        for (final sekme in [
+          'Yol',
+          'Pratik',
+          'Yarışma',
+          'Görevler',
+          'Profil',
+        ]) {
           await dokun(tester, _sekme(tester, sekme));
           await _tasmaYok(tester, sekme);
           expect(
@@ -206,8 +213,10 @@ void main() {
         final ad =
             '${boyut.width.toInt()}x${boyut.height.toInt()} '
             'ölçek $olcek';
-        testWidgets('Yol, Yarışma, Tekrar, Profil: $ad', (tester) async {
-          await uygulamayiAc(
+        testWidgets('Yol, Pratik, Yarışma, Görevler, Profil: $ad', (
+          tester,
+        ) async {
+          final kap = await uygulamayiAc(
             tester,
             BellekDepo(_durum()),
             kurslar: [sahteKurs, sahteKodKurs],
@@ -215,9 +224,23 @@ void main() {
             metinOlcegi: olcek,
           );
           await _tasmaYok(tester, 'Yol $ad');
-          for (final sekme in ['Yarışma', 'Tekrar', 'Profil', 'Yol']) {
+          for (final sekme in [
+            'Pratik',
+            'Yarışma',
+            'Görevler',
+            'Profil',
+            'Yol',
+          ]) {
             await dokun(tester, _sekme(tester, sekme));
             await _tasmaYok(tester, '$sekme $ad');
+          }
+          // Kabuk dışı yeni sayfalar: Tekrar ve Başarımlar.
+          for (final yol in ['/tekrar', '/basarimlar']) {
+            kap.read(yonlendiriciProvider).push(yol);
+            await tester.pumpAndSettle();
+            await _tasmaYok(tester, '$yol $ad');
+            kap.read(yonlendiriciProvider).pop();
+            await tester.pumpAndSettle();
           }
         });
 
