@@ -70,6 +70,43 @@ void main() {
       },
     );
 
+    test(
+      'A2, B1, B2 ve Almanca A1 kurslarında ipucu var (toplam en az 40)',
+      () {
+        expect(DilbilgisiIpuclari.kursIcin('ingilizce-2').length, 12);
+        expect(DilbilgisiIpuclari.kursIcin('ingilizce-3').length, 12);
+        expect(DilbilgisiIpuclari.kursIcin('ingilizce-4').length, 12);
+        expect(DilbilgisiIpuclari.kursIcin('almanca-1').length, 11);
+        expect(tumDilbilgisiIpuclari.length, greaterThanOrEqualTo(40));
+        for (final i in tumDilbilgisiIpuclari) {
+          expect(i.metin.trim().length, greaterThan(20), reason: i.dersId);
+          expect(i.ornek.trim(), isNotEmpty, reason: i.dersId);
+        }
+        // Kurs/ünite/ders sırasıyla gruplanır: ders başına en fazla 1 ipucu.
+        for (final kid in [
+          'ingilizce-2',
+          'ingilizce-3',
+          'ingilizce-4',
+          'almanca-1',
+        ]) {
+          final kurs = tumKurslar.firstWhere((k) => k.id == kid);
+          expect(
+            DilbilgisiIpuclari.kurslarIcin([kurs]).length,
+            DilbilgisiIpuclari.kursIcin(kid).length,
+            reason: kid,
+          );
+          for (var u = 0; u < kurs.uniteler.length; u++) {
+            expect(UniteRehberi.uret(kurs, u), isNotNull, reason: kid);
+            expect(
+              DilbilgisiIpuclari.uniteIcin(kurs.uniteler[u].id),
+              isNotEmpty,
+              reason: kurs.uniteler[u].id,
+            );
+          }
+        }
+      },
+    );
+
     test('uniteId/kursId türetimi ve geçersiz ders kimliği', () {
       const i = DilbilgisiIpucu(
         dersId: 'ingilizce-1.u3.d2',
@@ -165,7 +202,10 @@ void main() {
       );
       kap.read(yonlendiriciProvider).push('/pratik/ipucu');
       await tester.pumpAndSettle();
-      final n = DilbilgisiIpuclari.kursIcin('ingilizce-1').length;
+      final n = DilbilgisiIpuclari.kurslarIcin([
+        for (final k in tumKurslar)
+          if (k.alan == KursAlani.dil) k,
+      ]).length;
       expect(find.text('2 / $n'), findsOneWidget);
       expect(find.text('Be fiili (am, is, are)'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('ipucu-sonraki')));
@@ -229,6 +269,30 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byType(DersEkrani), findsOneWidget);
+    });
+
+    testWidgets('ünite rehberinde yeni kursların ipuçları da görünür', (
+      tester,
+    ) async {
+      final kap = await ac(tester);
+      for (final (kurs, adet) in [
+        ('ingilizce-2', 2),
+        ('ingilizce-3', 2),
+        ('ingilizce-4', 2),
+        ('almanca-1', 2),
+      ]) {
+        kap
+            .read(yonlendiriciProvider)
+            .push('/unite-rehberi?kurs=$kurs&unite=0');
+        await tester.pumpAndSettle();
+        expect(
+          find.byType(DilbilgisiIpucuKarti),
+          findsNWidgets(adet),
+          reason: kurs,
+        );
+        kap.read(yonlendiriciProvider).pop();
+        await tester.pumpAndSettle();
+      }
     });
 
     testWidgets('Pratik merkezi: dil alanında Dilbilgisi ipucu kartı açılır', (
