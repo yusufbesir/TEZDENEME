@@ -517,6 +517,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
     bool? gunDersiBildirimiAcik,
+    int? oturumKartSayisi,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -534,6 +535,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         tekrarBildirimiAcik: tekrarBildirimiAcik,
         konusmaAcik: konusmaAcik,
         gunDersiBildirimiAcik: gunDersiBildirimiAcik,
+        // Yalnız 5/10/20 kabul edilir; başka değer yok sayılır.
+        oturumKartSayisi:
+            (oturumKartSayisi != null &&
+                OgrenciDurumu.oturumKartSecenekleri.contains(oturumKartSayisi))
+            ? oturumKartSayisi
+            : null,
       ),
     );
     final bildirim = ref.read(bildirimProvider);

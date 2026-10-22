@@ -1,5 +1,5 @@
-/// Pratik sekmesi (ÖZELLİK 44): ortak üst çubuk, Tekrar (zamanı gelen kartlar)
-/// kartı, Hatalarım (hata defteri), Zamana karşı eşleştirme, Artan zorluk
+/// Pratik sekmesi (ÖZELLİK 44): ortak üst çubuk, Günlük karışım, Hızlı tekrar
+/// (60 sn zamanlı), Tekrar (zamanı gelen kartlar) kartı, Kelimelerim, Hatalarım (hata defteri), Zamana karşı eşleştirme, Artan zorluk
 /// turu ve Kelime kartları gibi etkinlikler. Hepsi çevrimdışı ve cezasızdır;
 /// etkinlikler kart aralıklarını (SRS) ve hata defterini değiştirmez. Tekrar
 /// ekranına (`/tekrar`, kabuk dışı) bu sekmeden `push` ile girilir; Tekrar
@@ -19,6 +19,7 @@ import '../bilesenler/ust_cubuk.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/pratik.dart';
+import '../motor/pratik_oturumlari.dart';
 import '../motor/sure.dart';
 import '../tema/tema.dart';
 
@@ -78,6 +79,22 @@ class PratikMerkeziEkrani extends ConsumerWidget {
               const SizedBox(height: Olcu.b2),
               MaskotKarti(durum: durum, bugun: ref.watch(bugunProvider)),
               kart(
+                anahtar: const ValueKey('pratik-karisim'),
+                simge: Icons.shuffle,
+                baslik: 'Günlük karışım',
+                ayrinti:
+                    'Tek dokunuşla ${GunlukKarisim.adet} kart: zayıf, '
+                    'zamanı gelen ve yeni',
+                onTap: () => context.push('/mikro?mod=karisim'),
+              ),
+              kart(
+                anahtar: const ValueKey('pratik-hizli'),
+                simge: Icons.bolt,
+                baslik: 'Hızlı tekrar',
+                ayrinti: '${HizliTekrar.sureSn} saniyede en çok kartı cevapla',
+                onTap: () => context.push('/pratik/hizli'),
+              ),
+              kart(
                 anahtar: const ValueKey('pratik-tekrar'),
                 simge: Icons.replay,
                 baslik: 'Tekrar',
@@ -85,6 +102,15 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                     ? 'Bugün bekleyen kart yok'
                     : '$bekleyen kart seni bekliyor',
                 onTap: () => context.push('/tekrar'),
+              ),
+              kart(
+                anahtar: const ValueKey('pratik-kelimelerim'),
+                simge: Icons.library_books_outlined,
+                baslik: 'Kelimelerim',
+                ayrinti: kelimeSayisi == 0
+                    ? 'Yeni, zayıf, orta ve güçlü kelimeler'
+                    : '$kelimeSayisi kelime · güç kovalarına göre',
+                onTap: () => context.push('/kelimelerim'),
               ),
               kart(
                 anahtar: const ValueKey('pratik-hatalarim'),

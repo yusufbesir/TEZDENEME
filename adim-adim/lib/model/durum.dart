@@ -19,7 +19,8 @@
 /// `yerImiGecmisi`: yer imi koleksiyonları, notları ve geçmişi (ÖZELLİK 72),
 /// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
 /// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
-/// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme)
+/// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
+/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -400,6 +401,7 @@ class OgrenciDurumu {
     this.kodProjeleri = const [],
     this.alinanGorevler = const {},
     this.rozetler = const {},
+    this.oturumKartSayisi = varsayilanOturumKarti,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -578,6 +580,13 @@ class OgrenciDurumu {
   /// kırpılsa da rozet geri alınmaz).
   final Set<String> rozetler;
 
+  /// Mikro ders, zayıf noktalar dersi ve karışık tekrar oturumlarında sorulan
+  /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
+  final int oturumKartSayisi;
+
+  static const List<int> oturumKartSecenekleri = [5, 10, 20];
+  static const int varsayilanOturumKarti = 5;
+
   /// Saklanan görev ödülü ve rozet kaydı sınırları.
   static const int alinanGorevEnCok = 120;
   static const int rozetEnCok = 100;
@@ -689,6 +698,7 @@ class OgrenciDurumu {
     List<KodProjesi>? kodProjeleri,
     Set<String>? alinanGorevler,
     Set<String>? rozetler,
+    int? oturumKartSayisi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -754,6 +764,7 @@ class OgrenciDurumu {
       kodProjeleri: kodProjeleri ?? this.kodProjeleri,
       alinanGorevler: alinanGorevler ?? this.alinanGorevler,
       rozetler: rozetler ?? this.rozetler,
+      oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
     );
   }
 
@@ -817,6 +828,7 @@ class OgrenciDurumu {
     'kodProjeleri': [for (final p in kodProjeleri) p.toJson()],
     'alinanGorevler': alinanGorevler.toList()..sort(),
     'rozetler': rozetler.toList()..sort(),
+    'oturumKartSayisi': oturumKartSayisi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1109,6 +1121,12 @@ class OgrenciDurumu {
           for (final e in (j['rozetler'] as List).take(rozetEnCok))
             if (e is String && rozetGecerli(e)) e,
       }),
+      // Eski kayıtta yoksa ya da 5/10/20 dışındaysa varsayılan (5).
+      oturumKartSayisi:
+          (j['oturumKartSayisi'] is int &&
+              oturumKartSecenekleri.contains(j['oturumKartSayisi']))
+          ? j['oturumKartSayisi'] as int
+          : varsayilanOturumKarti,
     );
   }
 

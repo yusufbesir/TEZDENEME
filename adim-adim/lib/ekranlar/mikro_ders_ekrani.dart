@@ -6,6 +6,11 @@
 /// `mod=donem` (ÖZELLİK 63: `donem=gunluk|haftalik|aylik`; takvime bağlı,
 /// tamamlanan derslerden karışık; bitişte Motor.donemDersiBitir sabit XP verir).
 ///
+/// Altıncı kip `mod=karisim` (Günlük Karışım): zayıf + zamanı gelen + yeni
+/// kartlardan 10 kartlık karışık oturum ([GunlukKarisim.sec]); bitişi normal
+/// mikro ders gibidir ([Motor.mikroBitir]). Normal ve zayıf kiplerinde kart
+/// sayısı ayarlardaki oturum kart sayısıdır (5/10/20, varsayılan 5).
+///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Seçim `Motor.mikroSec` ile yapılır; bitişte `mikroBitir` XP ve seriyi
@@ -21,6 +26,7 @@ import '../bilesenler/ders_ozeti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
 class MikroDersEkrani extends ConsumerStatefulWidget {
@@ -32,7 +38,7 @@ class MikroDersEkrani extends ConsumerStatefulWidget {
     this.donem,
   });
 
-  /// null: normal; 'zayif' | 'karisik' | 'quiz'.
+  /// null: normal; 'zayif' | 'karisik' | 'quiz' | 'donem' | 'karisim'.
   final String? mod;
 
   /// 'karisik' ve 'quiz' kiplerinde biten ders kimliği.
@@ -99,12 +105,14 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
         widget.dersId!,
         tohum: tohum,
       );
+    } else if (widget.mod == 'karisim') {
+      _liste = GunlukKarisim.sec(durum, kurslar, bugun, tohum: tohum);
     } else {
       _liste = Motor.mikroSec(
         durum,
         kurslar,
         bugun,
-        adet: 5,
+        adet: durum.oturumKartSayisi,
         tohum: tohum,
         oncelikliKartlar: widget.mod == 'zayif'
             ? Motor.zayifKartlar(durum, bugun)
@@ -125,7 +133,9 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
               ? 'Quizden çıkılsın mı?'
               : (_donem != null
                     ? '${Motor.donemAdi(_donem!)} bırakılsın mı?'
-                    : 'Mikro dersten çıkılsın mı?'),
+                    : (widget.mod == 'karisim'
+                          ? 'Günlük karışımdan çıkılsın mı?'
+                          : 'Mikro dersten çıkılsın mı?')),
         ),
         content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
         actions: [
@@ -191,6 +201,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                   'karisik' => 'Karışık tekrar tamamlandı',
                   'quiz' => 'Quiz tamamlandı',
                   'donem' => '${Motor.donemAdi(_donem ?? '')} tamamlandı',
+                  'karisim' => 'Günlük karışım tamamlandı',
                   _ => 'Mikro ders tamamlandı',
                 },
                 dogru: _ozet!.dogru,

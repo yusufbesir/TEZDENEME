@@ -39,6 +39,8 @@ import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
 import 'ekranlar/halat_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/hizli_tekrar_ekrani.dart';
+import 'ekranlar/kelimelerim_ekrani.dart';
 import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/projeler_ekrani.dart';
@@ -280,6 +282,16 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pratik/tur',
         builder: (c, s) => const ArtanZorlukEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/hizli',
+        builder: (c, s) => const HizliTekrarEkrani(),
+      ),
+      GoRoute(
+        path: '/kelimelerim',
+        // kova=yeni|zayif|orta|guclu: açılışta o kovaya süzülür.
+        builder: (c, s) =>
+            KelimelerimEkrani(baslangicKovasi: s.uri.queryParameters['kova']),
       ),
       GoRoute(
         path: '/pratik/kartlar',

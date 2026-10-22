@@ -1,4 +1,6 @@
-/// Ayarlar ekranı: ad, görünüm, ses, günlük ve haftalık hedef, hatırlatma
+/// Ayarlar ekranı: ad, görünüm, ses, günlük hedef (yoğunluk çipleri: Rahat,
+/// Orta, Yoğun, Ciddi ve XP kaydırıcısı), haftalık hedef, oturum başına kart
+/// sayısı (5/10/20), hatırlatma
 /// (günlük saat ve açılıştaki bekleyen tekrar bildirimi), veri sıfırlama.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
@@ -15,6 +17,7 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/motor.dart';
+import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
 class AyarlarEkrani extends ConsumerStatefulWidget {
@@ -318,6 +321,23 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   ],
                 ),
               ),
+              // Yoğunluk, günlük XP hedefinin hazır değerleridir; ayrı alan yok:
+              // seçili çip her zaman kaydırıcıdaki hedefle tutarlıdır.
+              const SizedBox(height: Olcu.b1),
+              Wrap(
+                spacing: Olcu.b1,
+                runSpacing: Olcu.b1,
+                children: [
+                  for (final y in HedefYogunlugu.values)
+                    ChoiceChip(
+                      key: ValueKey('yogunluk-${y.name}'),
+                      label: Text('${y.ad} · ${y.xp} XP'),
+                      selected: durum.gunlukHedef == y.xp,
+                      onSelected: (_) =>
+                          notifier.ayarGuncelle(gunlukHedef: y.xp),
+                    ),
+                ],
+              ),
               bolum('Haftalık hedef'),
               Semantics(
                 label: 'Haftalık hedef: haftada ${durum.haftalikHedefGun} gün',
@@ -386,6 +406,31 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                     child: const Text('Haftalık hedefi plana uydur'),
                   ),
                 ),
+              bolum('Oturum'),
+              Semantics(
+                label: 'Oturum başına kart sayısı: ${durum.oturumKartSayisi}',
+                child: SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<int>(
+                    key: const ValueKey('ayar-kart-sayisi'),
+                    showSelectedIcon: false,
+                    segments: [
+                      for (final n in OgrenciDurumu.oturumKartSecenekleri)
+                        ButtonSegment(value: n, label: Text('$n kart')),
+                    ],
+                    selected: {durum.oturumKartSayisi},
+                    onSelectionChanged: (s) =>
+                        notifier.ayarGuncelle(oturumKartSayisi: s.first),
+                  ),
+                ),
+              ),
+              const SizedBox(height: Olcu.b1),
+              Text(
+                'Mikro ders, zayıf noktalar dersi ve karışık tekrarda '
+                'sorulan kart sayısı. Günlük karışım hep '
+                '${GunlukKarisim.adet} karttır.',
+                style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+              ),
               bolum('Hatırlatma'),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
