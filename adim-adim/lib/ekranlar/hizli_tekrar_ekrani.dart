@@ -40,6 +40,10 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
   int _dogru = 0;
   int _toplam = 0;
   bool _sureDoldu = false;
+
+  /// Yalnız oturumdaki bütün kartlar gerçekten cevaplanıp bittiğinde true;
+  /// kullanıcı ortada çıkarsa false kalır (başlık yanıltıcı olmasın).
+  bool _hepsiBitti = false;
   bool _kaydedildi = false;
 
   /// Oturum her başladığında artar; oturum bileşeninin durumu sıfırlansın diye.
@@ -61,6 +65,7 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
       _dogru = 0;
       _toplam = 0;
       _sureDoldu = false;
+      _hepsiBitti = false;
       _kaydedildi = false;
       _kalan.value = HizliTekrar.sureSn;
       _tur++;
@@ -107,7 +112,10 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
                           .read(durumProvider.notifier)
                           .kartIsle(_liste[i].kartId, dogru);
                     },
-                    onBitti: (_, _) => _bitir(),
+                    onBitti: (_, _) {
+                      _hepsiBitti = true;
+                      _bitir();
+                    },
                     onKapat: () => _toplam > 0 ? _bitir() : _cik(),
                   ),
                 ),
@@ -121,6 +129,7 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
             dogru: _dogru,
             toplam: _toplam,
             sureDoldu: _sureDoldu,
+            hepsiBitti: _hepsiBitti,
             onYeniden: () => setState(() => _evre = _Evre.giris),
             onBitir: _cik,
           ),
@@ -260,12 +269,14 @@ class _Sonuc extends StatelessWidget {
     required this.dogru,
     required this.toplam,
     required this.sureDoldu,
+    required this.hepsiBitti,
     required this.onYeniden,
     required this.onBitir,
   });
   final int dogru;
   final int toplam;
   final bool sureDoldu;
+  final bool hepsiBitti;
   final VoidCallback onYeniden;
   final VoidCallback onBitir;
 
@@ -283,7 +294,9 @@ class _Sonuc extends StatelessWidget {
         Semantics(
           header: true,
           child: Text(
-            sureDoldu ? 'Süre doldu' : 'Hepsini bitirdin',
+            sureDoldu
+                ? 'Süre doldu'
+                : (hepsiBitti ? 'Hepsini bitirdin' : 'Oturum bitti'),
             style: yazi.titleLarge,
             textAlign: TextAlign.center,
           ),

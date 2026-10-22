@@ -23,11 +23,14 @@ import 'ekranlar/ayarlar_ekrani.dart';
 import 'ekranlar/basarimlar_ekrani.dart';
 import 'ekranlar/calisma_modlari_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
+import 'ekranlar/dilbilgisi_ipucu_ekrani.dart';
+import 'ekranlar/dinle_yaz_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
 import 'ekranlar/eller_serbest_ekrani.dart';
 import 'ekranlar/gorevler_ekrani.dart';
 import 'ekranlar/gorsel_kelime_ekrani.dart';
+import 'ekranlar/kart_kaydirma_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
 import 'ekranlar/meydan_ekrani.dart';
 import 'ekranlar/ogrenme_yolu_ekrani.dart';
@@ -296,6 +299,22 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/kaydir',
+        builder: (c, s) => KartKaydirmaEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/pratik/dinle-yaz',
+        builder: (c, s) => DinleYazEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/pratik/ipucu',
+        builder: (c, s) => const DilbilgisiIpucuEkrani(),
       ),
       // Meydan okuma ve rekorlar (49), ay/yıl özeti (51), süre takibi ve süreli
       // oturum (59, 80), görsel kelimeler (58).

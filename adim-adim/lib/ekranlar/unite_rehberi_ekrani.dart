@@ -1,7 +1,8 @@
 /// Ünite rehber kitapçığı ekranı (ÖZELLİK 42): ünitenin başında açılabilen
 /// kısa rehber. İçerik [UniteRehberi.uret] ile ünite verisinden türetilir:
 /// CEFR düzeyi, anahtar kalıplar, örnek cümleler (dil kurslarında sesli),
-/// anahtar kelimeler ve dilbilgisi notları. Ana sayfada ünite başlığındaki
+/// anahtar kelimeler ve dilbilgisi notları; ünitede sabit dilbilgisi ipucu
+/// varsa en üstte kart olarak gösterilir. Ana sayfada ünite başlığındaki
 /// rehber düğmesinden açılır; ünite bittiyse özete bağlantı da gösterilir.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
@@ -13,10 +14,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/dilbilgisi_ipucu_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../icerik/senaryolar.dart';
+import '../motor/dilbilgisi_ipucu.dart';
 import '../motor/motor.dart';
 import '../motor/senaryo.dart';
 import '../motor/unite_rehberi.dart';
@@ -154,7 +157,21 @@ class UniteRehberiEkrani extends ConsumerWidget {
                     ),
                   ],
                 ),
-                if (rehber.bos)
+                // Ünitenin dersleri için sabit dilbilgisi ipuçları (varsa).
+                for (final ip in DilbilgisiIpuclari.uniteIcin(
+                  kurs.uniteler[uniteIndeks].id,
+                )) ...[
+                  const SizedBox(height: Olcu.b2),
+                  DilbilgisiIpucuKarti(
+                    ipucu: ip,
+                    dersAdi: kurs.dersBul(ip.dersId)?.ad,
+                    onGit: () => context.push('/ders/${ip.dersId}'),
+                  ),
+                ],
+                if (rehber.bos &&
+                    DilbilgisiIpuclari.uniteIcin(
+                      kurs.uniteler[uniteIndeks].id,
+                    ).isEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: Olcu.b3),
                     child: Text(

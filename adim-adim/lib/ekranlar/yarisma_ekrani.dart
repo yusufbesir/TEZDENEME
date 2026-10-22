@@ -3,7 +3,8 @@
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Tek birincil eylem "Oyna"dır. Oyun tam ekran sayfa olarak kök Navigator'a
-/// itilir (rota kaydı sonra uygulama.dart'a eklenecek).
+/// itilir (sekme '/yarisma' rotası uygulama.dart'ta kayıtlıdır; dil, kod ve
+/// oyun alanlarının hepsinde çalışır).
 /// Esnek yerleşim: kategori kartları en çok 240 px'lik hücrelerle akar, seviye
 /// seçici dar pencerede yatay kaydırılır, istatistikler dar hücrede sarılır.
 /// docs/SADE-ARAYUZ-VE-YARISMA.md bölüm 5 ve 7.

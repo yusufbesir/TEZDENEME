@@ -240,6 +240,9 @@ void main() {
         await _cevapla(tester);
         await _tikla(tester, find.byTooltip('Dersten çık'));
         expect(find.text('Doğru oranı: %100 (1/1)'), findsOneWidget);
+        // Ortada çıkıldı: yanıltıcı 'Hepsini bitirdin' başlığı çıkmaz.
+        expect(find.text('Hepsini bitirdin'), findsNothing);
+        expect(find.text('Oturum bitti'), findsOneWidget);
         expect(_durumOku(kap).gunluk, hasLength(1));
       },
     );

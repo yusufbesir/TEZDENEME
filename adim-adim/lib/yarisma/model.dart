@@ -49,10 +49,10 @@ class YarismaSorusu {
   /// `kursId.kategori.sıra` biçimi, ör. 'ingilizce-1.tarih.3'.
   final String id;
 
-  /// 'dil' | 'kod'.
+  /// 'dil' | 'kod' | 'oyun'.
   final String alan;
 
-  /// Ör. 'ingilizce-1', 'html-1'.
+  /// Ör. 'ingilizce-1', 'html-1', 'satranc-1'.
   final String seviyeKursId;
   final YarismaKategori kategori;
   final String soru;
@@ -69,7 +69,7 @@ class YarismaSorusu {
     if (id.trim().isEmpty ||
         soru.trim().isEmpty ||
         aciklama.trim().isEmpty ||
-        (alan != 'dil' && alan != 'kod') ||
+        (alan != 'dil' && alan != 'kod' && alan != 'oyun') ||
         seviyeKursId.trim().isEmpty) {
       return false;
     }

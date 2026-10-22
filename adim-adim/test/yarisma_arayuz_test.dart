@@ -142,6 +142,55 @@ void main() {
       expect(find.text('A1'), findsNothing);
     });
 
+    testWidgets('alan oyun: Başlangıç, Orta, İleri; 6 kategori ve Oyna', (
+      tester,
+    ) async {
+      await _kur(tester, const YarismaEkrani(), alan: 'oyun');
+      expect(find.text('Başlangıç'), findsOneWidget);
+      expect(find.text('Orta'), findsOneWidget);
+      expect(find.text('İleri'), findsOneWidget);
+      expect(find.text('A1'), findsNothing);
+      expect(find.text('Bu alanda henüz yarışma yok.'), findsNothing);
+      for (final k in YarismaKategori.values) {
+        expect(find.text(k.ad), findsOneWidget);
+      }
+      expect(find.text('Oyna'), findsOneWidget);
+    });
+
+    testWidgets('alan oyun: Oyna oyun ekranını açar', (tester) async {
+      await _kur(tester, const YarismaEkrani(), alan: 'oyun');
+      await tester.tap(find.text('Oyna'));
+      await tester.pumpAndSettle();
+      expect(find.text('Çevir'), findsOneWidget);
+      expect(find.text('Puan 0'), findsOneWidget);
+    });
+
+    testWidgets(
+      'alan oyun: oyun sorusu oyun bankasından gelir, doğru 10 puan',
+      (tester) async {
+        await _kur(
+          tester,
+          YarismaOyunEkrani(
+            alan: 'oyun',
+            kursId: 'satranc-1',
+            motor: YarismaMotoru(tohum: 1),
+          ),
+          alan: 'oyun',
+        );
+        await _soruyaGel(tester);
+        final adaylar = sorulariBul(
+          'oyun',
+          'satranc-1',
+        ).where((s) => find.text(s.soru).evaluate().isNotEmpty);
+        expect(adaylar, isNotEmpty);
+        final s = adaylar.first;
+        await tester.tap(find.byKey(ValueKey('sik-${s.dogru}')));
+        await tester.pumpAndSettle();
+        expect(find.text('Puan 10'), findsOneWidget);
+        expect(find.text(s.aciklama), findsOneWidget);
+      },
+    );
+
     testWidgets('kayıttaki doğru/yanlış ve istatistikler görünür', (
       tester,
     ) async {

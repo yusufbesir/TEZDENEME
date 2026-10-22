@@ -258,15 +258,18 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('oyun alanında soru yoksa bilgi metni', (tester) async {
+    testWidgets('oyun alanında artık soru vardır (halat çekilir)', (
+      tester,
+    ) async {
       final kap = await uygulamayiAc(
         tester,
         BellekDepo(const OgrenciDurumu(alan: 'oyun')),
         kurslar: [hayvanKursu],
       );
-      kap.read(yonlendiriciProvider).go('/halat');
+      kap.read(yonlendiriciProvider).go('/halat?tohum=1');
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('halat-bos')), findsOneWidget);
+      expect(find.byKey(const ValueKey('halat-bos')), findsNothing);
+      expect(find.byKey(const ValueKey('halat-soru')), findsOneWidget);
     });
 
     testWidgets('480x600 ölçek 1,5 taşmaz', (tester) async {

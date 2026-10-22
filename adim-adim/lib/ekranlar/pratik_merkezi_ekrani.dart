@@ -1,5 +1,6 @@
 /// Pratik sekmesi (ÖZELLİK 44): ortak üst çubuk, Günlük karışım, Hızlı tekrar
-/// (60 sn zamanlı), Tekrar (zamanı gelen kartlar) kartı, Kelimelerim, Hatalarım (hata defteri), Zamana karşı eşleştirme, Artan zorluk
+/// (60 sn zamanlı), Kart kaydırma (bildim/bilmedim), Dinle ve yaz ile
+/// Dilbilgisi ipucu (dil alanı), Tekrar (zamanı gelen kartlar) kartı, Kelimelerim, Hatalarım (hata defteri), Zamana karşı eşleştirme, Artan zorluk
 /// turu ve Kelime kartları gibi etkinlikler. Hepsi çevrimdışı ve cezasızdır;
 /// etkinlikler kart aralıklarını (SRS) ve hata defterini değiştirmez. Tekrar
 /// ekranına (`/tekrar`, kabuk dışı) bu sekmeden `push` ile girilir; Tekrar
@@ -155,6 +156,15 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                 onTap: () => context.push('/pratik/kartlar'),
               ),
               kart(
+                anahtar: const ValueKey('pratik-kaydir'),
+                simge: Icons.swipe,
+                baslik: 'Kart kaydırma',
+                ayrinti: kelimeSayisi == 0
+                    ? 'Sağa bildim, sola bilmedim'
+                    : 'Sağa bildim, sola bilmedim · $kelimeSayisi kelime',
+                onTap: () => context.push('/pratik/kaydir'),
+              ),
+              kart(
                 anahtar: const ValueKey('pratik-halat'),
                 simge: Icons.sports_kabaddi_outlined,
                 baslik: 'Halat çekme',
@@ -176,6 +186,20 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                   baslik: 'Görsel kelimeler',
                   ayrinti: 'Simgeli kartlar, konu oyunları',
                   onTap: () => context.push('/gorsel'),
+                ),
+                kart(
+                  anahtar: const ValueKey('pratik-dinle-yaz'),
+                  simge: Icons.hearing,
+                  baslik: 'Dinle ve yaz',
+                  ayrinti: 'Okunan kelimeyi dinle, yaz; ses yoksa metin ipucu',
+                  onTap: () => context.push('/pratik/dinle-yaz'),
+                ),
+                kart(
+                  anahtar: const ValueKey('pratik-ipucu'),
+                  simge: Icons.lightbulb_outline,
+                  baslik: 'Dilbilgisi ipucu',
+                  ayrinti: 'Ünite ünite kısa ipuçları, ilgili derse bağlantı',
+                  onTap: () => context.push('/pratik/ipucu'),
                 ),
                 kart(
                   anahtar: const ValueKey('pratik-radyo'),
