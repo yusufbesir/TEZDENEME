@@ -35,6 +35,9 @@ void main() {
       'python-1',
       'python-2',
       'python-3',
+      'sql-1',
+      'sql-2',
+      'sql-3',
       'satranc-1',
       'satranc-2',
       'satranc-3',
@@ -68,6 +71,9 @@ void main() {
       python1,
       python2,
       python3,
+      sql1,
+      sql2,
+      sql3,
     ]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -89,6 +95,9 @@ void main() {
       python1,
       python2,
       python3,
+      sql1,
+      sql2,
+      sql3,
     ]) {
       expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
@@ -179,6 +188,9 @@ void main() {
       python1,
       python2,
       python3,
+      sql1,
+      sql2,
+      sql3,
     ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {

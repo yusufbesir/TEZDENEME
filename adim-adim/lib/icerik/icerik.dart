@@ -25,6 +25,9 @@ import 'python_1.dart';
 import 'python_2.dart';
 import 'python_3.dart';
 import 'satranc_1.dart';
+import 'sql_1.dart';
+import 'sql_2.dart';
+import 'sql_3.dart';
 import 'satranc_2.dart';
 import 'satranc_3.dart';
 
@@ -53,6 +56,9 @@ export 'python_3.dart' show python3;
 export 'satranc_1.dart' show satranc1;
 export 'satranc_2.dart' show satranc2;
 export 'satranc_3.dart' show satranc3;
+export 'sql_1.dart' show sql1;
+export 'sql_2.dart' show sql2;
+export 'sql_3.dart' show sql3;
 
 final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   ingilizceA1,
@@ -77,6 +83,9 @@ final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   python1,
   python2,
   python3,
+  sql1,
+  sql2,
+  sql3,
   satranc1,
   satranc2,
   satranc3,

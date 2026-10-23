@@ -67,6 +67,7 @@ abstract final class OgrenmeYolu {
     'css': (yol: 'web', ad: 'Web', sira: 1),
     'js': (yol: 'web', ad: 'Web', sira: 2),
     'python': (yol: 'python', ad: 'Python', sira: 0),
+    'sql': (yol: 'sql', ad: 'SQL', sira: 0),
     'ingilizce': (yol: 'ingilizce', ad: 'İngilizce', sira: 0),
     'almanca': (yol: 'almanca', ad: 'Almanca', sira: 0),
     'korece': (yol: 'korece', ad: 'Korece', sira: 0),

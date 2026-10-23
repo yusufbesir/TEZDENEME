@@ -84,6 +84,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'CSS$no';
       case 'js':
         return 'JS$no';
+      case 'sql':
+        return 'SQL$no';
       default:
         return kursId;
     }
