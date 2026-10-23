@@ -8,6 +8,7 @@
 | [hafiza-ve-not.md](hafiza-ve-not.md) | Model ataması, not alma, hafızadan silme yasağı, not okuma, hafıza ve Jev, ortak beyin, silme biçimi ve dosya açıklamaları |
 | [guvenlik-ve-dosya.md](guvenlik-ve-dosya.md) | E-posta, güvenlik, dosya düzeni ve iş sahipliği, tarayıcı koruması, tersine mühendislik aracı (Windows kurulum kuralı `.claude/rules/` altında) |
 | [orkestrasyon-ve-kayit.md](orkestrasyon-ve-kayit.md) | Orkestratör ve Baş Denetmen, etiketleme, token ve araç kaydı, kesintiden sonra devam, Archify (emek illüzyonu kuralı `.claude/rules/` altında) |
+| [dis-fikirler-avenox.md](dis-fikirler-avenox.md) | avenoxai incelemesinden alınan ek öneriler: onay kapısı, diskten devam, hafıza arşivi, kota ve zorluğa göre model, worktree, sır taraması (onay bekler) |
 | [`.claude/rules/windows-uygulama-dagitimi.md`](../../.claude/rules/windows-uygulama-dagitimi.md) | Yola bağlı: Windows kurulum, güncelleme, kaldırma, klasör düzeni |
 | [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) | Yola bağlı: arayüz dosyalarında emek illüzyonu |
 
