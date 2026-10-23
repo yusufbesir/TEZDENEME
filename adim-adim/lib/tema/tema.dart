@@ -223,7 +223,12 @@ ThemeData _tema(Brightness parlaklik, AdimRenkleri r) {
         ),
       ),
       labelTextStyle: WidgetStateProperty.resolveWith(
+        // Alt çubuk etiketi 12 px: 360 px genişlikte 5 sekmenin (72 px'lik
+        // hedef) en uzun etiketi (Görevler) metin ölçeği 1,3'te de tek satır
+        // kalır; 11 px alt sınırının üstündedir.
         (durumlar) => yazi.labelMedium!.copyWith(
+          fontSize: 12,
+          letterSpacing: 0,
           color: durumlar.contains(WidgetState.selected)
               ? r.metin
               : r.metinIkincil,

@@ -51,7 +51,7 @@ class _FiltreliDurumu extends ConsumerState<FiltreliTekrarEkrani> {
         ? _kursId
         : (kurslar.isEmpty ? null : kurslar.first.id);
 
-    void kapat() => context.canPop() ? context.pop() : context.go('/tekrar');
+    void kapat() => context.canPop() ? context.pop() : context.go('/pratik');
 
     final oturum = _oturum;
     if (oturum != null && _sonuc == null) {

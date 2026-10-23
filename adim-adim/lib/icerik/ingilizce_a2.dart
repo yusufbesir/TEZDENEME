@@ -122,6 +122,13 @@ const Kurs ingilizceA2 = Kurs(
               aciklama:
                   'Always her zaman demektir. Never hiçbir zaman, sometimes bazen demektir.',
             ),
+            Isaretle(
+              soru: 'Sıklık zarfını işaretle.',
+              cumle: 'She usually walks to work.',
+              dogru: [1],
+              aciklama:
+                  'Usually (genellikle) bir sıklık zarfıdır ve fiilden önce gelir.',
+            ),
             Bosluk(
               soru: 'He ___ eats meat. He is a vegetarian.',
               secenekler: ['always', 'never', 'usually'],
@@ -145,13 +152,6 @@ const Kurs ingilizceA2 = Kurs(
               kelimeler: ['bus', 'go', 'I', 'by', 'usually'],
               dogru: ['I', 'usually', 'go', 'by', 'bus'],
               aciklama: 'Sıklık zarfı ana fiilden önce gelir: I usually go.',
-            ),
-            Bosluk(
-              soru: 'My brother ___ play football on Mondays.',
-              secenekler: ['doesn\'t', 'don\'t', 'isn\'t'],
-              dogru: 0,
-              aciklama:
-                  'Üçüncü tekil kişide olumsuz yapı: doesn\'t + fiilin yalın hali.',
             ),
             Eslestir(
               soru: 'Eşleştir.',
@@ -226,18 +226,19 @@ const Kurs ingilizceA2 = Kurs(
               aciklama:
                   'Yesterday dün demektir. Tomorrow yarın, today bugündür.',
             ),
+            Isaretle(
+              soru: 'Geçmiş zaman fiillerini işaretle.',
+              cumle: 'She opened the door and walked in.',
+              dogru: [1, 5],
+              aciklama:
+                  'Düzenli fiillere geçmişte -ed eklenir: opened, walked.',
+            ),
             Bosluk(
               soru: 'I ___ football yesterday.',
               secenekler: ['play', 'played', 'plays'],
               dogru: 1,
               aciklama:
                   'Geçmiş zaman için düzenli fiillere -ed eklenir: played.',
-            ),
-            Bosluk(
-              soru: 'She ___ the door and went in.',
-              secenekler: ['open', 'opened', 'opens'],
-              dogru: 1,
-              aciklama: 'Geçmiş anlatımda opened kullanılır.',
             ),
             Yaz(
               soru: 'İngilizceye çevir: Dün gece televizyon izledim.',
@@ -832,11 +833,12 @@ const Kurs ingilizceA2 = Kurs(
               dogru: 0,
               aciklama: 'Be going to önceden yapılmış planı anlatır.',
             ),
-            Bosluk(
-              soru: 'We ___ going to have a picnic on Saturday.',
-              secenekler: ['is', 'are', 'am'],
-              dogru: 1,
-              aciklama: 'We öznesiyle are kullanılır.',
+            Isaretle(
+              soru: 'Be going to yapısındaki be fiilini işaretle.',
+              cumle: 'They are going to travel by train.',
+              dogru: [1],
+              aciklama:
+                  'Be going to yapısında be fiili özneye göre değişir: they are.',
             ),
             Bosluk(
               soru: 'Look at those black clouds! It ___ rain.',

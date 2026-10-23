@@ -3,7 +3,8 @@
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Tek birincil eylem "Oyna"dır. Oyun tam ekran sayfa olarak kök Navigator'a
-/// itilir (rota kaydı sonra uygulama.dart'a eklenecek).
+/// itilir (sekme '/yarisma' rotası uygulama.dart'ta kayıtlıdır; dil, kod ve
+/// oyun alanlarının hepsinde çalışır).
 /// Esnek yerleşim: kategori kartları en çok 240 px'lik hücrelerle akar, seviye
 /// seçici dar pencerede yatay kaydırılır, istatistikler dar hücrede sarılır.
 /// docs/SADE-ARAYUZ-VE-YARISMA.md bölüm 5 ve 7.
@@ -200,10 +201,11 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
 }
 
 /// Kategori kartı yüksekliği: üst şerit + dolgu + simge + iki satır ad + iki
-/// satır sayı (dar hücrede "doğru · yanlış" sarılır); metin ölçeğiyle büyür.
+/// satır sayı (360 px gibi dar hücrede "doğru · yanlış" üç satıra sarılabilir);
+/// metin ölçeğiyle büyür.
 double _kartYuksekligi(BuildContext context) {
   final olcek = MediaQuery.textScalerOf(context);
-  final satir = olcek.scale(14) * 1.5 * 2 + olcek.scale(12) * 1.5 * 2;
+  final satir = olcek.scale(14) * 1.5 * 2 + olcek.scale(12) * 1.5 * 3;
   return 4 + 2 * Olcu.b2 + 24 + 4 + satir + 4;
 }
 

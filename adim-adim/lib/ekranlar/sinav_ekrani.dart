@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/sinav_oncesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
@@ -36,6 +37,7 @@ class _SinavDurumu extends ConsumerState<SinavEkrani> {
   final Map<int, bool> _cevaplar = {};
   ({SinavSonucu bu, SinavSonucu? enIyi, bool gecti})? _sonuc;
   bool _kaydediliyor = false;
+  bool _basladi = false;
 
   bool get _sertifika => widget.uniteIndeks == null;
   double get _esik => _sertifika ? Motor.sertifikaEsik : Motor.araSinavEsik;
@@ -146,12 +148,32 @@ class _SinavDurumu extends ConsumerState<SinavEkrani> {
                   '/sertifika?kurs=${Uri.encodeComponent(_kurs!.id)}',
                 ),
               )
+            : !_basladi
+            ? SinavOncesiEkrani(
+                baslik: _baslik,
+                altBaslik: _kurs!.ad,
+                simge: _sertifika ? Icons.workspace_premium : Icons.quiz,
+                soruSayisi: _sorular.length,
+                sureKurali:
+                    'Süre sınırı yok. Sorular kursundaki alıştırmalardan '
+                    'seçilir; sınavdan çıkarsan sonuç kaydedilmez.',
+                gecmeKosulu: 'En az %${(_esik * 100).round()} doğru.',
+                kazanc: _sertifika
+                    ? 'Geçersen seviye sertifikanı alırsın. Sınav XP ve '
+                          'seri kazandırmaz; yalnız en iyi puanın saklanır.'
+                    : 'Ünite ustalığın için en iyi puanın saklanır. Sınav XP '
+                          've seri kazandırmaz; yanlışların tekrar '
+                          'destesine eklenir.',
+                onBasla: () => setState(() => _basladi = true),
+                onVazgec: _cik,
+              )
             : AlistirmaOturumu(
                 alistirmalar: [for (final s in _sorular) s.alistirma],
                 // Kart (SRS) güncellemesi sınav bitince Motor.sinavBitir'de.
                 onSonuc: (i, dogru) => _cevaplar[i] = dogru,
                 onBitti: (_, _) => _bitir(),
                 onKapat: _kapatOnayi,
+                cikisOnayi: false,
               ),
       ),
     );

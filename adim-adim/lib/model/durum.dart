@@ -18,7 +18,9 @@
 /// başarısız ders denemesi (ÖZELLİK 50), 0 ve yok; `yerImleri`/`koleksiyonlar`/
 /// `yerImiGecmisi`: yer imi koleksiyonları, notları ve geçmişi (ÖZELLİK 72),
 /// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
-/// alanları (ÖZELLİK 70), boş liste)
+/// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
+/// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
+/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -397,6 +399,11 @@ class OgrenciDurumu {
     this.koleksiyonlar = const [],
     this.yerImiGecmisi = const [],
     this.kodProjeleri = const [],
+    this.alinanGorevler = const {},
+    this.rozetler = const {},
+    this.haftalikNotlar = const {},
+    this.kelimeEklenme = const {},
+    this.oturumKartSayisi = varsayilanOturumKarti,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -567,6 +574,60 @@ class OgrenciDurumu {
   /// [KodProjesi] içinde.
   final List<KodProjesi> kodProjeleri;
 
+  /// Ödülü alınmış görevler: günlük 'g:YYYY-MM-DD|gorevId', haftalık
+  /// 'h:PazartesiGünü|gorevId'. En yeni [alinanGorevEnCok] anahtar tutulur.
+  final Set<String> alinanGorevler;
+
+  /// Bir kez kazanılmış başarım rozetlerinin kimlikleri (kalıcı: günlük
+  /// kırpılsa da rozet geri alınmaz).
+  final Set<String> rozetler;
+
+  /// Haftalık ödev notları ("Bu hafta ne öğrendim?"): anahtar haftanın
+  /// Pazartesi günü 'YYYY-MM-DD', değer serbest not. Yerelde saklanır; eski
+  /// kayıtta yoksa boş. En çok [haftalikNotEnCok] hafta, not başına en çok
+  /// [haftalikNotEnCokKarakter] karakter.
+  final Map<String, String> haftalikNotlar;
+
+  /// Kelimenin Kelimelerim listesine ilk eklendiği gün: kart kimliği ->
+  /// 'YYYY-MM-DD' ("yeni" etiketi ve "bu hafta eklenen" süzgeci). Eski kayıtta
+  /// boş; en çok [kelimeEklenmeEnCok] kayıt (en yeni günler tutulur).
+  final Map<String, String> kelimeEklenme;
+
+  /// Mikro ders, zayıf noktalar dersi ve karışık tekrar oturumlarında sorulan
+  /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
+  final int oturumKartSayisi;
+
+  static const List<int> oturumKartSecenekleri = [5, 10, 20];
+  static const int varsayilanOturumKarti = 5;
+
+  /// Saklanan görev ödülü ve rozet kaydı sınırları.
+  static const int alinanGorevEnCok = 120;
+  static const int rozetEnCok = 100;
+  static const int haftalikNotEnCok = 52;
+  static const int haftalikNotEnCokKarakter = 500;
+  static const int kelimeEklenmeEnCok = 3000;
+
+  static final _gorevAnahtarDeseni = RegExp(
+    r'^[gh]:\d{4}-\d{2}-\d{2}\|[a-z0-9_]{1,40}$',
+  );
+  static final _rozetDeseni = RegExp(r'^[a-z0-9_]{1,40}$');
+
+  /// Görev ödül anahtarı biçimi: 'g:YYYY-MM-DD|id' ya da 'h:YYYY-MM-DD|id'.
+  static bool gorevAnahtariGecerli(String s) =>
+      _gorevAnahtarDeseni.hasMatch(s) && gunGecerli(s.substring(2, 12));
+
+  /// Rozet kimliği biçimi: küçük harf, rakam, alt çizgi (en çok 40).
+  static bool rozetGecerli(String s) => _rozetDeseni.hasMatch(s);
+
+  /// Anahtarları tarihe göre sıralayıp en yeni [enCok] tanesini tutar.
+  static Set<String> gorevAnahtarlariKirp(Set<String> k, [int? enCok]) {
+    final sinir = enCok ?? alinanGorevEnCok;
+    if (k.length <= sinir) return k;
+    final liste = k.toList()
+      ..sort((a, b) => a.substring(2, 12).compareTo(b.substring(2, 12)));
+    return liste.sublist(liste.length - sinir).toSet();
+  }
+
   /// İlk açılış akışı tamamlandı mı? Varsayılan false. Belirtilmemişse alan
   /// doluysa true sayılır: eski JSON'daki mevcut kullanıcı akışı görmez,
   /// alan seçilmemiş yeni kullanıcı görür.
@@ -651,6 +712,11 @@ class OgrenciDurumu {
     List<String>? koleksiyonlar,
     List<String>? yerImiGecmisi,
     List<KodProjesi>? kodProjeleri,
+    Set<String>? alinanGorevler,
+    Set<String>? rozetler,
+    Map<String, String>? haftalikNotlar,
+    Map<String, String>? kelimeEklenme,
+    int? oturumKartSayisi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -714,6 +780,11 @@ class OgrenciDurumu {
       koleksiyonlar: koleksiyonlar ?? this.koleksiyonlar,
       yerImiGecmisi: yerImiGecmisi ?? this.yerImiGecmisi,
       kodProjeleri: kodProjeleri ?? this.kodProjeleri,
+      alinanGorevler: alinanGorevler ?? this.alinanGorevler,
+      rozetler: rozetler ?? this.rozetler,
+      haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
+      kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
+      oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
     );
   }
 
@@ -775,6 +846,11 @@ class OgrenciDurumu {
     'koleksiyonlar': koleksiyonlar,
     'yerImiGecmisi': yerImiGecmisi,
     'kodProjeleri': [for (final p in kodProjeleri) p.toJson()],
+    'alinanGorevler': alinanGorevler.toList()..sort(),
+    'rozetler': rozetler.toList()..sort(),
+    'haftalikNotlar': haftalikNotlar,
+    'kelimeEklenme': kelimeEklenme,
+    'oturumKartSayisi': oturumKartSayisi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1054,7 +1130,74 @@ class OgrenciDurumu {
       koleksiyonlar: koleksiyonlarCoz(j['koleksiyonlar']),
       yerImiGecmisi: yerImiGecmisiCoz(j['yerImiGecmisi']),
       kodProjeleri: KodProjesi.listeCoz(j['kodProjeleri']),
+      // Eski kayıtta yoksa boş; bozuk anahtarlar atlanır, fazlalar kırpılır.
+      alinanGorevler: Set.unmodifiable(
+        gorevAnahtarlariKirp({
+          if (j['alinanGorevler'] is List)
+            for (final e in j['alinanGorevler'] as List)
+              if (e is String && gorevAnahtariGecerli(e)) e,
+        }),
+      ),
+      rozetler: Set.unmodifiable({
+        if (j['rozetler'] is List)
+          for (final e in (j['rozetler'] as List).take(rozetEnCok))
+            if (e is String && rozetGecerli(e)) e,
+      }),
+      haftalikNotlar: haftalikNotlarCoz(j['haftalikNotlar']),
+      kelimeEklenme: kelimeEklenmeCoz(j['kelimeEklenme']),
+      // Eski kayıtta yoksa ya da 5/10/20 dışındaysa varsayılan (5).
+      oturumKartSayisi:
+          (j['oturumKartSayisi'] is int &&
+              oturumKartSecenekleri.contains(j['oturumKartSayisi']))
+          ? j['oturumKartSayisi'] as int
+          : varsayilanOturumKarti,
     );
+  }
+
+  /// Haftalık notlar: geçersiz hafta anahtarı, boş/metin olmayan değer atılır,
+  /// uzun not kırpılır, en yeni [haftalikNotEnCok] hafta tutulur.
+  static Map<String, String> haftalikNotlarCoz(Object? ham) {
+    final sonuc = <String, String>{};
+    if (ham is Map) {
+      for (final e in ham.entries) {
+        final k = e.key;
+        final v = e.value;
+        if (k is! String || !gunGecerli(k) || v is! String) continue;
+        final t = v.trim();
+        if (t.isEmpty) continue;
+        sonuc[k] = t.length > haftalikNotEnCokKarakter
+            ? t.substring(0, haftalikNotEnCokKarakter)
+            : t;
+      }
+    }
+    final anahtarlar = sonuc.keys.toList()..sort();
+    final tut = anahtarlar.length > haftalikNotEnCok
+        ? anahtarlar.sublist(anahtarlar.length - haftalikNotEnCok)
+        : anahtarlar;
+    return Map.unmodifiable({for (final k in tut) k: sonuc[k]!});
+  }
+
+  /// Kelime eklenme günleri: geçersiz girdi atılır, en yeni günler tutulur.
+  static Map<String, String> kelimeEklenmeCoz(Object? ham) {
+    final sonuc = <String, String>{};
+    if (ham is Map) {
+      for (final e in ham.entries) {
+        final k = e.key;
+        final v = e.value;
+        if (k is! String || k.isEmpty || k.length > 80) continue;
+        if (v is! String || !gunGecerli(v)) continue;
+        sonuc[k] = v;
+      }
+    }
+    if (sonuc.length <= kelimeEklenmeEnCok) return Map.unmodifiable(sonuc);
+    final sirali = sonuc.entries.toList()
+      ..sort((a, b) {
+        final c = b.value.compareTo(a.value);
+        return c != 0 ? c : a.key.compareTo(b.key);
+      });
+    return Map.unmodifiable({
+      for (final e in sirali.take(kelimeEklenmeEnCok)) e.key: e.value,
+    });
   }
 
   static List<YerImi> yerImleriCoz(Object? ham) {

@@ -119,6 +119,7 @@ class _HikayeDurumu extends ConsumerState<HikayeEkrani> {
                   onSonuc: (_, _) {},
                   onBitti: _bitir,
                   onKapat: _kapatOnayi,
+                  cikisOnayi: false,
                 ),
                 _Asama.okuma => _Okuma(
                   hikaye: h,

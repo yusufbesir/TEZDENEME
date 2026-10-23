@@ -6,6 +6,11 @@
 /// `mod=donem` (ÖZELLİK 63: `donem=gunluk|haftalik|aylik`; takvime bağlı,
 /// tamamlanan derslerden karışık; bitişte Motor.donemDersiBitir sabit XP verir).
 ///
+/// Altıncı kip `mod=karisim` (Günlük Karışım): zayıf + zamanı gelen + yeni
+/// kartlardan 10 kartlık karışık oturum ([GunlukKarisim.sec]); bitişi normal
+/// mikro ders gibidir ([Motor.mikroBitir]). Normal ve zayıf kiplerinde kart
+/// sayısı ayarlardaki oturum kart sayısıdır (5/10/20, varsayılan 5).
+///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Seçim `Motor.mikroSec` ile yapılır; bitişte `mikroBitir` XP ve seriyi
@@ -18,9 +23,13 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
+import '../bilesenler/oturum_ozeti.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../motor/oturum_ozeti.dart';
+import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
 class MikroDersEkrani extends ConsumerStatefulWidget {
@@ -32,7 +41,7 @@ class MikroDersEkrani extends ConsumerStatefulWidget {
     this.donem,
   });
 
-  /// null: normal; 'zayif' | 'karisik' | 'quiz'.
+  /// null: normal; 'zayif' | 'karisik' | 'quiz' | 'donem' | 'karisim'.
   final String? mod;
 
   /// 'karisik' ve 'quiz' kiplerinde biten ders kimliği.
@@ -52,6 +61,10 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   late final List<({String kartId, Alistirma alistirma})> _liste;
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
+
+  /// Oturum başındaki durum ve özet verisi (ortak Oturum özeti için).
+  OgrenciDurumu? _onceki;
+  OturumOzetiVeri? _veri;
 
   /// Ekran açıldığından beri geçen süre (günlük süre takibi, ÖZELLİK 80).
   final Stopwatch _sure = Stopwatch()..start();
@@ -77,6 +90,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   void initState() {
     super.initState();
     final durum = ref.read(durumProvider).value;
+    _onceki = durum;
     final kurslar = ref.read(alanKurslariProvider);
     final tohum = DateTime.now().millisecondsSinceEpoch;
     final bugun = ref.read(bugunProvider);
@@ -99,12 +113,14 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
         widget.dersId!,
         tohum: tohum,
       );
+    } else if (widget.mod == 'karisim') {
+      _liste = GunlukKarisim.sec(durum, kurslar, bugun, tohum: tohum);
     } else {
       _liste = Motor.mikroSec(
         durum,
         kurslar,
         bugun,
-        adet: 5,
+        adet: durum.oturumKartSayisi,
         tohum: tohum,
         oncelikliKartlar: widget.mod == 'zayif'
             ? Motor.zayifKartlar(durum, bugun)
@@ -125,7 +141,9 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
               ? 'Quizden çıkılsın mı?'
               : (_donem != null
                     ? '${Motor.donemAdi(_donem!)} bırakılsın mı?'
-                    : 'Mikro dersten çıkılsın mı?'),
+                    : (widget.mod == 'karisim'
+                          ? 'Günlük karışımdan çıkılsın mı?'
+                          : 'Mikro dersten çıkılsın mı?')),
         ),
         content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
         actions: [
@@ -157,17 +175,32 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
     // Harcanan süre günlük süreye eklenir (bir oturumda en çok 1 saat).
     await bildirici.sureEkle(_sure.elapsed.inSeconds.clamp(0, 3600));
     if (!mounted) return;
+    final xp = donem != null
+        ? Motor.donemXp(donem)
+        : _quiz
+        ? Motor.quizXp(dogru, toplam)
+        : Motor.mikroXp(dogru, toplam);
+    final onceki = _onceki;
+    // Büyüyen sözlük: oturumda Kelimelerim havuzuna giren yeni kelimeler.
+    final yeniKelime = onceki == null
+        ? 0
+        : await ref
+              .read(durumProvider.notifier)
+              .yeniKelimeleriIsle(onceki, ref.read(kurslarProvider));
+    if (!mounted) return;
+    _veri = onceki == null
+        ? null
+        : OturumOzetiMotoru.hesapla(
+            onceki: onceki,
+            sonraki: yeni,
+            kurslar: ref.read(kurslarProvider),
+            dogru: dogru,
+            toplam: toplam,
+            xp: xp,
+            yeniKelime: yeniKelime,
+          );
     setState(
-      () => _ozet = (
-        dogru: dogru,
-        toplam: toplam,
-        xp: donem != null
-            ? Motor.donemXp(donem)
-            : _quiz
-            ? Motor.quizXp(dogru, toplam)
-            : Motor.mikroXp(dogru, toplam),
-        seri: yeni.seri,
-      ),
+      () => _ozet = (dogru: dogru, toplam: toplam, xp: xp, seri: yeni.seri),
     );
   }
 
@@ -191,6 +224,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                   'karisik' => 'Karışık tekrar tamamlandı',
                   'quiz' => 'Quiz tamamlandı',
                   'donem' => '${Motor.donemAdi(_donem ?? '')} tamamlandı',
+                  'karisim' => 'Günlük karışım tamamlandı',
                   _ => 'Mikro ders tamamlandı',
                 },
                 dogru: _ozet!.dogru,
@@ -198,6 +232,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                 xp: _ozet!.xp,
                 seri: _ozet!.seri,
                 onDon: _cik,
+                oturum: _veri == null ? null : OturumOzeti(veri: _veri!),
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final o in _liste) o.alistirma],
@@ -214,6 +249,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                           .kartIsle(_liste[i].kartId, dogru),
                 onBitti: _bitir,
                 onKapat: _kapatOnayi,
+                cikisOnayi: false,
               ),
       ),
     );

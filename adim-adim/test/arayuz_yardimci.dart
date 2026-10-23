@@ -26,6 +26,9 @@ import 'sahte_icerik.dart';
 class SahteSes extends Ses {
   final okunanlar = <String>[];
 
+  /// Her `oku` çağrısındaki konuşma hızı (yavaş düğmesi testi).
+  final hizlar = <double>[];
+
   /// Kaç kez durdur çağrıldı (kelime oynatıcı duraklatma testi).
   int durdurmaSayisi = 0;
   @override
@@ -34,6 +37,7 @@ class SahteSes extends Ses {
   @override
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     okunanlar.add(metin);
+    hizlar.add(konusmaHizi);
     return true;
   }
 
@@ -84,6 +88,7 @@ Future<ProviderContainer> uygulamayiAc(
   Size boyut = const Size(500, 1600),
   double metinOlcegi = 1.0,
   List<Override> ekOverrides = const [],
+  String bugun = '2026-10-15',
 }) async {
   tester.view.physicalSize = boyut;
   tester.view.devicePixelRatio = 1;
@@ -99,7 +104,7 @@ Future<ProviderContainer> uygulamayiAc(
         ),
         kurslarProvider.overrideWithValue(kurslar ?? [sahteKurs]),
         yarismaDepoProvider.overrideWithValue(BellekYarismaDepo()),
-        bugunProvider.overrideWithValue('2026-10-15'),
+        bugunProvider.overrideWithValue(bugun),
         sesProvider.overrideWithValue(ses ?? SahteSes()),
         bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
         if (konusma != null) konusmaProvider.overrideWithValue(konusma),
@@ -122,4 +127,17 @@ Future<void> dokun(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f);
   await tester.tap(f);
   await tester.pumpAndSettle();
+}
+
+/// Tekrar ekranına Pratik sekmesindeki "Tekrar" kartıyla gider (Tekrar artık
+/// ayrı sekme değil, kabuk dışı `/tekrar` sayfasıdır).
+Future<void> tekrarEkraniniAc(WidgetTester tester) async {
+  final cubuk = find.byType(NavigationRail).evaluate().isNotEmpty
+      ? find.byType(NavigationRail)
+      : find.byType(NavigationBar);
+  await dokun(
+    tester,
+    find.descendant(of: cubuk, matching: find.text('Pratik')),
+  );
+  await dokun(tester, find.byKey(const ValueKey('pratik-tekrar')));
 }

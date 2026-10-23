@@ -28,10 +28,12 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
   int? _secili;
   bool _sesHatasi = false;
 
-  Future<void> _oku() async {
-    final tamam = await ref
-        .read(sesProvider)
-        .oku(widget.alistirma.okunacak, dil: widget.alistirma.dil);
+  Future<void> _oku({bool yavas = false}) async {
+    final ses = ref.read(sesProvider);
+    final a = widget.alistirma;
+    final tamam = yavas
+        ? await ses.okuYavas(a.okunacak, dil: a.dil)
+        : await ses.oku(a.okunacak, dil: a.dil);
     if (!tamam && mounted && !_sesHatasi) setState(() => _sesHatasi = true);
   }
 
@@ -41,6 +43,8 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
     final yazi = Theme.of(context).textTheme;
     final sesAcik = ref.watch(durumProvider).value?.sesAcik ?? true;
     final a = widget.alistirma;
+    // Ses kapalıyken ya da ses servisi çalışmıyorsa düğmeler pasif; cümle yazıyla gösterilir.
+    final dugmeAktif = sesAcik && !_sesHatasi;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -50,25 +54,30 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
             padding: const EdgeInsets.only(bottom: Olcu.b3),
             child: Column(
               children: [
-                Semantics(
-                  button: true,
-                  enabled: sesAcik,
-                  label: 'Cümleyi dinle',
-                  excludeSemantics: true,
-                  onTap: sesAcik ? _oku : null,
-                  child: SizedBox(
-                    width: 96,
-                    height: 96,
-                    child: FilledButton(
-                      onPressed: sesAcik ? _oku : null,
-                      style: FilledButton.styleFrom(
-                        shape: const CircleBorder(),
-                        minimumSize: const Size(96, 96),
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: const Icon(Icons.volume_up, size: 40),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _SesDugmesi(
+                      anahtar: const Key('dinle-normal'),
+                      etiket: 'Cümleyi dinle',
+                      gorunenEtiket: 'Normal',
+                      simge: Icons.volume_up,
+                      boyut: 96,
+                      aktif: dugmeAktif,
+                      onBas: _oku,
                     ),
-                  ),
+                    const SizedBox(width: Olcu.b3),
+                    _SesDugmesi(
+                      anahtar: const Key('dinle-yavas'),
+                      etiket: 'Cümleyi yavaş dinle',
+                      gorunenEtiket: 'Yavaş',
+                      simge: Icons.slow_motion_video,
+                      boyut: 64,
+                      aktif: dugmeAktif,
+                      onBas: () => _oku(yavas: true),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: Olcu.b1),
                 Text(
@@ -111,6 +120,65 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
             setState(() => _secili = i);
             widget.onCevap(i);
           },
+        ),
+      ],
+    );
+  }
+}
+
+/// Yuvarlak ses düğmesi + altında görünür etiket ("Normal" / "Yavaş").
+class _SesDugmesi extends StatelessWidget {
+  const _SesDugmesi({
+    required this.anahtar,
+    required this.etiket,
+    required this.gorunenEtiket,
+    required this.simge,
+    required this.boyut,
+    required this.aktif,
+    required this.onBas,
+  });
+
+  final Key anahtar;
+  final String etiket;
+  final String gorunenEtiket;
+  final IconData simge;
+  final double boyut;
+  final bool aktif;
+  final VoidCallback onBas;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          button: true,
+          enabled: aktif,
+          label: etiket,
+          excludeSemantics: true,
+          onTap: aktif ? onBas : null,
+          child: SizedBox(
+            width: boyut,
+            height: boyut,
+            child: FilledButton(
+              key: anahtar,
+              onPressed: aktif ? onBas : null,
+              style: FilledButton.styleFrom(
+                shape: const CircleBorder(),
+                minimumSize: Size(boyut, boyut),
+                padding: EdgeInsets.zero,
+              ),
+              child: Icon(simge, size: boyut * 0.42),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          gorunenEtiket,
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(color: r.metinIkincil),
         ),
       ],
     );

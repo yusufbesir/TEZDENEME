@@ -10,6 +10,7 @@ param(
   [Parameter(Mandatory = $true)][string]$Kaynak,
   [Parameter(Mandatory = $true)][string]$Surum,
   [Parameter(Mandatory = $true)][string]$Cikti,
+  [string]$Imza = $env:ADIM_IMZA_PARMAK_IZI,  # İsteğe bağlı: Cert:\CurrentUser\My içindeki kod imzalama sertifikasının parmak izi (anahtar dosyası/şifre betikte tutulmaz)
   [string]$Makensis = "$env:LOCALAPPDATA\electron-builder\Cache\nsis-3.0.4.1\nsis-3.0.4.1-1mx3n\makensis.exe"
 )
 $ErrorActionPreference = 'Stop'
@@ -20,6 +21,15 @@ New-Item -ItemType Directory -Force $uretilen | Out-Null
 $kok = (Resolve-Path $Kaynak).Path.TrimEnd('\')
 if (-not (Test-Path (Join-Path $kok 'adim_adim.exe'))) { throw "adim_adim.exe yok: $kok" }
 if ($Surum -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw "Surum 4 parçalı olmalı (1.2.3.4): $Surum" }
+
+function Imzala([string]$yol) {
+  if (-not $Imza) { return }
+  $sert = Get-Item "Cert:\CurrentUser\My\$Imza" -ErrorAction Stop
+  $r = Set-AuthenticodeSignature -FilePath $yol -Certificate $sert -HashAlgorithm SHA256
+  if ($r.SignerCertificate -eq $null) { throw "İmzalanamadı: $yol ($($r.StatusMessage))" }
+  Write-Host "İmzalandı: $yol"
+}
+Imzala (Join-Path $kok 'adim_adim.exe')
 
 # Bağ/junction içeren pakette derleme yapılmaz.
 $tum = Get-ChildItem -LiteralPath $kok -Recurse -Force
@@ -63,5 +73,6 @@ Set-Content -Path (Join-Path $uretilen 'liste-sha.nsh') -Value "!define LISTE_SH
 if (-not (Test-Path $Makensis)) { throw "makensis bulunamadı: $Makensis" }
 & $Makensis /V2 "/DSURUM=$Surum" "/DCIKTI=$Cikti" (Join-Path $here 'adim-adim.nsi')
 if ($LASTEXITCODE -ne 0) { throw "makensis hata kodu $LASTEXITCODE" }
+Imzala $Cikti
 Write-Host "Kurulum programı: $Cikti"
 Write-Host "SHA256: $((Get-FileHash $Cikti -Algorithm SHA256).Hash)"

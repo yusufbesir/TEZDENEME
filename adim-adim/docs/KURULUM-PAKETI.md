@@ -7,7 +7,7 @@
 ```
 cd adim-adim
 flutter build windows --release
-powershell -File tool/kurulum/derle.ps1 -Kaynak build/windows/x64/runner/Release -Surum 1.0.0.1 -Cikti D:\...\Adim-Adim-Kurulum-1.0.0.1.exe
+powershell -File tool/kurulum/derle.ps1 [-Imza <parmak izi>] -Kaynak build/windows/x64/runner/Release -Surum 1.0.0.1 -Cikti D:\...\Adim-Adim-Kurulum-1.0.0.1.exe
 ```
 `makensis.exe` yolu `-Makensis` ile verilir (varsayılan: electron-builder önbelleği, `%LOCALAPPDATA%\electron-builder\Cache\nsis-3.0.4.1\...`). Üretim artıkları `tool/kurulum/uretilen/` (git dışı).
 
@@ -21,6 +21,6 @@ powershell -File tool/kurulum/derle.ps1 -Kaynak build/windows/x64/runner/Release
 - Güncelleme: yeni sürüm üstüne kurulur; eski listede olup yeni listede olmayan dosyalar (yol ve bağ denetiminden geçerse) kaldırılır. Kullanıcının koyduğu dosyalara dokunulmaz.
 
 ## Bilinen sınırlar
-- İmzasız (kod imzası yok): SmartScreen uyarı verebilir.
+- Kod imzası kendi kendine imzalıdır (`-Imza <parmak izi>` ya da `ADIM_IMZA_PARMAK_IZI`; sertifika `Cert:\CurrentUser\My` içinde, anahtar dışa aktarılamaz, betikte şifre/anahtar dosyası yok). Güvenilen kök sertifikalara eklenmedi, bu yüzden SmartScreen yine uyarabilir; kullanıcı ek olarak güvenirse uyarı kalkar. Gerçek (CA) sertifikası alınırsa aynı parametre onun parmak izini alır. `adim_adim.exe` ve kurulum programı imzalanır; `kaldir.exe` imzasızdır.
 - Uygulamalar listesinden kaldırınca NSIS, silme için kendini `%TEMP%` altına kopyalar (standart NSIS davranışı; kalıcı değildir).
 - Derleme 2026-10-21'de `1.0.0.1` olarak denendi: sessiz kurulum, açıp kapatma, güncelleme (artık dosya ayıklama), sessiz kaldırma geçti; etkileşimli "veri silinsin mi" sorusu elle denenmedi.

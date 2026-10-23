@@ -1083,6 +1083,33 @@ abstract final class Motor {
     return null;
   }
 
+  /// Mikro ders dolgu havuzu (karıştırılmamış): kurslar sırasında ilk
+  /// tamamlanmamış dersin ve tamamlanmış tüm derslerin kartları; [haric]teki
+  /// kart kimlikleri atlanır. [mikroSec] ve Günlük Karışım ortak kullanır.
+  static List<({String kartId, Alistirma alistirma})> mikroHavuzu(
+    OgrenciDurumu d,
+    List<Kurs> kurslar, {
+    Set<String> haric = const {},
+  }) {
+    final havuz = <({String kartId, Alistirma alistirma})>[];
+    var siradakiBulundu = false;
+    for (final k in kurslar) {
+      for (final ders in k.tumDersler) {
+        final bitti = (d.tamamlanan[ders.id] ?? 0) > 0;
+        final al = bitti || !siradakiBulundu;
+        if (!bitti) siradakiBulundu = true;
+        if (!al) continue;
+        for (var i = 0; i < ders.alistirmalar.length; i++) {
+          final id = ders.kartKimligi(i);
+          if (!haric.contains(id)) {
+            havuz.add((kartId: id, alistirma: ders.alistirmalar[i]));
+          }
+        }
+      }
+    }
+    return havuz;
+  }
+
   /// Mikro ders seçimi (en çok [adet]): önce zamanı gelen tekrar kartları,
   /// kalan yerler sıradaki dersten ve tamamlanmış derslerden doldurulur.
   /// Dolgu karışıktır; mümkünse aynı türden ardışık iki alıştırma gelmez.
@@ -1112,22 +1139,7 @@ abstract final class Motor {
     }
 
     // Dolgu havuzu: kurslar sırasında ilk tamamlanmamış ders + tamamlanmışlar.
-    final havuz = <({String kartId, Alistirma alistirma})>[];
-    var siradakiBulundu = false;
-    for (final k in kurslar) {
-      for (final ders in k.tumDersler) {
-        final bitti = (d.tamamlanan[ders.id] ?? 0) > 0;
-        final al = bitti || !siradakiBulundu;
-        if (!bitti) siradakiBulundu = true;
-        if (!al) continue;
-        for (var i = 0; i < ders.alistirmalar.length; i++) {
-          final id = ders.kartKimligi(i);
-          if (!alinan.contains(id)) {
-            havuz.add((kartId: id, alistirma: ders.alistirmalar[i]));
-          }
-        }
-      }
-    }
+    final havuz = mikroHavuzu(d, kurslar, haric: alinan);
     havuz.shuffle(math.Random(tohum));
 
     while (sonuc.length < adet && havuz.isNotEmpty) {

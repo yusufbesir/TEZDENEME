@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/sinav_oncesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../motor/efsanevi.dart';
@@ -47,6 +48,7 @@ class _EfsaneviDurumu extends ConsumerState<EfsaneviEkrani> {
   int _dogru = 0;
   int _toplam = 0;
   bool _zatenAltin = false;
+  bool _basladi = false;
 
   @override
   void initState() {
@@ -60,11 +62,12 @@ class _EfsaneviDurumu extends ConsumerState<EfsaneviEkrani> {
         kurs != null &&
         Efsanevi.acik(durum, kurs, widget.uniteIndeks)) {
       _zatenAltin = Efsanevi.altinMi(durum, kurs.uniteler[widget.uniteIndeks]);
-      _baslat();
+      // Sayaç, "Başlamadan önce" ekranında Başla'ya basılınca çalışır.
+      _hazirla();
     }
   }
 
-  void _baslat() {
+  void _hazirla() {
     final kurs = _kurs!;
     _sorular = Efsanevi.sec(
       kurs,
@@ -74,6 +77,14 @@ class _EfsaneviDurumu extends ConsumerState<EfsaneviEkrani> {
     _tur++;
     _kalanSn = Efsanevi.sureSn(_sorular.length);
     _sonuc = _Sonuc.yok;
+  }
+
+  void _baslat() {
+    _hazirla();
+    _sayacBaslat();
+  }
+
+  void _sayacBaslat() {
     _sayac?.cancel();
     _sayac = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _sonuc != _Sonuc.yok) return;
@@ -122,6 +133,31 @@ class _EfsaneviDurumu extends ConsumerState<EfsaneviEkrani> {
       body: SafeArea(
         child: kurs == null || _sorular.isEmpty
             ? _Bos(onGeri: _cik)
+            : !_basladi
+            ? SinavOncesiEkrani(
+                baslik:
+                    'Efsanevi tekrar: ${kurs.uniteler[widget.uniteIndeks].ad}',
+                altBaslik: kurs.ad,
+                simge: Icons.local_fire_department_outlined,
+                soruSayisi: _sorular.length,
+                sureKurali:
+                    'Toplam ${_sureMetni(Efsanevi.sureSn(_sorular.length))} '
+                    '(soru başına ${Efsanevi.soruBasinaSaniye} sn), ipucu yok. '
+                    'Süre, Başla düğmesine basınca işler.',
+                gecmeKosulu:
+                    'En az %${(Efsanevi.gecmeOrani * 100).round()} doğru ve '
+                    'süre dolmadan.',
+                kazanc: _zatenAltin
+                    ? 'Ünite zaten altın. Başarısızlıkta ceza yok; kartların, '
+                          'hata defterin, XP ve serin değişmez.'
+                    : 'Geçersen ünite altın olur. Başarısızlıkta ceza yok; '
+                          'kartların, hata defterin, XP ve serin değişmez.',
+                onBasla: () {
+                  setState(() => _basladi = true);
+                  _sayacBaslat();
+                },
+                onVazgec: _cik,
+              )
             : _sonuc != _Sonuc.yok
             ? _SonucGorunumu(
                 sonuc: _sonuc,

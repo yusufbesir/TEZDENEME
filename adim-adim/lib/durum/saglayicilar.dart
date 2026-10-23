@@ -17,7 +17,10 @@ import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
+import '../motor/basarimlar.dart';
 import '../motor/efsanevi.dart';
+import '../motor/haftalik_odev.dart';
+import '../motor/gorevler.dart';
 import '../motor/kod_calistirici.dart';
 import '../motor/kod_projesi.dart';
 import '../motor/meydan.dart';
@@ -211,6 +214,26 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     );
   }
 
+  /// Haftalık ödev notu ("Bu hafta ne öğrendim?"): bugünün haftasına yazar;
+  /// boş metin o haftanın notunu siler. Yerelde saklanır.
+  Future<OgrenciDurumu> haftalikNotKaydet(String metin) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => HaftalikOdev.notKaydet(d, bugun, metin));
+  }
+
+  /// Büyüyen sözlük: [onceki] oturum başı durumuna göre Kelimelerim havuzuna
+  /// giren yeni kelimelerin eklenme gününü kaydeder; yeni kelime sayısını döner.
+  Future<int> yeniKelimeleriIsle(
+    OgrenciDurumu onceki,
+    List<Kurs> kurslar,
+  ) async {
+    final ids = YeniKelimeler.bul(onceki, _simdiki, kurslar);
+    if (ids.isEmpty) return 0;
+    final bugun = ref.read(bugunProvider);
+    await _uygula((d) => YeniKelimeler.isle(d, ids, bugun));
+    return ids.length;
+  }
+
   /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri
   /// "atlandı" işaretlenir (XP/seri/kart yok).
   Future<OgrenciDurumu> yerlestirmeUygula(Kurs kurs, List<int> gecilen) =>
@@ -269,6 +292,18 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     if (sn <= 0) return _simdiki;
     final bugun = ref.read(bugunProvider);
     return _uygula((d) => Motor.sureEkle(d, bugun, sn));
+  }
+
+  /// Tamamlanmış görevin sabit XP ödülünü verir (Gorevler.odulAl); görev
+  /// tamam değilse ya da ödül alınmışsa durum değişmez.
+  Future<OgrenciDurumu> gorevOdulAl(Gorev gorev) =>
+      _uygula((d) => Gorevler.odulAl(d, gorev));
+
+  /// Yeni kazanılan başarım rozetlerini kalıcı kayda ekler; yenisi yoksa
+  /// hiçbir şey yazılmaz.
+  Future<OgrenciDurumu> rozetleriIsle(List<Kurs> kurslar) async {
+    if (Basarimlar.yeniKazanilan(_simdiki, kurslar).isEmpty) return _simdiki;
+    return _uygula((d) => Basarimlar.rozetleriIsle(d, kurslar));
   }
 
   /// Günlük dakika hedefini ayarlar; 0 kapatır (ÖZELLİK 80).
@@ -503,6 +538,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? tekrarBildirimiAcik,
     bool? konusmaAcik,
     bool? gunDersiBildirimiAcik,
+    int? oturumKartSayisi,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -520,6 +556,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         tekrarBildirimiAcik: tekrarBildirimiAcik,
         konusmaAcik: konusmaAcik,
         gunDersiBildirimiAcik: gunDersiBildirimiAcik,
+        // Yalnız 5/10/20 kabul edilir; başka değer yok sayılır.
+        oturumKartSayisi:
+            (oturumKartSayisi != null &&
+                OgrenciDurumu.oturumKartSecenekleri.contains(oturumKartSayisi))
+            ? oturumKartSayisi
+            : null,
       ),
     );
     final bildirim = ref.read(bildirimProvider);
@@ -560,4 +602,18 @@ final durumProvider = AsyncNotifierProvider<DurumNotifier, OgrenciDurumu>(
 final alanKurslariProvider = Provider<List<Kurs>>((ref) {
   final alan = ref.watch(durumProvider).value?.alan;
   return Motor.alanKurslari(ref.watch(kurslarProvider), alan);
+});
+
+/// Seçili alandaki zamanı gelmiş (bekleyen) tekrar kartı sayısı. Pratik
+/// sekmesi rozeti, Pratik ekranı ve Görevler ekranı ortak kullanır; yalnızca
+/// seçili alanın kurslarındaki kartlar sayılır.
+final bekleyenTekrarProvider = Provider<int>((ref) {
+  final durum = ref.watch(durumProvider).value;
+  if (durum == null) return 0;
+  final alanKurslari = ref.watch(alanKurslariProvider);
+  final bugun = ref.watch(bugunProvider);
+  return Motor.tekrarBekleyen(
+    durum,
+    bugun,
+  ).where((id) => Motor.kartCoz(alanKurslari, id) != null).length;
 });

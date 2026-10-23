@@ -120,7 +120,11 @@ void main() {
         AlanRenkleri.kursRengi(KursAlani.oyun, Brightness.light),
         AlanRenkleri.oyunAcik,
       );
-      expect(seviyeler('oyun'), isEmpty);
+      expect(seviyeler('oyun').map((e) => e.kursId), [
+        'satranc-1',
+        'satranc-2',
+        'satranc-3',
+      ]);
     });
   });
 

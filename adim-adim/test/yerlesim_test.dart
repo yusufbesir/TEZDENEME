@@ -3,7 +3,7 @@
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden kod
 /// değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
-/// Matris: 480x600, 700x600, 900x700, 1280x720, 1600x900 × metin ölçeği 1,0
+/// Matris: 360x640, 480x600, 700x600, 900x700, 1280x720, 1600x900 × metin ölçeği 1,0
 /// ve 1,5 (uygulama 1,3'e kıstırır). Taşma = RenderFlex overflow hatası.
 library;
 
@@ -12,6 +12,7 @@ import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/tema/tema.dart';
+import 'package:adim_adim/uygulama.dart' show yonlendiriciProvider;
 import 'package:adim_adim/yarisma/depo.dart';
 import 'package:adim_adim/yarisma/ekranlar/oyun_ekrani.dart';
 import 'package:adim_adim/yarisma/motor.dart';
@@ -25,6 +26,7 @@ import 'arayuz_yardimci.dart';
 import 'sahte_icerik.dart';
 
 const _boyutlar = <Size>[
+  Size(360, 640),
   Size(480, 600),
   Size(700, 600),
   Size(900, 700),
@@ -152,7 +154,13 @@ void main() {
           boyut: boyut,
           metinOlcegi: 1.5,
         );
-        for (final sekme in ['Yol', 'Yarışma', 'Tekrar', 'Profil']) {
+        for (final sekme in [
+          'Yol',
+          'Pratik',
+          'Yarışma',
+          'Görevler',
+          'Profil',
+        ]) {
           await dokun(tester, _sekme(tester, sekme));
           await _tasmaYok(tester, sekme);
           expect(
@@ -206,8 +214,10 @@ void main() {
         final ad =
             '${boyut.width.toInt()}x${boyut.height.toInt()} '
             'ölçek $olcek';
-        testWidgets('Yol, Yarışma, Tekrar, Profil: $ad', (tester) async {
-          await uygulamayiAc(
+        testWidgets('Yol, Pratik, Yarışma, Görevler, Profil: $ad', (
+          tester,
+        ) async {
+          final kap = await uygulamayiAc(
             tester,
             BellekDepo(_durum()),
             kurslar: [sahteKurs, sahteKodKurs],
@@ -215,9 +225,31 @@ void main() {
             metinOlcegi: olcek,
           );
           await _tasmaYok(tester, 'Yol $ad');
-          for (final sekme in ['Yarışma', 'Tekrar', 'Profil', 'Yol']) {
+          for (final sekme in [
+            'Pratik',
+            'Yarışma',
+            'Görevler',
+            'Profil',
+            'Yol',
+          ]) {
             await dokun(tester, _sekme(tester, sekme));
             await _tasmaYok(tester, '$sekme $ad');
+          }
+          // Kabuk dışı sayfalar: Tekrar, Başarımlar, Kelimelerim, Hızlı tekrar
+          // girişi, Günlük karışım ve Ayarlar.
+          for (final yol in [
+            '/tekrar',
+            '/basarimlar',
+            '/kelimelerim',
+            '/pratik/hizli',
+            '/mikro?mod=karisim',
+            '/ayarlar',
+          ]) {
+            kap.read(yonlendiriciProvider).push(yol);
+            await tester.pumpAndSettle();
+            await _tasmaYok(tester, '$yol $ad');
+            kap.read(yonlendiriciProvider).pop();
+            await tester.pumpAndSettle();
           }
         });
 
@@ -250,6 +282,42 @@ void main() {
         });
       }
     }
+  });
+
+  group('360x640 alt çubuk', () {
+    // Test yazı tipi (Ahem) her harfi 1 em genişlikte çizer; gerçek yazı
+    // tipinden çok geniştir. Bu yüzden etiket genişliği ölçülmez: etiket
+    // stilinin 12 px (11 px alt sınırının üstünde) olduğu, 5 hedefin eşit
+    // genişlikte (72 px) kaldığı ve taşma olmadığı denetlenir.
+    testWidgets('5 sekme etiketi 12 px, hedefler eşit, taşma yok (ölçek 1,5)', (
+      tester,
+    ) async {
+      await uygulamayiAc(
+        tester,
+        BellekDepo(_durum()),
+        kurslar: [sahteKurs, sahteKodKurs],
+        boyut: const Size(360, 640),
+        metinOlcegi: 1.5,
+      );
+      final cubuk = find.byType(NavigationBar);
+      expect(cubuk, findsOneWidget);
+      final tema = Theme.of(tester.element(cubuk)).navigationBarTheme;
+      final stil = tema.labelTextStyle!.resolve(<WidgetState>{});
+      expect(stil!.fontSize, 12);
+      final hedefler = find.descendant(
+        of: cubuk,
+        matching: find.byType(NavigationDestination),
+      );
+      expect(hedefler, findsNWidgets(5));
+      final genislikler = {
+        for (var i = 0; i < 5; i++) tester.getSize(hedefler.at(i)).width,
+      };
+      expect(genislikler, {72.0});
+      for (final ad in ['Yol', 'Pratik', 'Yarışma', 'Görevler', 'Profil']) {
+        expect(_sekme(tester, ad), findsOneWidget, reason: ad);
+      }
+      await _tasmaYok(tester, 'alt çubuk 360x640');
+    });
   });
 
   group('kırılma noktaları', () {

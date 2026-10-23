@@ -94,13 +94,8 @@ void main() {
   });
 
   group('KelimeSagligiPanosu arayüzü', () {
-    Future<void> tekrarSekmesineGec(WidgetTester tester) => dokun(
-      tester,
-      find.descendant(
-        of: find.byType(NavigationBar),
-        matching: find.text('Tekrar'),
-      ),
-    );
+    Future<void> tekrarSekmesineGec(WidgetTester tester) =>
+        tekrarEkraniniAc(tester);
 
     BellekDepo dolaDepo() => BellekDepo(
       OgrenciDurumu(

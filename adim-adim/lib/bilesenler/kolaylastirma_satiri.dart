@@ -19,7 +19,7 @@ class KolaylastirmaSatiri extends StatelessWidget {
   final KolaylastirmaOnerisi? oneri;
 
   /// Önerinin rotası: kolay ders / yeniden dene -> ders, tekrar -> Tekrar
-  /// sekmesi, zayıf -> zayıf noktalar dersi.
+  /// ekranı (Pratik sekmesinden açılan), zayıf -> zayıf noktalar dersi.
   static String rota(KolaylastirmaOnerisi o) => switch (o.tur) {
     'ders' || 'yeniden' => '/ders/${Uri.encodeComponent(o.dersId ?? '')}',
     'zayif' => '/mikro?mod=zayif',
@@ -53,9 +53,7 @@ class KolaylastirmaSatiri extends StatelessWidget {
               child: FilledButton.tonal(
                 key: const ValueKey('kolaylastirma-git'),
                 style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
-                onPressed: () => o.tur == 'tekrar'
-                    ? context.go(rota(o))
-                    : context.push(rota(o)),
+                onPressed: () => context.push(rota(o)),
                 child: Text(o.etiket),
               ),
             ),

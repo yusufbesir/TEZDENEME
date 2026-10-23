@@ -1,33 +1,35 @@
 // Yarışma soru bankası testleri.
 // Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 import 'package:adim_adim/yarisma/model.dart';
+import 'package:adim_adim/yarisma/motor.dart';
 import 'package:adim_adim/yarisma/soru_bankasi.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_a2.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_b1.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_b2.dart';
+import 'package:adim_adim/yarisma/sorular/oyun_sorulari.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test(
-    'toplam 216 soru var: 144 İngilizce (A1+A2+B1+B2) + 3x24 programlama',
-    () {
-      expect(tumSorular.length, 216);
-      expect(sorulariBul('dil', 'ingilizce-1').length, 36);
-      expect(sorulariBul('dil', 'ingilizce-2').length, 36);
-      expect(sorulariBul('dil', 'ingilizce-3').length, 36);
-      expect(sorulariBul('dil', 'ingilizce-4').length, 36);
-      expect(
-        sorulariBul('dil', 'ingilizce-1').length +
-            sorulariBul('dil', 'ingilizce-2').length +
-            sorulariBul('dil', 'ingilizce-3').length +
-            sorulariBul('dil', 'ingilizce-4').length,
-        144,
-      );
-      expect(sorulariBul('kod', 'html-1').length, 24);
-      expect(sorulariBul('kod', 'css-1').length, 24);
-      expect(sorulariBul('kod', 'js-1').length, 24);
-    },
-  );
+  test('toplam 306 soru var: 144 İngilizce + 3x24 programlama + 90 oyun', () {
+    expect(tumSorular.length, 306);
+    expect(sorulariBul('oyun', 'satranc-1').length, 30);
+    expect(sorulariBul('oyun', 'satranc-2').length, 30);
+    expect(sorulariBul('oyun', 'satranc-3').length, 30);
+    expect(sorulariBul('dil', 'ingilizce-1').length, 36);
+    expect(sorulariBul('dil', 'ingilizce-2').length, 36);
+    expect(sorulariBul('dil', 'ingilizce-3').length, 36);
+    expect(sorulariBul('dil', 'ingilizce-4').length, 36);
+    expect(
+      sorulariBul('dil', 'ingilizce-1').length +
+          sorulariBul('dil', 'ingilizce-2').length +
+          sorulariBul('dil', 'ingilizce-3').length +
+          sorulariBul('dil', 'ingilizce-4').length,
+      144,
+    );
+    expect(sorulariBul('kod', 'html-1').length, 24);
+    expect(sorulariBul('kod', 'css-1').length, 24);
+    expect(sorulariBul('kod', 'js-1').length, 24);
+  });
 
   test('tüm sorular geçerli', () {
     for (final s in tumSorular) {
@@ -46,7 +48,7 @@ void main() {
   test(
     'her (alan, kursId, kategori) için en az 4 soru; A1, A2, B1 ve B2 için 6',
     () {
-      for (final alan in ['dil', 'kod']) {
+      for (final alan in ['dil', 'kod', 'oyun']) {
         for (final sv in seviyeler(alan)) {
           for (final k in YarismaKategori.values) {
             final adet = sorulariBul(
@@ -80,8 +82,50 @@ void main() {
       ('css-1', 'CSS'),
       ('js-1', 'JS'),
     ]);
+    final oyun = seviyeler('oyun');
+    expect(oyun.map((s) => (s.kursId, s.etiket)), [
+      ('satranc-1', 'Başlangıç'),
+      ('satranc-2', 'Orta'),
+      ('satranc-3', 'İleri'),
+    ]);
     expect(seviyeler('bilinmeyen'), isEmpty);
   });
+
+  test(
+    'oyun soruları: alan oyun, kategori başına 5, her seviye oynanabilir',
+    () {
+      expect(oyunSorulari.length, 90);
+      for (final s in oyunSorulari) {
+        expect(s.gecerliMi, isTrue, reason: s.id);
+        expect(s.alan, 'oyun', reason: s.id);
+        expect(s.id, startsWith('${s.seviyeKursId}.${s.kategori.kimlik}.'));
+      }
+      for (final sv in seviyeler('oyun')) {
+        for (final k in YarismaKategori.values) {
+          expect(
+            sorulariBul('oyun', sv.kursId).where((s) => s.kategori == k).length,
+            5,
+            reason: '${sv.kursId} $k',
+          );
+        }
+        // Motor her kategoride soru bulabilmeli (aksi halde ArgumentError).
+        expect(
+          () => YarismaMotoru(tohum: 1).basla(sorulariBul('oyun', sv.kursId)),
+          returnsNormally,
+        );
+      }
+      // Doğru şık indeksleri dağılmış: her indeks en az 20 kez.
+      for (var i = 0; i < 4; i++) {
+        expect(
+          oyunSorulari.where((s) => s.dogru == i).length,
+          greaterThanOrEqualTo(20),
+          reason: 'indeks $i',
+        );
+      }
+      // Soru metinleri benzersiz; açıklama boş değil.
+      expect(oyunSorulari.map((s) => s.soru).toSet().length, 90);
+    },
+  );
 
   test('A2 soruları geçerli, alan dil, kursId ingilizce-2', () {
     for (final s in ingilizceA2Sorulari) {

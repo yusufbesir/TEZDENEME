@@ -1,6 +1,7 @@
 /// Kelime sağlığı panosu: seçili alanın tüm kartlarını yarı ömre göre üç
 /// kümede gösterir (Zayıf / Orta / Güçlü). Her küme: sayı, tek yatay yığılı
 /// çubukta renkli pay ve dokununca o kümenin kartlarını listeleyen alt sayfa.
+/// "Kelimelerim" düğmesi dört güç kovalı kelime listesini açar.
 /// Eşikler [Kart.ortaEsik] ve [Kart.gucluEsik]; kümeleme [Motor.kelimeSagligi].
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
@@ -8,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../model/durum.dart';
 import '../model/icerik.dart';
@@ -105,6 +107,15 @@ class KelimeSagligiPanosu extends StatelessWidget {
                   ),
                 ),
             ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              key: const ValueKey('kelimelerim-ac'),
+              icon: const Icon(Icons.library_books_outlined),
+              label: const Text('Kelimelerim'),
+              onPressed: () => GoRouter.of(context).push('/kelimelerim'),
+            ),
           ),
         ],
       ],

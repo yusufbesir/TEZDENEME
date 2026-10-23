@@ -7,6 +7,7 @@ import 'sorular/ingilizce_a1.dart';
 import 'sorular/ingilizce_a2.dart';
 import 'sorular/ingilizce_b1.dart';
 import 'sorular/ingilizce_b2.dart';
+import 'sorular/oyun_sorulari.dart';
 import 'sorular/programlama_1.dart';
 import 'sorular/programlama_2.dart';
 import 'sorular/programlama_3.dart';
@@ -20,6 +21,7 @@ final List<YarismaSorusu> tumSorular = List.unmodifiable([
   ...programlama1Sorulari,
   ...programlama2Sorulari,
   ...programlama3Sorulari,
+  ...oyunSorulari,
 ]);
 
 /// Alan ve seviye (kurs) kimliğine uyan sorular; yoksa boş liste.
@@ -28,8 +30,8 @@ List<YarismaSorusu> sorulariBul(String alan, String kursId) => [
     if (s.alan == alan && s.seviyeKursId == kursId) s,
 ];
 
-/// Alanın seviyeleri; bilinmeyen alan için boş liste. 'oyun' alanında henüz
-/// yarışma sorusu yok: boş liste (ekran "bu alanda yarışma yok" der).
+/// Alanın seviyeleri; bilinmeyen alan için boş liste. 'oyun' alanında üç
+/// seviye vardır (satranç kurslarının kimlikleriyle): Başlangıç, Orta, İleri.
 List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
   'dil' => const [
     YarismaSeviye(kursId: 'ingilizce-1', etiket: 'A1'),
@@ -42,6 +44,10 @@ List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
     YarismaSeviye(kursId: 'css-1', etiket: 'CSS'),
     YarismaSeviye(kursId: 'js-1', etiket: 'JS'),
   ],
-  'oyun' => const [],
+  'oyun' => const [
+    YarismaSeviye(kursId: 'satranc-1', etiket: 'Başlangıç'),
+    YarismaSeviye(kursId: 'satranc-2', etiket: 'Orta'),
+    YarismaSeviye(kursId: 'satranc-3', etiket: 'İleri'),
+  ],
   _ => const [],
 };

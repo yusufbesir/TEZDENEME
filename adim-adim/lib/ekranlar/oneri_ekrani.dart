@@ -106,9 +106,7 @@ class OneriEkrani extends ConsumerWidget {
                                     style: FilledButton.styleFrom(
                                       minimumSize: const Size(48, 48),
                                     ),
-                                    onPressed: () => o.tur == OneriTuru.tekrar
-                                        ? context.go(o.rota)
-                                        : context.push(o.rota),
+                                    onPressed: () => context.push(o.rota),
                                     child: const Text('Başla'),
                                   ),
                                 ],

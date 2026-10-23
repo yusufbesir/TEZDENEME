@@ -150,7 +150,7 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                               key: const ValueKey('pratik-merkezi-ac'),
                               icon: const Icon(Icons.fitness_center),
                               label: const Text('Pratik merkezi'),
-                              onPressed: () => context.push('/pratik'),
+                              onPressed: () => context.go('/pratik'),
                             ),
                           ],
                         ),

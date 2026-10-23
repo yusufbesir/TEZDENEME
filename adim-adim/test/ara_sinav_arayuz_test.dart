@@ -88,6 +88,14 @@ void main() {
     final depo = BellekDepo(_bitmis);
     final kap = await uygulamayiAc(tester, depo, kurslar: [_kurs]);
     await dokun(tester, find.byKey(const ValueKey('ara-sinav-as-1.u1')));
+    // Başlamadan önce ekranı: soru sayısı, kural, geçme koşulu, kazanç.
+    expect(find.text('Başlamadan önce'), findsOneWidget);
+    expect(find.text('10 soru'), findsOneWidget);
+    expect(find.text('En az %70 doğru.'), findsOneWidget);
+    expect(find.textContaining('XP ve seri kazandırmaz'), findsOneWidget);
+    expect(find.text('1/10'), findsNothing);
+    await dokun(tester, find.byKey(const ValueKey('sinav-basla')));
+    expect(find.text('Başlamadan önce'), findsNothing);
     expect(find.text('1/10'), findsOneWidget);
 
     await _coz(tester, 10, 6);
@@ -107,6 +115,7 @@ void main() {
     expect(find.text('Ara sınav (en iyi %60)'), findsOneWidget);
 
     await dokun(tester, find.byKey(const ValueKey('ara-sinav-as-1.u1')));
+    await dokun(tester, find.byKey(const ValueKey('sinav-basla')));
     await _coz(tester, 10, 8);
     expect(find.text('Sınavı geçtin'), findsOneWidget);
     expect(find.text('En iyi puan: %80 (2026-10-15)'), findsOneWidget);
@@ -125,6 +134,7 @@ void main() {
     expect(find.byKey(const ValueKey('sertifika-sinavi-as-1')), findsNothing);
     for (final u in ['as-1.u1', 'as-1.u2']) {
       await dokun(tester, find.byKey(ValueKey('ara-sinav-$u')));
+      await dokun(tester, find.byKey(const ValueKey('sinav-basla')));
       await _coz(tester, 10, 10);
       await dokun(tester, find.byKey(const ValueKey('sinav-don')));
     }
@@ -132,6 +142,9 @@ void main() {
     expect(find.byKey(const ValueKey('sertifika-gor-as-1')), findsNothing);
 
     await dokun(tester, find.byKey(const ValueKey('sertifika-sinavi-as-1')));
+    expect(find.text('20 soru'), findsOneWidget);
+    expect(find.text('En az %80 doğru.'), findsOneWidget);
+    await dokun(tester, find.byKey(const ValueKey('sinav-basla')));
     expect(find.text('1/20'), findsOneWidget);
     await _coz(tester, 20, 20);
     expect(find.text('Sınavı geçtin'), findsOneWidget);
@@ -161,6 +174,7 @@ void main() {
     );
     final kap = await uygulamayiAc(tester, depo, kurslar: [_kurs]);
     await dokun(tester, find.byKey(const ValueKey('sertifika-sinavi-as-1')));
+    await dokun(tester, find.byKey(const ValueKey('sinav-basla')));
     await _coz(tester, 20, 15);
     expect(find.text('Bu sefer geçemedin'), findsOneWidget);
     expect(find.byKey(const ValueKey('sinav-sertifika')), findsNothing);
@@ -169,5 +183,18 @@ void main() {
     expect(d.kartlar, hasLength(5));
     await dokun(tester, find.byKey(const ValueKey('sinav-don')));
     expect(find.byKey(const ValueKey('sertifika-gor-as-1')), findsNothing);
+  });
+
+  testWidgets('Vazgeç: sınav başlamadan yola döner, hiçbir şey kaydedilmez', (
+    tester,
+  ) async {
+    final depo = BellekDepo(_bitmis);
+    final kap = await uygulamayiAc(tester, depo, kurslar: [_kurs]);
+    await dokun(tester, find.byKey(const ValueKey('ara-sinav-as-1.u1')));
+    expect(find.byKey(const ValueKey('sinav-vazgec')), findsOneWidget);
+    await dokun(tester, find.byKey(const ValueKey('sinav-vazgec')));
+    expect(find.byKey(const ValueKey('sinav-oncesi-baslik')), findsNothing);
+    expect(find.byKey(const ValueKey('ara-sinav-as-1.u1')), findsOneWidget);
+    expect(kap.read(durumProvider).value!.araSinavlar, isEmpty);
   });
 }

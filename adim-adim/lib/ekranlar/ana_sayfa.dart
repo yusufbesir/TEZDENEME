@@ -13,8 +13,6 @@
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
 
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +26,7 @@ import '../bilesenler/geri_kazanma_satiri.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/hikaye_karti.dart';
 import '../bilesenler/profil_karti.dart';
+import '../bilesenler/ust_cubuk.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
@@ -218,8 +217,6 @@ class _YolListesi extends StatelessWidget {
     final yazi = Theme.of(context).textTheme;
     final parlaklik = Theme.of(context).brightness;
     final alanRengi = AlanRenkleri.renk(durum.alan, parlaklik);
-    final bugunXp = durum.gunlukXp[bugun] ?? 0;
-    final seri = Motor.gosterilenSeri(durum, bugun);
     final alistirmaVar = kurslar.any(
       (k) => k.tumDersler.any((d) => d.alistirmalar.isNotEmpty),
     );
@@ -237,25 +234,10 @@ class _YolListesi extends StatelessWidget {
     }
 
     final ogeler = <Widget>[
-      // Üst şerit: alan simgesi + adı, seri alevi, küçük hedef halkası.
-      Row(
-        children: [
-          Icon(AlanRenkleri.simge(durum.alan), color: alanRengi),
-          const SizedBox(width: Olcu.b1),
-          Expanded(
-            child: Semantics(
-              header: true,
-              child: Text(
-                AlanRenkleri.ad(durum.alan),
-                style: yazi.titleLarge?.copyWith(color: alanRengi),
-              ),
-            ),
-          ),
-          _SeriAlevi(
-            seri: seri,
-            nabiz: durum.sonGun == bugun && seri > 0,
-            renk: r.vurgu,
-          ),
+      // Üst şerit: ortak üst çubuk (alan, seri, günlük XP halkası) + sözlük.
+      UstCubuk(
+        halka: seritteHalka,
+        eylemler: [
           // Sözlük girişi: ana sayfanın ayrı bir AppBar'ı olmadığı için üst
           // şeritte durur; kabuk dışı '/sozluk' rotasına gider.
           IconButton(
@@ -263,10 +245,6 @@ class _YolListesi extends StatelessWidget {
             tooltip: 'Sözlük',
             onPressed: () => context.push('/sozluk'),
           ),
-          if (seritteHalka) ...[
-            const SizedBox(width: Olcu.b2),
-            HedefHalkasi(xp: bugunXp, hedef: durum.gunlukHedef, boyut: 56),
-          ],
         ],
       ),
       Column(
@@ -652,50 +630,6 @@ class _YolListesi extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(Olcu.b3),
           children: ogeler,
-        ),
-      ),
-    );
-  }
-}
-
-/// Seri alevi: "12" + alev simgesi. Bugün ilk ders bitmişse bir kez nabız atar
-/// (1 → 1,15 → 1; en çok 250 ms, hareketi azalt açıksa 0).
-class _SeriAlevi extends StatelessWidget {
-  const _SeriAlevi({
-    required this.seri,
-    required this.nabiz,
-    required this.renk,
-  });
-  final int seri;
-  final bool nabiz;
-  final Color renk;
-
-  @override
-  Widget build(BuildContext context) {
-    final alev = Icon(Icons.local_fire_department, color: renk);
-    return Semantics(
-      label: '$seri gün seri',
-      excludeSemantics: true,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: Olcu.hedef),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('$seri', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(width: 4),
-            if (nabiz)
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: Olcu.sure(context, 250),
-                builder: (context, t, child) => Transform.scale(
-                  scale: 1 + 0.15 * math.sin(math.pi * t),
-                  child: child,
-                ),
-                child: alev,
-              )
-            else
-              alev,
-          ],
         ),
       ),
     );

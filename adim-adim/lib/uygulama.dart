@@ -1,6 +1,6 @@
-/// Uygulama kökü ve yönlendirici: 4 sekmeli kabuk (Yol, Yarışma, Tekrar,
-/// Profil) ile kabuk dışı rotalar (ayarlar, sözlük, ders, mikro ders, alan
-/// seçimi).
+/// Uygulama kökü ve yönlendirici: 5 sekmeli kabuk (Yol, Pratik, Yarışma,
+/// Görevler, Profil) ile kabuk dışı rotalar (tekrar, başarımlar, ayarlar,
+/// sözlük, ders, mikro ders, alan seçimi). `/tekrar` Pratik sekmesinden açılır.
 /// `/mikro` rotası `mod=zayif` (zayıf noktalar), `mod=karisik&ders=<id>`
 /// (ünite sonu serpiştirilmiş tekrar) ve `mod=quiz&ders=<id>&yanlis=0,3`
 /// (ders sonu kısa quiz) parametrelerini alır.
@@ -20,12 +20,17 @@ import 'durum/saglayicilar.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
+import 'ekranlar/basarimlar_ekrani.dart';
 import 'ekranlar/calisma_modlari_ekrani.dart';
 import 'ekranlar/calisma_plani_ekrani.dart';
+import 'ekranlar/dilbilgisi_ipucu_ekrani.dart';
+import 'ekranlar/dinle_yaz_ekrani.dart';
 import 'ekranlar/ders_ekrani.dart';
 import 'ekranlar/ders_ogeleri_ekrani.dart';
 import 'ekranlar/eller_serbest_ekrani.dart';
+import 'ekranlar/gorevler_ekrani.dart';
 import 'ekranlar/gorsel_kelime_ekrani.dart';
+import 'ekranlar/kart_kaydirma_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
 import 'ekranlar/meydan_ekrani.dart';
 import 'ekranlar/ogrenme_yolu_ekrani.dart';
@@ -37,6 +42,8 @@ import 'ekranlar/efsanevi_ekrani.dart';
 import 'ekranlar/filtreli_tekrar_ekrani.dart';
 import 'ekranlar/halat_ekrani.dart';
 import 'ekranlar/hikaye_ekrani.dart';
+import 'ekranlar/hizli_tekrar_ekrani.dart';
+import 'ekranlar/kelimelerim_ekrani.dart';
 import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/projeler_ekrani.dart';
@@ -101,6 +108,14 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/pratik',
+                builder: (c, s) => const PratikMerkeziEkrani(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/yarisma',
                 builder: (c, s) => const YarismaYerTutucu(),
               ),
@@ -108,7 +123,10 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/tekrar', builder: (c, s) => const TekrarEkrani()),
+              GoRoute(
+                path: '/gorevler',
+                builder: (c, s) => const GorevlerEkrani(),
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -118,6 +136,21 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // Tekrar ekranı artık sekme değil: Pratik sekmesinden `push` ile açılır.
+      GoRoute(
+        path: '/tekrar',
+        builder: (c, s) => Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Geri',
+              onPressed: () => c.canPop() ? c.pop() : c.go('/pratik'),
+            ),
+          ),
+          body: const TekrarEkrani(),
+        ),
+      ),
+      GoRoute(path: '/basarimlar', builder: (c, s) => const BasarimlarEkrani()),
       GoRoute(path: '/ayarlar', builder: (c, s) => const AyarlarEkrani()),
       GoRoute(path: '/plan', builder: (c, s) => const CalismaPlaniEkrani()),
       GoRoute(
@@ -245,7 +278,6 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         path: '/tekrar-filtre',
         builder: (c, s) => const FiltreliTekrarEkrani(),
       ),
-      GoRoute(path: '/pratik', builder: (c, s) => const PratikMerkeziEkrani()),
       GoRoute(
         path: '/pratik/eslestirme',
         builder: (c, s) => const EslestirmeEkrani(),
@@ -255,8 +287,34 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
         builder: (c, s) => const ArtanZorlukEkrani(),
       ),
       GoRoute(
+        path: '/pratik/hizli',
+        builder: (c, s) => const HizliTekrarEkrani(),
+      ),
+      GoRoute(
+        path: '/kelimelerim',
+        // kova=yeni|zayif|orta|guclu: açılışta o kovaya süzülür.
+        builder: (c, s) =>
+            KelimelerimEkrani(baslangicKovasi: s.uri.queryParameters['kova']),
+      ),
+      GoRoute(
         path: '/pratik/kartlar',
         builder: (c, s) => const KelimeKartlariEkrani(),
+      ),
+      GoRoute(
+        path: '/pratik/kaydir',
+        builder: (c, s) => KartKaydirmaEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/pratik/dinle-yaz',
+        builder: (c, s) => DinleYazEkrani(
+          tohum: int.tryParse(s.uri.queryParameters['tohum'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: '/pratik/ipucu',
+        builder: (c, s) => const DilbilgisiIpucuEkrani(),
       ),
       // Meydan okuma ve rekorlar (49), ay/yıl özeti (51), süre takibi ve süreli
       // oturum (59, 80), görsel kelimeler (58).
