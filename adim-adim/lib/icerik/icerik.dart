@@ -21,6 +21,9 @@ import 'html_2.dart';
 import 'html_3.dart';
 import 'js_2.dart';
 import 'js_3.dart';
+import 'php_1.dart';
+import 'php_2.dart';
+import 'php_3.dart';
 import 'python_1.dart';
 import 'python_2.dart';
 import 'python_3.dart';
@@ -59,6 +62,9 @@ export 'satranc_3.dart' show satranc3;
 export 'sql_1.dart' show sql1;
 export 'sql_2.dart' show sql2;
 export 'sql_3.dart' show sql3;
+export 'php_1.dart' show php1;
+export 'php_2.dart' show php2;
+export 'php_3.dart' show php3;
 
 final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   ingilizceA1,
@@ -86,6 +92,9 @@ final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   sql1,
   sql2,
   sql3,
+  php1,
+  php2,
+  php3,
   satranc1,
   satranc2,
   satranc3,
