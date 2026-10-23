@@ -21,6 +21,29 @@ class Ses {
     }
   }
 
+  /// Yavaş okuma hızı (flutter_tts ölçeği; normal 0,45).
+  static const double yavasHiz = 0.2;
+
+  /// [oku] gibi okur ama konuşma hızı bu çağrı için [yavasHiz]'dır (dinleme
+  /// sorularındaki "yavaş" düğmesi). Hız sonra eski değerine döner.
+  Future<bool> okuYavas(String metin, {String dil = 'en-US'}) async {
+    // Üst üste (çift dokunuş) çağrıda asıl hız yalnız ilk çağrıda saklanır;
+    // ikinci çağrı yavaş hızı "eski hız" sanıp kalıcı bırakmasın.
+    _kayitliHiz ??= konusmaHizi;
+    konusmaHizi = yavasHiz;
+    try {
+      return await oku(metin, dil: dil);
+    } finally {
+      final kayitli = _kayitliHiz;
+      if (kayitli != null) {
+        konusmaHizi = kayitli;
+        _kayitliHiz = null;
+      }
+    }
+  }
+
+  double? _kayitliHiz;
+
   /// Başarıyla konuşma başlatıldıysa true; hata olursa false.
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     try {

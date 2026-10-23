@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../model/dilbilgisi_ipucu.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
 import '../tema/tema.dart';
 import 'alistirma/alistirma_karti.dart';
 import 'alistirma/dogru_cevap.dart';
+import 'cikis_sayfasi.dart';
 import 'geri_bildirim_bandi.dart';
+import 'kombo.dart';
 
 /// Alıştırmaları sırayla sorar: cevap -> Kontrol et -> alt bant -> Devam.
 /// Ders ve tekrar ekranları ortak kullanır.
@@ -26,6 +29,8 @@ class AlistirmaOturumu extends StatefulWidget {
     this.onIpucu,
     this.ipucuAcik = true,
     this.ust,
+    this.dilbilgisiIpucu,
+    this.cikisOnayi = true,
   });
 
   final List<Alistirma> alistirmalar;
@@ -52,6 +57,15 @@ class AlistirmaOturumu extends StatefulWidget {
   /// etkinliklerinde "dinle" düğmesi. Parametre alıştırma indeksidir.
   final Widget? Function(int indeks)? ust;
 
+  /// Dersin dilbilgisi ipucu; yanlış cevapta bantta kısa "İpucu" kutusu olarak
+  /// görünür (null: yalnız doğru cevap ve açıklama).
+  final DilbilgisiIpucu? dilbilgisiIpucu;
+
+  /// true: en az bir soru cevaplandıktan sonra kapat düğmesi ve sistem geri
+  /// hareketi "İlerlemeni kaybedeceksin" alt sayfasını açar; hiç cevap yoksa
+  /// sormadan [onKapat] çağrılır. Kendi onay penceresi olan ekranlar false verir.
+  final bool cikisOnayi;
+
   @override
   State<AlistirmaOturumu> createState() => _OturumDurumu();
 }
@@ -68,6 +82,15 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
 
   /// Bu sorunun ilk cevabı onSonuc'a bildirildi mi?
   bool _bildirildi = false;
+
+  /// Bu oturumda cevaplanan (ilk cevabı verilen) soru sayısı.
+  int _cevaplanan = 0;
+
+  /// Art arda doğru sayısı (yalnız ilk cevaplar; yanlışta sıfırlanır).
+  int _kombo = 0;
+
+  /// Çıkış alt sayfası şu an açık mı (çift açılmayı önler).
+  bool _cikisAcik = false;
 
   Alistirma get _simdiki => widget.alistirmalar[_indeks];
   bool get _son => _indeks == widget.alistirmalar.length - 1;
@@ -105,6 +128,10 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
       _dogruMu = dogru;
       if (dogru && ilk) _dogru++;
       _bildirildi = true;
+      if (ilk) {
+        _cevaplanan++;
+        _kombo = Kombo.sonraki(_kombo, dogru);
+      }
     });
     if (ilk) widget.onSonuc(_indeks, dogru);
   }
@@ -119,6 +146,20 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
       _cevap = null;
     });
     widget.onIpucu?.call(_indeks, _ipucuAdim);
+  }
+
+  /// Çıkış isteği (kapat düğmesi ya da sistem geri hareketi): hiç cevap yoksa
+  /// ya da onay kapalıysa doğrudan çıkar; aksi halde alt sayfa sorar.
+  Future<void> _cikisIste() async {
+    if (!widget.cikisOnayi || _cevaplanan == 0) {
+      widget.onKapat();
+      return;
+    }
+    if (_cikisAcik) return;
+    _cikisAcik = true;
+    final cik = await cikisSayfasiGoster(context);
+    _cikisAcik = false;
+    if (cik && mounted) widget.onKapat();
   }
 
   void _devam() {
@@ -165,7 +206,9 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
     final yazi = Theme.of(context).textTheme;
     final not = widget.notGetir?.call(_indeks);
     final yanlisVeIpucuVar = _kontrolEdildi && !_dogruMu && _ipucuKaldi;
-    return Column(
+    final komboRenk = Kombo.renk(r, Kombo.asama(_kombo));
+    final komboEtiket = Kombo.etiket(_kombo);
+    final icerik = Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -179,20 +222,56 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
               IconButton(
                 tooltip: 'Dersten çık',
                 icon: const Icon(Icons.close),
-                onPressed: widget.onKapat,
+                onPressed: _cikisIste,
               ),
               Expanded(
-                child: Semantics(
-                  label: 'Alıştırma ${_indeks + 1} / $toplam',
-                  excludeSemantics: true,
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: oran),
-                    duration: Olcu.sure(context, 250),
-                    builder: (context, v, _) => ClipRRect(
-                      borderRadius: BorderRadius.circular(Olcu.b1),
-                      child: LinearProgressIndicator(value: v, minHeight: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Semantics(
+                      label: 'Alıştırma ${_indeks + 1} / $toplam',
+                      excludeSemantics: true,
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: oran),
+                        duration: Olcu.sure(context, 250),
+                        builder: (context, v, _) =>
+                            TweenAnimationBuilder<Color?>(
+                              key: const Key('ilerleme-cubugu'),
+                              tween: ColorTween(end: komboRenk),
+                              duration: Olcu.sure(context, 250),
+                              builder: (context, renk, _) => ClipRRect(
+                                borderRadius: BorderRadius.circular(Olcu.b1),
+                                child: LinearProgressIndicator(
+                                  value: v,
+                                  minHeight: 12,
+                                  color: renk,
+                                  backgroundColor: r.kenar,
+                                ),
+                              ),
+                            ),
+                      ),
                     ),
-                  ),
+                    if (komboEtiket != null)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Semantics(
+                          label: 'Art arda $_kombo doğru',
+                          excludeSemantics: true,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              komboEtiket,
+                              key: const Key('kombo-etiketi'),
+                              style: yazi.labelLarge?.copyWith(
+                                color: r.metin,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(width: Olcu.b1),
@@ -231,6 +310,7 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
             ekEtiket: yanlisVeIpucuVar ? 'İpucu al' : null,
             ekAnahtar: yanlisVeIpucuVar ? const Key('ipucu-al') : null,
             onEk: yanlisVeIpucuVar ? _ipucuAl : null,
+            dilbilgisiIpucu: widget.dilbilgisiIpucu,
           )
         else
           SafeArea(
@@ -267,6 +347,13 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
             ),
           ),
       ],
+    );
+    return PopScope(
+      canPop: !widget.cikisOnayi || _cevaplanan == 0,
+      onPopInvokedWithResult: (gecti, _) {
+        if (!gecti) _cikisIste();
+      },
+      child: icerik,
     );
   }
 }

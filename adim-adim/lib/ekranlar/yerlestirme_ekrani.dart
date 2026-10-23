@@ -117,6 +117,7 @@ class _YerlestirmeDurumu extends ConsumerState<YerlestirmeEkrani> {
                 onSonuc: (i, dogru) => _cevaplar[i] = dogru,
                 onBitti: (_, _) => _bitir(),
                 onKapat: _kapatOnayi,
+                cikisOnayi: false,
               ),
       ),
     );

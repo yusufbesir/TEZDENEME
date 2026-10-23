@@ -23,6 +23,7 @@ import '../model/icerik.dart';
 import '../icerik/projeler.dart';
 import '../motor/ders_meta.dart';
 import '../motor/ders_ogeleri.dart';
+import '../motor/dilbilgisi_ipucu.dart';
 import '../motor/kolaylastirma.dart';
 import '../motor/motor.dart';
 import '../motor/satranc_calisma.dart';
@@ -79,29 +80,6 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
     final yanlis = _yanlislar.join(',');
     return '/mikro?mod=quiz&ders=${Uri.encodeComponent(ders.id)}'
         '${yanlis.isEmpty ? '' : '&yanlis=$yanlis'}';
-  }
-
-  Future<void> _kapatOnayi() async {
-    final cik = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        icon: const Icon(Icons.warning_amber_rounded),
-        title: const Text('Dersten çıkılsın mı?'),
-        content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('Devam et'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('Çık'),
-          ),
-        ],
-      ),
-    );
-    if (cik == true && mounted) _cik();
   }
 
   Future<void> _bitir(Ders ders, int dogru, int toplam) async {
@@ -259,7 +237,8 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                       .kartIsle(ders.kartKimligi(ozgun), dogru);
                 },
                 onBitti: (d, t) => _bitir(ders, d, t),
-                onKapat: _kapatOnayi,
+                onKapat: _cik,
+                dilbilgisiIpucu: DilbilgisiIpuclari.dersIcin(ders.id),
               ),
       ),
     );

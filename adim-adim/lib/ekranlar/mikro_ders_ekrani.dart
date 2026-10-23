@@ -225,6 +225,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                           .kartIsle(_liste[i].kartId, dogru),
                 onBitti: _bitir,
                 onKapat: _kapatOnayi,
+                cikisOnayi: false,
               ),
       ),
     );

@@ -152,6 +152,7 @@ class _SinavDurumu extends ConsumerState<SinavEkrani> {
                 onSonuc: (i, dogru) => _cevaplar[i] = dogru,
                 onBitti: (_, _) => _bitir(),
                 onKapat: _kapatOnayi,
+                cikisOnayi: false,
               ),
       ),
     );

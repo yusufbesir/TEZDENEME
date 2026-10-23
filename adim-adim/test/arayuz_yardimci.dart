@@ -26,6 +26,9 @@ import 'sahte_icerik.dart';
 class SahteSes extends Ses {
   final okunanlar = <String>[];
 
+  /// Her `oku` çağrısındaki konuşma hızı (yavaş düğmesi testi).
+  final hizlar = <double>[];
+
   /// Kaç kez durdur çağrıldı (kelime oynatıcı duraklatma testi).
   int durdurmaSayisi = 0;
   @override
@@ -34,6 +37,7 @@ class SahteSes extends Ses {
   @override
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     okunanlar.add(metin);
+    hizlar.add(konusmaHizi);
     return true;
   }
 

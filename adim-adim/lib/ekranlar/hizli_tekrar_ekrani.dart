@@ -117,6 +117,7 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
                       _bitir();
                     },
                     onKapat: () => _toplam > 0 ? _bitir() : _cik(),
+                    cikisOnayi: false,
                   ),
                 ),
               ],
