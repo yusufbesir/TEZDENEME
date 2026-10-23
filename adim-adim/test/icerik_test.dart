@@ -41,6 +41,9 @@ void main() {
       'php-1',
       'php-2',
       'php-3',
+      'go-1',
+      'go-2',
+      'go-3',
       'satranc-1',
       'satranc-2',
       'satranc-3',
@@ -80,6 +83,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -107,6 +113,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
@@ -203,6 +212,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {
