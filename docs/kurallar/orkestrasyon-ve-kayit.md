@@ -42,3 +42,9 @@ Yusuf: "rea bundan sonra hep çalışır halde olsun". REA (APK/ikili yapı anal
 - Her cihaz oturumunun başında, REA'ya iş verilecekse önce `inspect_apktool_client` ile sağlık kontrolü yapılır; "capability_unavailable" dönerse iş başlamadan neden bulunup düzeltilir ve Yusuf'a tek satırla bildirilir.
 - REA'nın ortam değişkenleri yalnız sunucu başlarken okunur; ayar değişince REA yeniden bağlanır (yeni oturum ya da /mcp Reconnect). Koordinatör cihaz oturumunu yeniden başlatarak bunu kendisi yapabilir.
 - APK taramaları REA (apktool + JADX) ile yapılır; REA çalışmıyorsa yalnız geçici olarak doğrudan apktool'a düşülür ve rapora "REA çalışmadı, sebep" yazılır.
+
+## Onay kapısı, diskten devam ve kota (kullanıcı onayı 2026-10-23; kaynak: dis-fikirler-avenox.md)
+- Geri alınamaz adımlar (kalıcı işlem, dış hizmete gönderme, ACL, üretim) açık onay olmadan yapılmaz; onay yoksa iş taslakta bekler. Zamanlanmış iş kurmak o işi onaylamak sayılır.
+- Uzun iş diskteki durumdan sürdürülür (CHECKPOINT/DEVAM); uzun çalışan işte düzenli "yaşıyorum" izi tutulur, iz kesilirse iş takılmış sayılıp Yusuf'a bildirilir. Gerçek hatalar belirti, kök neden, çözüm olarak kasa\notlar\ altındaki hata kataloğuna eklenir.
+- Alt ajana iş verilmeden önce ilgili modelin kalan kotasına bakılır; azsa bir alt modele ya da sonraya bırakılır. Önce düşük model ve efor, yetmezse yükselt (model-ve-efor-tablosu.md).
+- Aynı depoda paralel çalışan ajanlar ayrı git worktree'de çalışır; birleştirme tek noktadan yapılır.

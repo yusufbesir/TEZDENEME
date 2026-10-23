@@ -42,3 +42,9 @@ Kasada Claude, Codex (ChatGPT) ve Antigravity (Gemini) için ortak bir beyin ağ
 ## Silme biçimi ve dosya açıklamaları (kullanıcının kesin kuralı, 2026-10-16; bilgisayardaki tüm yapay zekalar ve tüm oturumlar için)
 - Silme kararı yalnızca kullanıcınındır. Kullanıcı bir silmeye karar verse bile silme yalnızca Windows Geri Dönüşüm Kutusu'na (çöp kutusuna) taşıma biçiminde yapılır; kalıcı silme (Remove-Item, del, rm, Shift+Delete, çöpü boşaltma vb.) hiçbir biçimde yapılmaz.
 - Her dosyaya, tüm yapay zekaların (Claude, Codex/ChatGPT, Antigravity/Gemini) anlayacağı biçimde kısa bir açıklama yazılır: dosyanın ne olduğu, kime ait olduğu, hangi kurallarla değiştirilebileceği. Not ve metin dosyalarında başta özet/üst bilgi olarak; kod, ikili ya da biçimi bozulacak dosyalarda klasördeki bir açıklama (BENIOKU) dosyası ya da yan dosya olarak. Yapay zekalar dosyaları kullanıcının daha önce belirlediği kurallar çerçevesinde inceleyip değiştirebilir.
+
+## Hafıza dosyası bakımı ve paketleme (kullanıcı onayı 2026-10-23; kaynak: dis-fikirler-avenox.md)
+- Birden çok yapay zekanın yazdığı dosyada okuma anındaki özet (hash) yazma anında doğrulanır; değişmişse yazılmaz, yeniden okunur.
+- Hafıza dosyası boyut sınırını aşarsa eski bölümler silinmeden, özetlenmeden arşiv klasörüne taşınır (yalnız ekleme kuralıyla uyumlu).
+- Sohbet dökümü saklanmaz; kalıcı kararlar kaynağı bağlantılı kısa kayıt olarak yazılır.
+- Bir klasör dışarıya (sohbet arayüzü, yükleme, paylaşım) paketlenmeden önce sır taraması yapılır; anahtar benzeri değer bulunursa paketleme durur. Anahtarlar klasörüne yine hiçbir yapay zeka dokunmaz.

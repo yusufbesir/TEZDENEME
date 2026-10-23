@@ -1,6 +1,6 @@
 # Dış fikirler: avenoxai incelemesinden alınanlar
 
-> **Özet:** github.com/avenoxai herkese açık depolarından (MIT) alınan fikirlerin bizim kurallarımıza uyarlanmış hali. Kod kopyalanmadı, yalnızca fikir alındı. Mevcut kurallar değişmedi; bu dosya ek öneridir ve Yusuf onayıyla ilgili dosyalara işlenir. Sahibi: Yusuf. [İP:Avenoxai incelemesi#9fbo28]
+> **Özet:** github.com/avenoxai herkese açık depolarından (MIT) alınan fikirlerin bizim kurallarımıza uyarlanmış hali. Kod kopyalanmadı, yalnızca fikir alındı. Yusuf 2026-10-23 onayladı; 1-3 ve 6. bölümler orkestrasyon-ve-kayit.md ile hafiza-ve-not.md dosyalarına işlendi. Sahibi: Yusuf. [İP:Avenoxai incelemesi#9fbo28]
 
 ## 1. Onay kapısı ve geri alınamaz adımlar (Hermes notları)
 - Geri alınamaz her adım (kalıcı silme, dış hizmete gönderme, ACL, üretim değişikliği) açık onay kapısından geçer; onay yoksa iş taslakta bekler.
