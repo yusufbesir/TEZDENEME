@@ -23,9 +23,12 @@ import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
+import '../bilesenler/oturum_ozeti.dart';
 import '../durum/saglayicilar.dart';
+import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
+import '../motor/oturum_ozeti.dart';
 import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
@@ -59,6 +62,10 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Oturum başındaki durum ve özet verisi (ortak Oturum özeti için).
+  OgrenciDurumu? _onceki;
+  OturumOzetiVeri? _veri;
+
   /// Ekran açıldığından beri geçen süre (günlük süre takibi, ÖZELLİK 80).
   final Stopwatch _sure = Stopwatch()..start();
 
@@ -83,6 +90,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   void initState() {
     super.initState();
     final durum = ref.read(durumProvider).value;
+    _onceki = durum;
     final kurslar = ref.read(alanKurslariProvider);
     final tohum = DateTime.now().millisecondsSinceEpoch;
     final bugun = ref.read(bugunProvider);
@@ -167,17 +175,32 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
     // Harcanan süre günlük süreye eklenir (bir oturumda en çok 1 saat).
     await bildirici.sureEkle(_sure.elapsed.inSeconds.clamp(0, 3600));
     if (!mounted) return;
+    final xp = donem != null
+        ? Motor.donemXp(donem)
+        : _quiz
+        ? Motor.quizXp(dogru, toplam)
+        : Motor.mikroXp(dogru, toplam);
+    final onceki = _onceki;
+    // Büyüyen sözlük: oturumda Kelimelerim havuzuna giren yeni kelimeler.
+    final yeniKelime = onceki == null
+        ? 0
+        : await ref
+              .read(durumProvider.notifier)
+              .yeniKelimeleriIsle(onceki, ref.read(kurslarProvider));
+    if (!mounted) return;
+    _veri = onceki == null
+        ? null
+        : OturumOzetiMotoru.hesapla(
+            onceki: onceki,
+            sonraki: yeni,
+            kurslar: ref.read(kurslarProvider),
+            dogru: dogru,
+            toplam: toplam,
+            xp: xp,
+            yeniKelime: yeniKelime,
+          );
     setState(
-      () => _ozet = (
-        dogru: dogru,
-        toplam: toplam,
-        xp: donem != null
-            ? Motor.donemXp(donem)
-            : _quiz
-            ? Motor.quizXp(dogru, toplam)
-            : Motor.mikroXp(dogru, toplam),
-        seri: yeni.seri,
-      ),
+      () => _ozet = (dogru: dogru, toplam: toplam, xp: xp, seri: yeni.seri),
     );
   }
 
@@ -209,6 +232,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                 xp: _ozet!.xp,
                 seri: _ozet!.seri,
                 onDon: _cik,
+                oturum: _veri == null ? null : OturumOzeti(veri: _veri!),
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final o in _liste) o.alistirma],

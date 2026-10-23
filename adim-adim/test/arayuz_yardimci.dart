@@ -88,6 +88,7 @@ Future<ProviderContainer> uygulamayiAc(
   Size boyut = const Size(500, 1600),
   double metinOlcegi = 1.0,
   List<Override> ekOverrides = const [],
+  String bugun = '2026-10-15',
 }) async {
   tester.view.physicalSize = boyut;
   tester.view.devicePixelRatio = 1;
@@ -103,7 +104,7 @@ Future<ProviderContainer> uygulamayiAc(
         ),
         kurslarProvider.overrideWithValue(kurslar ?? [sahteKurs]),
         yarismaDepoProvider.overrideWithValue(BellekYarismaDepo()),
-        bugunProvider.overrideWithValue('2026-10-15'),
+        bugunProvider.overrideWithValue(bugun),
         sesProvider.overrideWithValue(ses ?? SahteSes()),
         bildirimProvider.overrideWithValue(bildirim ?? SahteBildirim()),
         if (konusma != null) konusmaProvider.overrideWithValue(konusma),

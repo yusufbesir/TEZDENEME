@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../bilesenler/haftalik_odev_karti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../bilesenler/ust_cubuk.dart';
 import '../durum/saglayicilar.dart';
@@ -69,6 +70,8 @@ class GorevlerEkrani extends ConsumerWidget {
               sayi: '${Gorevler.tamamSayisi(haftalik)}/${haftalik.length}',
             ),
             for (final g in haftalik) _GorevKarti(gorev: g, durum: durum),
+            const SizedBox(height: Olcu.b3),
+            const HaftalikOdevKarti(),
             const SizedBox(height: Olcu.b3),
             Card(
               child: ListTile(

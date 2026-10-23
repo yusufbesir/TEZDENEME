@@ -16,6 +16,7 @@ import '../bilesenler/alistirma_oturumu.dart';
 import '../bilesenler/ders_ozeti.dart';
 import '../bilesenler/dilbilgisi_notu_karti.dart';
 import '../bilesenler/kolaylastirma_satiri.dart';
+import '../bilesenler/oturum_ozeti.dart';
 import '../bilesenler/ustalik_karti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
@@ -26,6 +27,7 @@ import '../motor/ders_ogeleri.dart';
 import '../motor/dilbilgisi_ipucu.dart';
 import '../motor/kolaylastirma.dart';
 import '../motor/motor.dart';
+import '../motor/oturum_ozeti.dart';
 import '../motor/satranc_calisma.dart';
 import '../tema/tema.dart';
 
@@ -42,6 +44,10 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
   ({int dogru, int toplam, int xp, int seri})? _ozet;
   bool _kaydediliyor = false;
 
+  /// Oturum başındaki durum (özet için rozet/seri/ünite farkı).
+  OgrenciDurumu? _onceki;
+  OturumOzetiVeri? _veri;
+
   /// Ders ekranı açıldığından beri geçen süre (ustalık için çalışma süresi).
   final Stopwatch _sure = Stopwatch()..start();
 
@@ -50,6 +56,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
 
   /// Bu oturumda ilk cevabı yanlış olan alıştırma indeksleri (sırayla).
   final List<int> _yanlislar = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _onceki = ref.read(durumProvider).value;
+  }
 
   Ders? _dersBul() {
     for (final k in ref.read(kurslarProvider)) {
@@ -89,13 +101,28 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
         .read(durumProvider.notifier)
         .dersBitir(ders.id, dogru, toplam, sureSn: _sure.elapsed.inSeconds);
     if (!mounted) return;
+    final xp = Motor.dersXp(dogru, toplam);
+    final onceki = _onceki;
+    // Büyüyen sözlük: oturumda Kelimelerim havuzuna giren yeni kelimeler.
+    final yeniKelime = onceki == null
+        ? 0
+        : await ref
+              .read(durumProvider.notifier)
+              .yeniKelimeleriIsle(onceki, ref.read(kurslarProvider));
+    if (!mounted) return;
+    _veri = onceki == null
+        ? null
+        : OturumOzetiMotoru.hesapla(
+            onceki: onceki,
+            sonraki: yeni,
+            kurslar: ref.read(kurslarProvider),
+            dogru: dogru,
+            toplam: toplam,
+            xp: xp,
+            yeniKelime: yeniKelime,
+          );
     setState(
-      () => _ozet = (
-        dogru: dogru,
-        toplam: toplam,
-        xp: Motor.dersXp(dogru, toplam),
-        seri: yeni.seri,
-      ),
+      () => _ozet = (dogru: dogru, toplam: toplam, xp: xp, seri: yeni.seri),
     );
   }
 
@@ -221,6 +248,7 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                       )
                     : null,
                 bilgi: _ustalik(ders),
+                oturum: _veri == null ? null : OturumOzeti(veri: _veri!),
               )
             : AlistirmaOturumu(
                 alistirmalar: [for (final i in idx) ders.alistirmalar[i]],

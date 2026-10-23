@@ -76,10 +76,24 @@ Future<ProviderContainer> _ac(
   OgrenciDurumu durum = _biten,
 }) => uygulamayiAc(tester, BellekDepo(durum), kurslar: [_kurs]);
 
-Future<void> _git(WidgetTester tester, ProviderContainer kap) async {
+Future<void> _git(
+  WidgetTester tester,
+  ProviderContainer kap, {
+  bool basla = true,
+}) async {
   kap.read(yonlendiriciProvider).push('/efsanevi?kurs=$_kursId&unite=0');
   await tester.pump();
   await tester.pump(const Duration(seconds: 1));
+  if (basla &&
+      find.byKey(const ValueKey('sinav-basla')).evaluate().isNotEmpty) {
+    await _basla(tester);
+  }
+}
+
+/// "Başlamadan önce" ekranında Başla'ya basar (sayaç bundan sonra işler).
+Future<void> _basla(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('sinav-basla')));
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 /// Sayaç çalışırken pumpAndSettle kullanılamaz.
@@ -182,6 +196,13 @@ void main() {
       expect(find.byKey(const ValueKey('efsanevi-efs-1.u1')), findsOneWidget);
       expect(find.text('Efsanevi tekrar'), findsOneWidget);
       await dokun(tester, find.byKey(const ValueKey('efsanevi-efs-1.u1')));
+      // Başlamadan önce: sayaç henüz işlemez.
+      expect(find.text('Başlamadan önce'), findsOneWidget);
+      expect(find.text('10 soru'), findsOneWidget);
+      expect(find.textContaining('2:30'), findsOneWidget);
+      expect(find.text('En az %90 doğru ve süre dolmadan.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('efsanevi-sure')), findsNothing);
+      await _basla(tester);
       // Süre şeridi: 10 soru x 15 sn = 2:30; ipucu yok.
       expect(find.byKey(const ValueKey('efsanevi-sure')), findsOneWidget);
       expect(find.text('2:30'), findsOneWidget);
@@ -252,6 +273,19 @@ void main() {
       expect(find.textContaining('Ceza yok'), findsOneWidget);
       final d = kap.read(durumProvider).value!;
       expect(d.toJson(), _biten.toJson());
+    });
+
+    testWidgets('Vazgeç: sayaç başlamaz, hiçbir şey değişmez', (tester) async {
+      final kap = await _ac(tester);
+      await _git(tester, kap, basla: false);
+      expect(find.text('Başlamadan önce'), findsOneWidget);
+      // Süre dolacak kadar beklense de sınav başlamadığı için sonuç yok.
+      await tester.pump(const Duration(seconds: 200));
+      expect(find.text('Süre doldu'), findsNothing);
+      await _tikla(tester, find.byKey(const ValueKey('sinav-vazgec')));
+      await tester.pumpAndSettle();
+      expect(find.text('Başlamadan önce'), findsNothing);
+      expect(kap.read(durumProvider).value!.toJson(), _biten.toJson());
     });
 
     testWidgets('açık olmayan ünitede "bitince açılır" ekranı', (tester) async {

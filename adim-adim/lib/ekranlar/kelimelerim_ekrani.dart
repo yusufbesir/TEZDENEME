@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/haftalik_odev.dart';
 import '../motor/kelime_gucu.dart';
 import '../tema/tema.dart';
 
@@ -33,6 +34,9 @@ class _KelimelerimDurumu extends ConsumerState<KelimelerimEkrani> {
   final _arama = TextEditingController();
   late GucKovasi? _kova = _kovaCoz(widget.baslangicKovasi);
   KelimeSirasi _sira = KelimeSirasi.alfabe;
+
+  /// "Bu hafta eklenen" süzgeci (büyüyen sözlük).
+  bool _buHafta = false;
 
   static GucKovasi? _kovaCoz(String? ad) {
     for (final k in GucKovasi.values) {
@@ -69,10 +73,13 @@ class _KelimelerimDurumu extends ConsumerState<KelimelerimEkrani> {
     final durum = ref.watch(durumProvider).value ?? const OgrenciDurumu();
     final tum = KelimeGucu.liste(durum, ref.watch(alanKurslariProvider));
     final sayilar = KelimeGucu.sayilar(tum);
-    final gosterilen = KelimeGucu.sirala(
-      KelimeGucu.suz(tum, kova: _kova, arama: _arama.text),
-      _sira,
-    );
+    final bugun = ref.watch(bugunProvider);
+    final haftaIds = YeniKelimeler.buHaftaKimlikleri(durum, bugun);
+    final gosterilen = KelimeGucu.sirala([
+      for (final s in KelimeGucu.suz(tum, kova: _kova, arama: _arama.text))
+        if (!_buHafta || haftaIds.contains(s.kartId)) s,
+    ], _sira);
+    final haftaSayisi = tum.where((s) => haftaIds.contains(s.kartId)).length;
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
 
@@ -140,6 +147,13 @@ class _KelimelerimDurumu extends ConsumerState<KelimelerimEkrani> {
                         selected: _kova == k,
                         onSelected: (_) => setState(() => _kova = k),
                       ),
+                    FilterChip(
+                      key: const ValueKey('kelime-bu-hafta'),
+                      avatar: const Icon(Icons.fiber_new_outlined, size: 18),
+                      label: Text('Bu hafta eklenen $haftaSayisi'),
+                      selected: _buHafta,
+                      onSelected: (v) => setState(() => _buHafta = v),
+                    ),
                   ],
                 ),
               ),
@@ -193,7 +207,8 @@ class _KelimelerimDurumu extends ConsumerState<KelimelerimEkrani> {
                           return Semantics(
                             label:
                                 '${s.metin}, ${s.anlam}. ${s.kova.ad}, '
-                                'güç ${s.puan}',
+                                'güç ${s.puan}'
+                                '${haftaIds.contains(s.kartId) ? ', yeni' : ''}',
                             excludeSemantics: true,
                             child: ListTile(
                               key: ValueKey('kelime-${s.kartId}-${s.metin}'),
@@ -205,7 +220,8 @@ class _KelimelerimDurumu extends ConsumerState<KelimelerimEkrani> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               subtitle: Text(
-                                '${s.anlam}\nGüç ${s.puan}/100',
+                                '${s.anlam}\nGüç ${s.puan}/100'
+                                '${haftaIds.contains(s.kartId) ? ' · yeni' : ''}',
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: r.metinIkincil),

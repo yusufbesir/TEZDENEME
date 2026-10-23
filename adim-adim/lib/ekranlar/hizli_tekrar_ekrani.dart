@@ -17,9 +17,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/alistirma_oturumu.dart';
+import '../bilesenler/oturum_ozeti.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/oturum_ozeti.dart';
 import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
@@ -46,6 +48,10 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
   bool _hepsiBitti = false;
   bool _kaydedildi = false;
 
+  /// Oturum başındaki durum ve ortak Oturum özeti verisi.
+  OgrenciDurumu? _onceki;
+  OturumOzetiVeri? _veri;
+
   /// Oturum her başladığında artar; oturum bileşeninin durumu sıfırlansın diye.
   int _tur = 0;
 
@@ -67,6 +73,8 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
       _sureDoldu = false;
       _hepsiBitti = false;
       _kaydedildi = false;
+      _veri = null;
+      _onceki = ref.read(durumProvider).value;
       _kalan.value = HizliTekrar.sureSn;
       _tur++;
       _evre = _Evre.oturum;
@@ -87,6 +95,19 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
     _kaydedildi = true;
     if (_toplam > 0) {
       ref.read(durumProvider.notifier).tekrarBitir(_dogru, _toplam);
+      // Durum eşzamanlı güncellenir; özet bu ana göre hesaplanır.
+      final onceki = _onceki;
+      final sonraki = ref.read(durumProvider).value;
+      if (onceki != null && sonraki != null) {
+        _veri = OturumOzetiMotoru.hesapla(
+          onceki: onceki,
+          sonraki: sonraki,
+          kurslar: ref.read(kurslarProvider),
+          dogru: _dogru,
+          toplam: _toplam,
+          xp: sonraki.xp - onceki.xp,
+        );
+      }
     }
     if (mounted) setState(() => _evre = _Evre.sonuc);
   }
@@ -133,6 +154,7 @@ class _HizliTekrarDurumu extends ConsumerState<HizliTekrarEkrani> {
             hepsiBitti: _hepsiBitti,
             onYeniden: () => setState(() => _evre = _Evre.giris),
             onBitir: _cik,
+            ozet: _veri,
           ),
         );
       case _Evre.giris:
@@ -273,6 +295,7 @@ class _Sonuc extends StatelessWidget {
     required this.hepsiBitti,
     required this.onYeniden,
     required this.onBitir,
+    this.ozet,
   });
   final int dogru;
   final int toplam;
@@ -280,6 +303,7 @@ class _Sonuc extends StatelessWidget {
   final bool hepsiBitti;
   final VoidCallback onYeniden;
   final VoidCallback onBitir;
+  final OturumOzetiVeri? ozet;
 
   @override
   Widget build(BuildContext context) {
@@ -324,6 +348,10 @@ class _Sonuc extends StatelessWidget {
           style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
           textAlign: TextAlign.center,
         ),
+        if (ozet != null) ...[
+          const SizedBox(height: Olcu.b2),
+          OturumOzeti(veri: ozet!),
+        ],
         const SizedBox(height: Olcu.b3),
         FilledButton(
           key: const ValueKey('hizli-yeniden'),

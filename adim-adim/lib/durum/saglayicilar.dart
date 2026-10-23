@@ -19,6 +19,7 @@ import '../model/icerik.dart';
 import '../model/satranc_durumu.dart';
 import '../motor/basarimlar.dart';
 import '../motor/efsanevi.dart';
+import '../motor/haftalik_odev.dart';
 import '../motor/gorevler.dart';
 import '../motor/kod_calistirici.dart';
 import '../motor/kod_projesi.dart';
@@ -211,6 +212,26 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula(
       (d) => Motor.dersBitir(d, dersId, dogru, toplam, bugun, sureSn: sureSn),
     );
+  }
+
+  /// Haftalık ödev notu ("Bu hafta ne öğrendim?"): bugünün haftasına yazar;
+  /// boş metin o haftanın notunu siler. Yerelde saklanır.
+  Future<OgrenciDurumu> haftalikNotKaydet(String metin) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => HaftalikOdev.notKaydet(d, bugun, metin));
+  }
+
+  /// Büyüyen sözlük: [onceki] oturum başı durumuna göre Kelimelerim havuzuna
+  /// giren yeni kelimelerin eklenme gününü kaydeder; yeni kelime sayısını döner.
+  Future<int> yeniKelimeleriIsle(
+    OgrenciDurumu onceki,
+    List<Kurs> kurslar,
+  ) async {
+    final ids = YeniKelimeler.bul(onceki, _simdiki, kurslar);
+    if (ids.isEmpty) return 0;
+    final bugun = ref.read(bugunProvider);
+    await _uygula((d) => YeniKelimeler.isle(d, ids, bugun));
+    return ids.length;
   }
 
   /// Seviye belirleme sınavı sonucu: geçilen ünitelerin tamamlanmamış dersleri

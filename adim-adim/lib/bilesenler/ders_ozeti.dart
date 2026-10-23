@@ -35,6 +35,7 @@ class DersOzeti extends StatelessWidget {
     this.onEk3,
     this.ek3Simge = Icons.style_outlined,
     this.bilgi,
+    this.oturum,
   });
 
   final String baslik;
@@ -64,6 +65,9 @@ class DersOzeti extends StatelessWidget {
 
   /// İsteğe bağlı bilgi bölümü (ör. ustalık kartı); özet kartının altında.
   final Widget? bilgi;
+
+  /// İsteğe bağlı ortak oturum özeti ([OturumOzeti]); özet kartının altında.
+  final Widget? oturum;
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +174,10 @@ class DersOzeti extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (oturum != null) ...[
+                      const SizedBox(height: Olcu.b2),
+                      oturum!,
+                    ],
                     if (bilgi != null) ...[
                       const SizedBox(height: Olcu.b2),
                       bilgi!,

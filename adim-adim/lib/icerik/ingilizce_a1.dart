@@ -1016,6 +1016,13 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 0,
               aciklama: 'Rain yağmur, raining yağmur yağıyor demektir.',
             ),
+            Isaretle(
+              soru: 'Cümlenin öznesini işaretle.',
+              cumle: 'They are my friends.',
+              dogru: [0],
+              aciklama:
+                  'They (onlar) cümlenin öznesidir; be fiili are onu izler.',
+            ),
             Bosluk(
               soru: 'It is ___ today. (sıcak)',
               secenekler: ['hot', 'cold', 'cool'],
@@ -1106,6 +1113,12 @@ const Kurs ingilizceA1 = Kurs(
               kelimeler: ['corner', 'left', 'the', 'Turn', 'at'],
               dogru: ['Turn', 'left', 'at', 'the', 'corner'],
               aciklama: 'Yön tarifi emir kipiyle yapılır: Turn left.',
+            ),
+            Isaretle(
+              soru: 'Cümledeki çoğul ismi işaretle.',
+              cumle: 'I have two sisters.',
+              dogru: [3],
+              aciklama: 'Birden çok varlıkta isme -s eklenir: sisters.',
             ),
             Bosluk(
               soru: 'Go ___ ahead.',

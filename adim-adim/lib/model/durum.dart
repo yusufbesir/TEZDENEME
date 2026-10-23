@@ -401,6 +401,8 @@ class OgrenciDurumu {
     this.kodProjeleri = const [],
     this.alinanGorevler = const {},
     this.rozetler = const {},
+    this.haftalikNotlar = const {},
+    this.kelimeEklenme = const {},
     this.oturumKartSayisi = varsayilanOturumKarti,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
@@ -580,6 +582,17 @@ class OgrenciDurumu {
   /// kırpılsa da rozet geri alınmaz).
   final Set<String> rozetler;
 
+  /// Haftalık ödev notları ("Bu hafta ne öğrendim?"): anahtar haftanın
+  /// Pazartesi günü 'YYYY-MM-DD', değer serbest not. Yerelde saklanır; eski
+  /// kayıtta yoksa boş. En çok [haftalikNotEnCok] hafta, not başına en çok
+  /// [haftalikNotEnCokKarakter] karakter.
+  final Map<String, String> haftalikNotlar;
+
+  /// Kelimenin Kelimelerim listesine ilk eklendiği gün: kart kimliği ->
+  /// 'YYYY-MM-DD' ("yeni" etiketi ve "bu hafta eklenen" süzgeci). Eski kayıtta
+  /// boş; en çok [kelimeEklenmeEnCok] kayıt (en yeni günler tutulur).
+  final Map<String, String> kelimeEklenme;
+
   /// Mikro ders, zayıf noktalar dersi ve karışık tekrar oturumlarında sorulan
   /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
   final int oturumKartSayisi;
@@ -590,6 +603,9 @@ class OgrenciDurumu {
   /// Saklanan görev ödülü ve rozet kaydı sınırları.
   static const int alinanGorevEnCok = 120;
   static const int rozetEnCok = 100;
+  static const int haftalikNotEnCok = 52;
+  static const int haftalikNotEnCokKarakter = 500;
+  static const int kelimeEklenmeEnCok = 3000;
 
   static final _gorevAnahtarDeseni = RegExp(
     r'^[gh]:\d{4}-\d{2}-\d{2}\|[a-z0-9_]{1,40}$',
@@ -698,6 +714,8 @@ class OgrenciDurumu {
     List<KodProjesi>? kodProjeleri,
     Set<String>? alinanGorevler,
     Set<String>? rozetler,
+    Map<String, String>? haftalikNotlar,
+    Map<String, String>? kelimeEklenme,
     int? oturumKartSayisi,
   }) {
     return OgrenciDurumu(
@@ -764,6 +782,8 @@ class OgrenciDurumu {
       kodProjeleri: kodProjeleri ?? this.kodProjeleri,
       alinanGorevler: alinanGorevler ?? this.alinanGorevler,
       rozetler: rozetler ?? this.rozetler,
+      haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
+      kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
       oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
     );
   }
@@ -828,6 +848,8 @@ class OgrenciDurumu {
     'kodProjeleri': [for (final p in kodProjeleri) p.toJson()],
     'alinanGorevler': alinanGorevler.toList()..sort(),
     'rozetler': rozetler.toList()..sort(),
+    'haftalikNotlar': haftalikNotlar,
+    'kelimeEklenme': kelimeEklenme,
     'oturumKartSayisi': oturumKartSayisi,
   };
 
@@ -1121,6 +1143,8 @@ class OgrenciDurumu {
           for (final e in (j['rozetler'] as List).take(rozetEnCok))
             if (e is String && rozetGecerli(e)) e,
       }),
+      haftalikNotlar: haftalikNotlarCoz(j['haftalikNotlar']),
+      kelimeEklenme: kelimeEklenmeCoz(j['kelimeEklenme']),
       // Eski kayıtta yoksa ya da 5/10/20 dışındaysa varsayılan (5).
       oturumKartSayisi:
           (j['oturumKartSayisi'] is int &&
@@ -1128,6 +1152,52 @@ class OgrenciDurumu {
           ? j['oturumKartSayisi'] as int
           : varsayilanOturumKarti,
     );
+  }
+
+  /// Haftalık notlar: geçersiz hafta anahtarı, boş/metin olmayan değer atılır,
+  /// uzun not kırpılır, en yeni [haftalikNotEnCok] hafta tutulur.
+  static Map<String, String> haftalikNotlarCoz(Object? ham) {
+    final sonuc = <String, String>{};
+    if (ham is Map) {
+      for (final e in ham.entries) {
+        final k = e.key;
+        final v = e.value;
+        if (k is! String || !gunGecerli(k) || v is! String) continue;
+        final t = v.trim();
+        if (t.isEmpty) continue;
+        sonuc[k] = t.length > haftalikNotEnCokKarakter
+            ? t.substring(0, haftalikNotEnCokKarakter)
+            : t;
+      }
+    }
+    final anahtarlar = sonuc.keys.toList()..sort();
+    final tut = anahtarlar.length > haftalikNotEnCok
+        ? anahtarlar.sublist(anahtarlar.length - haftalikNotEnCok)
+        : anahtarlar;
+    return Map.unmodifiable({for (final k in tut) k: sonuc[k]!});
+  }
+
+  /// Kelime eklenme günleri: geçersiz girdi atılır, en yeni günler tutulur.
+  static Map<String, String> kelimeEklenmeCoz(Object? ham) {
+    final sonuc = <String, String>{};
+    if (ham is Map) {
+      for (final e in ham.entries) {
+        final k = e.key;
+        final v = e.value;
+        if (k is! String || k.isEmpty || k.length > 80) continue;
+        if (v is! String || !gunGecerli(v)) continue;
+        sonuc[k] = v;
+      }
+    }
+    if (sonuc.length <= kelimeEklenmeEnCok) return Map.unmodifiable(sonuc);
+    final sirali = sonuc.entries.toList()
+      ..sort((a, b) {
+        final c = b.value.compareTo(a.value);
+        return c != 0 ? c : a.key.compareTo(b.key);
+      });
+    return Map.unmodifiable({
+      for (final e in sirali.take(kelimeEklenmeEnCok)) e.key: e.value,
+    });
   }
 
   static List<YerImi> yerImleriCoz(Object? ham) {
