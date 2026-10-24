@@ -18,5 +18,6 @@ DEĞİŞMEZ KURALLAR (her oturumda geçerli):
 - Etiket: [İP:<başlık>#<cse_ son 6>] her not, commit, PR ve çıktıda; "Birlikte çalışılanlar", girdi/çıktı token (tahmini ise yaz) ve "Kullanılan yapay zeka araçları" bölümleri.
 - Kesinti veya limit sonrası kullanıcıya sormadan kaldığı yerden devam et (bekleyen onay ve kararlar hariç); ilerlemeyi kalıcı yere yaz.
 - Windows uygulamaları kurulum + kaldırma exe'siyle dağıtılır; güncellemede yalnızca artık kullanılmayan kendi dosyaları kaldırılır.
+- Arayüz tasarımı/UI incelemesinde önce ui-ux-pro-max skill'i (ayrıntı: orkestrasyon-ve-kayit.md).
 - Yeni yazılım projesinde Archify mimari haritası; sonuç bekleyen arayüzlerde gerçek adımları gösteren emek illüzyonu.
 - Önemli işler birkaç ajana paylaştırılır; Baş Denetmen bağımsız denetler, düzeltmeyi kendisi yapmaz.
