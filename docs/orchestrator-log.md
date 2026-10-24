@@ -66,3 +66,4 @@
 | 2026-10-23 | Gündem brifi 23.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 123.757 toplam | Kısmen: 11 madde, çoğu tek derleme bültenine dayanıyor; Türkiye siyaseti, BIST/dolar ve spor boş; e-posta gönderildi |
 | 2026-10-24 | Yapay zeka brifi 24.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 111.789 toplam | Geçti: 9 madde, e-posta gönderildi, 3 madde başlıktan/doğrulanmadı işaretli |
 | 2026-10-24 | Gündem brifi 24.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | ~100.000 toplam | Kısmen: 10 madde, çoğu tek kaynaklı (doğrulanmadı), 23-24 Ekim piyasa verisi ve spor yok |
+| 2026-10-24 | Denetmen takibi 24.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~15.000 | Geçti: yeni dosya/mesaj yok, hatırlatma gönderilmedi |
