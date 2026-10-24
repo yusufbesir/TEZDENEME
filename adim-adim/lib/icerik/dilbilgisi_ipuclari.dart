@@ -1,10 +1,10 @@
-/// Dilbilgisi ipuçları (sabit içerik): İngilizce A1 (14), A2, B1, B2 (12'şer)
-/// ve Almanca A1 (11) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
+/// Dilbilgisi ipuçları (sabit içerik): İngilizce A1 (14), A2, B1, B2, C1 (12'şer)
+/// ve Almanca A1 (11), A2 (11), B1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
 /// bağlı dersin konusuyla tutarlıdır. Yalnızca kesin, yaygın dilbilgisi
 /// kuralları yazıldı; istisnalı konularda "genellikle" denir. İpucu olmayan
 /// kurslarda kart gösterilmez.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
-/// yazan: [Claude#dalga3], genişletme [Claude#dalga4]
+/// yazan: [Claude#dalga3], genişletme [Claude#dalga4], Almanca A2/B1 ve İngilizce C1 [Claude#dalga10]
 library;
 
 import '../model/dilbilgisi_ipucu.dart';
@@ -500,6 +500,104 @@ const List<DilbilgisiIpucu> tumDilbilgisiIpuclari = [
     ornek: 'She is likely to win the prize.',
     ornekCeviri: 'Ödülü kazanması muhtemel.',
   ),
+  // ---- İngilizce C1 (ingilizce-5) ----
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u1.d1',
+    baslik: 'Future perfect ve future continuous',
+    metin:
+        'Will be + -ing gelecekteki bir anda süren eylemi, will have + V3 ise gelecekteki bir andan önce tamamlanmış olacak eylemi anlatır. Zaman bağlacından sonra şimdiki zaman kullanılır.',
+    ornek: 'By Friday, I will have finished the report.',
+    ornekCeviri: 'Cumaya kadar raporu bitirmiş olacağım.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u1.d2',
+    baslik: 'Olumsuz zarflarla devrik yapı',
+    metin:
+        'Never, rarely, hardly, not only gibi ifadeler cümle başına gelince yardımcı fiil özneden önce gelir; yardımcı fiil yoksa do / did eklenir.',
+    ornek: 'Never have I seen such a beautiful view.',
+    ornekCeviri: 'Hiç bu kadar güzel bir manzara görmemiştim.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u1.d3',
+    baslik: 'Cleft cümleler',
+    metin:
+        'It was ... who / that ... ve What ... is / was ... kalıpları cümlenin bir öğesini vurgular. Kişiler için who ya da that kullanılır; which kullanılmaz.',
+    ornek: 'What I need is a long holiday.',
+    ornekCeviri: 'İhtiyacım olan şey uzun bir tatil.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u1.d4',
+    baslik: 'Karışık ve devrik koşul',
+    metin:
+        'Resmî yazıda if atılır: Had I known (= If I had known), Should you need (= If you need), Were I you (= If I were you).',
+    ornek: 'Had I known, I would have called you.',
+    ornekCeviri: 'Bilseydim seni arardım.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u2.d1',
+    baslik: 'İsimleştirme',
+    metin:
+        'Akademik yazıda fiil ve sıfatlar isimleştirilir: introduce - introduction, improve - improvement, aware - awareness. "The" ya da "a" sonrasında isim gelir.',
+    ornek: 'The introduction of new rules reduced costs.',
+    ornekCeviri: 'Yeni kuralların getirilmesi maliyetleri düşürdü.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u2.d2',
+    baslik: 'Söylem işaretleri ve despite',
+    metin:
+        'However ve nevertheless gibi işaretlerden önce nokta ya da noktalı virgül, sonra virgül gelir. Despite / in spite of + isim alır; "despite of" denmez.',
+    ornek: 'Despite the rain, we enjoyed the trip.',
+    ornekCeviri: 'Yağmura rağmen gezinin tadını çıkardık.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u2.d3',
+    baslik: 'Hedging: hafifletme',
+    metin:
+        'Akademik yazıda prove yerine suggest, kesin ifadeler yerine may, tend to, to some extent gibi yumuşatıcılar kullanılır.',
+    ornek: 'The results suggest that exercise may improve memory.',
+    ornekCeviri:
+        'Sonuçlar egzersizin belleği geliştirebileceğini düşündürüyor.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u2.d4',
+    baslik: 'Geçmişle ilgili çıkarım',
+    metin:
+        'Must have + V3 neredeyse kesin çıkarım, can\'t have + V3 imkânsızlık, might have + V3 olasılık bildirir. Imply konuşanın, infer dinleyenin işidir.',
+    ornek: 'She must have left already.',
+    ornekCeviri: 'Çoktan gitmiş olmalı.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u3.d1',
+    baslik: 'Eşdizim: make ve do',
+    metin:
+        'Eşdizimler ezberlenir: make a decision, make progress; do research, do damage; take a break, take a risk. Yağmur için heavy rain denir, strong rain denmez.',
+    ornek: 'We need to make a decision.',
+    ornekCeviri: 'Bir karar vermemiz gerekiyor.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u3.d2',
+    baslik: 'Ayrılabilen phrasal verb',
+    metin:
+        'Ayrılabilen phrasal verb\'lerde nesne zamirse fiil ile edat arasına girer: bring it up (bring up it denmez). Come across ve put up with ayrılmaz.',
+    ornek: 'Let\'s bring it up at the meeting.',
+    ornekCeviri: 'Bunu toplantıda gündeme getirelim.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u3.d3',
+    baslik: 'Deyimler sözcük sözcük çevrilmez',
+    metin:
+        'Deyimlerin anlamı sözcüklerin toplamından çıkmaz: once in a blue moon çok nadiren, under the weather keyifsiz demektir. Deyimi bütün olarak öğren.',
+    ornek: 'It rains here once in a blue moon.',
+    ornekCeviri: 'Burada çok nadiren yağmur yağar.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'ingilizce-5.u3.d4',
+    baslik: 'Wish ve if only',
+    metin:
+        'Şimdiki dilek için wish + past simple, geçmiş pişmanlık için wish + past perfect kullanılır. It\'s high time + özne + past simple da aynı mantıkla kurulur.',
+    ornek: 'I wish I had listened to her advice.',
+    ornekCeviri: 'Keşke onun tavsiyesini dinleseydim.',
+  ),
   // ---- Almanca A1 (almanca-1) ----
   DilbilgisiIpucu(
     dersId: 'almanca-1.u1.d1',
@@ -609,5 +707,237 @@ const List<DilbilgisiIpucu> tumDilbilgisiIpuclari = [
         'du kannst, er kann.',
     ornek: 'Ich möchte einen Kaffee trinken.',
     ornekCeviri: 'Bir kahve içmek istiyorum.',
+  ),
+  // ---- Almanca A2 (almanca-2) ----
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u1.d1',
+    baslik: 'Perfekt: haben + Partizip II',
+    metin:
+        'Perfekt, çekimli haben (ikinci sırada) ve Partizip II (cümle '
+        'sonunda) ile kurulur. Düzenli fiillerde Partizip II: ge- + kök + '
+        '-t (machen - gemacht).',
+    ornek: 'Ich habe Fußball gespielt.',
+    ornekCeviri: 'Futbol oynadım.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u1.d2',
+    baslik: 'Perfekt: sein ile',
+    metin:
+        'Yer değiştirme (gehen, fahren, kommen) ve durum değişikliği ya da '
+        'kalma (bleiben, sein) bildiren fiiller Perfekt\'te genellikle '
+        '"sein" alır. Çoğu diğer fiil "haben" alır.',
+    ornek: 'Er ist nach Berlin gefahren.',
+    ornekCeviri: 'Berlin\'e gitti (araçla).',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u1.d3',
+    baslik: 'Düzensiz fiillerde Partizip II',
+    metin:
+        'Düzensiz fiillerde Partizip II ge-...-en olur ve kök değişebilir '
+        '(trinken - getrunken). Ayrılabilen fiillerde ge- ortaya girer '
+        '(aufstehen - aufgestanden); be-, ver- ve -ieren fiillerinde ge- '
+        'gelmez (besucht, telefoniert).',
+    ornek: 'Wir haben Wasser getrunken.',
+    ornekCeviri: 'Su içtik.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u2.d1',
+    baslik: 'Daima Dativ isteyen edatlar',
+    metin:
+        'aus, bei, mit, nach, seit, von, zu edatlarından sonra her zaman '
+        'Dativ gelir. Dativ artikelleri: dem (eril/nötr), der (dişil), '
+        'den + isme -n (çoğul).',
+    ornek: 'Ich fahre mit dem Bus.',
+    ornekCeviri: 'Otobüsle gidiyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u2.d2',
+    baslik: 'Dativ zamirleri ve Dativ fiilleri',
+    metin:
+        'Dativ zamirleri: mir, dir, ihm, ihr, uns, euch, ihnen. helfen, '
+        'gefallen, gehören, danken ve schmecken fiillerinden sonra Dativ '
+        'gelir.',
+    ornek: 'Das Buch gehört mir.',
+    ornekCeviri: 'Bu kitap bana ait.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u2.d3',
+    baslik: 'Wechselpräpositionen: Wo? / Wohin?',
+    metin:
+        'in, an, auf, über, unter, vor, hinter, neben, zwischen edatlarından '
+        'sonra yer (Wo?) bildirince Dativ, yön (Wohin?) bildirince '
+        'Akkusativ gelir.',
+    ornek: 'Ich gehe in die Küche.',
+    ornekCeviri: 'Mutfağa gidiyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u3.d1',
+    baslik: 'Modal fiiller: müssen, dürfen, sollen, wollen',
+    metin:
+        'Modal fiil ikinci sırada çekimlenir, ana fiil mastar hâlinde '
+        'cümle sonuna gider. ich ve er/sie/es için çekimde ek yoktur: ich '
+        'muss, er muss.',
+    ornek: 'Ich muss heute arbeiten.',
+    ornekCeviri: 'Bugün çalışmak zorundayım.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u3.d2',
+    baslik: 'Imperativ: emir kipi',
+    metin:
+        'du için kök kullanılır (Komm!), ihr için -t eklenir (Kommt!), Sie '
+        'için fiil başa gelir (Kommen Sie!). Düzensiz örnekler: nehmen - '
+        'Nimm!, sprechen - Sprich!, sein - Sei!',
+    ornek: 'Komm bitte schnell!',
+    ornekCeviri: 'Lütfen çabuk gel!',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u3.d3',
+    baslik: 'Yan cümle: weil, dass, wenn',
+    metin:
+        'weil, dass, wenn ve ob ile başlayan yan cümlede çekimli fiil '
+        'cümlenin sonuna gider. Yan cümle virgülle ayrılır.',
+    ornek: 'Ich bleibe zu Hause, weil ich krank bin.',
+    ornekCeviri: 'Hasta olduğum için evde kalıyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u4.d1',
+    baslik: 'Sıfat çekimi ve karşılaştırma',
+    metin:
+        'Belirsiz artikel (ein) sonrası sıfat çekilir: ein großer Mann '
+        '(eril -er), eine kleine Wohnung (dişil -e), ein neues Auto '
+        '(nötr -es). Karşılaştırma: schnell - schneller; "als" ile '
+        'kıyaslanır.',
+    ornek: 'Mein Bruder ist größer als ich.',
+    ornekCeviri: 'Erkek kardeşim benden daha uzun.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-2.u4.d2',
+    baslik: 'Refleksif fiiller ve war/hatte',
+    metin:
+        'Refleksif fiilde zamir özneye uyar: ich wasche mich, du wäschst '
+        'dich, er wäscht sich, wir treffen uns. Präteritum: ich war/hatte, '
+        'du warst/hattest, wir waren/hatten.',
+    ornek: 'Gestern war ich sehr müde.',
+    ornekCeviri: 'Dün çok yorgundum.',
+  ),
+  // ---- Almanca B1 (almanca-3) ----
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u1.d1',
+    baslik: 'Präteritum: düzenli ve düzensiz',
+    metin:
+        'Düzenli fiiller -te alır (machen - machte); düzensiz fiillerde '
+        'kök değişir (gehen - ging, sehen - sah). Präteritum daha çok '
+        'yazıda ve hikâye anlatımında kullanılır.',
+    ornek: 'Er ging nach Hause.',
+    ornekCeviri: 'Eve gitti.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u1.d2',
+    baslik: 'Plusquamperfekt',
+    metin:
+        'Plusquamperfekt, hatte/war + Partizip II ile kurulur ve geçmişteki '
+        'başka bir olaydan daha önce olanı anlatır. Konuşmada geçmiş için '
+        'çoğunlukla Perfekt kullanılır.',
+    ornek: 'Ich hatte schon gegessen, als er kam.',
+    ornekCeviri: 'O geldiğinde ben zaten yemek yemiştim.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u1.d3',
+    baslik: 'Bağlaçlar ve fiilin sona gitmesi',
+    metin:
+        'obwohl (rağmen), während (iken), bevor (-meden önce), damit (diye) '
+        've sodass (öyle ki) yan cümle kurar: çekimli fiil cümlenin '
+        'sonuna gider ve yan cümle virgülle ayrılır.',
+    ornek: 'Obwohl es regnet, gehen wir spazieren.',
+    ornekCeviri: 'Yağmur yağmasına rağmen yürüyüşe çıkıyoruz.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u2.d1',
+    baslik: 'Relativsatz: der, die, das',
+    metin:
+        'İlgi zamirinin cinsi ve sayısı önceki isimden, hâli ise yan '
+        'cümledeki görevinden gelir. Relativsatz virgülle ayrılır ve '
+        'çekimli fiil sonda durur.',
+    ornek: 'Der Mann, der dort steht, ist mein Lehrer.',
+    ornekCeviri: 'Orada duran adam benim öğretmenim.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u2.d2',
+    baslik: 'Passiv: werden + Partizip II',
+    metin:
+        'Passiv, werden + Partizip II ile kurulur. Präsens: wird/werden '
+        'gebaut; Präteritum: wurde/wurden gebaut. Yapan kişi von + Dativ '
+        'ile belirtilir.',
+    ornek: 'Das Haus wurde von einer Firma gebaut.',
+    ornekCeviri: 'Ev bir firma tarafından inşa edildi.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u2.d3',
+    baslik: 'Konjunktiv II: dilek ve gerçek dışı',
+    metin:
+        'Gerçek dışı durum ve dilekler için wäre, hätte, könnte ya da '
+        'würde + mastar kullanılır. Nezaket için de aynı biçimler '
+        'kullanılır: Könnten Sie ...?',
+    ornek: 'Wenn ich Zeit hätte, würde ich reisen.',
+    ornekCeviri: 'Zamanım olsaydı seyahat ederdim.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u3.d1',
+    baslik: 'Belirli artikelden sonra sıfat sonu',
+    metin:
+        'Belirli artikelden sonra sıfat sonu çoğunlukla -en\'dir; yalnız '
+        'Nominativ\'de ve dişil/nötr Akkusativ\'de -e olur (der gute '
+        'Mann, die gute Frau). Dativ ve çoğulda hep -en.',
+    ornek: 'Ich helfe der alten Frau.',
+    ornekCeviri: 'Yaşlı kadına yardım ediyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u3.d2',
+    baslik: 'Genitiv ve wegen, trotz',
+    metin:
+        'Genitiv sahiplik bildirir; eril ve nötr isme -(e)s eklenir: das '
+        'Auto des Mannes. wegen (yüzünden), trotz (rağmen), während '
+        '(süresince) ve statt (yerine) Genitiv ister.',
+    ornek: 'Wegen des Wetters bleiben wir zu Hause.',
+    ornekCeviri: 'Hava yüzünden evde kalıyoruz.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u3.d3',
+    baslik: 'Edatlı fiiller ve dolaylı soru',
+    metin:
+        'Bazı fiiller sabit edatla kullanılır: warten auf + Akkusativ. '
+        'Cansız şeyler için da-/wo- kullanılır (darauf, worauf). '
+        'Dolaylı soruda çekimli fiil sona gider.',
+    ornek: 'Ich warte auf den Bus.',
+    ornekCeviri: 'Otobüsü bekliyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u4.d1',
+    baslik: 'Resmî ricada bitten um',
+    metin:
+        'Resmî yazıda "bitten um + Akkusativ" kalıbı ile rica edilir. '
+        'Resmî hitapta Sie ve Ihnen büyük harfle yazılır.',
+    ornek: 'Ich bitte um eine schnelle Antwort.',
+    ornekCeviri: 'Hızlı bir yanıt rica ediyorum.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u4.d2',
+    baslik: 'Görüş bildirme: dass ve fiil sırası',
+    metin:
+        '"Ich finde, dass ..." yan cümlesinde çekimli fiil sona gider. '
+        '"Meiner Meinung nach" ile başlayan cümlede ise fiil hemen '
+        'ardından, ikinci sırada gelir.',
+    ornek: 'Ich finde, dass Bildung sehr wichtig ist.',
+    ornekCeviri: 'Bence eğitim çok önemli.',
+  ),
+  DilbilgisiIpucu(
+    dersId: 'almanca-3.u4.d3',
+    baslik: 'sich ärgern über + Akkusativ',
+    metin:
+        'Bazı refleksif fiiller sabit edat ister: sich ärgern über + '
+        'Akkusativ (bir şeye kızmak). Zamir özneye uyar: ich ärgere mich, '
+        'er ärgert sich.',
+    ornek: 'Ich ärgere mich über den Lärm.',
+    ornekCeviri: 'Gürültüye kızıyorum.',
   ),
 ];

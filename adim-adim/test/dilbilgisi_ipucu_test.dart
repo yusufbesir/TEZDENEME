@@ -71,12 +71,15 @@ void main() {
     );
 
     test(
-      'A2, B1, B2 ve Almanca A1 kurslarında ipucu var (toplam en az 40)',
+      'A2, B1, B2, C1 ve Almanca A1-B1 kurslarında ipucu var (toplam en az 40)',
       () {
         expect(DilbilgisiIpuclari.kursIcin('ingilizce-2').length, 12);
         expect(DilbilgisiIpuclari.kursIcin('ingilizce-3').length, 12);
         expect(DilbilgisiIpuclari.kursIcin('ingilizce-4').length, 12);
+        expect(DilbilgisiIpuclari.kursIcin('ingilizce-5').length, 12);
         expect(DilbilgisiIpuclari.kursIcin('almanca-1').length, 11);
+        expect(DilbilgisiIpuclari.kursIcin('almanca-2').length, 11);
+        expect(DilbilgisiIpuclari.kursIcin('almanca-3').length, 12);
         expect(tumDilbilgisiIpuclari.length, greaterThanOrEqualTo(40));
         for (final i in tumDilbilgisiIpuclari) {
           expect(i.metin.trim().length, greaterThan(20), reason: i.dersId);
@@ -87,7 +90,10 @@ void main() {
           'ingilizce-2',
           'ingilizce-3',
           'ingilizce-4',
+          'ingilizce-5',
           'almanca-1',
+          'almanca-2',
+          'almanca-3',
         ]) {
           final kurs = tumKurslar.firstWhere((k) => k.id == kid);
           expect(
@@ -279,7 +285,10 @@ void main() {
         ('ingilizce-2', 2),
         ('ingilizce-3', 2),
         ('ingilizce-4', 2),
+        ('ingilizce-5', 4),
         ('almanca-1', 2),
+        ('almanca-2', 3),
+        ('almanca-3', 3),
       ]) {
         kap
             .read(yonlendiriciProvider)

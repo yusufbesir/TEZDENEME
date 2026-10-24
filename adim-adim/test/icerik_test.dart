@@ -17,6 +17,7 @@ void main() {
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'ingilizce-5',
       'almanca-1',
       'almanca-2',
       'almanca-3',
@@ -54,6 +55,7 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
+    expect(ingilizceC1.alan, KursAlani.dil);
     for (final k in [
       almancaA1,
       almancaA2,
@@ -184,6 +186,7 @@ void main() {
       ...ingilizceA2.tumDersler,
       ...ingilizceB1.tumDersler,
       ...ingilizceB2.tumDersler,
+      ...ingilizceC1.tumDersler,
     ]) {
       final dinle = d.alistirmalar.whereType<Dinle>().toList();
       expect(dinle, isNotEmpty, reason: d.id);

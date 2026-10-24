@@ -32,12 +32,12 @@ void main() {
   });
 
   test(
-    'gerçek kurslar: İngilizce A1..B2 CEFR etiketleriyle, Python ayrı yol',
+    'gerçek kurslar: İngilizce A1..C1 CEFR etiketleriyle, Python ayrı yol',
     () {
       final yollar = OgrenmeYolu.uret(const OgrenciDurumu(), tumu);
       final en = yollar.firstWhere((y) => y.kimlik == 'ingilizce');
       expect(en.ad, 'İngilizce');
-      expect(en.seviyeler.map((s) => s.etiket), ['A1', 'A2', 'B1', 'B2']);
+      expect(en.seviyeler.map((s) => s.etiket), ['A1', 'A2', 'B1', 'B2', 'C1']);
       expect(yollar.any((y) => y.kimlik == 'python'), isTrue);
       // Her kurs tam bir yolda ve tek kez geçer.
       final kimlikler = [
