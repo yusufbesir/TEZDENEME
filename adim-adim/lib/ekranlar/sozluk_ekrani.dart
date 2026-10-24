@@ -74,6 +74,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'Alm.$no';
       case 'fransizca':
         return 'Fra.$no';
+      case 'rusca':
+        return 'Rus.$no';
       case 'korece':
         return 'Kor.$no';
       case 'japonca':

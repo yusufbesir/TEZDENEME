@@ -81,8 +81,8 @@ void main() {
 
   test('tabloda olmayan taban kendi yolu; kimliksiz kurs seviye 1', () {
     final garip = Kurs(
-      id: 'rusca-2',
-      ad: 'Rusça B1',
+      id: 'ispanyolca-2',
+      ad: 'İspanyolca B1',
       aciklama: '',
       alan: KursAlani.dil,
       uniteler: const [],
@@ -95,7 +95,7 @@ void main() {
       uniteler: const [],
     );
     final y = OgrenmeYolu.uret(const OgrenciDurumu(), [garip, yok]);
-    expect(y.map((x) => x.ad), ['Rusca', 'Tek']);
+    expect(y.map((x) => x.ad), ['Ispanyolca', 'Tek']);
     expect(y.first.seviyeler.single.sira, 2);
     expect(y.first.seviyeler.single.etiket, 'B1');
     expect(y.last.seviyeler.single.sira, 1);

@@ -66,6 +66,13 @@ const List<DilTanimi> dilTanimlari = [
     kisaAd: 'Fra.',
   ),
   DilTanimi(
+    kod: 'ru',
+    ad: 'Rusça',
+    kursOnek: 'rusca',
+    ttsDili: 'ru-RU',
+    kisaAd: 'Rus.',
+  ),
+  DilTanimi(
     kod: 'ko',
     ad: 'Korece',
     kursOnek: 'korece',

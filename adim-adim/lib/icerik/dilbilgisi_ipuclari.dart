@@ -1,5 +1,5 @@
 /// Dilbilgisi ipuçları (sabit içerik): İngilizce A1 (14), A2, B1, B2, C1 (12'şer)
-/// ve Almanca A1 (11), A2 (11), B1 (12) ve Fransızca A1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
+/// ve Almanca A1 (11), A2 (11), B1 (12), Fransızca A1 (12) ve Rusça A1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
 /// bağlı dersin konusuyla tutarlıdır. Yalnızca kesin, yaygın dilbilgisi
 /// kuralları yazıldı; istisnalı konularda "genellikle" denir. İpucu olmayan
 /// kurslarda kart gösterilmez.
@@ -1036,5 +1036,102 @@ const List<DilbilgisiIpucu> tumDilbilgisiIpuclari = [
         "Gitme ve yer bildirirken à, le ile au, les ile aux olur; la ve l' ile değişmez. Şehirle à kullanılır. aller + mastar yakın gelecek anlatır.",
     ornek: "Je vais au marché.",
     ornekCeviri: "Pazara gidiyorum.",
+  ),
+  // ---- Rusça A1 (rusca-1) ----
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u1.d1',
+    baslik: "Benzeyen ama farklı okunan harfler",
+    metin:
+        "Kiril alfabesinde В = v, Н = n, Р = r, С = s, У = u okunur; Latin harflerine benzemeleri yanıltır. Vurgusuz O \"a\" gibi okunur: молоко (malakO).",
+    ornek: "Это мой дом.",
+    ornekCeviri: "Bu benim evim.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u1.d2',
+    baslik: "Yumuşatma işareti ь",
+    metin:
+        "Ь kendi sesi olmayan bir harftir; önceki ünsüzü yumuşatır. Ш = ş, Ч = ç, Щ = şç, Ж = j, Ы = ı okunur. Ъ çok nadirdir.",
+    ornek: "Сегодня понедельник.",
+    ornekCeviri: "Bugün pazartesi.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u1.d3',
+    baslik: "Resmi ve samimi selamlaşma",
+    metin:
+        "Здравствуйте herkese ve resmi ortamda, Привет yalnız arkadaşlara söylenir. Veda için resmi До свидания, samimi Пока kullanılır.",
+    ornek: "Здравствуйте, спасибо!",
+    ornekCeviri: "Merhaba, teşekkürler!",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u2.d1',
+    baslik: "Şimdiki zamanda \"olmak\" söylenmez",
+    metin:
+        "Rusçada şimdiki zamanda быть fiili söylenmez: Я студент (Ben öğrenciyim). Tanışırken Меня зовут ... denir. Kadınlarda meslek ve uyruk değişir: студент / студентка.",
+    ornek: "Меня зовут Али. Я из Турции.",
+    ornekCeviri: "Adım Ali. Türkiye'denim.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u2.d2',
+    baslik: "11-19 arası sayılar",
+    metin:
+        "11-19 arası sayılar sayı kökü ve -надцать ile kurulur: четырнадцать (14), пятнадцать (15). 20 двадцать'tır. 11 одиннадцать ve 12 двенадцать biraz düzensizdir.",
+    ornek: "Мне двадцать лет.",
+    ornekCeviri: "Yirmi yaşındayım.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u2.d3',
+    baslik: "Sayıdan sonra ruble",
+    metin:
+        "Fiyatta sayıya göre biçim değişir: 1 рубль, 2-4 рубля, 5 ve üstü рублей. Bileşik sayıda önce onluk gelir: двадцать пять (25).",
+    ornek: "Это стоит пять рублей.",
+    ornekCeviri: "Bu beş ruble.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u3.d1',
+    baslik: "Üç cins ve çoğul",
+    metin:
+        "İsimler eril (стол), dişil (книга) ve nötr (окно) olur. \"Benim\" isme uyar: мой, моя, моё, мои. Çoğulda eril ve dişil isimler genellikle -ы / -и alır.",
+    ornek: "Моя книга на столе.",
+    ornekCeviri: "Kitabım masanın üstünde.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u3.d2',
+    baslik: "Var için есть, yok için нет",
+    metin:
+        "\"Bende ... var\" У меня есть ... ile söylenir. Yok için нет kullanılır: У меня нет сестры. Şimdiki zamanda Это мой папа gibi cümlelerde olmak fiili yoktur.",
+    ornek: "У меня есть брат.",
+    ornekCeviri: "Bir erkek kardeşim var.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u3.d3',
+    baslik: "Birinci ve ikinci çekim",
+    metin:
+        "Fiiller iki grupta çekilir. Birinci grup -ю, -ешь, -ет: читать → читаю, читаешь. İkinci grup -ю, -ишь, -ит: говорить → говорю, говоришь. Olumsuzlukta не fiilden önce gelir.",
+    ornek: "Я не говорю по-русски.",
+    ornekCeviri: "Rusça konuşmuyorum.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u4.d1',
+    baslik: "в ve на + yer hâli",
+    metin:
+        "Yer bildirirken в (içinde) ya da на (açık alan, iş, etkinlik) kullanılır ve isim genellikle -е alır: в Москве, в школе, на работе. Soru sözcükleri: Кто, Что, Где, Как, Когда.",
+    ornek: "Я живу в Москве.",
+    ornekCeviri: "Moskova'da yaşıyorum.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u4.d2',
+    baslik: "Nesne hâli: -а → -у",
+    metin:
+        "Fiilin nesnesi -а ile bitiyorsa genellikle -у olur: вода → воду, книга → книгу. Eril cansız ve nötr isimlerde değişmez: чай → чай. Nezaketle sipariş için Дайте, пожалуйста ... denir.",
+    ornek: "Я хочу воду.",
+    ornekCeviri: "Su istiyorum.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'rusca-1.u4.d3',
+    baslik: "Saat, gün ve ay adları",
+    metin:
+        "Saatte 1 час, 2-4 часа, 5 ve üstü часов kullanılır. Gün ve ay adları Rusçada küçük harfle yazılır: понедельник, январь. Zaman için сегодня, завтра, вчера.",
+    ornek: "Сейчас три часа.",
+    ornekCeviri: "Saat şimdi üç.",
   ),
 ];

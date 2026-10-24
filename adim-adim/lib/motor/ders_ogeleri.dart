@@ -63,6 +63,7 @@ class DersOgeleri {
     final k = kursId.toLowerCase();
     if (k.startsWith('almanca')) return 'de-DE';
     if (k.startsWith('fransizca')) return 'fr-FR';
+    if (k.startsWith('rusca')) return 'ru-RU';
     if (k.startsWith('korece')) return 'ko-KR';
     if (k.startsWith('japonca')) return 'ja-JP';
     if (k.startsWith('cince')) return 'zh-CN';

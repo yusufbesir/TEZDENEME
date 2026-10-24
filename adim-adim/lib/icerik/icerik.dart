@@ -17,6 +17,7 @@ import 'almanca_a1.dart';
 import 'almanca_a2.dart';
 import 'almanca_b1.dart';
 import 'fransizca_a1.dart';
+import 'rusca_a1.dart';
 import 'css_2.dart';
 import 'css_3.dart';
 import 'go_1.dart';
@@ -54,6 +55,7 @@ export 'almanca_a1.dart' show almancaA1;
 export 'almanca_a2.dart' show almancaA2;
 export 'almanca_b1.dart' show almancaB1;
 export 'fransizca_a1.dart' show fransizcaA1;
+export 'rusca_a1.dart' show ruscaA1;
 export 'css_2.dart' show css2;
 export 'css_3.dart' show css3;
 export 'html_2.dart' show html2;
@@ -86,6 +88,7 @@ final List<Kurs> tumKurslar = List.unmodifiable(<Kurs>[
   almancaA2,
   almancaB1,
   fransizcaA1,
+  ruscaA1,
   koreceA1,
   japoncaA1,
   cinceA1,
