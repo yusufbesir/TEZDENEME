@@ -105,6 +105,7 @@ void main() {
 
     test('kurs kimliğinden okuma dili', () {
       expect(DersOgeleri.kursSesDili('almanca-a1'), 'de-DE');
+      expect(DersOgeleri.kursSesDili('fransizca-1'), 'fr-FR');
       expect(DersOgeleri.kursSesDili('korece-1'), 'ko-KR');
       expect(DersOgeleri.kursSesDili('japonca-1'), 'ja-JP');
       expect(DersOgeleri.kursSesDili('cince-1'), 'zh-CN');

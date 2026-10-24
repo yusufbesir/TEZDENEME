@@ -1,5 +1,5 @@
 /// Dilbilgisi ipuçları (sabit içerik): İngilizce A1 (14), A2, B1, B2, C1 (12'şer)
-/// ve Almanca A1 (11), A2 (11), B1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
+/// ve Almanca A1 (11), A2 (11), B1 (12) ve Fransızca A1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
 /// bağlı dersin konusuyla tutarlıdır. Yalnızca kesin, yaygın dilbilgisi
 /// kuralları yazıldı; istisnalı konularda "genellikle" denir. İpucu olmayan
 /// kurslarda kart gösterilmez.
@@ -939,5 +939,102 @@ const List<DilbilgisiIpucu> tumDilbilgisiIpuclari = [
         'er ärgert sich.',
     ornek: 'Ich ärgere mich über den Lärm.',
     ornekCeviri: 'Gürültüye kızıyorum.',
+  ),
+  // ---- Fransızca A1 (fransizca-1) ----
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u1.d1',
+    baslik: "Resmî ve samimi selamlaşma",
+    metin:
+        "\"Bonjour\" gün boyu kullanılır, akşam \"Bonsoir\" denir. \"Salut\" samimidir. \"Bonne nuit\" yalnızca yatmadan önce söylenir. Hitapta Monsieur (Bay) ve Madame (Bayan) kullanılır.",
+    ornek: "Bonjour, Madame Martin!",
+    ornekCeviri: "Günaydın, Bayan Martin!",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u1.d2',
+    baslik: "Aksanlar ve sessiz harfler",
+    metin:
+        "Fransızcada aksan sesi değiştirir: é kapalı, è ve ê açık e'dir; ç her zaman \"s\" okunur. Sözcük sonundaki ünsüzler çoğunlukla okunmaz (petit, vous).",
+    ornek: "Je parle français.",
+    ornekCeviri: "Fransızca konuşuyorum.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u1.d3',
+    baslik: "70, 80 ve 90 nasıl söylenir",
+    metin:
+        "Fransızcada 70 \"altmış-on\" (soixante-dix), 80 \"dört-yirmi\" (quatre-vingts), 90 \"dört-yirmi-on\" (quatre-vingt-dix) diye söylenir. 21'de et kullanılır: vingt et un.",
+    ornek: "J'ai quatre-vingts euros.",
+    ornekCeviri: "Seksen avrom var.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u2.d1',
+    baslik: "être fiili",
+    metin:
+        "être özneye göre değişir: je suis, tu es, il/elle est, nous sommes, vous êtes, ils/elles sont. Meslek ve uyruk söylerken artikel kullanılmaz.",
+    ornek: "Nous sommes étudiants.",
+    ornekCeviri: "Biz öğrenciyiz.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u2.d2',
+    baslik: "avoir ile yaş söylemek",
+    metin:
+        "Fransızcada yaş \"olmak\" ile değil avoir (sahip olmak) ile söylenir: j'ai, tu as, il a, nous avons, vous avez, ils ont. Ünlüden önce je, j' olur.",
+    ornek: "J'ai vingt ans.",
+    ornekCeviri: "Yirmi yaşındayım.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u2.d3',
+    baslik: "Evet/hayır sorusu: est-ce que",
+    metin:
+        "Evet/hayır sorusu cümlenin başına \"Est-ce que\" getirerek ya da yalnızca tonlamayla kurulur. Soru sözcükleri (où, qui, comment) cümlenin başında yer alır.",
+    ornek: "Est-ce que tu es étudiant?",
+    ornekCeviri: "Öğrenci misin?",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u3.d1',
+    baslik: "İsimlerin cinsiyeti ve artikel",
+    metin:
+        "Her isim eril ya da dişildir: le/un (eril), la/une (dişil). Ünlüyle başlayan isimlerde le/la, l' olur. Çoğulda genellikle les/des kullanılır ve isme -s eklenir.",
+    ornek: "Elle a une amie.",
+    ornekCeviri: "Onun bir kız arkadaşı var.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u3.d2',
+    baslik: "Olumsuz: ne ... pas",
+    metin:
+        "Olumsuz cümlede ne ve pas fiili ortaya alır. Fiil ünlüyle başlıyorsa ne, n' olur. -er fiillerinin ekleri: -e, -es, -e, -ons, -ez, -ent.",
+    ornek: "Je n'aime pas le café.",
+    ornekCeviri: "Kahveyi sevmiyorum.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u3.d3',
+    baslik: "Sahiplik sıfatları",
+    metin:
+        "Sahiplik sıfatı, sahibe değil sahip olunan ismin cinsiyetine ve sayısına uyar: mon père, ma mère, mes parents. Dişil isim ünlüyle başlarsa mon kullanılır: mon amie.",
+    ornek: "C'est ma sœur.",
+    ornekCeviri: "Bu benim kız kardeşim.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u4.d1',
+    baslik: "Belirsiz miktar: du, de la, des",
+    metin:
+        "Yiyecek ve içecekte belirsiz miktar için du (eril), de la (dişil), de l' (ünlüyle başlayan) ve des (çoğul) kullanılır. Nezaketle sipariş için \"Je voudrais ...\" denir.",
+    ornek: "Je voudrais du pain, s'il vous plaît.",
+    ornekCeviri: "Biraz ekmek istiyorum, lütfen.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u4.d2',
+    baslik: "Saat söylemek",
+    metin:
+        "Saat \"Il est ... heure(s)\" ile söylenir; bir için tekil: une heure. Çeyrek geçe et quart, buçuk et demie, çeyrek var moins le quart'tır. Gün ve ay adları küçük harfle yazılır.",
+    ornek: "Il est trois heures et demie.",
+    ornekCeviri: "Saat üç buçuk.",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'fransizca-1.u4.d3',
+    baslik: "à + le = au",
+    metin:
+        "Gitme ve yer bildirirken à, le ile au, les ile aux olur; la ve l' ile değişmez. Şehirle à kullanılır. aller + mastar yakın gelecek anlatır.",
+    ornek: "Je vais au marché.",
+    ornekCeviri: "Pazara gidiyorum.",
   ),
 ];

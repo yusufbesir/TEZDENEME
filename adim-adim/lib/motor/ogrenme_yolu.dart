@@ -72,6 +72,7 @@ abstract final class OgrenmeYolu {
     'go': (yol: 'go', ad: 'Go', sira: 0),
     'ingilizce': (yol: 'ingilizce', ad: 'İngilizce', sira: 0),
     'almanca': (yol: 'almanca', ad: 'Almanca', sira: 0),
+    'fransizca': (yol: 'fransizca', ad: 'Fransızca', sira: 0),
     'korece': (yol: 'korece', ad: 'Korece', sira: 0),
     'japonca': (yol: 'japonca', ad: 'Japonca', sira: 0),
     'cince': (yol: 'cince', ad: 'Çince', sira: 0),
