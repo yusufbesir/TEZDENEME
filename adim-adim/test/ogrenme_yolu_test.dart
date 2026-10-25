@@ -105,6 +105,11 @@ void main() {
   test('yalnız verilen kurslar yola girer (alan süzgeci)', () {
     final kod = tumu.where((k) => k.alan == KursAlani.kod).toList();
     final yollar = OgrenmeYolu.uret(const OgrenciDurumu(), kod);
-    expect(yollar.map((y) => y.kimlik).toSet(), {'web', 'python', 'sql', 'php'});
+    expect(yollar.map((y) => y.kimlik).toSet(), {
+      'web',
+      'python',
+      'sql',
+      'php',
+    });
   });
 }

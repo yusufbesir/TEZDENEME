@@ -31,6 +31,7 @@ import 'ekranlar/eller_serbest_ekrani.dart';
 import 'ekranlar/gorevler_ekrani.dart';
 import 'ekranlar/gorsel_kelime_ekrani.dart';
 import 'ekranlar/kart_kaydirma_ekrani.dart';
+import 'ekranlar/kelime_agaci_ekrani.dart';
 import 'ekranlar/kelime_bulutu_ekrani.dart';
 import 'ekranlar/meydan_ekrani.dart';
 import 'ekranlar/ogrenme_yolu_ekrani.dart';
@@ -346,6 +347,10 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/kelime-bulutu',
         builder: (c, s) => const KelimeBulutuEkrani(),
+      ),
+      GoRoute(
+        path: '/kelime-agaci',
+        builder: (c, s) => const KelimeAgaciEkrani(),
       ),
       // Dinleme radyosu (ÖZELLİK 46).
       GoRoute(path: '/radyo', builder: (c, s) => const RadyoListesiEkrani()),
