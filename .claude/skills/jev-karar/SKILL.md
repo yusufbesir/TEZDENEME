@@ -1,6 +1,6 @@
 ---
 name: jev-karar
-description: Bir karar aşamasında (yöntem, mimari, varsayılan seçimi, öneri) seçenekler arasında Jev'e danışmak ve Jev'in seçimini bağımsız kontrolle doğrulamak için kullan. Denetim işlerinde kullanılmaz.
+description: ŞİMDİLİK KAPALI (Yusuf, 2026-10-25): Jev yalnızca hafızadaki notları puanlar. Yeniden açılırsa, bir karar aşamasında (yöntem, mimari, varsayılan seçimi, öneri) seçenekler arasında Jev'e danışmak ve Jev'in seçimini bağımsız kontrolle doğrulamak için kullan. Denetim işlerinde kullanılmaz.
 ---
 
 # Jev ile karar (danışman + bağımsız kontrol)
