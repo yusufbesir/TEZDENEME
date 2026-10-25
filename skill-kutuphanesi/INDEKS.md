@@ -1,20 +1,46 @@
 # Skill kütüphanesi dizini
 
-Toplam 1404 skill. Bunlar Claude tarafından kendiliğinden yüklenmez; etkinleştirmek için `scripts/skill-etkinlestir.sh <ad>` kullan. Açıklamalar kaynak depodaki özgün metindir.
+Toplam 1463 skill. Bunlar Claude tarafından kendiliğinden yüklenmez; etkinleştirmek için `scripts/skill-etkinlestir.sh <ad>` kullan. Açıklamalar kaynak depodaki özgün metindir.
 
-## [mattpocock/skills](https://github.com/mattpocock/skills) · commit `49dd158` · 11 skill
+## [mattpocock/skills](https://github.com/mattpocock/skills) · commit `49dd158` · 37 skill
 
 | Ad | Açıklama |
 |---|---|
+| [ask-matt](mattpocock__skills/ask-matt/SKILL.md) | Ask which skill or flow fits your situation. A router over the skills in this repo. |
 | [chief-of-staff](mattpocock__skills/chief-of-staff/SKILL.md) | Pursue a long-running goal in a single session by co-ordinating subagents. |
 | [claude-handoff](mattpocock__skills/claude-handoff/SKILL.md) | Hand the current conversation off to a fresh background agent that picks up the work immediately. |
+| [codebase-design](mattpocock__skills/codebase-design/SKILL.md) | Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunitie |
+| [diagnosing-bugs](mattpocock__skills/diagnosing-bugs/SKILL.md) | Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwi |
+| [domain-modeling](mattpocock__skills/domain-modeling/SKILL.md) | Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or edit |
 | [git-guardrails-claude-code](mattpocock__skills/git-guardrails-claude-code/SKILL.md) | Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wan |
+| [grill-me](mattpocock__skills/grill-me/SKILL.md) | A relentless interview to sharpen a plan or design. |
+| [grill-with-docs](mattpocock__skills/grill-with-docs/SKILL.md) | A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go. |
+| [grilling](mattpocock__skills/grilling/SKILL.md) | Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trig |
+| [handoff](mattpocock__skills/handoff/SKILL.md) | Compact the current conversation into a handoff document for another agent to pick up. |
+| [implement](mattpocock__skills/implement/SKILL.md) | Implement a piece of work based on a spec or set of tickets. |
+| [implement-spec](mattpocock__skills/implement-spec/SKILL.md) | Implement the result of /to-spec and /to-tickets in code. |
+| [improve-codebase-architecture](mattpocock__skills/improve-codebase-architecture/SKILL.md) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. |
 | [loop-me](mattpocock__skills/loop-me/SKILL.md) | Grill me about specs for the workflows I want to build, within this workspace. |
 | [migrate-to-shoehorn](mattpocock__skills/migrate-to-shoehorn/SKILL.md) | Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, |
+| [mp-code-review](mattpocock__skills/mp-code-review/SKILL.md) | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's docu |
+| [prototype](mattpocock__skills/prototype/SKILL.md) | Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, |
+| [research](mattpocock__skills/research/SKILL.md) | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a |
+| [retro](mattpocock__skills/retro/SKILL.md) | Conduct a retrospective on a coding session. |
 | [scaffold-exercises](mattpocock__skills/scaffold-exercises/SKILL.md) | Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold e |
+| [setup-matt-pocock-skills](mattpocock__skills/setup-matt-pocock-skills/SKILL.md) | Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before fi |
 | [setup-pre-commit](mattpocock__skills/setup-pre-commit/SKILL.md) | Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-comm |
 | [setup-ts-deep-modules](mattpocock__skills/setup-ts-deep-modules/SKILL.md) | Wire dependency-cruiser into a TypeScript repo so each package is a deep module, with implementation hidden in subfolders and reachable only |
+| [tdd](mattpocock__skills/tdd/SKILL.md) | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integrati |
+| [teach](mattpocock__skills/teach/SKILL.md) | Teach the user a new skill or concept, within this workspace. |
+| [to-questionnaire](mattpocock__skills/to-questionnaire/SKILL.md) | Turn a decision you can't fully answer into a questionnaire for someone else to fill in. |
+| [to-spec](mattpocock__skills/to-spec/SKILL.md) | Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already d |
+| [to-tickets](mattpocock__skills/to-tickets/SKILL.md) | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the con |
+| [triage](mattpocock__skills/triage/SKILL.md) | Move issues and external PRs through a state machine of triage roles, categorise, verify, grill if needed, and write agent-ready briefs. |
+| [wait-what](mattpocock__skills/wait-what/SKILL.md) | Stop. That last message did not land: re-pitch it. |
+| [wayfinder](mattpocock__skills/wayfinder/SKILL.md) | Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them |
+| [wizard](mattpocock__skills/wizard/SKILL.md) | Generate an interactive bash wizard that walks a human through steps only they can perform. Use when provisioning infrastructure, setting up |
 | [writing-beats](mattpocock__skills/writing-beats/SKILL.md) | Writing, exploit; assemble raw material into a journey of beats, grounding each term before a beat leans on it. |
+| [writing-for-agents](mattpocock__skills/writing-for-agents/SKILL.md) | Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md. |
 | [writing-fragments](mattpocock__skills/writing-fragments/SKILL.md) | Writing, explore: mine raw fragments, no structure yet. |
 | [writing-shape](mattpocock__skills/writing-shape/SKILL.md) | Writing, exploit: shape raw material into an article, paragraph by paragraph. |
 
@@ -1575,3 +1601,56 @@ Toplam 1404 skill. Bunlar Claude tarafından kendiliğinden yüklenmez; etkinle�
 | [voice-of-customer-miner](deanpeters__Product-Manager-Skills/voice-of-customer-miner/SKILL.md) | Mine public reviews, app stores, and forums for unmet needs, competitor weaknesses, and switching triggers — with quoted evidence. Use when  |
 | [vp-cpo-readiness-advisor](deanpeters__Product-Manager-Skills/vp-cpo-readiness-advisor/SKILL.md) | Guide the transition to VP or CPO across preparing, interviewing, landing, and recalibrating. Use when executive product scope is changing f |
 | [workshop-facilitation](deanpeters__Product-Manager-Skills/workshop-facilitation/SKILL.md) | Facilitate workshop sessions in a one-step, multi-turn flow. Use when an interactive skill needs consistent pacing, options, and progress tr |
+
+## [anthropics/skills](https://github.com/anthropics/skills) · commit `dbd4588` · 14 skill
+
+| Ad | Açıklama |
+|---|---|
+| [academy-guide](anthropics__skills/academy-guide/SKILL.md) | Stop and check this skill before finishing any reply to a question about how to use Claude or a Claude product — it recommends matching cour |
+| [algorithmic-art](anthropics__skills/algorithmic-art/SKILL.md) | Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art |
+| [brand-guidelines](anthropics__skills/brand-guidelines/SKILL.md) | Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use |
+| [canvas-design](anthropics__skills/canvas-design/SKILL.md) | Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a pos |
+| [discernment-nudge](anthropics__skills/discernment-nudge/SKILL.md) | After you give a substantive answer or draft that the user may act on — advice or recommendations, drafted artifacts such as goals, plans, p |
+| [doc-coauthoring](anthropics__skills/doc-coauthoring/SKILL.md) | Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical s |
+| [frontend-design](anthropics__skills/frontend-design/SKILL.md) | Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typog |
+| [internal-comms](anthropics__skills/internal-comms/SKILL.md) | A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use |
+| [mcp-builder](anthropics__skills/mcp-builder/SKILL.md) | Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-design |
+| [skill-creator](anthropics__skills/skill-creator/SKILL.md) | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, ed |
+| [slack-gif-creator](anthropics__skills/slack-gif-creator/SKILL.md) | Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use |
+| [theme-factory](anthropics__skills/theme-factory/SKILL.md) | Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set t |
+| [web-artifacts-builder](anthropics__skills/web-artifacts-builder/SKILL.md) | Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, |
+| [webapp-testing](anthropics__skills/webapp-testing/SKILL.md) | Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI be |
+
+## [obra/superpowers](https://github.com/obra/superpowers) · commit `bb92a77` · 12 skill
+
+| Ad | Açıklama |
+|---|---|
+| [brainstorming](obra__superpowers/brainstorming/SKILL.md) | You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning a |
+| [diagnosing-superpowers](obra__superpowers/diagnosing-superpowers/SKILL.md) | Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a |
+| [dispatching-parallel-agents](obra__superpowers/dispatching-parallel-agents/SKILL.md) | Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies |
+| [executing-plans](obra__superpowers/executing-plans/SKILL.md) | Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or |
+| [finishing-a-development-branch](obra__superpowers/finishing-a-development-branch/SKILL.md) | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work |
+| [receiving-code-review](obra__superpowers/receiving-code-review/SKILL.md) | Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - |
+| [subagent-driven-development](obra__superpowers/subagent-driven-development/SKILL.md) | Use when executing implementation plans with independent tasks in the current session |
+| [test-driven-development](obra__superpowers/test-driven-development/SKILL.md) | Use when implementing any feature or bugfix, before writing implementation code |
+| [using-git-worktrees](obra__superpowers/using-git-worktrees/SKILL.md) | Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated wo |
+| [using-superpowers](obra__superpowers/using-superpowers/SKILL.md) | Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarif |
+| [writing-plans](obra__superpowers/writing-plans/SKILL.md) | Use when you have a spec or requirements for a multi-step task, before touching code |
+| [writing-skills](obra__superpowers/writing-skills/SKILL.md) | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
+
+## [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) · commit `3ccff53` · 6 skill
+
+| Ad | Açıklama |
+|---|---|
+| [defuddle](kepano__obsidian-skills/defuddle/SKILL.md) | Extract clean Markdown from HTML pages with Defuddle CLI. |
+| [json-canvas](kepano__obsidian-skills/json-canvas/SKILL.md) | Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual |
+| [knap](kepano__obsidian-skills/knap/SKILL.md) | Render Markdown from templates and structured data using Knap CLI. Use when the user asks to apply a Knap template, turn JSON or CSV data in |
+| [obsidian-bases](kepano__obsidian-skills/obsidian-bases/SKILL.md) | Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating datab |
+| [obsidian-cli](kepano__obsidian-skills/obsidian-cli/SKILL.md) | Interact with Obsidian vaults using the Obsidian CLI to read, create, search, and manage notes, tasks, properties, and more. Also supports p |
+| [obsidian-markdown](kepano__obsidian-skills/obsidian-markdown/SKILL.md) | Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when workin |
+
+## [OthmanAdi/planning-with-files](https://github.com/OthmanAdi/planning-with-files) · commit `7056ed2` · 1 skill
+
+| Ad | Açıklama |
+|---|---|
+| [planning-with-files](OthmanAdi__planning-with-files/planning-with-files/SKILL.md) | Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks injec |

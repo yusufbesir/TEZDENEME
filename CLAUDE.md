@@ -2,18 +2,24 @@
 
 ## Orchestrator Kuralları
 
-Ana oturum (Opus 5.5) beyin rolündedir; işleri aşağıdaki ajanlara dağıtır.
+Ana oturum beyin rolündedir; işleri ajanlara dağıtır. Model görev zorluğuna göre seçilir (`docs/kurallar/model-ve-efor-tablosu.md`).
 
 - Arama ve keşifte `scout`'u kullan, bağımsız aramaları paralel çalıştır.
-- Kod için `implementer`'a tek ve net görev ver.
-- `implementer`'dan sonra mutlaka `verifier`. Kaldı derse iş `implementer`'a döner.
+- Kod için `implementer`'a tek ve net görev ver; ardından mutlaka `verifier`. Kaldı derse iş `implementer`'a döner, Geçti deyince commit'le.
 - Küçük, tek dosyalık işleri kendin yap.
 - Mimari, güvenlik ve veri bütünlüğü kararları sende kalır.
-- Yalnızca `scout`, `implementer` ve `verifier` ajanlarını kullan.
-- `verifier` Geçti deyince commit'le.
-- Her ajan çalışmasından sonra `docs/orchestrator-log.md` dosyasına tarih, görev, ajan/model, token ve sonuç satırı ekle.
-- Bilmediğin şeyi tahmin etme, sor.
-- Mevcut bir dosyanın üzerine yazmadan önce sor.
+- Aşağıdaki üç ajan varsayılandır; görev gerektirirse başka ajan türü de kullanılır (Baş Denetmen dahil).
+- Ajan sınırı: bir oturum toplam en fazla 50 alt ajan çalıştırır. Aynı anda açılan oturum ve ajan sayısı cihazın boş RAM ve işlemci yüküne göre belirlenir (`docs/kurallar/orkestrasyon-ve-kayit.md`, 2026-10-25 bölümü).
+- Kayıt: iş başına tek satır `docs/orchestrator-log.md`'ye (tarih, görev, ajan/model, token, sonuç); her ajan için ayrı satır gerekmez.
+- Etkileşimli oturumda bilmediğini sor. Git'te izlenmeyen bir dosyanın üzerine yazmadan önce sor; git'teki dosya ayrı dalda değiştirilir.
+
+### Gözetimsiz oturum (Remote Control, zamanlanmış iş)
+
+- Soru sorup bekleme. Belirsizlikte en olası yolu seç, kararı ve gerekçesini commit mesajına ya da issue yorumuna yaz, devam et.
+- Her adım geri alınabilir olmalı: ana dala değil ayrı dala commit, birleştirme Yusuf'ta; silme yok (taşıma); git dışı dosyayı değiştirmeden önce `_yedek/<tarih>/` altına kopyala.
+- Geri alınamaz adım (dış gönderim, kalıcı silme, ACL, üretim) gelirse o adımı yapma, issue'ya not düş, kalan işe devam et.
+- Oturumu başlatan başlık: talimata Yusuf'un onay mesajını aynen ekler; 15 ve 45 dakika sonra commit/PR kontrolü kurar. Değişiklik yoksa "devam ediyor" demez, "durdu" der ve nedenini araştırır.
+- Bağlamı 200 bin token'ı aşan başlık devir notu (yapılan, sıradaki, açık PR) yazıp yeni başlığa geçer.
 
 ### Ajanlar
 

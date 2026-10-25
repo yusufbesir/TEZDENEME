@@ -4,14 +4,13 @@
 
 | Depo | Commit | Lisans | Eklenen skill'ler |
 |---|---|---|---|
-| [anthropics/skills](https://github.com/anthropics/skills) | `dbd4588` | Apache 2.0 (her skill'in kendi `LICENSE.txt` dosyasında) | academy-guide, algorithmic-art, brand-guidelines, canvas-design, discernment-nudge, doc-coauthoring, frontend-design, internal-comms, mcp-builder, skill-creator, slack-gif-creator, theme-factory, web-artifacts-builder, webapp-testing |
-| [obra/superpowers](https://github.com/obra/superpowers) | `bb92a77` | MIT | brainstorming, diagnosing-superpowers, dispatching-parallel-agents, executing-plans, finishing-a-development-branch, receiving-code-review, requesting-code-review, subagent-driven-development, systematic-debugging, test-driven-development, using-git-worktrees, using-superpowers, verification-before-completion, writing-plans, writing-skills |
-| [mattpocock/skills](https://github.com/mattpocock/skills) | `49dd158` | MIT | ask-matt, codebase-design, diagnosing-bugs, domain-modeling, grill-me, grill-with-docs, grilling, handoff, implement, implement-spec, improve-codebase-architecture, mp-code-review, pr, prototype, research, retro, setup-matt-pocock-skills, tdd, teach, to-questionnaire, to-spec, to-tickets, triage, wait-what, wayfinder, wizard, writing-for-agents |
-| [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) | `3ccff53` | MIT | defuddle, json-canvas, knap, obsidian-bases, obsidian-cli, obsidian-markdown |
-| [OthmanAdi/planning-with-files](https://github.com/OthmanAdi/planning-with-files) | `7056ed2` | MIT | planning-with-files |
+| [obra/superpowers](https://github.com/obra/superpowers) | `bb92a77` | MIT | requesting-code-review, systematic-debugging, verification-before-completion |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | `49dd158` | MIT | pr |
 | [NVIDIA/SkillSpector](https://github.com/NVIDIA/SkillSpector) | `5edc347` | Apache 2.0 | skill-inspector |
 
 Lisans metinleri `lisanslar/` klasöründe.
+
+2026-10-25: Kullanılmayan 59 skill Yusuf'un onayıyla `skill-kutuphanesi/<sahip__depo>/<ad>/` altına taşındı (`git mv`, silinmedi). Bu tablo yalnız `.claude/skills/` altında etkin kalan kaynaklı skill'leri listeler (kendi yazdığımız jev-karar, kasa-notu-yaz, is-kaydi, denetmen-raporu ve karpathy-guidelines burada yok). Taşınanlar `INDEKS.md` içinde; geri almak için `scripts/skill-etkinlestir.sh <ad>`.
 
 ## Yapılan değişiklikler
 
@@ -32,7 +31,7 @@ Lisans metinleri `lisanslar/` klasöründe.
 
 - **planning-with-files** çağrıldığında kendi hook'larını (UserPromptSubmit, PreToolUse, PostToolUse, Stop, PreCompact) etkinleştirir ve skill klasöründeki yerel betikleri çalıştırır. Betiklerde ağ çağrısı yok.
 - **brainstorming** (superpowers) görsel beyin fırtınası için yerel bir web sunucusu başlatabilir.
-- Skill açıklamaları her oturumda Claude'un bağlamına yüklenir; 64 skill bağlamda birkaç bin token yer kaplar. Kullanılmayanları silmek bu maliyeti düşürür.
+- Skill açıklamaları her oturumda Claude'un bağlamına yüklenir; etkin skill'ler bağlamda yer kaplar. Kullanılmayanlar kütüphaneye taşınarak bu maliyet düşürüldü.
 
 ## Kaynak kilidi
 
