@@ -69,3 +69,4 @@
 | 2026-10-24 | Denetmen takibi 24.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~15.000 | Geçti: yeni dosya/mesaj yok, hatırlatma gönderilmedi |
 | 2026-10-25 | Yapay zeka brifi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 131.534 toplam | Geçti: 10 madde, e-posta gönderildi, Jev sızıntısı tek kaynaklı (doğrulanmadı) |
 | 2026-10-25 | Gündem brifi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 132.817 toplam | Kısmen: 11 madde, tümü tek X derlemesi (doğrulanmadı), piyasa ve spor verisi yok; TCMB maddesi tekrar olduğu için çıkarıldı |
+| 2026-10-25 | Denetmen takibi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~20.000 | Geçti: yeni dosya/mesaj yok, hatırlatma gönderilmedi |
