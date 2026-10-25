@@ -1,17 +1,18 @@
 // Yarışma soru bankası testleri.
-// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+// Sahibi: Yusuf (yusufbesir); yazan (SQL, PHP, Go, C1 testleri): [İP:Adım Adım Windows sürümü#cihaz] Claude. Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 import 'package:adim_adim/yarisma/model.dart';
 import 'package:adim_adim/yarisma/motor.dart';
 import 'package:adim_adim/yarisma/soru_bankasi.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_a2.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_b1.dart';
 import 'package:adim_adim/yarisma/sorular/ingilizce_b2.dart';
+import 'package:adim_adim/yarisma/sorular/ingilizce_c1.dart';
 import 'package:adim_adim/yarisma/sorular/oyun_sorulari.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('toplam 306 soru var: 144 İngilizce + 3x24 programlama + 90 oyun', () {
-    expect(tumSorular.length, 306);
+  test('toplam 414 soru var: 180 İngilizce + 6x24 programlama + 90 oyun', () {
+    expect(tumSorular.length, 414);
     expect(sorulariBul('oyun', 'satranc-1').length, 30);
     expect(sorulariBul('oyun', 'satranc-2').length, 30);
     expect(sorulariBul('oyun', 'satranc-3').length, 30);
@@ -29,6 +30,10 @@ void main() {
     expect(sorulariBul('kod', 'html-1').length, 24);
     expect(sorulariBul('kod', 'css-1').length, 24);
     expect(sorulariBul('kod', 'js-1').length, 24);
+    expect(sorulariBul('dil', 'ingilizce-5').length, 36);
+    expect(sorulariBul('kod', 'sql-1').length, 24);
+    expect(sorulariBul('kod', 'php-1').length, 24);
+    expect(sorulariBul('kod', 'go-1').length, 24);
   });
 
   test('tüm sorular geçerli', () {
@@ -46,7 +51,7 @@ void main() {
   });
 
   test(
-    'her (alan, kursId, kategori) için en az 4 soru; A1, A2, B1 ve B2 için 6',
+    'her (alan, kursId, kategori) için en az 4 soru; A1, A2, B1, B2 ve C1 için 6',
     () {
       for (final alan in ['dil', 'kod', 'oyun']) {
         for (final sv in seviyeler(alan)) {
@@ -59,7 +64,8 @@ void main() {
             if (sv.kursId == 'ingilizce-1' ||
                 sv.kursId == 'ingilizce-2' ||
                 sv.kursId == 'ingilizce-3' ||
-                sv.kursId == 'ingilizce-4') {
+                sv.kursId == 'ingilizce-4' ||
+                sv.kursId == 'ingilizce-5') {
               expect(adet, 6, reason: '${sv.kursId} $k');
             }
           }
@@ -75,12 +81,16 @@ void main() {
       ('ingilizce-2', 'A2'),
       ('ingilizce-3', 'B1'),
       ('ingilizce-4', 'B2'),
+      ('ingilizce-5', 'C1'),
     ]);
     final kod = seviyeler('kod');
     expect(kod.map((s) => (s.kursId, s.etiket)), [
       ('html-1', 'HTML'),
       ('css-1', 'CSS'),
       ('js-1', 'JS'),
+      ('sql-1', 'SQL'),
+      ('php-1', 'PHP'),
+      ('go-1', 'Go'),
     ]);
     final oyun = seviyeler('oyun');
     expect(oyun.map((s) => (s.kursId, s.etiket)), [
@@ -168,6 +178,49 @@ void main() {
         greaterThanOrEqualTo(6),
         reason: 'indeks $i',
       );
+    }
+  });
+
+  test('C1 soruları geçerli, alan dil, kursId ingilizce-5', () {
+    for (final s in ingilizceC1Sorulari) {
+      expect(s.gecerliMi, isTrue, reason: s.id);
+      expect(s.alan, 'dil', reason: s.id);
+      expect(s.seviyeKursId, 'ingilizce-5', reason: s.id);
+      expect(s.id, startsWith('ingilizce-5.${s.kategori.kimlik}.'));
+    }
+    expect(ingilizceC1Sorulari.length, 36);
+    for (final k in YarismaKategori.values) {
+      expect(ingilizceC1Sorulari.where((s) => s.kategori == k).length, 6);
+    }
+    for (var i = 0; i < 4; i++) {
+      expect(
+        ingilizceC1Sorulari.where((s) => s.dogru == i).length,
+        greaterThanOrEqualTo(6),
+        reason: 'indeks $i',
+      );
+    }
+  });
+
+  test('SQL, PHP ve Go soruları: alan kod, 24 soru, kategori başına 4', () {
+    for (final kurs in ['sql-1', 'php-1', 'go-1']) {
+      final liste = sorulariBul('kod', kurs);
+      expect(liste.length, 24, reason: kurs);
+      for (final s in liste) {
+        expect(s.gecerliMi, isTrue, reason: s.id);
+        expect(s.id, startsWith('$kurs.${s.kategori.kimlik}.'));
+      }
+      for (final k in YarismaKategori.values) {
+        expect(liste.where((s) => s.kategori == k).length, 4, reason: '$kurs $k');
+      }
+      for (var i = 0; i < 4; i++) {
+        expect(
+          liste.where((s) => s.dogru == i).length,
+          greaterThanOrEqualTo(4),
+          reason: '$kurs indeks $i',
+        );
+      }
+      // Motor her kategoride soru bulabilmeli.
+      expect(() => YarismaMotoru(tohum: 1).basla(liste), returnsNormally);
     }
   });
 
