@@ -71,7 +71,7 @@ Yarışma, ders motorundan bağımsız bir pakettir: `lib/yarisma/`. Ders içeri
 ```
 lib/yarisma/
   model.dart          YarismaKategori (6), YarismaSorusu, Seviye bağlantısı
-  sorular/            soru bankası: ingilizce_a1.dart, programlama_1.dart (HTML), programlama_2.dart (CSS), programlama_3.dart (JS)
+  sorular/            soru bankası: ingilizce_a1.dart, programlama_1.dart (HTML), programlama_2.dart (CSS), programlama_3.dart (JS), programlama_4.dart (SQL), programlama_5.dart (PHP), programlama_6.dart (Go), ingilizce_c1.dart (C1)
   soru_bankasi.dart   alan + seviyeye göre soru listesi; kursBul gibi bulucu
   motor.dart          YarismaMotoru: saf Dart, yan etkisiz; oyun durumu ve geçişler
   depo.dart           YarismaDepo (Bellek, Dosya: yarisma.v1.json), YarismaIstatistik
@@ -91,7 +91,7 @@ lib/yarisma/
 
 ### Seviye eşlemesi
 - İngilizce alanı: seviye = kurs (`ingilizce-1` → "A1"). Sorular İngilizce yazılır, A1 sözcük dağarcığıyla; açıklama Türkçe. Sonraki kurslar (A2…) eklendiğinde aynı adla soru dosyası eklenir.
-- Programlama alanı: seviye = kurs (`html-1` → 1 "HTML", `css-1` → 2 "CSS", `js-1` → 3 "JS"). Sorular Türkçe; genel kültür/tarih/sanat/matematik/fen/coğrafya alanlarından, bilişim dünyasına yakın örneklerle (ör. tarih: ilk web sayfası 1991).
+- Programlama alanı: seviye = kurs (`html-1` → 1 "HTML", `css-1` → 2 "CSS", `js-1` → 3 "JS", `sql-1` → "SQL", `php-1` → "PHP", `go-1` → "Go"; İngilizce: `ingilizce-5` → "C1"; yeni seviyeler de seviye başına 24 soru, C1 36 soru; 2026-10-25, yazan: [İP:Adım Adım Windows sürümü#cihaz] Claude). Sorular Türkçe; genel kültür/tarih/sanat/matematik/fen/coğrafya alanlarından, bilişim dünyasına yakın örneklerle (ör. tarih: ilk web sayfası 1991).
 - Soru bankası: her seviye × kategori en az 4 soru (A1: 6). Her soru 4 şık, tek doğru, kısa Türkçe açıklama.
 - Oyun yalnızca o anda seçili alanın seviyelerini gösterir. Varsayılan seviye: yolda en son açılan kurs.
 
