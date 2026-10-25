@@ -294,3 +294,4 @@
 | 2026-10-25 | TAARKOD 1.4.1 PNG indirme (300/600 DPI), AI 21 şifrelemeye bağlanmadı [İP:TAARKOD] | implementer yok, ana oturum claude-sonnet-5-5 + bağımsız denetim general-purpose sonnet (~110k) | token ayrıntısı kasa notunda | Denetim Geçti; cihaza SHA256 doğrulamalı teslim |
 | 2026-10-25 | TAARKOD 1.4.2 türe göre kural ön ayarı, EAN-8/UPC-A hatta, ünlem balonları [İP:TAARKOD] | implementer (general-purpose sonnet ~250k), verifier (general-purpose sonnet ~190k), ana oturum claude-sonnet-5-5 | token ayrıntısı kasa notunda | Verifier Geçti; cihaza teslim bilgisayar açılınca |
 2026-10-25 | TAARKOD 1.5.0 bütünleşik pencere, tasarım dili, logo, ASI hata düzeltmesi + duman testi | sonnet (implementer+verifier) | token: kayıt dışı | 237+66 test geçti, Windows paketi teslim, SHA256 doğrulandı
+2026-10-26 | TAARKOD 1.6.0 tasarım dili 1.6 uygulaması, yeni logo, bayat derleme dosyası düzeltmesi | sonnet | token: kayıt dışı | 239+66 test geçti, Windows paketi teslim
