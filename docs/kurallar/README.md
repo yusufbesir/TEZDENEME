@@ -12,6 +12,7 @@
 | [durustluk-ve-iletisim.md](durustluk-ve-iletisim.md) | Dürüstlük ve kısa yanıt kuralı, skill'i sormadan kullanma |
 | [yusuf-ile-konusma-rehberi.md](yusuf-ile-konusma-rehberi.md) | Yusuf için iyi istek şablonu ve ipuçları |
 | [skill-incelemesi-2026-10-24.md](skill-incelemesi-2026-10-24.md) | caveman ve 6 depo güvenlik incelemesi |
+| [test-dosyalari-temizligi.md](test-dosyalari-temizligi.md) | Test amaçlı dosyaları iş bitince Geri Dönüşüm Kutusu'na taşıma; dolu kutuyu Yusuf'a bildirme (2026-10-25) |
 | [`.claude/rules/windows-uygulama-dagitimi.md`](../../.claude/rules/windows-uygulama-dagitimi.md) | Yola bağlı: Windows kurulum, güncelleme, kaldırma, klasör düzeni |
 | [`.claude/rules/emek-illuzyonu.md`](../../.claude/rules/emek-illuzyonu.md) | Yola bağlı: arayüz dosyalarında emek illüzyonu |
 
