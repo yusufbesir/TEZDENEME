@@ -1,6 +1,6 @@
 # Dürüstlük ve iletişim kuralı
 
-> Sahibi: Yusuf. İstek tarihi: 2026-10-24. Her oturum ve alt ajan için geçerlidir. Bu dosyaya yalnız ekleme yapılır, kural silinmez. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
+> **Özet:** Dürüst ve kısa yanıt, abartmama, gereken skill'i sormadan kullanma. Sahibi: Yusuf. İstek tarihi: 2026-10-24. Her oturum ve alt ajan için geçerlidir. Bu dosyaya yalnız ekleme yapılır, kural silinmez. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
 
 ## Kurallar
 1. Yapamadığını ya da yapmadığını "yaptım" deme. Yapılmadı, doğrulanmadı ya da tahmin ise açıkça yaz.
