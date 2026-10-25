@@ -11,6 +11,8 @@
     panelOpen: { check: function (v) { return typeof v === "boolean"; }, def: false },
     sidebarCollapsed: { check: function (v) { return typeof v === "boolean"; }, def: false },
     panelWide: { check: function (v) { return typeof v === "boolean"; }, def: false },
+    // Arayüz dili (madde 26): yalnız bilinen kodlar; geçersiz değer Türkçe'ye düşer.
+    lang: { check: function (v) { return v === "tr" || v === "en"; }, def: "tr" },
     // Arayüz karmaşıklığı (madde 91): "simple" = gelişmiş bölümler tek satıra daralır; varsayılan "advanced" (hiçbir şey gizlenmez).
     complexity: { check: function (v) { return v === "simple" || v === "advanced"; }, def: "advanced" }
   };

@@ -210,7 +210,7 @@
   }
 
   function sigOf(AM, requested) {
-    try { var st = AM && AM.state ? AM.state : {}; return JSON.stringify([st.usage, requested === true]); } catch (e) { return "?" + Math.random(); }
+    try { var st = AM && AM.state ? AM.state : {}; return JSON.stringify([st.usage, requested === true, (typeof window !== "undefined" && typeof window.AM_LANG === "function" ? window.AM_LANG() : "tr")]); } catch (e) { return "?" + Math.random(); }
   }
 
   var pure = {
