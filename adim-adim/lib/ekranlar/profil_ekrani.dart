@@ -202,6 +202,16 @@ class ProfilEkrani extends ConsumerWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/kelime-bulutu'),
               ),
+            if (durum.alan == 'dil')
+              ListTile(
+                key: const ValueKey('profil-kelime-agaci'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.park_outlined, color: r.ana),
+                title: const Text('Kelime ağacı'),
+                subtitle: const Text('Konulara göre büyüyen dalların'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/kelime-agaci'),
+              ),
             const SizedBox(height: Olcu.b2),
             ProfilKarti(durum: durum, bugun: bugun),
             const SizedBox(height: Olcu.b2),
