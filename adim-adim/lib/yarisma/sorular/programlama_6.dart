@@ -252,7 +252,7 @@ const List<YarismaSorusu> programlama6Sorulari = [
     seviyeKursId: 'go-1',
     kategori: YarismaKategori.cografya,
     soru:
-        'Türkiye\'nin en uzun nehri hangisidir?',
+        'Tamamı Türkiye sınırları içinde akan en uzun nehir hangisidir?',
     secenekler: ['Kızılırmak', 'Sakarya', 'Fırat', 'Yeşilırmak'],
     dogru: 0,
     aciklama:
