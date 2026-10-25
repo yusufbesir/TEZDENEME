@@ -1,0 +1,471 @@
+/*
+ * Sahip: Claude (Sonnet) [İP:AgentMom Faz 11, dilim 2] - ORTA SOHBET AKIŞI stilleri (chat.js ile birlikte).
+ * yazan: [Claude#agentmom-faz11-chat]
+ * Kural: yalnız belirteç değişkenleri (var(--am-*)); sabit renk, dış kaynak, satır içi stil yok.
+ * Değiştirme: yalnız sahibi ya da ana oturum; sözleşme docs/tasarim/masaustu-arayuz-sozlesmesi-faz11.md.
+ */
+
+.am-chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: var(--am-bg);
+  color: var(--am-text);
+  font-family: var(--am-font-sans);
+  font-size: var(--am-fs-4);
+  line-height: var(--am-lh-ui);
+}
+.am-chat *, .am-chat *::before, .am-chat *::after { box-sizing: border-box; }
+.am-chat [hidden] { display: none !important; }
+.am-chat :focus-visible { outline: 2px solid var(--am-focus); outline-offset: 2px; }
+
+.am-chat-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.am-chat-muted { color: var(--am-muted); font-size: var(--am-fs-2); overflow-wrap: anywhere; }
+
+/* ---------- ton sınıfları (sabit küme) ---------- */
+.am-chat-tone-ok { --am-chat-tone: var(--am-ok); }
+.am-chat-tone-warn { --am-chat-tone: var(--am-warn); }
+.am-chat-tone-bad { --am-chat-tone: var(--am-bad); }
+.am-chat-tone-info { --am-chat-tone: var(--am-info); }
+.am-chat-tone-muted { --am-chat-tone: var(--am-muted); }
+
+.am-chat-banner {
+  margin: var(--am-gap-2) var(--am-gap-4) 0;
+  padding: var(--am-gap-2) var(--am-gap-3);
+  border: 1px solid var(--am-bad);
+  border-radius: var(--am-radius-row);
+  background: var(--am-surface);
+  color: var(--am-text);
+  font-size: var(--am-fs-2);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- akış ---------- */
+.am-chat-stage { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; }
+.am-chat-feed {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--am-gap-5) var(--am-gap-4) var(--am-gap-6);
+  overscroll-behavior: contain;
+}
+.am-chat-items, .am-chat-welcome {
+  width: 100%;
+  max-width: calc(76ch + 2 * var(--am-gap-4));
+  margin: 0 auto;
+  min-width: 0;
+}
+.am-chat-items { display: flex; flex-direction: column; gap: var(--am-gap-6); }
+
+/* Karşılama */
+.am-chat-welcome { padding: var(--am-gap-7) 0 var(--am-gap-5); display: flex; flex-direction: column; gap: var(--am-gap-4); align-items: flex-start; }
+.am-chat-hello { margin: 0; font-family: var(--am-font-display); font-weight: 600; letter-spacing: -0.01em; font-size: var(--am-fs-7); line-height: 1.2; overflow-wrap: anywhere; }
+.am-chat-hello-sub { margin: 0; color: var(--am-muted); font-size: var(--am-fs-4); line-height: var(--am-lh-chat); overflow-wrap: anywhere; }
+.am-chat-suggest { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); }
+.am-chat-sugg {
+  min-height: 36px;
+  padding: var(--am-gap-1) var(--am-gap-4);
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-pill);
+  background: var(--am-surface);
+  color: var(--am-text);
+  font: inherit;
+  font-size: var(--am-fs-3);
+  cursor: pointer;
+}
+.am-chat-sugg:hover { background: var(--am-surface-2); border-color: var(--am-accent); }
+.am-chat-summary {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 32px;
+  align-items: center;
+  padding: var(--am-gap-1) var(--am-gap-3);
+  border: 0;
+  border-radius: var(--am-radius-chip);
+  background: transparent;
+  color: var(--am-muted);
+  font: inherit;
+  font-size: var(--am-fs-2);
+  text-align: left;
+  cursor: pointer;
+}
+.am-chat-summary:hover { background: var(--am-surface); color: var(--am-text); }
+.am-chat-summary-text { min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------- mesajlar ---------- */
+.am-chat-msg { min-width: 0; display: flex; flex-direction: column; }
+.am-chat-msg--user { align-items: flex-end; gap: var(--am-gap-1); }
+.am-chat-bubble {
+  max-width: min(85%, 60ch);
+  padding: var(--am-gap-3) var(--am-gap-4);
+  border-radius: var(--am-radius-card);
+  background: var(--am-user-bg);
+  border: 1px solid var(--am-user-line);
+  color: var(--am-text);
+  font-size: var(--am-fs-4);
+  line-height: var(--am-lh-chat);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.am-chat-note { color: var(--am-muted); font-size: var(--am-fs-1); overflow-wrap: anywhere; text-align: right; max-width: 85%; }
+
+.am-chat-msg--assistant { align-items: stretch; gap: var(--am-gap-3); }
+.am-chat-prose { line-height: var(--am-lh-chat); font-size: var(--am-fs-4); overflow-wrap: anywhere; min-width: 0; max-width: 76ch; }
+.am-chat-prose > :first-child { margin-top: 0; }
+.am-chat-prose > :last-child { margin-bottom: 0; }
+.am-chat-prose p, .am-chat-plain { margin: 0 0 var(--am-gap-3); white-space: pre-wrap; }
+.am-chat-prose code {
+  padding: 1px var(--am-gap-1);
+  border-radius: var(--am-radius-chip);
+  background: var(--am-code-bg);
+  color: var(--am-code-fg);
+  font-family: var(--am-font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+.am-chat-prose pre { max-width: 100%; overflow-x: auto; padding: var(--am-gap-3); border-radius: var(--am-radius-row); background: var(--am-code-bg); }
+.am-chat-prose pre code { padding: 0; background: transparent; }
+.am-chat-prose a { display: inline-block; max-width: 100%; padding: 0 var(--am-gap-2); border-radius: var(--am-radius-chip); background: var(--am-chip-bg); color: var(--am-chip-fg); text-decoration: none; overflow-wrap: anywhere; vertical-align: baseline; }
+.am-chat-prose a:hover { text-decoration: underline; }
+.am-chat-prose ul, .am-chat-prose ol { padding-left: var(--am-gap-5); margin: 0 0 var(--am-gap-3); }
+.am-chat-prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.am-chat-prose th, .am-chat-prose td { padding: var(--am-gap-1) var(--am-gap-3); border: 1px solid var(--am-line); }
+
+/* dal / PR çipi */
+.am-chat-chips { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); }
+.am-chat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--am-gap-2);
+  max-width: 100%;
+  min-height: 28px;
+  padding: 0 var(--am-gap-3);
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-pill);
+  background: var(--am-surface);
+  color: var(--am-text);
+  font-size: var(--am-fs-2);
+}
+.am-chat-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--am-font-mono); }
+.am-chat-chip-state { padding: 0 var(--am-gap-2); border-radius: var(--am-radius-pill); border: 1px solid var(--am-chat-tone); color: var(--am-chat-tone); font-size: var(--am-fs-1); white-space: nowrap; }
+
+/* "Yeni" ayracı */
+.am-chat-divider { display: flex; align-items: center; gap: var(--am-gap-3); color: var(--am-accent); font-size: var(--am-fs-1); }
+.am-chat-divider::before, .am-chat-divider::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--am-line); }
+.am-chat-divider-label { padding: 0 var(--am-gap-2); border: 1px solid var(--am-accent); border-radius: var(--am-radius-pill); line-height: 1.6; }
+
+.am-chat-older { display: flex; justify-content: center; }
+
+/* ---------- kartlar ---------- */
+.am-chat-card {
+  min-width: 0;
+  border: 1px solid var(--am-line);
+  border-left: 3px solid var(--am-chat-tone, var(--am-line));
+  border-radius: var(--am-radius-card);
+  background: var(--am-surface);
+  color: var(--am-text);
+  font-size: var(--am-fs-3);
+  overflow-wrap: anywhere;
+}
+.am-chat-card-title { display: flex; align-items: center; flex-wrap: wrap; gap: var(--am-gap-2); padding: var(--am-gap-3) var(--am-gap-4) var(--am-gap-1); font-weight: 600; }
+.am-chat-card > .am-chat-kv, .am-chat-card > .am-chat-muted, .am-chat-card > .am-chat-error-text, .am-chat-card > .am-chat-prose, .am-chat-card > .am-chat-resolved, .am-chat-card > .am-chat-pre { margin: 0 var(--am-gap-4) var(--am-gap-2); }
+.am-chat-unknown { padding: var(--am-gap-3) var(--am-gap-4); color: var(--am-muted); }
+.am-chat-error-text { color: var(--am-text); line-height: var(--am-lh-ui); }
+.am-chat-resolved { padding-bottom: var(--am-gap-3); color: var(--am-muted); font-size: var(--am-fs-2); }
+.am-chat-card > :last-child { margin-bottom: var(--am-gap-3); }
+
+.am-chat-kv { display: flex; gap: var(--am-gap-3); line-height: var(--am-lh-ui); min-width: 0; }
+.am-chat-k { flex: 0 0 auto; min-width: 5.5em; color: var(--am-muted); }
+.am-chat-v { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+.am-chat-actions { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); padding: var(--am-gap-2) var(--am-gap-4) var(--am-gap-3); }
+
+/* katlanır kart */
+.am-chat-fold-head {
+  display: flex;
+  align-items: center;
+  gap: var(--am-gap-2);
+  width: 100%;
+  min-height: 40px;
+  padding: var(--am-gap-2) var(--am-gap-4);
+  border: 0;
+  border-radius: var(--am-radius-card);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.am-chat-fold-head:hover { background: var(--am-surface-2); }
+.am-chat-fold-name { flex: 0 0 auto; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.am-chat-fold-sum { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--am-muted); }
+.am-chat-fold-meta { flex: 0 0 auto; color: var(--am-muted); font-size: var(--am-fs-1); }
+.am-chat-chev { flex: 0 0 auto; display: inline-flex; color: var(--am-muted); transition: transform var(--am-dur) ease-out; }
+.am-chat-open .am-chat-chev { transform: rotate(180deg); }
+.am-chat-fold-body { padding: var(--am-gap-1) var(--am-gap-4) var(--am-gap-3); display: flex; flex-direction: column; gap: var(--am-gap-2); border-top: 1px solid var(--am-line); }
+
+.am-chat-dot {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--am-chat-tone, var(--am-muted));
+  border-radius: var(--am-radius-pill);
+  color: var(--am-chat-tone, var(--am-muted));
+  font-size: var(--am-fs-1);
+  line-height: 1;
+}
+.am-chat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--am-gap-1);
+  max-width: 100%;
+  min-height: 24px;
+  padding: 0 var(--am-gap-3);
+  border: 1px solid var(--am-chat-tone, var(--am-line));
+  border-radius: var(--am-radius-pill);
+  color: var(--am-chat-tone, var(--am-muted));
+  font-size: var(--am-fs-1);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.am-chat-pre {
+  margin: 0;
+  max-width: 100%;
+  max-height: 22rem;
+  overflow: auto;
+  padding: var(--am-gap-3);
+  border-radius: var(--am-radius-row);
+  background: var(--am-code-bg);
+  color: var(--am-text);
+  font-family: var(--am-font-mono);
+  font-size: var(--am-fs-2);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.am-chat-line { display: block; }
+.am-chat-add { color: var(--am-ok); }
+.am-chat-del { color: var(--am-bad); }
+.am-chat-hunk { color: var(--am-info); }
+.am-chat-ctx { color: var(--am-muted); }
+
+.am-chat-check { display: flex; align-items: baseline; gap: var(--am-gap-2); min-width: 0; }
+.am-chat-check .am-chat-dot { align-self: center; }
+.am-chat-check-name { min-width: 0; overflow-wrap: anywhere; }
+.am-chat-check-detail { flex: 1 1 100%; }
+
+/* düğmeler */
+.am-chat-btn {
+  min-height: 32px;
+  padding: var(--am-gap-1) var(--am-gap-4);
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-row);
+  background: var(--am-surface-2);
+  color: var(--am-text);
+  font: inherit;
+  font-size: var(--am-fs-3);
+  cursor: pointer;
+}
+.am-chat-btn:hover { border-color: var(--am-accent); }
+.am-chat-btn--primary { background: var(--am-accent); border-color: var(--am-accent); color: var(--am-accent-ink); font-weight: 600; }
+.am-chat-btn--danger { background: transparent; border-color: var(--am-bad); color: var(--am-bad); }
+.am-chat-btn--ghost { background: transparent; border-color: transparent; color: var(--am-muted); }
+.am-chat-btn--ghost:hover { color: var(--am-text); }
+
+/* en alta git */
+.am-chat-jump {
+  position: absolute;
+  right: var(--am-gap-5);
+  bottom: var(--am-gap-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-pill);
+  background: var(--am-surface-2);
+  color: var(--am-text);
+  box-shadow: var(--am-shadow);
+  cursor: pointer;
+}
+.am-chat-jump:hover { border-color: var(--am-accent); }
+
+/* ---------- giriş kutusu ---------- */
+.am-chat-dock { flex: 0 0 auto; padding: 0 var(--am-gap-4) var(--am-gap-4); min-width: 0; }
+.am-chat-composer {
+  position: relative;
+  width: 100%;
+  max-width: calc(76ch + 2 * var(--am-gap-4));
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--am-gap-2);
+  padding: var(--am-gap-3) var(--am-gap-4) var(--am-gap-2);
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-input);
+  background: var(--am-surface);
+  box-shadow: var(--am-shadow);
+  min-width: 0;
+}
+.am-chat-composer:focus-within { border-color: var(--am-accent); }
+.am-chat-input {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  resize: none;
+  border: 0;
+  outline: 0;
+  padding: var(--am-gap-1) 0;
+  background: transparent;
+  color: var(--am-text);
+  font: inherit;
+  font-size: var(--am-fs-4);
+  line-height: var(--am-lh-chat);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.am-chat-input::placeholder { color: var(--am-muted); }
+.am-chat-composer:focus-within .am-chat-input { outline: 0; }
+
+.am-chat-attachrow { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); }
+.am-chat-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--am-gap-2);
+  max-width: 100%;
+  min-height: 36px;
+  padding: var(--am-gap-1) var(--am-gap-1) var(--am-gap-1) var(--am-gap-3);
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-row);
+  background: var(--am-surface-2);
+  color: var(--am-text);
+}
+.am-chat-attach-meta { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.am-chat-attach-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--am-fs-2); }
+.am-chat-attach-ago { color: var(--am-muted); font-size: var(--am-fs-1); white-space: nowrap; }
+.am-chat-attach-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--am-radius-chip);
+  background: transparent;
+  color: var(--am-muted);
+  cursor: pointer;
+}
+.am-chat-attach-x:hover { background: var(--am-surface); color: var(--am-text); }
+
+.am-chat-bar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--am-gap-2); min-width: 0; }
+.am-chat-grow { flex: 1 1 0; min-width: 0; }
+.am-chat-iconbtn, .am-chat-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--am-radius-pill);
+  background: transparent;
+  color: var(--am-muted);
+  cursor: pointer;
+}
+.am-chat-iconbtn:hover:not(:disabled), .am-chat-ring:hover { background: var(--am-surface-2); color: var(--am-text); }
+.am-chat-iconbtn:disabled { cursor: not-allowed; opacity: 0.6; }
+.am-chat-model { max-width: 100%; }
+/* Durum göstergeleri: simge + metin + ton (renk tek ipucu değil). */
+.am-chat-ind { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--am-gap-2); min-width: 0; }
+.am-chat-ind-btn { background: transparent; font-family: inherit; cursor: pointer; }
+.am-chat-ind-btn:hover { background: var(--am-surface-2); }
+.am-chat-mode { color: var(--am-muted); border-color: var(--am-line); }
+.am-chat-badge-shape { font-size: var(--am-fs-1); }
+
+.am-chat-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--am-radius-pill);
+  background: var(--am-accent);
+  color: var(--am-accent-ink);
+  cursor: pointer;
+}
+.am-chat-circle:disabled { background: var(--am-surface-2); color: var(--am-muted); cursor: not-allowed; }
+.am-chat-circle--stop { background: var(--am-surface-2); color: var(--am-text); border: 1px solid var(--am-line); }
+
+/* slash menü */
+.am-chat-slash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + var(--am-gap-2));
+  margin: 0;
+  padding: var(--am-gap-1);
+  list-style: none;
+  max-height: 16rem;
+  overflow-y: auto;
+  border: 1px solid var(--am-line);
+  border-radius: var(--am-radius-card);
+  background: var(--am-surface);
+  box-shadow: var(--am-shadow);
+  z-index: 2;
+}
+.am-chat-slash-item, .am-chat-slash-empty {
+  display: flex;
+  align-items: baseline;
+  gap: var(--am-gap-3);
+  min-height: 32px;
+  padding: var(--am-gap-1) var(--am-gap-3);
+  border-radius: var(--am-radius-row);
+  cursor: pointer;
+}
+.am-chat-slash-empty { color: var(--am-muted); cursor: default; }
+.am-chat-slash-item:hover, .am-chat-selected { background: var(--am-surface-2); }
+.am-chat-selected { outline: 1px solid var(--am-accent); }
+.am-chat-slash-name { flex: 0 0 auto; font-family: var(--am-font-mono); color: var(--am-accent); }
+.am-chat-slash-desc { min-width: 0; color: var(--am-muted); font-size: var(--am-fs-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- dar pencere ---------- */
+@media (max-width: 520px) {
+  .am-chat-feed { padding-left: var(--am-gap-3); padding-right: var(--am-gap-3); }
+  .am-chat-dock { padding-left: var(--am-gap-2); padding-right: var(--am-gap-2); padding-bottom: var(--am-gap-2); }
+  .am-chat-bubble, .am-chat-note { max-width: 100%; }
+  .am-chat-fold-name { max-width: 50%; }
+  .am-chat-kv { flex-direction: column; gap: 0; }
+  .am-chat-mode { display: none; }
+  .am-chat-hello { font-size: var(--am-fs-6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-chat *, .am-chat *::before, .am-chat *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- Onay kartı: risk rozeti + geri alma satırı; yazan: [Claude#agentmom-faz11-risk] ---------- */
+.am-chat-card > .am-chat-risk { margin: 0 var(--am-gap-4) var(--am-gap-2); }
+.am-chat-risk { display: flex; flex-direction: column; gap: var(--am-gap-2); min-width: 0; }
+.am-chat-risk-badge { display: inline-flex; align-items: center; gap: var(--am-gap-1); padding: 1px var(--am-gap-2); border: 1px solid var(--am-chat-tone); border-radius: var(--am-radius-pill); color: var(--am-chat-tone); font-size: var(--am-fs-2); font-weight: 600; }
+.am-chat-risk-shape { font-weight: 700; }
+.am-chat-risk-why { display: flex; gap: var(--am-gap-3); min-width: 0; font-size: var(--am-fs-2); }
+.am-chat-risk-list { margin: 0; padding-left: var(--am-gap-4); min-width: 0; overflow-wrap: anywhere; }
+.am-chat-undo { padding: var(--am-gap-2) var(--am-gap-3); border: 1px solid var(--am-line); border-left: 3px solid var(--am-chat-tone, var(--am-line)); border-radius: var(--am-radius-row); font-size: var(--am-fs-2); min-width: 0; overflow-wrap: anywhere; }
+.am-chat-undo-head { display: flex; align-items: center; gap: var(--am-gap-2); flex-wrap: wrap; }
+.am-chat-undo-head strong { color: var(--am-chat-tone); }
+.am-chat-undo--hard { border-width: 2px; border-color: var(--am-bad); background: var(--am-surface-2); }
+.am-chat-undo-warn { margin-top: var(--am-gap-1); color: var(--am-bad); font-weight: 600; }
+@media (max-width: 420px) { .am-chat-risk-why { flex-direction: column; gap: var(--am-gap-1); } }

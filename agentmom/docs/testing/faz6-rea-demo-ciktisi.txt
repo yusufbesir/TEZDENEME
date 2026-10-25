@@ -1,0 +1,42 @@
+== sources (local notes only)
+integrations/gemini.md -> 85451752-bf21-4fa2-b40b-b2331a519c5b
+security/codex-okuma-kapsami.md -> f5bea6a4-e98a-4c60-8363-2dedbd0649af
+research/yz-merkezi/codex-antigravity-tarama.md -> 93b95538-bf58-4ab5-a4ef-76a3466131c8
+status/durum.md -> c949704d-34ee-47dd-934e-772975f1a656
+== deterministic discovery (no model)
+gemini.md findings: 6
+  - docs/integrations/gemini.md:9 | testConnection → partial (yalnız `--version`). execute ve diğer yürütme işlemleri → **unavailable** (varsayıla
+  - docs/integrations/gemini.md:12 | - Yürütme `allowUnverifiedExecution` verilmedikçe reddedilir (araç / eklenti / MCP / çalışma alanı ayarı kısıt
+  - docs/integrations/gemini.md:13 | - Açıldığında yalnız salt-okunur `plan` kipi; yazılabilir sandbox ve okuma dışı araçlar (`checkSandbox`) redde
+codex-okuma-kapsami.md findings: 3
+  - docs/security/codex-okuma-kapsami.md:32 | 2. **17:06:** "Codex, Claude ve Gemini aynı yetkide olsun": Codex'e özel ek kısıt (kayıt dışı yollarda reddi) 
+  - docs/security/codex-okuma-kapsami.md:33 | 3. **17:07:** "sandbox olarak kur, eğer Claude de aynıysa": Claude Code'da doğrulanmış OS düzeyi dosya izolasy
+  - docs/security/codex-okuma-kapsami.md:35 | **Kalan risk (belgelenmiş):** Codex salt-okunur kipte dosya sistemini okuyabilir; güvenilen kök içinde bile ot
+codex-antigravity-tarama.md findings: 3
+  - docs/research/yz-merkezi/codex-antigravity-tarama.md:25 | - Belgelerden (resmi olmayan aynalar; doğrulanmalı): JSON-RPC 2.0 ("jsonrpc" alanı atlanır), önce `initialize`
+  - docs/research/yz-merkezi/codex-antigravity-tarama.md:36 | **Belgelerden özellikler (üçüncü taraf incelemeler; Google'ın resmi sayfaları doğrulanmadı):**
+  - docs/research/yz-merkezi/codex-antigravity-tarama.md:55 | - Antigravity bilgileri yalnız ikincil kaynaklar; Google'ın resmi belgesi doğrulanmadı. Gemini CLI ile ilişkis
+== recommendation 1: Gemini -> Antigravity research (docs only)
+state: proposed priority: 4 policy: false
+   ok   evidence - 4 finding(s) from 1 source(s)
+   ok   freshness - all sources fresh
+   ok   reliability - all sources at or above trust 0.6
+   ok   license - licenses known (ideas only; nothing is copied)
+   ok   security - no executable or instruction-like content
+   ok   compatibility - affected paths are repository-relative
+   ok   overlap - no overlap with listed existing features
+   ok   policy_boundary - does not touch policy
+== recommendation 2: elevated Codex sandbox (must go to the user, not the workflow)
+state: user_decision_required priority: -6 policy: true
+  FAIL policy_boundary - would change policy, permissions, approval, sandbox or REA's own guard: user decision only
+== trying to start an experiment for recommendation 2 (expected refusal)
+HTTP 403
+this recommendation changes policy and never enters the adoption workflow
+== listing (ranked by priority) and token leak check
+4 proposed Gemini icin Antigravity arastirmasi
+-6 user_decision_required Codex icin yukseltilmis Windows sandbox
+list.json:0
+rec1.json:0
+rec2.json:0
+server.log:0
+outputs in: /d/YusufII/Projeler/agentmom-state/rea-run-212840

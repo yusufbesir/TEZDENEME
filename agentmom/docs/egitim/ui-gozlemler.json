@@ -1,0 +1,60 @@
+{
+  "kaynak": "Claude masaustu 2.42304.2.0 resources/ion-dist (statik, salt okunur tarama; yazan: Claude alt ajan; yalniz olcu/rol/yapi, kopya icerik yok)",
+  "bulgular": [
+    {
+      "claim": "Arayuz uc katmanli: dframe (masaustu kabugu), epitaxy (sohbet/oturum arayuzu), cds (ortak tasarim degiskenleri, --cds- oneki).",
+      "evidence": "shared-styles-Bl9zqrv-.css ve c6a992d55-sXiDGMFQ.css sinif/degisken oneki sayimi",
+      "locator": "assets/v1/shared-styles-*.css (.dframe-*, .epitaxy-*), assets/v1/c6a992d55-*.css (--cds-*, 1069 benzersiz degisken)"
+    },
+    {
+      "claim": "Sol menu genisligi 288 px, yuzen/daraltilmis govde 280 px; satir yuksekligi 26-32 px (aciklamali 44), satir yazisi 13-14 px, ust cubuk 36 px, baslik 48 px.",
+      "evidence": "--df-sidebar-width, --df-row-h, --df-row-font, --df-chrome-bar-height, --df-header-h",
+      "locator": "assets/v1/shared-styles-Bl9zqrv-.css"
+    },
+    {
+      "claim": "Orta sohbet sutunu 720 px olcu sinirli (bazi yerlesimlerde 850), kenar bosluklari 32/16/12 px degiskeni; kullanici baloncugu en cok min(85%, 29.5rem), ic bosluk 16x12 px.",
+      "evidence": "--chat-column-measure, --chat-gutter, --cds-message-bubble-measure/-pad-x/-pad-y",
+      "locator": "assets/v1/c6a992d55-sXiDGMFQ.css"
+    },
+    {
+      "claim": "Tema ekseni uc boyutlu: data-theme (claude/console...), data-mode (light/dark/system), data-density (comfortable/compact); anlamsal yuzey 4 kademe (#f9f9f7/#fcfcfb/#fff/#fff acik; #0b0b0b/#151515/#1a1a19/#20201f koyu).",
+      "evidence": "html niteligi data-theme/data-mode/data-density; --cds-surface-0..3 gray-* eslemesi",
+      "locator": "ion-dist/index.html (html etiketi), assets/v1/c6a992d55-sXiDGMFQ.css"
+    },
+    {
+      "claim": "Hareket olcegi bes basamak: 60/120/200/300/450 ms; uc egri (ease-out, ease-snap, ease-overshoot); 227 anahtar kare.",
+      "evidence": "--cds-dur-fast/snap/base/sheet/slow, --cds-ease-*, @keyframes sayimi",
+      "locator": "assets/v1/c6a992d55-sXiDGMFQ.css ve tum assets/v1/*.css"
+    },
+    {
+      "claim": "Yazi olcegi: govde 13/14 px (sohbet 13/14/15), kod 12/13, baslik ~15, baslik buyuk 20/22, ek aciklama 11/12; ince ayarli degisken eksen agirliklari 360/460/540/560; sohbet satir yuksekligi orani 1.429 (15 px'te 1.467).",
+      "evidence": "--cds-font-size-*, --cds-leading-*, --cds-font-wght-*, --chat-body, --chat-leading",
+      "locator": "assets/v1/c6a992d55-sXiDGMFQ.css, assets/v1/c19e90103-CuNz46ca.css (.epitaxy-transcript-typography)"
+    },
+    {
+      "claim": "Asistan mesaji balonsuz markdown akisi (oge araligi ~10 px); satir ici kod mono, govde-1 px, kose 4 px; blok ve tablo yatay kaydirmali; kullanici istemi kayarken ustte yapiskan kalir.",
+      "evidence": ".epitaxy-markdown, .epitaxy-codeblock, .epitaxy-table-scroll, .epitaxy-sticky-prompt-bubble",
+      "locator": "assets/v1/c19e90103-CuNz46ca.css, assets/v1/shared-styles-Bl9zqrv-.css"
+    },
+    {
+      "claim": "Giris kutusu TipTap/ProseMirror tabanli cok satirli editor (role textbox, aria-multiline); yazi 16 px taban; kapsul kosesi 12-14 px; model secici, cabasi, izin, kuyruk, taslak, dikte, anma ve slash islevleri ayni parcada.",
+      "evidence": "role:\"textbox\", aria-multiline, .epitaxy-prompt-input .tiptap, anahtar sozcuk sayimlari (model 274, effort 97, permission 141, draft 91, mention 58, slash 20)",
+      "locator": "assets/v1/c227f4d5e-BtCczSFM.js, assets/v1/c19e90103/shared-styles css"
+    },
+    {
+      "claim": "Onay istegi kalici bir dock karti (taban yukseklik 144 px) ve yanit sonrasi 'makbuz'a donusen soru/secenek bileseni olarak uygulanmis.",
+      "evidence": ".epitaxy-approval-card, .epitaxy-approval-actions, .epitaxy-answer-option, .epitaxy-question-receipt, --approval-dock-floor",
+      "locator": "assets/v1/shared-styles-Bl9zqrv-.css ve c227f4d5e-BtCczSFM.js"
+    },
+    {
+      "claim": "Sag panel birden cok icerik tipi tasir: dosya/belge onizleme (prose, csv, ozet rayi), Monaco diff editoru, yerlesik terminal, PR durumu, yan sohbet; ayri pencereye cikarilabilir.",
+      "evidence": ".epitaxy-document-*, .monaco-diff-editor, epitaxy-terminal-view, epitaxy-pr-status-block, epitaxy-side-chat, .epitaxy-pane-window",
+      "locator": "assets/v1/c3fde7009-BH42YUtA.css, c5aee9dbd-*.css, shared-styles-*.css, JS sayimlari"
+    },
+    {
+      "claim": "Erisilebilirlik: durum alanlari role=status + aria-live, ilerleme icin aria-valuenow/min/max, 38 suslu simge aria-hidden, RTL anahtar kareleri ve disleksi yazi tipi secenegi, azaltilmis hareket icin sure 0 degiskeni.",
+      "evidence": "role/aria-* sayimi, :dir(rtl), --cds-font-sans disleksi varyanti, --cds-dur-base:0s",
+      "locator": "assets/v1/c227f4d5e-BtCczSFM.js, assets/v1/c6a992d55-sXiDGMFQ.css"
+    }
+  ]
+}
