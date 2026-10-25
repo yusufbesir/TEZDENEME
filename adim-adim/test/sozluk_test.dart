@@ -65,6 +65,7 @@ void main() {
       'de',
       'fr',
       'ru',
+      'ar',
       'ko',
       'ja',
       'zh',

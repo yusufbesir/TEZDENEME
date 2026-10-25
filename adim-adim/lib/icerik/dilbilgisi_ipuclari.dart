@@ -1,5 +1,5 @@
 /// Dilbilgisi ipuçları (sabit içerik): İngilizce A1 (14), A2, B1, B2, C1 (12'şer)
-/// ve Almanca A1 (11), A2 (11), B1 (12), Fransızca A1 (12) ve Rusça A1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
+/// ve Almanca A1 (11), A2 (11), B1 (12), Fransızca A1 (12), Rusça A1 (12) ve Arapça A1 (12) kurslarının derslerine bağlı kısa ipuçları. Her ipucu,
 /// bağlı dersin konusuyla tutarlıdır. Yalnızca kesin, yaygın dilbilgisi
 /// kuralları yazıldı; istisnalı konularda "genellikle" denir. İpucu olmayan
 /// kurslarda kart gösterilmez.
@@ -1133,5 +1133,102 @@ const List<DilbilgisiIpucu> tumDilbilgisiIpuclari = [
         "Saatte 1 час, 2-4 часа, 5 ve üstü часов kullanılır. Gün ve ay adları Rusçada küçük harfle yazılır: понедельник, январь. Zaman için сегодня, завтра, вчера.",
     ornek: "Сейчас три часа.",
     ornekCeviri: "Saat şimdi üç.",
+  ),
+  // ---- Arapça A1 (arapca-1) ----
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u1.d1',
+    baslik: "Sağdan sola ve bitişik yazı",
+    metin:
+        "Arapça sağdan sola yazılır; harfler bitişir ve çoğunun başta, ortada, sonda ayrı şekli vardır. ا د ذ ر ز و harfleri sonraki harfe bitişmez.",
+    ornek: "كتاب",
+    ornekCeviri: "Kitap. (kitaab)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u1.d2',
+    baslik: "Kısa ünlüler harekelerle yazılır",
+    metin:
+        "Kısa ünlüler harfle değil, harfin üstüne ya da altına konan harekelerle gösterilir: fetha a, kesra i, damme u, sükun ünlüsüzdür. Günlük yazıda harekeler genellikle yazılmaz.",
+    ornek: "دَرْس",
+    ornekCeviri: "Ders. (dars)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u1.d3',
+    baslik: "Selam ve cevabı",
+    metin:
+        "السلام عليكم selamının cevabı وعليكم السلام'dır. Günaydın için صباح الخير denir, cevabı صباح النور'dur.",
+    ornek: "السلام عليكم",
+    ornekCeviri: "Selam size olsun. (essalaamu aleykum)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u2.d1',
+    baslik: "Tanışma kalıbı",
+    metin:
+        "“Adım ...” için اسمي ... denir; sondaki ـي “benim” anlamı verir. Ülke bildirmek için أنا من ... kalıbı kullanılır.",
+    ornek: "اسمي يوسف",
+    ornekCeviri: "Adım Yusuf. (ismii yuusuf)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u2.d2',
+    baslik: "Şimdiki zamanda “olmak” söylenmez",
+    metin:
+        "Arapçada isim cümlesinde “-im, -sin, -dir” karşılığı bir fiil yoktur: zamir ve isim yan yana gelir. Erkek ve kadın için zamir ve meslek sözcüğü değişir.",
+    ornek: "أنا طالب",
+    ornekCeviri: "Ben öğrenciyim. (ana taalib)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u2.d3',
+    baslik: "Rakamlar soldan sağa okunur",
+    metin:
+        "Arapça yazı sağdan sola gitse de ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩ rakamları soldan sağa okunur. 3-10 arası sayılarda sayılan isim çoğul olur.",
+    ornek: "ثلاثة",
+    ornekCeviri: "Üç. (selaasa)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u3.d1',
+    baslik: "ة müennes işaretidir",
+    metin:
+        "Müennes isimlerin çoğu ة ile biter ve sondaki ة “a” okunur. Sıfat isme cinsiyetçe uyar; genellikle erkekte ة yoktur, kadında vardır.",
+    ornek: "مدرسة كبيرة",
+    ornekCeviri: "Büyük bir okul. (madrasa kabiira)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u3.d2',
+    baslik: "Belirli artikel ال ve güneş harfleri",
+    metin:
+        "ال isme eklenerek belirlilik verir. Güneş harflerinden önce ل okunmaz ve sonraki harf ikilenir: الشمس (eş-şems). Ay harflerinde ل okunur: القمر (el-kamar).",
+    ornek: "الشمس كبيرة",
+    ornekCeviri: "Güneş büyüktür. (eş-şems kabiira)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u3.d3',
+    baslik: "Sahiplik ekleri",
+    metin:
+        "Sahiplik isme eklenir: ـي benim, ـك senin, ـه onun (erkek). Örneğin كتاب kitap iken كتابي kitabım olur.",
+    ornek: "كتابي كبير",
+    ornekCeviri: "Kitabım büyük. (kitaabii kabiir)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u4.d1',
+    baslik: "Soru edatları",
+    metin:
+        "Evet/hayır sorusu هل ile açılır. ما “ne”, أين “nerede”, كيف “nasıl” demektir ve cümlenin başına gelir.",
+    ornek: "هل أنت طالب؟",
+    ornekCeviri: "Sen öğrenci misin? (hel ente taalib)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u4.d2',
+    baslik: "Fiilin başındaki kişi ön eki",
+    metin:
+        "Şimdiki zaman fiilinin başındaki ön ek kişiyi gösterir: أ ben, ت sen ya da o (kadın), ي o (erkek). Kök aynı kalır: أشرب, تشرب, يشرب.",
+    ornek: "أنا أشرب الشاي",
+    ornekCeviri: "Çay içiyorum. (ana eşrab eş-şaay)",
+  ),
+  DilbilgisiIpucu(
+    dersId: 'arapca-1.u4.d3',
+    baslik: "Saatte sıra sayısı",
+    metin:
+        "Saat bildirirken sıra sayısı kullanılır ve الساعة sözcüğüne uyar: الساعة الواحدة saat bir, الساعة الثالثة saat üç.",
+    ornek: "كم الساعة؟",
+    ornekCeviri: "Saat kaç? (kam es-saa)",
   ),
 ];

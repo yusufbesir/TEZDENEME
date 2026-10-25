@@ -107,6 +107,7 @@ void main() {
       expect(DersOgeleri.kursSesDili('almanca-a1'), 'de-DE');
       expect(DersOgeleri.kursSesDili('fransizca-1'), 'fr-FR');
       expect(DersOgeleri.kursSesDili('rusca-1'), 'ru-RU');
+      expect(DersOgeleri.kursSesDili('arapca-1'), 'ar-SA');
       expect(DersOgeleri.kursSesDili('korece-1'), 'ko-KR');
       expect(DersOgeleri.kursSesDili('japonca-1'), 'ja-JP');
       expect(DersOgeleri.kursSesDili('cince-1'), 'zh-CN');

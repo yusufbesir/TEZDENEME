@@ -30,6 +30,7 @@ void main() {
         'de',
         'fr',
         'ru',
+        'ar',
         'ko',
         'ja',
         'zh',
@@ -44,6 +45,7 @@ void main() {
       expect(dilTanimi('de')!.ttsDili, 'de-DE');
       expect(dilTanimi('fr')!.ttsDili, 'fr-FR');
       expect(dilTanimi('ru')!.ttsDili, 'ru-RU');
+      expect(dilTanimi('ar')!.ttsDili, 'ar-SA');
       expect(dilTanimi('ko')!.ttsDili, 'ko-KR');
       expect(dilTanimi('ja')!.ttsDili, 'ja-JP');
       expect(dilTanimi('zh')!.ttsDili, 'zh-CN');
@@ -126,7 +128,7 @@ void main() {
       'paket kurs listesi: ilgili dil, kullanılanlar yalnız dolu paketler',
       () {
         final p = DilPaketleri([sahteKurs, sahteKodKurs]);
-        expect(p.kodlar, ['en', 'de', 'fr', 'ru', 'ko', 'ja', 'zh', 'kod']);
+        expect(p.kodlar, ['en', 'de', 'fr', 'ru', 'ar', 'ko', 'ja', 'zh', 'kod']);
         expect(p.kullanilanlar.map((x) => x.tanim.kod), ['en', 'kod']);
         expect(p.paket('en')!.kurslar.single.id, sahteKursId);
         expect(p.paket('de')!.maddeler, isEmpty);
