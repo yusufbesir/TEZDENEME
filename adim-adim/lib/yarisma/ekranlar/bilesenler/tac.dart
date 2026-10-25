@@ -79,9 +79,11 @@ class TacKazanimi extends StatelessWidget {
               child: Icon(tacSimgesi, size: 40, color: renk),
             ),
             const SizedBox(width: Olcu.b1),
-            Text(
-              'Taç kazandın: ${kategori.ad}',
-              style: Theme.of(context).textTheme.titleMedium,
+            Flexible(
+              child: Text(
+                'Taç kazandın: ${kategori.ad}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
           ],
         ),
