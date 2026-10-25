@@ -17,9 +17,13 @@ void main() {
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'ingilizce-5',
       'almanca-1',
       'almanca-2',
       'almanca-3',
+      'fransizca-1',
+      'rusca-1',
+      'arapca-1',
       'korece-1',
       'japonca-1',
       'cince-1',
@@ -41,6 +45,9 @@ void main() {
       'php-1',
       'php-2',
       'php-3',
+      'go-1',
+      'go-2',
+      'go-3',
       'satranc-1',
       'satranc-2',
       'satranc-3',
@@ -51,10 +58,14 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
+    expect(ingilizceC1.alan, KursAlani.dil);
     for (final k in [
       almancaA1,
       almancaA2,
       almancaB1,
+      fransizcaA1,
+      ruscaA1,
+      arapcaA1,
       koreceA1,
       japoncaA1,
       cinceA1,
@@ -80,6 +91,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -107,6 +121,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
@@ -175,6 +192,7 @@ void main() {
       ...ingilizceA2.tumDersler,
       ...ingilizceB1.tumDersler,
       ...ingilizceB2.tumDersler,
+      ...ingilizceC1.tumDersler,
     ]) {
       final dinle = d.alistirmalar.whereType<Dinle>().toList();
       expect(dinle, isNotEmpty, reason: d.id);
@@ -203,6 +221,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {

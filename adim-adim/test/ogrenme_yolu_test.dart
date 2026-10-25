@@ -32,12 +32,12 @@ void main() {
   });
 
   test(
-    'gerçek kurslar: İngilizce A1..B2 CEFR etiketleriyle, Python ayrı yol',
+    'gerçek kurslar: İngilizce A1..C1 CEFR etiketleriyle, Python ayrı yol',
     () {
       final yollar = OgrenmeYolu.uret(const OgrenciDurumu(), tumu);
       final en = yollar.firstWhere((y) => y.kimlik == 'ingilizce');
       expect(en.ad, 'İngilizce');
-      expect(en.seviyeler.map((s) => s.etiket), ['A1', 'A2', 'B1', 'B2']);
+      expect(en.seviyeler.map((s) => s.etiket), ['A1', 'A2', 'B1', 'B2', 'C1']);
       expect(yollar.any((y) => y.kimlik == 'python'), isTrue);
       // Her kurs tam bir yolda ve tek kez geçer.
       final kimlikler = [
@@ -81,8 +81,8 @@ void main() {
 
   test('tabloda olmayan taban kendi yolu; kimliksiz kurs seviye 1', () {
     final garip = Kurs(
-      id: 'rusca-2',
-      ad: 'Rusça B1',
+      id: 'ispanyolca-2',
+      ad: 'İspanyolca B1',
       aciklama: '',
       alan: KursAlani.dil,
       uniteler: const [],
@@ -95,7 +95,7 @@ void main() {
       uniteler: const [],
     );
     final y = OgrenmeYolu.uret(const OgrenciDurumu(), [garip, yok]);
-    expect(y.map((x) => x.ad), ['Rusca', 'Tek']);
+    expect(y.map((x) => x.ad), ['Ispanyolca', 'Tek']);
     expect(y.first.seviyeler.single.sira, 2);
     expect(y.first.seviyeler.single.etiket, 'B1');
     expect(y.last.seviyeler.single.sira, 1);
@@ -110,6 +110,7 @@ void main() {
       'python',
       'sql',
       'php',
+      'go',
     });
   });
 }

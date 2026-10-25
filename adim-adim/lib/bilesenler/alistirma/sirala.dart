@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/icerik.dart';
 import '../../tema/tema.dart';
 import 'soru_basligi.dart';
+import 'yon.dart';
 
 /// Parçaları sıraya dizme: havuzdaki parçaya dokun, cevap satırına eklenir;
 /// cevap satırındaki parçaya dokun, havuza döner.
@@ -60,6 +61,7 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
     final kontrol = widget.kontrolEdildi;
+    final yon = parcaYonu(_kelimeler);
     final renk = kontrol ? (widget.dogruMu ? r.dogru : r.hata) : r.kenar;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,6 +85,8 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
               border: Border.all(color: renk, width: kontrol ? 2 : 1),
             ),
             child: Wrap(
+              // Arapça parçalar sağdan sola akar (ilk seçilen sağda).
+              textDirection: _secilen.isEmpty ? null : yon,
               spacing: Olcu.b1,
               runSpacing: Olcu.b1,
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -107,6 +111,7 @@ class _SiralaDurumu extends State<SiralaGorunumu> {
         ),
         const SizedBox(height: Olcu.b3),
         Wrap(
+          textDirection: yon,
           spacing: Olcu.b1,
           runSpacing: Olcu.b1,
           children: [for (final i in _havuz) _parca(i, () => _ekle(i), false)],
