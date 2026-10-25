@@ -116,8 +116,14 @@ abstract final class Motor {
     final fark = gunFarki(sonGun, b);
     if (fark < 0) return 0;
     if (fark <= 1) return d.seri;
+    if (fark == 2 && seriKorumaVar(d, sonGun)) return d.seri;
     return _seriKopmadi(d, sonGun, b) ? d.seri : 0;
   }
+
+  /// Seri koruma hakkı: [sonGun]'den sonra atlanan tek gün için, o günün
+  /// haftasında hak daha önce kullanılmadıysa true (haftada bir gün atlanabilir).
+  static bool seriKorumaVar(OgrenciDurumu d, String sonGun) =>
+      d.seriKorumaHafta != haftaBaslangici(_gunEkle(sonGun, 1));
 
   /// Günün haftasının Pazartesi'si 'YYYY-MM-DD'; geçersiz günde aynı metin.
   static String haftaBaslangici(String gun) {
@@ -156,6 +162,7 @@ abstract final class Motor {
     int yeniSeri;
     final son = d.sonGun;
     var kopti = false;
+    var korumaHafta = d.seriKorumaHafta;
     if (son == bugun) {
       yeniSeri = d.seri;
     } else if (son != null && gunFarki(son, bugun) == 1) {
@@ -164,6 +171,11 @@ abstract final class Motor {
         gunFarki(son, bugun) > 1 &&
         _seriKopmadi(d, son, bugun)) {
       yeniSeri = d.seri + 1; // haftalık hedef tutuldu: günlük ara seriyi bozmaz
+    } else if (son != null &&
+        gunFarki(son, bugun) == 2 &&
+        seriKorumaVar(d, son)) {
+      yeniSeri = d.seri + 1; // haftada bir atlanan gün: seri koruma hakkı
+      korumaHafta = haftaBaslangici(_gunEkle(son, 1));
     } else {
       yeniSeri = 1;
       kopti = son != null && gunFarki(son, bugun) > 1;
@@ -206,6 +218,7 @@ abstract final class Motor {
       kirilanSeri: kirilan,
       geriKazanmaGun: ilerleme,
       geriKazanmaSon: ilerSon,
+      seriKorumaHafta: korumaHafta,
     );
   }
 

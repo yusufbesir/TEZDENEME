@@ -381,6 +381,7 @@ class OgrenciDurumu {
     this.kirilanSeri = 0,
     this.geriKazanmaGun = 0,
     this.geriKazanmaSon,
+    this.seriKorumaHafta,
     this.donemDersleri = const {},
     this.gunDersiBildirimiAcik = false,
     this.sonGunDersiBildirimGunu,
@@ -513,6 +514,10 @@ class OgrenciDurumu {
   /// 3'te seri geri gelir ve sıfırlanır) ve son tutulan gün.
   final int geriKazanmaGun;
   final String? geriKazanmaSon;
+
+  /// Seri koruma hakkı: haftada bir atlanan gün seriyi bozmaz. En son hakkın
+  /// kullanıldığı haftanın Pazartesi'si; null: hiç kullanılmadı (eski kayıt).
+  final String? seriKorumaHafta;
 
   /// Tamamlanan günün/haftanın/ayın dersleri (ÖZELLİK 63): dönem anahtarı
   /// ('g:2026-10-21', 'h:2026-10-19' (Pazartesi), 'a:2026-10'); eski kayıtta boş.
@@ -693,6 +698,7 @@ class OgrenciDurumu {
     int? kirilanSeri,
     int? geriKazanmaGun,
     String? geriKazanmaSon,
+    String? seriKorumaHafta,
     Set<String>? donemDersleri,
     bool? gunDersiBildirimiAcik,
     String? sonGunDersiBildirimGunu,
@@ -758,6 +764,7 @@ class OgrenciDurumu {
       kirilanSeri: kirilanSeri ?? this.kirilanSeri,
       geriKazanmaGun: geriKazanmaGun ?? this.geriKazanmaGun,
       geriKazanmaSon: geriKazanmaSon ?? this.geriKazanmaSon,
+      seriKorumaHafta: seriKorumaHafta ?? this.seriKorumaHafta,
       donemDersleri: donemDersleri ?? this.donemDersleri,
       gunDersiBildirimiAcik:
           gunDersiBildirimiAcik ?? this.gunDersiBildirimiAcik,
@@ -828,6 +835,7 @@ class OgrenciDurumu {
     'kirilanSeri': kirilanSeri,
     'geriKazanmaGun': geriKazanmaGun,
     'geriKazanmaSon': geriKazanmaSon,
+    'seriKorumaHafta': seriKorumaHafta,
     'donemDersleri': donemDersleri.toList()..sort(),
     'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
     'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
@@ -1059,6 +1067,11 @@ class OgrenciDurumu {
           (j['geriKazanmaSon'] is String &&
               gunGecerli(j['geriKazanmaSon'] as String))
           ? j['geriKazanmaSon'] as String
+          : null,
+      seriKorumaHafta:
+          (j['seriKorumaHafta'] is String &&
+              gunGecerli(j['seriKorumaHafta'] as String))
+          ? j['seriKorumaHafta'] as String
           : null,
       // Eski kayıtta yoksa boş; bozuk anahtarlar atlanır.
       donemDersleri: Set.unmodifiable({
