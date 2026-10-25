@@ -365,7 +365,7 @@
       var data = st.data || {};
       return JSON.stringify([id, st.providers, st.policy, st.busy === true, data["providerDetail:" + id], data["providerAction:" + id],
         (function () { var o = {}; (st.providers || []).forEach(function (p) { if (p && p.id) o[p.id] = data["providerDetail:" + p.id]; }); return id ? null : o; })(),
-        id && st.docs ? st.docs : null]);
+        id && st.docs ? st.docs : null, (typeof window !== "undefined" && typeof window.AM_LANG === "function" ? window.AM_LANG() : "tr")]);
     } catch (e) { return "?" + Math.random(); }
   }
 

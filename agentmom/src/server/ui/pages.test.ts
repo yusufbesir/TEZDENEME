@@ -9,7 +9,7 @@ import path from "node:path";
 const dir = import.meta.dirname as string;
 const read = (f: string): string => fs.readFileSync(path.join(dir, f), "utf8");
 const PAGE_FILES = ["page-overview.js", "page-projects.js", "page-tasks.js", "page-security.js", "page-audit.js"];
-const ALL_JS = ["pages.js", ...PAGE_FILES];
+const ALL_JS = ["pages.js", ...PAGE_FILES, "wf-editor.js"];
 
 // ---------- Sahte DOM ----------
 class FNode {
@@ -490,6 +490,88 @@ test("tasks: iş akışı adım ilerlemesi (progress) ve hata durumu", () => {
   const p = e.P.get("tasks").pure;
   assert.equal(p.normWorkflow({ stepsDone: 9, stepsTotal: 4 }).done, 4, "yapılan adım toplamı aşamaz");
   assert.equal(p.normWorkflow({ stepsDone: 1, stepsTotal: 0 }).total, null);
+});
+
+// ---------- İş akışı editörü (madde 16) ----------
+const wfeProblems = (n: FNode): string => walk(n).filter((x) => x.tag === "ul" && x.attrs["aria-live"] === "polite").map((x) => x.textContent).join(" | ");
+test("tasks: iş akışı editörü sağlayıcısız açılır, adım yok uyarısı ve boş JSON gösterir; kütüphane yoksa bölüm çıkmaz", () => {
+  const e = started();
+  e.P.get("tasks").pure.resetEditor();
+  e.go("tasks");
+  const t = e.host.textContent;
+  assert.ok(t.includes("İş akışı editörü") && t.includes("Sağlayıcı listesi boş") && t.includes("En az bir adım seçin."));
+  assert.ok(byTag(e.host, "pre").some((p) => p.textContent.includes('"steps": []')));
+  const bare = started(["pages.js", "page-tasks.js"]);
+  bare.go("tasks");
+  assert.ok(!bare.host.textContent.includes("İş akışı editörü"), "wf-editor.js yüklenmediyse bölüm gizli");
+});
+
+test("tasks: iş akışı editörü şablon, sağlayıcı seçimi, bağımsızlık kuralı ve kopyalama", async () => {
+  const e = started();
+  e.P.get("tasks").pure.resetEditor();
+  e.AM.state.providers = [{ id: "claude", displayName: "Claude" }, { id: "codex", displayName: "Codex" }];
+  e.go("tasks");
+  byKey(e.host, "wfe-tpl-reviewed")!.click();
+  assert.ok(e.host.textContent.includes("Uygula — açık") && e.host.textContent.includes("Planla — kapalı"));
+  assert.ok(wfeProblems(e.host).includes("Uygula: sağlayıcı seçin."));
+  const pick = (key: string, v: string) => { const s = byKey(e.host, key)!; s.value = v; s.fire("change"); };
+  pick("wfe-prov-implement", "claude");
+  pick("wfe-prov-review", "claude");
+  assert.ok(wfeProblems(e.host).includes("farklı bir sağlayıcı"), "aynı sağlayıcı bağımsız sayılmaz");
+  byKey(e.host, "wfe-copy")!.click();
+  assert.ok(e.host.textContent.includes("Sorunlar giderilmeden kopyalanamaz."));
+  assert.equal(e.calls.filter((c) => c[0] === "copyText").length, 0, "geçersiz tanım kopyalanmaz");
+  pick("wfe-prov-review", "codex");
+  assert.equal(wfeProblems(e.host).includes("sağlayıcı"), false);
+  assert.ok(e.host.textContent.includes("Tanım sunucu kurallarına uygun görünüyor."));
+  pick("wfe-att-implement", "2");
+  const json = byTag(e.host, "pre").find((p) => p.textContent.includes('"steps"'))!.textContent;
+  assert.deepEqual(JSON.parse(json), { steps: [{ role: "implement", providerId: "claude", maxAttempts: 2 }, { role: "review", providerId: "codex" }] });
+  byKey(e.host, "wfe-copy")!.click();
+  await Promise.resolve();
+  const cp = e.calls.filter((c) => c[0] === "copyText");
+  assert.equal(cp.length, 1);
+  assert.deepEqual(JSON.parse(cp[0]![1]), JSON.parse(json));
+  assert.ok(e.host.textContent.includes("Kopyalandı."));
+});
+
+test("tasks: iş akışı editörü yedek sağlayıcı sınırı (en çok 3) ve sıfırlama; sağlayıcı adı yalnız metin", () => {
+  const e = started();
+  e.P.get("tasks").pure.resetEditor();
+  const evil = "<img src=x onerror=alert(1)>";
+  e.AM.state.providers = ["a", "b", "c", "d", "e"].map((id) => ({ id }));
+  e.AM.state.providers.push({ id: evil });
+  e.go("tasks");
+  byKey(e.host, "wfe-tpl-build")!.click();
+  const s = byKey(e.host, "wfe-prov-implement")!; s.value = "a"; s.fire("change");
+  for (const id of ["b", "c", "d", "e"]) { const c = byKey(e.host, "wfe-fb-implement-" + id)!; c.checked = true; c.fire("change"); }
+  const json = JSON.parse(byTag(e.host, "pre").find((p) => p.textContent.includes('"steps"'))!.textContent);
+  assert.deepEqual(json.steps[0].fallbackProviders, ["b", "c", "d"], "dördüncü yedek eklenmez");
+  assert.ok(e.host.textContent.includes(evil), "ad metin olarak görünür");
+  assert.equal(byTag(e.host, "img").length, 0);
+  byKey(e.host, "wfe-reset")!.click();
+  assert.ok(e.host.textContent.includes("En az bir adım seçin."));
+});
+
+test("tasks: iş akışı editörü devre dışı sağlayıcıyı sunmaz; listeden düşmüş yedek görünür kalır ve işaretlenir", () => {
+  const e = started();
+  e.P.get("tasks").pure.resetEditor();
+  e.AM.state.providers = [{ id: "claude", disabled: false }, { id: "gemini", disabled: true }, { id: "codex" }];
+  e.go("tasks");
+  assert.equal(byKey(e.host, "wfe-tpl-build") !== undefined, true);
+  byKey(e.host, "wfe-tpl-build")!.click();
+  const sel = byKey(e.host, "wfe-prov-implement")!;
+  assert.deepEqual(byTag(sel, "option").map((o) => o.value), ["", "claude", "codex"], "devre dışı sağlayıcı seçenek değil");
+  sel.value = "claude"; sel.fire("change");
+  const c = byKey(e.host, "wfe-fb-implement-codex")!; c.checked = true; c.fire("change");
+  e.AM.state.providers = [{ id: "claude" }, { id: "codex", disabled: true }];
+  e.go("tasks");
+  const stale = byKey(e.host, "wfe-fb-implement-codex");
+  assert.ok(stale, "düşmüş yedek kaldırılabilsin diye görünür");
+  assert.ok(wfeProblems(e.host).includes("kayıtlı değil"));
+  stale!.checked = false; stale!.fire("change");
+  assert.equal(byKey(e.host, "wfe-fb-implement-codex"), undefined);
+  assert.ok(e.host.textContent.includes("Tanım sunucu kurallarına uygun görünüyor."));
 });
 
 // ---------- Güvenlik ----------
