@@ -1,0 +1,1746 @@
+{
+ "summary": {
+  "dogrulandi": 30,
+  "kismi": 59,
+  "planli": 9,
+  "desteklenmiyor": 0,
+  "kapsamdisi": 2,
+  "total": 100
+ },
+ "items": [
+  {
+   "n": 1,
+   "en": "AgentMom Command Center",
+   "tr": "Komuta Merkezi",
+   "sahip": "M1",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/server/ui/chat.js",
+    "src/server/ui/sidebar.js",
+    "src/server/ui/panel.js",
+    "src/server/ui/settings.js",
+    "src/server/ui/pages.js",
+    "src/server/ui/page-overview.js",
+    "src/server/ui/page-providers.js",
+    "src/server/ui/page-integrations.js",
+    "src/desktop/launcher.ts",
+    "src/server/ui-desktop.test.ts",
+    "docs/testing/faz11-dilim3.md"
+   ],
+   "eksik": "Tek pencere + sohbet + §14 ana navigasyonun 13 sayfası (Genel Bakış, Projeler, Görevler ve İş Akışları, AI Bağlantıları, Modeller ve Ajanlar, Entegrasyonlar ve Yetenekler, Beceriler, Araştırma ve Kalibrasyon, Hafıza ve Bilgi, Beyin Verify, Kullanım ve Maliyetler, Güvenlik ve Yetkiler, Denetim Kayıtları) çalışıyor. Eksik: çoklu proje, görsel iş akışı, bazı sayfalar salt okunur/ince; gerçek veri olmayan yerde dürüstçe 'yok' der.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 2,
+   "en": "Orchestration and Policy Engine",
+   "tr": "Orkestrasyon ve Politika Motoru",
+   "sahip": "M3",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/policy/engine.ts",
+    "src/core/policy/engine.test.ts",
+    "src/workflows/engine.ts"
+   ],
+   "eksik": "Politika motoru doğrulandı (deny/allow/onay, gerçek yol denetimi). Orkestrasyon yalnız SIRALI iş akışı; paralel/koşullu akış, olay tetikleme yok.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 3,
+   "en": "Multi-Agent Adapter Framework",
+   "tr": "Çoklu Ajan Adaptör Çerçevesi",
+   "sahip": "M4",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/providers/contract.ts",
+    "src/providers/claude-code.ts",
+    "src/providers/codex.ts",
+    "src/providers/gemini.ts",
+    "src/providers/registry.ts",
+    "src/providers/providers.test.ts",
+    "docs/integrations/claude-code.md"
+   ],
+   "eksik": "Sözleşme + 3 adaptör var. Claude/Codex execute 'partial' (tek gerçek çalıştırma), cancel doğrulanmadı, Gemini yürütme 'unavailable'. OpenCode/Cursor/Antigravity adaptörü yok.",
+   "dilim": "D3",
+   "cagri": "—"
+  },
+  {
+   "n": 4,
+   "en": "Task Planning and Decomposition",
+   "tr": "Görev Planlama ve Ayrıştırma",
+   "sahip": "M3",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/workflows/engine.ts",
+    "src/workflows/types.ts",
+    "docs/testing/faz5-gercek-deneme-wf.json"
+   ],
+   "eksik": "Planlayıcı adım düz plan metni üretir; alt görev grafiği/bağımlılık ayrıştırması yok.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 5,
+   "en": "Task Contract and Acceptance Criteria Engine",
+   "tr": "Görev Sözleşmesi ve Kabul Kriterleri",
+   "sahip": "M3",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/workflows/types.ts",
+    "src/core/db/migrations/005_workflows.sql",
+    "src/verify/completeness.ts",
+    "src/workflows/store.ts",
+    "docs/testing/faz5-gercek-deneme-delivery.json"
+   ],
+   "eksik": "Kabul ölçütleri yapılandırılmış ve eleştirmen/doğrulayıcı kararına bağlı; gerçek çok adımlı denemede çalıştı.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 6,
+   "en": "Conflict-Free Parallel Workspaces",
+   "tr": "Çakışmasız Paralel Çalışma Alanları",
+   "sahip": "M5",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/workflows/scopes.ts",
+    "src/orchestrator/run-task.ts",
+    "src/workflows/engine.ts",
+    "src/core/db/migrations/005_workflows.sql"
+   ],
+   "eksik": "Git worktree yalıtımı + yazma kapsamı talepleri (çakışan kapsam reddedilir) testlidir. Sert sandbox değildir (madde 17). Not (D8d incelemesi): worktree izolasyonu zaten var, ek iş yapılmadı.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 7,
+   "en": "Checkpoint and Recovery Manager",
+   "tr": "Kontrol Noktası ve Kurtarma",
+   "sahip": "M5",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/workflows/testing/crash-runner.ts",
+    "src/workflows/store.ts",
+    "src/workflows/engine.ts",
+    "docs/decisions/ADR-004-is-akisi-ve-kurtarma.md"
+   ],
+   "eksik": "Öldürülen süreç yarım kalan adımdan devam eder (çökme testi), sınırlı yeniden deneme bütçesi.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 8,
+   "en": "Live Task Monitoring and Bottleneck Analysis",
+   "tr": "Canlı İzleme ve Darboğaz Analizi",
+   "sahip": "M12",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/server/monitor.ts",
+    "src/server/monitor.test.ts",
+    "src/server/d5a-api.test.ts",
+    "src/server/ui/page-overview.js"
+   ],
+   "eksik": "Gerçek izleme: çalışan/bekleyen/yavaş/yeniden denenen iş sayıları ve darboğaz (GET /api/monitor; eşikler onay 30 dk, adım 10 dk, deneme 3). Genel Bakış'ta gösterilir. Sınır: olay tetikleme (madde 13) D5b'de.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 9,
+   "en": "Independent Delivery Auditor",
+   "tr": "Bağımsız Teslim Denetçisi",
+   "sahip": "M10",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/verify/auditor.ts",
+    "src/verify/delivery.test.ts",
+    "src/verify/completeness.ts"
+   ],
+   "eksik": "Bağımsız teslim denetçisi: kanıt dosyası, tamlık, izlenebilirlik kontrolleri testli. Model beyanı karar verici değildir.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 10,
+   "en": "Dependency and Impact Analysis",
+   "tr": "Bağımlılık ve Etki Analizi",
+   "sahip": "M8",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Bağımlılık/etki grafiği yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 11,
+   "en": "Risk-Based Approval Center",
+   "tr": "Risk Tabanlı Onay Merkezi",
+   "sahip": "M15",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/policy/risk.ts",
+    "src/core/policy/risk.test.ts",
+    "src/core/policy/engine.ts",
+    "src/server/ui/core.js",
+    "src/server/ui-desktop.test.ts"
+   ],
+   "eksik": "Onay akışı + deterministik risk skoru (0-100, düşük/orta/yüksek/kritik; gerekçeli) ve geri alma bilgisi onay penceresinde (güvenilir satırlar ajan başlığından önce). Ayrı Onay Merkezi sayfası yok.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 12,
+   "en": "Agent and Model Benchmark Center",
+   "tr": "Ajan/Model Kıyaslama Merkezi",
+   "sahip": "M4",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Ajan/model kıyaslama yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 13,
+   "en": "Event-Driven Automation",
+   "tr": "Olay Tetiklemeli Otomasyon",
+   "sahip": "M3",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/automation/automation.ts",
+    "src/automation/automation.test.ts",
+    "src/server/d5b-api.test.ts",
+    "src/core/db/migrations/014_d5b.sql",
+    "src/server/ui/page-security.js"
+   ],
+   "eksik": "Kullanıcı kuralları denetim olaylarına VE zamana (aralıklı / günlük saatli; yerel saat; kaçırılan çalışma toplu çalışmaz, tek 'kaçırıldı' kaydı) tepki verir; yalnız iki güvenli eylem: bildir ve politikadan geçen görev kaydı aç (otomasyon izin veremez, geçici izin tüketemez). Döngü koruması, bekleme süresi, saatlik sınır, hatada denetim bozulmaz. Güvenlik sayfasından kural eklenir/açılıp kapatılır (onay penceresi, yalnız kullanıcı). Zamanlı kuralda ek eylem 'analiz çalıştır' (yalnız salt-okunur yerel analizler, kısa özet). Sınır: zamanlanmış MODEL görevi ve dosya olayı tetikleyicisi yok; tetikleyiciler denetim olayı ve zaman.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 14,
+   "en": "Evidence and Decision Traceability",
+   "tr": "Kanıt ve Karar İzlenebilirliği",
+   "sahip": "M12",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/orchestrator/evidence.ts",
+    "src/verify/trace.ts",
+    "src/core/audit/audit.ts",
+    "src/core/db/migrations/004_evidence.sql",
+    "src/core/db/migrations/010_reasoning.sql"
+   ],
+   "eksik": "Kanıt (task_evidence), denetim olayları ve karar defteri bağlı ve ekler-yalnız.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 15,
+   "en": "Multi-Project Portfolio Management",
+   "tr": "Çoklu Proje Portföyü",
+   "sahip": "M2",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Tek proje; portföy yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 16,
+   "en": "Visual Workflow Editor",
+   "tr": "Görsel İş Akışı Editörü",
+   "sahip": "M1",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Görsel iş akışı editörü yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 17,
+   "en": "Isolated Execution Environments",
+   "tr": "İzole Çalışma Ortamları",
+   "sahip": "M5",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/workflows/scopes.ts",
+    "src/providers/child-env.ts",
+    "docs/security/codex-okuma-kapsami.md"
+   ],
+   "eksik": "Worktree + Node izin modeli + temizlenmiş çocuk ortamı. Ağı kısıtlayan sert sandbox yok; Docker yok (karar). Codex okuma kapsamı sınırı kabul edildi.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 18,
+   "en": "Browser Automation",
+   "tr": "Tarayıcı Otomasyonu",
+   "sahip": "M10",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/verify/scenario.ts",
+    "src/verify/browser-worker.ts",
+    "src/verify/browser-automation.test.ts",
+    "src/verify/scenario-library.ts"
+   ],
+   "eksik": "Bildirimsel tarayıcı otomasyonu: gezinme, tıklama, doldurma, seçme, tuş, onay kutusu, bekleme, URL/sayı/öznitelik/odak/konsol denetimleri, görsel kalite ve görsel regresyon; kod çalıştırma yok, yalnız yerel sunucu, dış istek engelli; gerçek Edge testleri. Sınır: genel amaçlı (rastgele web sitesi/script) otomasyon bilerek yok.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 19,
+   "en": "Remote Work and Task Handoff",
+   "tr": "Uzaktan Çalışma ve Devir",
+   "sahip": "M13",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/workflows/handoff.ts"
+   ],
+   "eksik": "Sağlayıcılar arası görev devri (nonce çevreli) var. Uzaktan çalışma/başka makineye devir yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 20,
+   "en": "Mobile Companion Interface",
+   "tr": "Mobil Yardımcı Arayüz",
+   "sahip": "M1",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/server/ui/shell.js",
+    "src/server/ui/pages.js",
+    "src/server/ui-desktop.test.ts"
+   ],
+   "eksik": "Duyarlı arayüz (sayfalar dahil) 320px'e kadar yatay taşmasız, izleme/onay çalışır. Telefon/yerel ağ erişimi YOK (bilinçli, Yusuf kararı bekliyor).",
+   "dilim": "D3",
+   "cagri": "—"
+  },
+  {
+   "n": 21,
+   "en": "Automated Documentation",
+   "tr": "Otomatik Dokümantasyon",
+   "sahip": "M7",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/docs/autodoc.ts",
+    "src/docs/autodoc.test.ts",
+    "scripts/dokuman-uret.mjs",
+    "docs/status/otomatik-dokuman.md"
+   ],
+   "eksik": "Koddan deterministik belge üretimi: modül haritası, HTTP uç tablosu, migrasyonlar, yetenek sayımları; --dogrula bayat belgeyi yakalar (test depoyla tutarlılığı sınar). Sınır: uç çıkarımı ham (bazı yollar 'çözümlenemedi' listesinde), kullanıcı kılavuzu/anlatı belgesi üretilmez.",
+   "dilim": "D7",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 22,
+   "en": "Deployment and Release Management",
+   "tr": "Dağıtım ve Sürüm Yönetimi",
+   "sahip": "M2",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/desktop/launcher.ts",
+    "masaustu/AgentMom.vbs"
+   ],
+   "eksik": "Yalnız yerel başlatıcı/kurulum klasörü. Kurulum/kaldırma programı, sürüm yönetimi, güncelleme yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 23,
+   "en": "Secure Secrets Vault Integration",
+   "tr": "Güvenli Sır Kasası Entegrasyonu",
+   "sahip": "M15",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/secrets/secrets.ts",
+    "src/core/secrets/credman.ts",
+    "src/core/secrets/credman.test.ts",
+    "src/server/ui/page-security.js",
+    "docs/decisions/ADR-002-sir-deposu.md"
+   ],
+   "eksik": "Yalnız secret_ref döner; değer yalnız Windows Kimlik Bilgisi Yöneticisi köprüsünde (gerçek test girdisiyle). Güvenlik sayfasında sır REFERANS adları listelenir (GET /api/secrets/refs: değer okuyan yol yok). Sınır: sır ekleme/silme arayüzü yoktur (bilinçli).",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 24,
+   "en": "API Testing Laboratory",
+   "tr": "API Test Laboratuvarı",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/api.ts",
+    "src/verify/labs/labs.test.ts",
+    "src/server/labs-api.test.ts",
+    "docs/testing/faz11-dilim6a.md"
+   ],
+   "eksik": "Bildirimsel API senaryoları (durum kodu, başlık, JSON kuralları, değişken aktarımı, süre) YALNIZ yerel (127.0.0.1/localhost/[::1]) sunucuya; yönlendirme izlenmez, kendi portu yasak, Authorization maskeli; POST /api/verification/labs ile (yalnız kullanıcı). Sınır: iş akışı teslim denetimine bağlı değil (sunucu gerektirir), sonuç kaydedilmez, OpenAPI/şema üretimi yok.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 25,
+   "en": "Data Analysis Laboratory",
+   "tr": "Veri Analizi Laboratuvarı",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/data-profile.ts",
+    "src/verify/labs/data-profile.test.ts",
+    "src/verify/labs/safe-read.ts",
+    "src/server/analysis-more-api.test.ts",
+    "src/server/ui/page-integrations.js",
+    "docs/testing/faz11-dilim9a.md"
+   ],
+   "eksik": "Veri analizi laboratuvarı (salt-okunur): CSV/TSV/JSON/NDJSON dosyası için satır/sütun sayısı, tür çıkarımı, boş oranı, benzersiz sayısı, yinelenen satır, anomali işaretleri. HAM HÜCRE DEĞERİ DÖNMEZ (min/max de yok); kalıp taşıyan sütun adları maskelenir; politika (allowedDirs/trustedRepos), anahtar klasörü, UNC/aygıt yolu reddi, açıldıktan sonra yeniden doğrulama. Sınır: 8 MB/200 bin satır/200 sütun; duyarlılık sezgiseldir (yüksek entropili kimlik sütunları 'duyarlı' görünebilir; 20+ karakterli meşru ad maskelenebilir); ondalık virgüllü sayı metin sayılır; istatistiksel test/görselleştirme/model yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 26,
+   "en": "Multilingual Project Support",
+   "tr": "Çok Dilli Proje Desteği",
+   "sahip": "M11",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/server/ui/strings.js"
+   ],
+   "eksik": "Arayüz metinleri tek sözlükte (Türkçe). Başka dil ve proje içeriği çok dillilik yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 27,
+   "en": "Accessibility Laboratory",
+   "tr": "Erişilebilirlik Laboratuvarı",
+   "sahip": "M11",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/a11y.ts",
+    "src/verify/labs/a11y.test.ts",
+    "src/workflows/lab-runs.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Statik HTML için 17 WCAG denetimi (lang, başlık, alt, etiket, ad, başlık sırası, tabindex, yinelenen id, ARIA, viewport) ve verilen renk çiftleri için kontrast; teslim planında kullanılır, ihlal teslimi bozar. Sınır: renkler sayfadan çıkarılmaz, CSS gizleme/çalışma zamanı klavye-odak denetimi yok. AgentMom arayüzünün kendisi için kontrast/ARIA/klavye ayrıca testli.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 28,
+   "en": "Observability Center",
+   "tr": "Gözlemlenebilirlik Merkezi",
+   "sahip": "M12",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/health/health.ts",
+    "src/server/usage.ts",
+    "src/server/ui/usage.js",
+    "src/core/audit/audit.ts",
+    "src/ops/backup-scheduler.ts"
+   ],
+   "eksik": "Sağlık, kullanım, denetim kaydı ve yedek uyarıları görünür. Ölçüm/iz/genel uyarı merkezi yok.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 29,
+   "en": "Release Impact Analysis",
+   "tr": "Sürüm Etki Analizi",
+   "sahip": "M8",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/release-impact.ts",
+    "src/analysis/release-impact.test.ts",
+    "src/server/analysis-more-api.test.ts",
+    "src/server/ui/page-integrations.js",
+    "docs/testing/faz11-dilim9a.md"
+   ],
+   "eksik": "Sürüm etki analizi (salt-okunur): iki git başvurusu arasındaki değişen dosyalar, her src dosyası için etkilenen dosya/test sayısı, test edilmemiş değişenler, migrasyon değişim uyarısı. Git sertleştirilmiş (tam sha, kabuksuz, ağ/lazy-fetch kapalı, tehlikeli .git/config reddi 'unsafe_config', süreç ağacı öldürme). Sınır: etki, SEÇİLEN sürümün içeriğinden değil çalışma ağacının import grafiğinden hesaplanır; uç (API) düzeyinde değişim çözümlenmez; git okunamazsa dürüstçe 'okunamadı'.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 30,
+   "en": "Backup and Disaster Recovery",
+   "tr": "Yedekleme ve Felaket Kurtarma",
+   "sahip": "M13",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/ops/backup.ts",
+    "src/ops/backup.test.ts",
+    "src/ops/backup-scheduler.ts",
+    "src/ops/backup-scheduler.test.ts",
+    "src/cli/yedek.ts",
+    "docs/decisions/ADR-010-yedekleme-ve-goc-guvenligi.md",
+    "docs/decisions/ADR-013-kullanim-tabanli-yedek.md",
+    "docs/testing/faz11-dilim4.md"
+   ],
+   "eksik": "Doğrulamalı yedek/geri yükleme + kullanım-tabanlı denetimli otomatik yedek (kararlar denetim kaydında, periyodik doğrulama, görünür uyarılar, geri çekilme). Sınır: reddedilen yedekte yarım klasör kalabilir (temizleme Yusuf kararı).",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 31,
+   "en": "Multi-User Roles and Permissions",
+   "tr": "Çok Kullanıcılı Roller",
+   "sahip": "M15",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/auth/auth.ts",
+    "src/core/auth/auth.test.ts",
+    "src/server/app.ts",
+    "src/server/ui/page-security.js"
+   ],
+   "eksik": "Tek-sahip yetki modeli: kullanıcı belirteci ≠ ajan belirteci (ajan yalnız görev açar), sistem (zamanlayıcı) ayrı; Güvenlik sayfasında 'Yetki modeli' görünür. Çok kullanıcı/hesap/paylaşım YOK (Yusuf kararı: yalnız Yusuf).",
+   "dilim": "Karar",
+   "cagri": "—"
+  },
+  {
+   "n": 32,
+   "en": "Trusted Tool Marketplace",
+   "tr": "Güvenilir Araç Pazarı",
+   "sahip": "M8",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Güvenilir araç pazarı yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 33,
+   "en": "Technical Debt Center",
+   "tr": "Teknik Borç Merkezi",
+   "sahip": "M2",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/tech-debt.ts",
+    "src/analysis/tech-debt.test.ts",
+    "src/server/analysis-more-api.test.ts",
+    "src/server/ui/page-integrations.js",
+    "docs/testing/faz11-dilim9a.md"
+   ],
+   "eksik": "Teknik borç merkezi (yalnız kullanıcı isteğiyle, salt-okunur): açık işaretçiler, kardeş testi olmayan dosyalar, en büyük/600+ satırlık dosyalar, import döngüleri, bağımlılık sürümleri; her sinyal sayı + en çok 20 dosya:satır örneği, puan/öncelik YOK. Sınır: işaretçi taraması yaklaşık (dizgi içi '//' yorum sayılabilir, 4 KB üstü satırlar atlanır); güncel bağımlılık sürümü BİLİNMİYOR (ağ kontrolü yok); kapsam ölçümü değil dosya-adı eşleşmesi.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 34,
+   "en": "Learning and Specialization Center",
+   "tr": "Öğrenme ve Uzmanlaşma Merkezi",
+   "sahip": "M14",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Öğrenme/uzmanlaşma merkezi yok.",
+   "dilim": "D8",
+   "cagri": "—"
+  },
+  {
+   "n": 35,
+   "en": "Skill Hunter",
+   "tr": "Skill Hunter",
+   "sahip": "M9",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/skills/lifecycle.ts",
+    "src/skills/lifecycle.test.ts"
+   ],
+   "eksik": "Beceri ADAYI kaydı (araştırılıyor aşaması) var; otomatik arama/keşif yok (modül hiçbir şey indirmez, yalnız kayıt).",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 36,
+   "en": "Skill Factory and Lifecycle Manager",
+   "tr": "Skill Fabrikası ve Yaşam Döngüsü",
+   "sahip": "M9",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/skills/lifecycle.ts",
+    "src/skills/lifecycle.test.ts",
+    "src/core/db/migrations/008_skills.sql",
+    "docs/decisions/ADR-006-bellek-ve-beceri.md"
+   ],
+   "eksik": "Yaşam döngüsü iskeleti (aday→güvenlik→yalıtılmış test→onay→yayın/ret/iptal) testli. Beceri ÜRETİMİ yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 37,
+   "en": "Research Center",
+   "tr": "Araştırma Merkezi",
+   "sahip": "M6",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/research-center.ts",
+    "src/capabilities/model-runner-net.test.ts",
+    "src/net/web-fetch.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Araştırma merkezi (Yusuf kararı: internetli): soru + en çok 5 URL (izinli alan adı, her URL için tek kullanımlık onay bileti) → kaynaklı özet; iddialar kaynak numarası + aynen alıntıyla; alıntı doğrulama rozeti (iddianın doğruluğunu GARANTİ ETMEZ); kaynaksız mod dürüstçe işaretli. İnternet VARSAYILAN KAPALI, Ayarlar > İnternet erişimi'nden Yusuf açar. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 38,
+   "en": "Feature Discovery Engine",
+   "tr": "Özellik Keşif Motoru",
+   "sahip": "M6",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/feature-discovery.ts",
+    "src/capabilities/model-runner-net.test.ts",
+    "src/net/web-fetch.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Özellik keşfi (internetli): proje açıklaması + isteğe bağlı kaynaklardan öncelikli özellik önerileri, gerekçe ve emek tahmini; kaynak/alıntı doğrulama; internet varsayılan kapalı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 39,
+   "en": "Research and Continuous Improvement Engine (REA)",
+   "tr": "REA",
+   "sahip": "M6",
+   "durum": "Kapsam dışı",
+   "kanit": [
+    "docs/decisions/ADR-007-rea.md",
+    "docs/decisions/ADR-014-jev-kapsam-disi-uzanti-noktasi.md"
+   ],
+   "eksik": "Yusuf kararı (2026-10-23, 'b'): AgentMom'ın REA kodu, API uçları, arayüzü ve testleri git rm ile kaldırıldı (geçmişten geri alınır). 009_rea migrasyonu ve tabloları geçmiş migrasyon değişmez kuralıyla bırakıldı, kullanılmaz. Sonradan eklenebilir (ADR-014). Yusuf'un cihazındaki REA MCP aracı bundan bağımsızdır.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 40,
+   "en": "Competitor and Ecosystem Research",
+   "tr": "Rakip ve Ekosistem Araştırması",
+   "sahip": "M6",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/competitor-research.ts",
+    "src/capabilities/model-runner-net.test.ts",
+    "src/net/web-fetch.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Rakip/ekosistem araştırması (internetli): konu + karşılaştırılacaklar + kaynaklardan güçlü/zayıf yönler ve karşılaştırma; kaynak/alıntı doğrulama; canlı izleme/zamanlama yok; internet varsayılan kapalı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 41,
+   "en": "Obsidian Memory System",
+   "tr": "Obsidian Hafıza Sistemi",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/memory/export.ts",
+    "src/memory/memory.test.ts",
+    "docs/decisions/ADR-006-bellek-ve-beceri.md"
+   ],
+   "eksik": "Obsidian uyumlu, ekler-yalnız (wx) dışa aktarma; anahtarlar klasörü reddedilir. Kasadan geri okuma yok (tek yön).",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 42,
+   "en": "SQLite Operational State",
+   "tr": "SQLite Operasyonel Durum",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/db/db.ts",
+    "src/core/db/migrate.ts",
+    "src/core/db/migrate.test.ts",
+    "src/core/db/migrations/011_subsessions.sql"
+   ],
+   "eksik": "11 geri alınabilir göç, göç öncesi doğrulamalı anlık görüntü.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 43,
+   "en": "Jev Structured Decision Integration",
+   "tr": "Jev Yapılandırılmış Karar Entegrasyonu (KAPSAM DIŞI, Yusuf 2026-10-22: sonradan eklenebilir; bkz. ADR-014)",
+   "sahip": "M7",
+   "durum": "Kapsam dışı",
+   "kanit": [],
+   "eksik": "Yusuf kararı (2026-10-22): Jev şimdilik AgentMom kapsamı dışındadır; kodda, arayüzde ve kurguda Jev yoktur. Sonradan eklenirse ADR-014 uzantı noktasıyla (karar sağlayıcı yalnız danışmandır, izin veremez) eklenir.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 44,
+   "en": "Progressive Memory Retrieval",
+   "tr": "Aşamalı Hafıza Getirme",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/memory/retrieval.ts",
+    "src/memory/retrieval.test.ts",
+    "src/server/d7-api.test.ts",
+    "src/server/ui/page-memory.js"
+   ],
+   "eksik": "Aşamalı getirme: özet → bölüm → kaynak/bağlantı, karakter bütçesi asla aşılmaz, bayraklı kayıtlar işaretli döner, pasifler gelmez; GET /api/memory/context ve Hafıza sayfasında. Sınır: en yeni 500 kayıt okunur.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 45,
+   "en": "Memory Conflict and Staleness Management",
+   "tr": "Hafıza Çelişki ve Bayatlık Yönetimi",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/memory/store.ts",
+    "src/memory/memory.test.ts"
+   ],
+   "eksik": "Çelişki ve bayatlık BAYRAKLANIR, otomatik çözülmez/gizlenmez (testli).",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 46,
+   "en": "Unified Integration and Capability Center",
+   "tr": "Birleşik Entegrasyon ve Yetenek Merkezi",
+   "sahip": "M8",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/providers/registry.ts",
+    "src/server/providers-api.ts",
+    "src/server/providers-api.test.ts",
+    "src/server/ui/page-providers.js",
+    "src/server/ui/page-integrations.js"
+   ],
+   "eksik": "Sağlayıcı listesi + detay sayfası (yetenek kayıt defteri, modeller, limitler 'Bilinmiyor', son hatalar), yerel Test, Devre dışı/Etkinleştir (fail-closed). OpenCode/Cursor/Antigravity adaptörü yok; IDE/MCP entegrasyon ayrımı ve yaşam döngüsü eylemleri yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 47,
+   "en": "Capability and Dependency Graph",
+   "tr": "Yetenek ve Bağımlılık Grafiği",
+   "sahip": "M8",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Yetenek/bağımlılık grafiği yok.",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 48,
+   "en": "Integration Lifecycle Manager",
+   "tr": "Entegrasyon Yaşam Döngüsü",
+   "sahip": "M8",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "Entegrasyon yaşam döngüsü yok (beceri yaşam döngüsü ayrı).",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 49,
+   "en": "Project-Specific Design Engine",
+   "tr": "Projeye Özgü Tasarım Motoru",
+   "sahip": "M11",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/design.ts",
+    "src/verify/labs/design.test.ts",
+    "src/workflows/verify-integration.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Her proje kendi tasarım sözleşmesini (palet, font, aralık/yarıçap skalası, çeşitlilik sınırları) tanımlar; statik HTML/CSS çıktısı buna karşı ölçülür, teslim denetimine bağlı. AgentMom'un kendi tasarımı için ayrıca süreç yapıldı. Sınır: tasarımı ÜRETEN bir motor değil, uyumu denetler; var() kullanımı takip edilmez; spec dosyası uygulayıcı tarafından yazılabilir (satır içi spec önerilir).",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 50,
+   "en": "Anti-Generic Design Principles",
+   "tr": "Jenerik Tasarım Karşıtı İlkeler",
+   "sahip": "M11",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/design.ts",
+    "src/verify/labs/design.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Jenerik/şablon izleri ölçülebilir kurallarla yakalanır: yer tutucu metin, bilinen şablon/framework renkleri, aşırı renk/font/boyut çeşitliliği, yasak dizeler; teslim kapısı. Sınır: estetik/özgünlük yargısı yok; bölünmüş metin düğümleri yakalanmaz.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 51,
+   "en": "Visual Quality Gate",
+   "tr": "Görsel Kalite Kapısı",
+   "sahip": "M11",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/visual-probe.ts",
+    "src/verify/browser-worker.ts",
+    "src/verify/scenario.ts",
+    "src/verify/browser.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Tarayıcı adımı expectVisualQuality: 3 görünüm alanı x 7 ölçülebilir kural (taşma, kırpılmış metin, yazı boyutu, hedef boyutu, kontrast, örtüşme, kırık görsel), ekran görüntüsü kanıtı. Sınır: estetik/piksel yargısı yok; gradyan/resimli arka planlar atlanır.",
+   "dilim": "D6",
+   "cagri": "—"
+  },
+  {
+   "n": 52,
+   "en": "Playwright Browser Verification",
+   "tr": "Playwright Tarayıcı Doğrulama",
+   "sahip": "M10",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/verify/scenario-library.ts",
+    "src/verify/screenshot-compare.ts",
+    "src/verify/baselines.ts",
+    "src/verify/baselines-api.test.ts",
+    "src/workflows/verify-integration.test.ts"
+   ],
+   "eksik": "Playwright+Edge doğrulaması: 5 şablonlu senaryo kütüphanesi, plan entegrasyonu, görsel regresyon (taban yalnız kullanıcı onayıyla, uygulayıcı tabanı güvenilmez, fark kanıtı, history korunur), uçtan uca teslim testi. Sınır: font/anti-aliasing farkına eşikle dayanılır.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 53,
+   "en": "Unified Verification Laboratory",
+   "tr": "Birleşik Doğrulama Laboratuvarı",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/schema.ts",
+    "src/verify/labs/index.ts",
+    "src/verify/local-tests.ts",
+    "src/verify/browser.ts",
+    "src/workflows/lab-runs.ts"
+   ],
+   "eksik": "Yerel test, tarayıcı, API, sözleşme ve durum sağlayıcıları ortak RunResult şemasında; birleşik runLab/summarizeRuns. Sınır: veri/erişilebilirlik/mutasyon/görsel sağlayıcıları yok (D6b).",
+   "dilim": "D6",
+   "cagri": "—"
+  },
+  {
+   "n": 54,
+   "en": "Optional TestSprite Provider",
+   "tr": "İsteğe Bağlı TestSprite Sağlayıcısı",
+   "sahip": "M10",
+   "durum": "Planlı",
+   "kanit": [],
+   "eksik": "İsteğe bağlı TestSprite sağlayıcısı yok (yalnız kayıtlı sağlayıcı kalıbı hazır; ağ/anahtar gerektirebilir, onay şart).",
+   "dilim": "D10",
+   "cagri": "—"
+  },
+  {
+   "n": 55,
+   "en": "Common Verification Result Schema",
+   "tr": "Ortak Doğrulama Sonuç Şeması",
+   "sahip": "M10",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/verify/schema.ts",
+    "src/verify/junit.ts",
+    "src/verify/classify.ts"
+   ],
+   "eksik": "Sürümlü ortak sonuç şeması; ham kanıt düşürülmez.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 56,
+   "en": "Behavioral Contracts and Invariants",
+   "tr": "Davranış Sözleşmeleri ve Değişmezler",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/contracts.ts",
+    "src/verify/labs/rules.ts",
+    "src/workflows/lab-runs.ts",
+    "src/workflows/verify-integration.test.ts"
+   ],
+   "eksik": "Bildirimsel değişmez/ön/son koşul sözleşmeleri (before/after, [*] kuantifikasyonu, regex yok, bütçeli) teslim denetimine bağlı: çalışma ağacındaki JSON konu dosyasına uygulanır, kanıt dosyası yazılır, ihlal teslimi bozar. Sınır: konu dosyası uygulayıcının çıktısıdır (sırf geçsin diye yazabilir); kod davranışı çalıştırılarak sınanmaz.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 57,
+   "en": "State Transition Laboratory",
+   "tr": "Durum Geçiş Laboratuvarı",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/state.ts",
+    "src/verify/labs/labs.test.ts",
+    "src/workflows/lab-runs.ts",
+    "src/core/tasks/tasks.ts"
+   ],
+   "eksik": "Durum makinesi laboratuvarı: yapısal denetim (belirlilik, erişilebilirlik, çıkmaz sokak), neverReach yol araması, iz oynatma; teslim planında kullanılabilir; AgentMom'un kendi görev makinesi gerçek geçiş tablosuyla sınandı. Sınır: tarif edilen makineyi sınar, uygulayıcının kodunu makineye bağlamaz.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 58,
+   "en": "Mutation Testing",
+   "tr": "Mutasyon Testi",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/mutation.ts",
+    "src/verify/labs/mutation.test.ts",
+    "src/workflows/verify-integration.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Çalışma ağacı KOPYASINDA deterministik mutantlar üretir (orijinal değişmez, sha256 doğrulanır), testleri mevcut güvenli yoldan koşturur; zayıf testte mutant hayatta kalır ve teslim bozulur (minScore). Teslim planında kullanılır. Sınır: JS/TS; JSX/şablon içi ifadeler yok; harici paket gerektiren testler kopyada çalışmaz; eşdeğer mutantlar; kopya temizliği Yusuf onayında.",
+   "dilim": "D6",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 59,
+   "en": "Test Data Lineage and Scenario Data",
+   "tr": "Test Verisi Soy Ağacı",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/lineage.ts",
+    "src/verify/labs/lineage.test.ts",
+    "src/workflows/verify-integration.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Planda verilen veri dosyalarının sha256/boyut/git blob kaydı kanıt olarak yazılır; görevin değiştirdiği veri dosyası işaretlenir ve teslim raporunda görünür; sapma doğrulanır. Sınır: senaryo verisi ÜRETİMİ yok.",
+   "dilim": "D6",
+   "cagri": "—"
+  },
+  {
+   "n": 60,
+   "en": "Reproducible Failure Replay",
+   "tr": "Tekrarlanabilir Hata Oynatma",
+   "sahip": "M10",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/verify/labs/replay.ts",
+    "src/verify/labs/replay.test.ts",
+    "src/server/labs-api.test.ts",
+    "docs/testing/faz11-dilim6b.md"
+   ],
+   "eksik": "Başarısız teslimde yeniden üretim paketi (komut, ortam, plan, kanıt hash'leri) kanıt olarak yazılır, bütünlüğü doğrulanır, GET /api/tasks/:id/replay ile okunur. Sınır: otomatik yeniden ÇALIŞTIRMA yok.",
+   "dilim": "D6",
+   "cagri": "—"
+  },
+  {
+   "n": 61,
+   "en": "Reasoning Compiler",
+   "tr": "Akıl Yürütme Derleyicisi",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/reasoning/argument.ts",
+    "src/reasoning/argument.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Karar + varsayım + soy ağacından yapılandırılmış argüman belgesi (hüküm: güvenilir/gözden geçir/zayıf; karşı görüşler; riskler), karar soy ağacında 'Argüman' düğmesi. Sınır: yalnız kayıtlı kararlardan; serbest metin akıl yürütme derlemesi (model) yok.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 62,
+   "en": "Competing Hypotheses Laboratory",
+   "tr": "Rakip Hipotezler Laboratuvarı",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/hypotheses.ts",
+    "src/reasoning/hypotheses.test.ts",
+    "src/server/d8-api.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Bayes ardılları (log-uzayı, taşmasız) ve ACH uyuşmazlık sayıları, ayırt edicilik, kesin eleme uyarısı; Araştırma ve Kalibrasyon sayfasında form. Varsayım: kanıtlar koşullu bağımsız (çıktıda yazılı). Hesaplama aracıdır, karar yazmaz.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 63,
+   "en": "Value-of-Information Evaluator",
+   "tr": "Bilgi Değeri Değerlendirici",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/voi.ts",
+    "src/reasoning/voi.test.ts",
+    "src/server/d8-api.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "EV, EVPI, EVSI ve net değer (bilinen örnekle elle doğrulandı); bilgi toplamaya değer mi önerisi; arayüzde basit (iki sonuçlu test) form, sunucu daha genel. Hesaplama aracıdır.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 64,
+   "en": "Logical Contradiction Resolver",
+   "tr": "Mantıksal Çelişki Çözücü",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/memory/resolver.ts",
+    "src/memory/resolver.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Açık çelişkiler için kural tabanlı çözüm ÖNERİSİ (kaynak/yenilik/güven/tür/bayatlık; kullanıcı kaydı için güven <=0,5; ajan kullanıcıyı geçemez). Sınır: öneriyi uygulayan (emekli et/çelişkiyi çöz) HTTP ucu yok; kararı kullanıcı verir.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 65,
+   "en": "Multi-Horizon Strategy Engine",
+   "tr": "Çok Ufuklu Strateji Motoru",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/multi-horizon.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Çok ufuklu strateji: hedef + en çok 4 ufuk için hedefler, riskler, bağımlılıklar ve tutarlılık notları; aynı güvenlik hattı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 66,
+   "en": "Knowledge Half-Life Mapper",
+   "tr": "Bilgi Yarı Ömrü Haritası",
+   "sahip": "M7",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/memory/halflife.ts",
+    "src/memory/halflife.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Tür/kapsam başına yerine-geçme yaşam sürelerinden Kaplan-Meier yarı ömür tahmini, örnek boyutu daima görünür, <5 örnekte 'yetersiz veri'. Sınır: emekli kayıtların emeklilik zamanı kayıtlı değil, hesaba girmez.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 67,
+   "en": "Assumption Debt Ledger",
+   "tr": "Varsayım Borcu Defteri",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/reasoning.ts",
+    "src/reasoning/reasoning.test.ts",
+    "src/core/db/migrations/010_reasoning.sql",
+    "docs/decisions/ADR-008-karar-defteri-ve-kalibrasyon.md"
+   ],
+   "eksik": "Varsayım borcu defteri: ekler-yalnız, gecikme günü, kırık/bekleyen ayrımı; panelde ve /borc komutunda.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 68,
+   "en": "Confidence Calibration Engine",
+   "tr": "Güven Kalibrasyonu",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/reasoning.ts",
+    "src/reasoning/reasoning.test.ts",
+    "docs/decisions/ADR-008-karar-defteri-ve-kalibrasyon.md"
+   ],
+   "eksik": "Tahmin/güven kayıtları, deterministik kalibrasyon raporu (model yok).",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 69,
+   "en": "Decision Expiration Contracts",
+   "tr": "Karar Son Kullanma Sözleşmeleri",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/reasoning.ts",
+    "src/reasoning/reasoning.test.ts",
+    "src/core/db/migrations/010_reasoning.sql"
+   ],
+   "eksik": "Karar son kullanma sözleşmeleri, gözden geçirme durumu, üst karar zinciri.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 70,
+   "en": "Causal Impact Mapper",
+   "tr": "Nedensel Etki Haritası",
+   "sahip": "M14",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/analysis/impact.ts",
+    "src/analysis/impact.test.ts",
+    "src/server/d8b-api.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Depo import grafiğinden bir dosyanın katman katman bağımlıları ve etkilenen testleri, döngüler, graf özeti; hostile dosyalara dayanıklı (derinlik/süre sınırı), tek tarama kilidi. Sınır: dinamik yollar/dizgi birleştirmeyle kurulan import görünmez.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 71,
+   "en": "Context-Switching Cost Optimizer",
+   "tr": "Bağlam Değiştirme Maliyeti Optimizasyonu",
+   "sahip": "M13",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/switching.ts",
+    "src/analysis/switching.test.ts",
+    "src/server/d8b-api.test.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Denetim kayıtlarından görev/iş akışı geçişleri, günlük geçiş sayısı, en yoğun saatler, ortalama bağlam oturumu ve (bildirilmişse) tahmini yeniden yükleme token'ı; örnek boyutu daima görünür, <20 olayda 'yetersiz veri'. Sınır: kullanıcının sohbet/pencere geçişleri KAYDEDİLMEZ, bu yüzden KISMİ bir göstergedir; öneri/optimizasyon yok.",
+   "dilim": "D8",
+   "cagri": "—"
+  },
+  {
+   "n": 72,
+   "en": "Resource Shadow-Price Engine",
+   "tr": "Kaynak Gölge Fiyat Motoru",
+   "sahip": "M13",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/shadow-price.ts",
+    "src/analysis/quota.ts",
+    "src/analysis/quota.test.ts",
+    "src/analysis/broker.ts",
+    "src/analysis/broker.test.ts",
+    "src/server/indicators.ts",
+    "docs/testing/faz11-dilim8d.md"
+   ],
+   "eksik": "Sağlayıcı başına 7 günlük kullanım, hızlanma ve kıtlık endeksi (para birimi YOK) + D8d: sağlayıcının BİLDİRDİĞİ kalan kota %15'ten azsa broker adayı sıralamada alta alır ve 'yedek sağlayıcı/alt model önerilir' der; kota bilinmiyorsa sıralama değişmez. Yalnız ÖNERİ: eleme/politika/ücretli rota değişmez, hiçbir koşu yönlendirilmez. Sınır: BUGÜN hiçbir adaptör kota bildirmiyor, bu yüzden kota daima 'bilinmiyor'; tesisat sahte olayla test edildi.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 73,
+   "en": "Capability Continuity Graph",
+   "tr": "Yetenek Süreklilik Grafiği",
+   "sahip": "M13",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/analysis/continuity.ts",
+    "src/analysis/continuity.test.ts",
+    "src/server/d8b-api.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Sağlayıcı x yetenek grafiği: tek hata noktaları, bir sağlayıcı kapanırsa kaybolan/kalan yetenekler (kayıt/beyan verisinden; canlı test yok).",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 74,
+   "en": "Offline Continuity Mode",
+   "tr": "Çevrimdışı Süreklilik Kipi",
+   "sahip": "M13",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/offline.ts",
+    "src/analysis/offline.test.ts",
+    "src/server/indicators.ts",
+    "src/server/ui/chat.js",
+    "docs/testing/faz11-dilim8d.md"
+   ],
+   "eksik": "Çevrimdışı/kısıtlı/çevrimiçi kip + D8d durum göstergeleri (bağlam %, kota %, bekleyen onay; %75 sarı, %90 kırmızı; bilinmeyen 'bilinmiyor'). Sınır: kip yalnız GÖSTERİLİR, otomatik davranış değiştirmez; bağlam penceresi sağlayıcıdan gelmez (program varsayılanı 150.000, etiketli).",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 75,
+   "en": "Inter-Agent Negotiation Protocol",
+   "tr": "Ajanlar Arası Müzakere Protokolü",
+   "sahip": "M3",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/negotiation.ts",
+    "src/capabilities/model/negotiation.ts",
+    "src/capabilities/negotiation.test.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Ajanlar arası müzakere: İKİ farklı sağlayıcı tur tur (öneri, eleştiri, gözden geçirme, son tutum) konuşur; önceki çıktı sonrakine GÜVENİLMEZ VERİ olarak verilir; sonuç uzlaşma/kısmi/anlaşmazlık, 1 turda uzlaşma ASLA üretilmez (tek tur doğrulanamaz), güven rozeti, öneri kaynağı etiketli; yalnız kullanıcı isteğiyle; salt-okunur sandbox; iki sağlayıcı yoksa dürüstçe 'kullanılamıyor'. Sınır: canlı iki model denenmedi (sahte sağlayıcılar); çalışma ağacı birikimi (80 eşiği, Yusuf temizler).",
+   "dilim": "D8",
+   "cagri": "—"
+  },
+  {
+   "n": 76,
+   "en": "Data Boundary Router",
+   "tr": "Veri Sınırı Yönlendirici",
+   "sahip": "M15",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/policy/data-boundary.ts",
+    "src/core/policy/engine.ts",
+    "src/automation/automation.test.ts",
+    "src/orchestrator/steps.ts",
+    "src/core/audit/redact.ts",
+    "src/providers/child-env.ts"
+   ],
+   "eksik": "Veri sınıfı (public/internal/sensitive/secret) ve motorda ret kuralı: secret yalnız yerel rotada, sensitive ücretli rotaya gitmez, onay gevşetemez; sağlayıcı çağrısında yol sınıflandırılır. Sınır: sınıflandırma SEZGİSEL (yol/dosya adı/sır kalıbı), dosya İÇERİĞİ taranmaz; duyarlı klasörler yapılandırmayla (sensitiveDirs) verilir, varsayılan boş.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 77,
+   "en": "Temporary Capability Grants",
+   "tr": "Geçici Yetenek İzinleri",
+   "sahip": "M15",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/policy/grants.ts",
+    "src/core/policy/grants.test.ts",
+    "src/server/d5b-api.test.ts",
+    "src/core/db/migrations/014_d5b.sql",
+    "src/server/ui/page-security.js"
+   ],
+   "eksik": "Kullanıcı kapsamlı (eylem+klasör), süreli (en çok 24 sa), sayılı (1-100) geçici izin verir; yalnız 'onay gerekir' kararını önceden onaylar, hiçbir ret kuralını gevşetmez; ajan veremez/iptal edemez; denetlenir. Güvenlik sayfasından verilir (onay penceresi), listelenir ve iptal edilir. Sınır: izin yalnız görev oluşturma kapısında uygulanır (diğer yollarda zaten kullanıcı onayı gerekir); otomasyon izin tüketemez (bilinçli).",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 78,
+   "en": "Semantic Change Ledger",
+   "tr": "Anlamsal Değişiklik Defteri",
+   "sahip": "M12",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/audit/change-ledger.ts",
+    "src/automation/automation.test.ts",
+    "src/server/d5b-api.test.ts",
+    "src/core/db/migrations/014_d5b.sql",
+    "src/server/ui/page-security.js"
+   ],
+   "eksik": "Yalnız eklenen defter: ne değişti, neden, kim, bağlı görev. Görev onay/ret, sözleşme, geçici izin ve otomasyon kural değişiklikleri otomatik düşer; elle not eklenebilir. Güvenlik sayfasından elle not eklenir ve listelenir. Sınır: dosya düzeyinde fark otomatik yakalanmaz.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 79,
+   "en": "Portable Project Capsules",
+   "tr": "Taşınabilir Proje Kapsülleri",
+   "sahip": "M2",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/ops/backup.ts"
+   ],
+   "eksik": "Yedek paketi taşınabilir (anahtarsız, doğrulamalı). Yeniden kurulabilir proje kapsülü (bağımlılık+yapılandırma+hafıza) yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  },
+  {
+   "n": 80,
+   "en": "Provider Exit and Replaceability Planner",
+   "tr": "Sağlayıcı Çıkış ve Değiştirilebilirlik Planlayıcı",
+   "sahip": "M4",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/analysis/exit-plan.ts",
+    "src/analysis/exit-plan.test.ts",
+    "src/server/d8b-api.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Sağlayıcı çıkarsa yerine geçecek adaylar: kapsama x rota uyumu x sağlık puanı, politika/devre dışı elemesi, ücretli rota asla önerilmez (kapalı listede), yedek yoksa dürüstçe 'yedek yok'.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 81,
+   "en": "Solution Space Explorer",
+   "tr": "Çözüm Uzayı Gezgini",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/solution-space.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Çözüm uzayı gezgini: problem + kısıtlardan çözüm aileleri, dengeler, öneri; yalnız kullanıcı isteğiyle, abonelik rotası, salt-okunur sandbox, veri sınırı, denetim, şema doğrulamalı çıktı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 82,
+   "en": "Cross-Disciplinary Idea Transfer",
+   "tr": "Disiplinler Arası Fikir Aktarımı",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/idea-transfer.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Disiplinler arası fikir aktarımı: problem + en çok 3 kaynak disiplinden eşlemeler ve riskler; aynı güvenlik hattı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 83,
+   "en": "Absence and Redundancy Detector",
+   "tr": "Eksiklik ve Fazlalık Dedektörü",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/absence.ts",
+    "src/analysis/absence.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Kodda/istemcide görünmeyen tablo, uç ve yetenek beyanları ile eksikler (bilgi dili: 'görünmüyor', silme önerisi değildir). Sınır: metin eşleştirmesi, dizgi birleştirmeyle kurulan yollar kaçabilir.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 84,
+   "en": "Inversion-Based Design Engine",
+   "tr": "Tersine Çevirme Tasarım Motoru",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/inversion.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Tersine çevirme: hedef için başarısızlık kipleri, nedenleri, önlemler ve ön ölüm analizi; aynı güvenlik hattı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 85,
+   "en": "Emergent Behavior Explorer",
+   "tr": "Ortaya Çıkan Davranış Gezgini",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/emergence.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Ortaya çıkan davranış gezgini: sistem açıklamasından davranışlar, tetikleyiciler, olasılık, önlem; aynı güvenlik hattı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 86,
+   "en": "Expertise Mapper",
+   "tr": "Uzmanlık Haritalayıcı",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/expertise.ts",
+    "src/analysis/expertise.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Sağlayıcı x rol deneme/başarı/süre, gerçek denetim kayıtlarından; <5 örnekte 'yetersiz veri'. Sınır: tek koşu kayıtlarında rol yok; teslim sonuçları sağlayıcıya bağlanamıyor.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 87,
+   "en": "Implicit Knowledge Extractor",
+   "tr": "Örtük Bilgi Çıkarıcı",
+   "sahip": "M7",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/memory/implicit.ts",
+    "src/memory/implicit.test.ts",
+    "src/server/ui/page-memory.js"
+   ],
+   "eksik": "Kural tabanlı (modelsiz) aday öneriler: tekrar eden onay/ret, ardışık sağlayıcı hatası, süresi dolmuş karar, tekrar eden çelişki; hiçbiri kendiliğinden kaydedilmez, kullanıcı onayıyla hafızaya eklenir, adaylar güvenilmez kaynak işaretli. Sınır: yalnız denetim/karar örüntüleri; doğal dil sohbetten örtük bilgi çıkarımı yok.",
+   "dilim": "D7",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 88,
+   "en": "Task Handoff Contract Generator",
+   "tr": "Görev Devri Sözleşmesi Üreticisi",
+   "sahip": "M3",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/workflows/handoff.ts",
+    "src/workflows/engine.ts"
+   ],
+   "eksik": "Devir notu üretimi nonce-çevreli (düşmanca özet çerçeveyi kıramaz) ve testli.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 89,
+   "en": "Decision Genealogy",
+   "tr": "Karar Soy Ağacı",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/reasoning/genealogy.ts",
+    "src/reasoning/genealogy.test.ts",
+    "src/server/ui/page-research.js",
+    "src/server/d7-api.test.ts"
+   ],
+   "eksik": "Karar soy ağacı: yerine-geçme zinciri, güncel karar, süre/varsayım/inceleme durumu, orman görünümü ve tek zincir; döngü/derinlik korumalı; Araştırma ve Kalibrasyon sayfasında. Sınır: indeks yok (küçük veride sorun değil).",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 90,
+   "en": "Long-Term Project Memory Compiler",
+   "tr": "Uzun Vadeli Proje Hafızası Derleyicisi",
+   "sahip": "M7",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/memory/compile.ts",
+    "src/memory/compile.test.ts",
+    "src/server/d7-api.test.ts",
+    "src/server/ui/page-memory.js"
+   ],
+   "eksik": "Proje hafızası derleyicisi: kayıtlar, geçerli/yaklaşan kararlar, çelişkiler, varsayım borcu, bayatlar; deterministik, sır taramalı, bütçeli, markdown/şablon etkisizleştirilmiş; dosyaya yazmaz (dışa aktarma ayrı, kullanıcı kararı). Sınır: en yeni 500 etkin kayıt.",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 91,
+   "en": "Adaptive Interface Complexity",
+   "tr": "Uyarlanabilir Arayüz Karmaşıklığı",
+   "sahip": "M1",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/server/ui/prefs.js",
+    "src/server/ui/pages.js",
+    "src/server/ui/complexity.test.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Ayarlar > Görünüm'de 'Basit | Gelişmiş' arayüz karmaşıklığı (varsayılan Gelişmiş, kalıcı): Basit kipte gelişmiş bölümler (sistem analitiği, eylem anlamları, yetenek kayıt defteri) tek satıra daralır, 'Göster' ile açılır; yönetim formları ve araştırma laboratuvarı gizlenmez; menü etkilenmez. Sınır: kullanıcı seçimlidir, kendiliğinden UYARLANMAZ (kullanım izleyip yoğunluğu otomatik değiştirmez).",
+   "dilim": "D8",
+   "cagri": "—"
+  },
+  {
+   "n": 92,
+   "en": "Intent-Based Control Layer",
+   "tr": "Niyet Tabanlı Kontrol Katmanı",
+   "sahip": "M1",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/capabilities/model/intent.ts",
+    "src/capabilities/model/capabilities.test.ts",
+    "src/capabilities/model-runner.ts",
+    "docs/testing/faz11-dilim8c.md"
+   ],
+   "eksik": "Niyet katmanı: serbest metinden Yetenekler kataloğundaki bir yeteneği ÖNERİR (katalog dışı 'none'); öneri ASLA kendiliğinden çalıştırılmaz, kullanıcı menüden açar; aynı güvenlik hattı. Sınır: gerçek model çağrısı henüz CANLI denenmedi (testler sahte sağlayıcıyla; canlı deneme Yusuf'un onayıyla abonelik yolundan yapılacak); model çıktısı daima GÜVENİLMEZ VERİ.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 93,
+   "en": "Attention Budget Manager",
+   "tr": "Dikkat Bütçesi Yöneticisi",
+   "sahip": "M1",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/attention.ts",
+    "src/core/attention.test.ts",
+    "src/server/indicators.ts",
+    "src/server/monitor.ts",
+    "src/server/indicators-api.test.ts",
+    "src/server/monitor.test.ts",
+    "docs/testing/faz11-dilim8d.md"
+   ],
+   "eksik": "Onay bekleyen görevleri risk+bekleme süresine göre katmanlar (salt sıralama) + D8d: composer çubuğunda bekleyen onay rozeti (tıklayınca dikkat sırası; onaylamaz) ve takılma şüphesi rozeti (≥5 dk iz yok 'takılmış görünüyor', ≥15 dk uzun; yalnız ŞÜPHE, otomatik öldürme/iptal YOK).",
+   "dilim": "-",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 94,
+   "en": "Action Semantics and Undo Map",
+   "tr": "Eylem Anlamları ve Geri Alma Haritası",
+   "sahip": "M12",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/policy/action-semantics.ts",
+    "src/core/policy/action-semantics.test.ts",
+    "src/server/ui/page-security.js"
+   ],
+   "eksik": "Her politika eylemi için etki/geri alınabilirlik/geri alma yolu kaydı (24 eylem, kapsam testi zorunlu; GET /api/actions/semantics; Güvenlik sayfasında süzgeçli liste). Sınır: harita tanımlayıcıdır, geri almayı kendisi yapmaz.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 95,
+   "en": "Action Provenance and Accountability Chain",
+   "tr": "Eylem Kaynağı ve Hesap Verebilirlik Zinciri",
+   "sahip": "M12",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/core/audit/audit.ts",
+    "src/core/audit/audit-chain.test.ts",
+    "src/core/db/migrations/013_audit_chain.sql",
+    "src/server/ui/page-audit.js"
+   ],
+   "eksik": "Denetim kaydı hash zincirli (GET /api/audit/verify; zincir sonrası özetsiz satır = kırık). Sınır: anahtar/dış sabitleme noktası yok; tüm zinciri yeniden yazan ya da son satırları silen biri fark edilmeyebilir; eski satırlar zincire girmez.",
+   "dilim": "D5",
+   "cagri": "—"
+  },
+  {
+   "n": 96,
+   "en": "Capability Maturity Ladder",
+   "tr": "Yetenek Olgunluk Merdiveni",
+   "sahip": "M6",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/providers/contract.ts",
+    "src/server/ui/page-integrations.js",
+    "docs/status/100-yetenek-durum.json",
+    "docs/integrations/claude-code.md"
+   ],
+   "eksik": "Sağlayıcı yetenekleri Verified/Partial/Unverified/Unsupported/Unavailable + kanıt metni + tarih kayıtlı ve Entegrasyonlar sayfasında görünür. Olgunluk MERDİVENİ (hedef/ilerleme planı) yok.",
+   "dilim": "D8",
+   "cagri": "—"
+  },
+  {
+   "n": 97,
+   "en": "Learning Return Calculator",
+   "tr": "Öğrenme Getirisi Hesaplayıcı",
+   "sahip": "M14",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/reasoning/learning.ts",
+    "src/reasoning/learning.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Kalibrasyon verisinden kaynak başına Brier, ilk/son yarı iyileşmesi ve getiri; <10 çözülmüş tahminde 'yetersiz veri'. Sınır: güven aralığı yok.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 98,
+   "en": "Autonomy Contracts",
+   "tr": "Özerklik Sözleşmeleri",
+   "sahip": "M15",
+   "durum": "Doğrulandı",
+   "kanit": [
+    "src/core/policy/types.ts",
+    "src/core/policy/engine.ts",
+    "src/core/policy/engine.test.ts"
+   ],
+   "eksik": "Özerklik sözleşmesi (izinli eylem/klasör/sağlayıcı, süre, bütçe, onay gerektirenler); yalnız kullanıcı katmanı genişletir.",
+   "dilim": "-",
+   "cagri": "—"
+  },
+  {
+   "n": 99,
+   "en": "Internal Capability Broker",
+   "tr": "İç Yetenek Aracısı",
+   "sahip": "M8",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/broker.ts",
+    "src/analysis/broker.test.ts",
+    "docs/testing/faz11-dilim8.md"
+   ],
+   "eksik": "Yetenek+rol talebi için uygun sağlayıcıların sıralı listesi (politika, durum, rota; ücretli rota daima elenir), nedenleriyle. Sınır: salt ÖNERİ; çalışma zamanı sağlayıcı yönlendirmesine bağlı değil.",
+   "dilim": "D8",
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
+  },
+  {
+   "n": 100,
+   "en": "AgentMom Evolution Map",
+   "tr": "AgentMom Evrim Haritası",
+   "sahip": "M6",
+   "durum": "Kısmi",
+   "kanit": [
+    "docs/status/durum.md",
+    "docs/architecture/yetenek-sahiplik-matrisi.md",
+    "docs/status/100-yetenek-durum.json",
+    "src/server/ui/page-integrations.js"
+   ],
+   "eksik": "100 yetenek durumu, dilim planı ve kanıtlar uygulama içinde (Entegrasyonlar ve Yetenekler) görünür. Etkileşimli ilişki/evrim grafiği yok.",
+   "dilim": "D9",
+   "cagri": "—"
+  }
+ ],
+ "slices": {
+  "D3": "TAMAMLANDI (87d95bb + D3b): tek ekran + §14 navigasyonun 13 sayfası + sağlayıcı detay/yetenek kayıt defteri + Test/Devre dışı + 100 yetenek sayfası + sır-referans listesi + yetki modeli (madde 1, 3, 20, 23, 31, 46, 96, 100)",
+  "D4": "TAMAMLANDI (6929c36): eski dosya temizliği (Geri Dönüşüm Kutusu) + kullanım-tabanlı DENETİMLİ yedek (madde 30; 7 ve 28 ilişkili)",
+  "D5": "Yürütme güvenliği ve izleme. D5a TAMAM (8, 94; 11, 95 kısmi). D5b TAMAM (kısmi): 13 olay otomasyonu, 76 veri sınırı, 77 geçici izinler, 78 değişiklik defteri (oluşturma arayüzleri eklendi; 77 Doğrulandı, diğerleri sınırlarıyla Kısmi)",
+  "D6": "Doğrulama laboratuvarı TAMAM (D6a-D6d): 18, 52 Doğrulandı; 24, 27, 49-51, 53, 56-60 sınırlarıyla Kısmi",
+  "D7": "Hafıza ve karar altyapısı TAMAM (21, 44, 87, 89, 90); 37, 38, 40 (internetli model yetenekleri) D8c ile eklendi (Kısmi)",
+  "D8": "Akıl yürütme ve strateji TAMAM (D8a, D8b, D8c-1/2/3, D8d): 37, 38, 40, 61-66, 70-75, 80-86, 91-93, 97, 99; zamanlanmış görev (13); D8d: bağlam/limit göstergesi, kota farkındalıklı ÖNERİ, takılma rozeti",
+  "D9": "Proje ve sürüm yönetimi: D9a TAMAM (33 teknik borç, 29 sürüm etkisi, 25 veri analizi); kalan: portföy, görsel iş akışı, dağıtım/sürüm, kapsüller, uzaktan devir, çok dillilik (15, 16, 19, 22, 26, 79)",
+  "D10": "Ekosistem: bağımlılık/yetenek grafiği, entegrasyon yaşam döngüsü, araç pazarı, kıyaslama, beceri keşfi/üretimi, TestSprite (10, 12, 32, 35, 36, 47, 48, 54)"
+ },
+ "registry": [
+  {
+   "id": "claude-code",
+   "ad": "Claude Code CLI",
+   "rota": "abonelik",
+   "ops": [
+    {
+     "op": "describeCapabilities",
+     "durum": "verified",
+     "kanit": "yerel, saf işlev"
+    },
+    {
+     "op": "validateConfiguration",
+     "durum": "verified",
+     "kanit": "yerel dosya denetimi"
+    },
+    {
+     "op": "getStatus",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "dispose",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "testConnection",
+     "durum": "unverified",
+     "kanit": "çalıştırılmadı (kayıtta)"
+    },
+    {
+     "op": "execute",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21 (claude-code 2.1.306, abonelik)"
+    },
+    {
+     "op": "streamEvents",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "collectEvidence",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "getUsage",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "cancel",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21 (başlayan çalıştırmanın iptali)"
+    }
+   ]
+  },
+  {
+   "id": "codex",
+   "ad": "Codex CLI",
+   "rota": "abonelik",
+   "ops": [
+    {
+     "op": "describeCapabilities",
+     "durum": "verified",
+     "kanit": "yerel, saf işlev"
+    },
+    {
+     "op": "validateConfiguration",
+     "durum": "verified",
+     "kanit": "yerel dosya denetimi"
+    },
+    {
+     "op": "getStatus",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "dispose",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "testConnection",
+     "durum": "unverified",
+     "kanit": "çalıştırılmadı (kayıtta)"
+    },
+    {
+     "op": "execute",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21 (codex-cli 0.163.0, salt okunur)"
+    },
+    {
+     "op": "streamEvents",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "collectEvidence",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "getUsage",
+     "durum": "partial",
+     "kanit": "gerçek çalıştırma 2026-10-21"
+    },
+    {
+     "op": "cancel",
+     "durum": "unverified",
+     "kanit": "yalnız sahte süreçle test (fixture)"
+    }
+   ]
+  },
+  {
+   "id": "gemini",
+   "ad": "Gemini CLI",
+   "rota": "abonelik",
+   "ops": [
+    {
+     "op": "describeCapabilities",
+     "durum": "verified",
+     "kanit": "yerel, saf işlev"
+    },
+    {
+     "op": "validateConfiguration",
+     "durum": "verified",
+     "kanit": "yerel dosya denetimi"
+    },
+    {
+     "op": "getStatus",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "dispose",
+     "durum": "verified",
+     "kanit": "yerel durum"
+    },
+    {
+     "op": "testConnection",
+     "durum": "unverified",
+     "kanit": "çalıştırılmadı (kayıtta)"
+    },
+    {
+     "op": "execute",
+     "durum": "unavailable",
+     "kanit": "reddedildi: kapsama doğrulanmadı; gerçek deneme 2026-10-21 hesap uygunsuz"
+    },
+    {
+     "op": "streamEvents",
+     "durum": "unavailable",
+     "kanit": "aynı"
+    },
+    {
+     "op": "collectEvidence",
+     "durum": "unavailable",
+     "kanit": "aynı"
+    },
+    {
+     "op": "getUsage",
+     "durum": "unavailable",
+     "kanit": "aynı"
+    },
+    {
+     "op": "cancel",
+     "durum": "unavailable",
+     "kanit": "aynı"
+    }
+   ]
+  }
+ ],
+ "updatedAt": "2026-10-22"
+}

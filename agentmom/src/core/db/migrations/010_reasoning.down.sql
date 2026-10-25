@@ -1,0 +1,20 @@
+-- Down for 010 drops the reasoning ledgers (rollback only).
+DROP TRIGGER IF EXISTS predictions_birth;
+DROP TRIGGER IF EXISTS predictions_no_delete;
+DROP TRIGGER IF EXISTS predictions_resolve_once;
+DROP TRIGGER IF EXISTS predictions_content_immutable;
+DROP TRIGGER IF EXISTS assumption_events_no_delete;
+DROP TRIGGER IF EXISTS assumption_events_real_from;
+DROP TRIGGER IF EXISTS assumptions_status_needs_event;
+DROP TRIGGER IF EXISTS assumption_events_append_only;
+DROP TRIGGER IF EXISTS assumptions_birth;
+DROP TRIGGER IF EXISTS assumptions_no_delete;
+DROP TRIGGER IF EXISTS assumptions_content_immutable;
+DROP TRIGGER IF EXISTS decisions_birth;
+DROP TRIGGER IF EXISTS decisions_no_delete;
+DROP TRIGGER IF EXISTS decisions_status_forward;
+DROP TRIGGER IF EXISTS decisions_content_immutable;
+DROP TABLE IF EXISTS predictions;
+DROP TABLE IF EXISTS assumption_events;
+DROP TABLE IF EXISTS decision_assumptions;
+DROP TABLE IF EXISTS decisions;

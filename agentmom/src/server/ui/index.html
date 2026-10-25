@@ -1,0 +1,96 @@
+<!doctype html>
+<!-- AgentMom masaüstü arayüzü iskeleti (Faz 11, dilim 2). Sahip: Claude [İP:AgentMom Faz 11]. Sözleşme: docs/tasarim/masaustu-arayuz-sozlesmesi-faz11.md. Modüller kendi bağlantı noktalarını doldurur; satır içi betik/stil yok. Değişiklik: yalnız sahibi ya da Yusuf'un izniyle. -->
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>AgentMom</title>
+<link rel="icon" type="image/png" href="/ui/icon.png">
+<link rel="stylesheet" href="/ui/tokens.css">
+<link rel="stylesheet" href="/ui/layout.css">
+<link rel="stylesheet" href="/ui/sidebar.css">
+<link rel="stylesheet" href="/ui/menu.css">
+<link rel="stylesheet" href="/ui/chat.css">
+<link rel="stylesheet" href="/ui/panel.css">
+<link rel="stylesheet" href="/ui/settings.css">
+<link rel="stylesheet" href="/ui/shell.css">
+<link rel="stylesheet" href="/ui/pages.css">
+<link rel="stylesheet" href="/ui/page-providers.css">
+<link rel="stylesheet" href="/ui/page-more.css">
+</head>
+<body>
+<noscript><p class="am-empty">Bu uygulama çalışmak için JavaScript gerektirir.</p></noscript>
+
+<p id="bootNote" class="am-empty">Arayüz yükleniyor. Bu yazı kalırsa betikler yüklenemedi: sayfayı yenileyin ya da sunucuyu yeniden başlatın.</p>
+
+<main id="loginView" class="am-login" hidden>
+  <section class="am-card" aria-labelledby="loginTitle">
+    <h1 id="loginTitle" data-i18n="login.title"></h1>
+    <p data-i18n="login.help"></p>
+    <form id="loginForm" autocomplete="off">
+      <label for="tokenInput" data-i18n="login.label"></label>
+      <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" required>
+      <button id="loginSubmit" class="am-btn am-btn--primary" type="submit" data-i18n="login.submit"></button>
+    </form>
+    <p id="loginMsg" class="am-note" role="status"></p>
+  </section>
+</main>
+
+<div id="app" class="am-app" data-drawer="" data-panel="closed" data-sidebar="open" data-panel-wide="0" hidden>
+  <aside id="sidebar" class="am-sidebar" aria-label="Oturumlar">
+    <div id="userMenuRoot"></div>
+  </aside>
+
+  <main id="main" class="am-main">
+    <header id="topbar" class="am-topbar"></header>
+
+    <div id="errorCard" class="am-card am-error" role="alert" hidden>
+      <h2 id="errorTitle"></h2>
+      <p id="errorMsg"></p>
+      <button id="errorRetry" class="am-btn am-btn--primary" type="button" data-i18n="error.retry"></button>
+    </div>
+
+    <section id="chatView" class="am-chat" aria-label="Sohbet"></section>
+    <section id="pageView" class="am-pageview" aria-label="Sayfa" hidden></section>
+  </main>
+
+  <aside id="panel" class="am-panel" aria-label="Genel bakış"></aside>
+
+  <div id="scrim" class="am-scrim"></div>
+</div>
+
+<div id="overlayRoot" class="am-overlay-root"></div>
+
+<script src="/ui/strings.js" defer></script>
+<script src="/ui/prefs.js" defer></script>
+<script src="/ui/icons.js" defer></script>
+<script src="/ui/safe.js" defer></script>
+<script src="/ui/chat.js" defer></script>
+<script src="/ui/sidebar.js" defer></script>
+<script src="/ui/usermenu.js" defer></script>
+<script src="/ui/panel.js" defer></script>
+<script src="/ui/settings.js" defer></script>
+<script src="/ui/help.js" defer></script>
+<script src="/ui/usage.js" defer></script>
+<script src="/ui/pages.js" defer></script>
+<script src="/ui/page-overview.js" defer></script>
+<script src="/ui/page-projects.js" defer></script>
+<script src="/ui/page-tasks.js" defer></script>
+<script src="/ui/page-security.js" defer></script>
+<script src="/ui/page-audit.js" defer></script>
+<script src="/ui/page-providers.js" defer></script>
+<script src="/ui/page-models.js" defer></script>
+<script src="/ui/page-usage.js" defer></script>
+<script src="/ui/page-integrations.js" defer></script>
+<script src="/ui/page-skills.js" defer></script>
+<script src="/ui/page-research.js" defer></script>
+<script src="/ui/page-memory.js" defer></script>
+<script src="/ui/page-verify.js" defer></script>
+<script src="/ui/capabilities.js" defer></script>
+<script src="/ui/shell.js" defer></script>
+<script src="/ui/palette.js" defer></script>
+<script src="/ui/ring.js" defer></script>
+<script src="/ui/core.js" defer></script>
+</body>
+</html>
