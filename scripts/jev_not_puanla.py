@@ -252,6 +252,8 @@ def calistir(argv=None, tasima=None, bugun=None, cikis=None):
     p.add_argument("--en-fazla", type=int, default=40)
     p.add_argument("--onbellek")
     p.add_argument("--kuru", action="store_true")
+    p.add_argument("--etiketle", action="store_true",
+                   help="Rapordan sonra sonuçları notlara etiket olarak işle ve BILGI-DIZINI.md üret")
     a = p.parse_args(argv)
     bugun = bugun or datetime.date.today().isoformat()
     onbellek_yolu = Path(a.onbellek) if a.onbellek else Path(a.cikti) / ".onbellek.json"
@@ -329,6 +331,11 @@ def calistir(argv=None, tasima=None, bugun=None, cikis=None):
     onbellek_yaz(onbellek_yolu, onbellek)
     yol = rapor_yaz(a.cikti, bugun, sayac, satirlar, gizliler, degradedler, erken, kalan)
     yaz("Rapor yazıldı: %s" % yol)
+    if a.etiketle:
+        import jev_not_etiketle  # gecikmeli: betik klasörü sys.path'te
+        e = jev_not_etiketle.etiketle(a.kasa, a.cikti, onbellek_yolu, Path(a.cikti) / jev_not_etiketle.DIZIN_ADI,
+                                      bugun, yaz=yaz)
+        yaz("Etiket: değişen %d, aynı %d, gizli %d, okunamayan %d." % (e["degisen"], e["ayni"], e["gizli"], e["hata"]))
     yaz("Puanlanan %d, atlanan %d, gizli %d, degraded %d%s."
         % (sayac["puanlanan"], sayac["degismemis"], sayac["gizli"], sayac["degraded"],
            " (Jev'e ulaşılamadığı için erken durdu)" if erken else ""))

@@ -2,7 +2,7 @@
 #
 # Ne yapar: "Jev not puanlama" adlı tek bir görevi, yalnız geçerli kullanıcı için, her gün 08:41'de
 # çalışacak şekilde kaydeder. Görev scripts\jev_not_puanla.py'yi çalıştırır; o betik hafıza notlarını
-# SALT OKUNUR tarar, Jev'e puanlatır ve rapor klasörüne bir rapor yazar. Not taşımaz/değiştirmez.
+# SALT OKUNUR tarar, Jev'e puanlatır ve rapor klasörüne bir rapor yazar, sonra sonucu notlara etiket olarak işler (yalnız frontmatter tags eklenir, yedekli) ve BILGI-DIZINI.md üretir. Not taşımaz, silmez.
 # Aynı ada tekrar çalıştırmak görevi günceller (idempotent). Yönetici hakkı gerekmez; SYSTEM kullanılmaz;
 # ACL, ortam değişkeni ve başka görevlere dokunmaz.
 #
@@ -36,7 +36,7 @@ if (-not (Test-Path -LiteralPath $betik)) {
 
 $kasa  = 'D:\YusufII\HAFIZAM1\kasa\notlar'
 $cikti = 'D:\YusufII\HAFIZAM1\kasa\notlar\jev-puan-raporlari'
-$argumanlar = "`"$betik`" --kasa `"$kasa`" --cikti `"$cikti`""
+$argumanlar = "`"$betik`" --kasa `"$kasa`" --cikti `"$cikti`" --etiketle"
 
 $eylem = New-ScheduledTaskAction -Execute 'python' -Argument $argumanlar -WorkingDirectory $RepoKoku
 $tetik = New-ScheduledTaskTrigger -Daily -At '08:41'

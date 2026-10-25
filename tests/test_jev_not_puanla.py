@@ -55,6 +55,17 @@ class Temel(unittest.TestCase):
 
 
 class Testler(Temel):
+    def test_etiketle_bayragi_etiket_ve_dizin_yazar_ve_tekrar_puanlatmaz(self):
+        self.not_yaz("barkod.md")
+        t = sahte("arsiv")
+        kod, _ = self.calistir("--etiketle", tasima=t)
+        self.assertEqual(kod, 0)
+        self.assertIn("jev/arsiv", (self.kasa / "barkod.md").read_text(encoding="utf-8"))
+        self.assertTrue((self.cikti / "BILGI-DIZINI.md").exists())
+        t2 = sahte("arsiv")
+        self.calistir("--etiketle", tasima=t2, bugun="2026-10-26")
+        self.assertEqual(t2.govdeler, [])  # etiket eklemek notu "değişmiş" saydırmadı
+
     def test_atlanan_klasorler(self):
         self.not_yaz("a.md")
         for k in ("Benim Notlarım", "anahtarlar", "Yusuf'un Notları", ".obsidian", ".git", ".claude",
