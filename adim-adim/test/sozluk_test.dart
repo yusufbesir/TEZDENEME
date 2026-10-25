@@ -63,6 +63,9 @@ void main() {
     final toplam = [
       'en',
       'de',
+      'fr',
+      'ru',
+      'ar',
       'ko',
       'ja',
       'zh',

@@ -72,6 +72,12 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'İng.$no';
       case 'almanca':
         return 'Alm.$no';
+      case 'fransizca':
+        return 'Fra.$no';
+      case 'rusca':
+        return 'Rus.$no';
+      case 'arapca':
+        return 'Ara.$no';
       case 'korece':
         return 'Kor.$no';
       case 'japonca':
@@ -88,6 +94,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'SQL$no';
       case 'php':
         return 'PHP$no';
+      case 'go':
+        return 'Go$no';
       default:
         return kursId;
     }
