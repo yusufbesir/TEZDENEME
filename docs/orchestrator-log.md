@@ -296,3 +296,4 @@
 2026-10-25 | TAARKOD 1.5.0 bütünleşik pencere, tasarım dili, logo, ASI hata düzeltmesi + duman testi | sonnet (implementer+verifier) | token: kayıt dışı | 237+66 test geçti, Windows paketi teslim, SHA256 doğrulandı
 2026-10-26 | TAARKOD 1.6.0 tasarım dili 1.6 uygulaması, yeni logo, bayat derleme dosyası düzeltmesi | sonnet | token: kayıt dışı | 239+66 test geçti, Windows paketi teslim
 2026-10-26 | TAARKOD 1.6.1 menü: Yardım en sağda, Barkod türleri/Kurallar/Önizleme 'Daha fazla' çekmecesinde | sonnet | token: kayıt dışı | 240+66 test geçti, Windows paketi teslim
+2026-10-26 | TAARKOD 1.6.2 Stitch Şifrele ekranı uyarlaması (serif başlık, sekme ikonları, etiket pah+3px dikiş) | sonnet | token: kayıt dışı | 240+66 test, Windows paketi teslim
