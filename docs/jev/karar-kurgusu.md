@@ -4,6 +4,8 @@
 
 Etiket: [İP:Jev'i projeye bağlama#TMGrRs]
 
+> **Kapsam notu (2026-10-25):** Yusuf, Jev'in şimdilik yalnızca hafızadaki notları puanlamasını istedi. Bu belgedeki karar protokolü kapalıdır; yeniden açma kararı Yusuf'a aittir.
+
 ## Neden bu kurgu
 - **Jev hatasız değil.** Jev bozuk biçimli cevap vermez ama emin göründüğü halde yanlış seçebilir. Bağımsız kalibrasyon ölçümü henüz yayımlanmadı ([eesel.ai](https://www.eesel.ai/blog/typesafe-jev)). Bu yüzden yüksek güvenli ve uyumlu cevaplarda otomatik ilerlenir, kalanlar başka göze gider.
 - **Kör seçim.** Claude, Jev'in cevabını görmeden kendi seçimini kaydeder. Böylece Jev'e uyup uymadığı ölçülebilir ve iki görüş birbirinden etkilenmez.
