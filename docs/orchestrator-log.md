@@ -71,3 +71,4 @@
 | 2026-10-25 | Gündem brifi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-haiku-5-5 | 132.817 toplam | Kısmen: 11 madde, tümü tek X derlemesi (doğrulanmadı), piyasa ve spor verisi yok; TCMB maddesi tekrar olduğu için çıkarıldı |
 | 2026-10-25 | Denetmen takibi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~20.000 | Geçti: yeni dosya/mesaj yok, hatırlatma gönderilmedi |
 | 2026-10-26 | Haftalık Claude rehber taraması [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-sonnet-5-5 | ~150.000 (tahmini) | Geçti: 5 öneri Yusuf onayını bekliyor, hiçbir ayar değiştirilmedi |
+| 2026-10-26 | Denetmen takibi + LibreOffice/FFmpeg Pazartesi kontrolü [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 + Haiku alt ajan | ~40 bin | Geçti: yeni CVE yok (sınırlı kanıt), hatırlatma gönderilmedi |
