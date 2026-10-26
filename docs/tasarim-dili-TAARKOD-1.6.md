@@ -3,11 +3,18 @@ description: TAARKOD tasarım dili 1.6 önerisi (1.5.0'ın araçlarla güçlendi
 sahip: Yusuf
 yazan: [Claude#TAARKOD-tasarim]
 tags: [tasarim, taarkod, konu/tasarim-dili]
-surum: 1.6-oneri
+surum: 1.6-uygulandi
 tarih: 2026-10-26
 degistirme: 1.5.0 belgesi (tasarim-dili-TAARKOD.md) korunur; bu belge onaylanınca yerine geçer, eskisi silinmez.
 ---
-# TAARKOD tasarım dili 1.6 (öneri)
+# TAARKOD tasarım dili 1.6
+
+## Güncel durum (2026-10-26)
+- 1.6.x uygulandı: 1.6.0 (başlık şeridi, iplik ilerleme göstergesi, yeni logo), 1.6.1 (Yardım en sağda, "Daha fazla" çekmecesi), 1.6.2 (Stitch Şifrele uyarlaması: serif başlık, sekme ikonları, etiket pahı ve çift dikiş).
+- Yazı tipi kararı TERSİNE DÖNDÜ: aşağıdaki "Newsreader / Space Mono gömülmez" reddi geçersiz. Yusuf "İçine göm" dedi; 1.7.0'da Newsreader ve Space Mono WOFF2 olarak uygulamaya gömülür (CSP'de yalnız font-src data: eklenir, OFL lisansları dahil).
+- Gerçek Windows penceresinde titleBarOverlay kontrolü hâlâ bekliyor.
+
+> Aşağıdaki metin önerinin ilk hâlidir; eski içerik korunur.
 
 ## Özet
 - 1.5.0'ın ilkeleri korunur (tek vurgu, düz, kartsız, çevrimdışı, hareketsiz, AA kontrast).
@@ -50,7 +57,7 @@ html[data-pasif] .ust .dikis{opacity:.4}
 ## 4. Stitch fikirlerinden reddedilenler
 | Fikir | Neden |
 |---|---|
-| Newsreader / Space Grotesk / Space Mono | Çevrimdışı, CSP `default-src 'none'`, yazı tipi gömülmez (ilke 4). Sistem yığını kalır. |
+| Newsreader / Space Grotesk / Space Mono | Çevrimdışı, CSP `default-src 'none'`, yazı tipi gömülmez (ilke 4). Sistem yığını kalır. | (~~geçersiz, 1.7.0'da gömülüyor~~)
 | 0 px yarıçap | 1.5.0'da 4 px karar verildi; değiştirmek yerleşimi/algıyı bozar. |
 | BÜYÜK HARF mono etiketler ("TAARKOD / ATELIER") | İlke 3: büyük harf etiket yok. |
 | Elmas (45°) radyo düğmesi | Tanınırlık/erişilebilirlik; standart radyo kalır. |

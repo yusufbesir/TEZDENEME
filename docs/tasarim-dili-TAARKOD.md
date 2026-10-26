@@ -1,4 +1,7 @@
 ---
+description: TAARKOD tasarım dili 1.5.0 (bütünleşik başlık şeridi, belirteçler, bileşenler, Electron pencere tarifi, logo). 1.6 belgesi bunun üzerine kurulur.
+sahip: Yusuf
+yazan: [Claude#TAARKOD-tasarim]
 tags: [tasarim, taarkod, konu/tasarim-dili]
 surum: 1.5.0
 tarih: 2026-10-25
