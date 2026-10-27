@@ -1,6 +1,6 @@
 // Sağlayıcı kotası ve gösterge seviyeleri (Faz 11 durum göstergeleri + kota farkında öneri). Sahip: Claude [İP:AgentMom Faz 11]; yalnız yazan yapay zeka değiştirir, diğerleri öneri sunar.
 // İLKE: sağlayıcının BİLDİRMEDİĞİ değer asla uydurulmaz. Kota yalnız sağlayıcı olayının (provider.event:usage) kendi "data.limits" alanından, doğrulanarak okunur;
-// bugünkü hiçbir adaptör bu alanı üretmez (claude-code rate_limit_event'i bilerek yok sayar), bu yüzden bugün sonuç "bilinmiyor"dur. Tahmin, varsayılan limit, ücret yok.
+// yalnız claude-code adaptörü bu alanı üretir (gerçek rate_limit_event'in en çok kullanılan penceresi); diğer sağlayıcılar ve olaysız durumlar "bilinmiyor"dur. Tahmin, varsayılan limit, ücret yok.
 // Bayat bildirim (6 saatten eski), gelecekteki damga, sıfırlanma zamanı geçmiş bildirim ve kendi içinde tutarsız bildirim "bilinmiyor" sayılır.
 // Salt okunur: tek SELECT; hiçbir şey yazılmaz; model ve ağ yok.
 import type { Db } from "../core/db/db.ts";

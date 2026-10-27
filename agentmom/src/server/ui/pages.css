@@ -163,3 +163,12 @@
 .am-pg-chipbtn { font: inherit; font-size: var(--am-fs-s); cursor: pointer; }
 .am-pg-chipbtn:hover { background: var(--am-surface-2); }
 .am-pg-statecell { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--am-gap-2); }
+
+/* D9c iş akışı editörü (madde 16): adım kartları ve akış önizlemesi; durum renge değil metne/şekle bağlıdır. */
+.am-pg-wfe-step { padding: var(--am-gap-3); border: 1px solid var(--am-line); border-radius: var(--am-radius-row); margin: var(--am-gap-2) 0; display: flex; flex-wrap: wrap; gap: var(--am-gap-3); align-items: flex-start; min-width: 0; }
+.am-pg-wfe-flow { list-style: none; padding: 0; margin: var(--am-gap-3) 0; display: flex; flex-wrap: wrap; gap: var(--am-gap-3); }
+.am-pg-wfe-node { padding: var(--am-gap-2) var(--am-gap-3); border: 1px solid var(--am-line); border-radius: var(--am-radius-row); min-width: 0; overflow-wrap: anywhere; }
+.am-pg-wfe-node + .am-pg-wfe-node::before { content: "→ "; color: var(--am-muted); }
+.am-pg-wfe-on { border-style: solid; }
+.am-pg-wfe-off { border-style: dashed; color: var(--am-muted); }
+.am-pg-h3 { font-size: var(--am-fs-m, 1rem); margin: var(--am-gap-3) 0 var(--am-gap-1); }

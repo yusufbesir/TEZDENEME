@@ -1127,7 +1127,7 @@
   }
 
   // ------------------------------------------------------------------ çatı
-  function localSig() { return { s: U.sort, l: U.limit, q: U.auditQ, a: U.auditLimit }; }
+  function localSig() { return { s: U.sort, l: U.limit, q: U.auditQ, a: U.auditLimit, g: (typeof window !== "undefined" && typeof window.AM_LANG === "function" ? window.AM_LANG() : "tr") }; }
 
   function renderPage(AM, force) {
     if (!U.content) return;

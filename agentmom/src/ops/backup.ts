@@ -22,7 +22,7 @@ export class BackupError extends Error {
 }
 
 export const MANIFEST = "manifest.json";
-const FORBIDDEN = /(^|[\\/])(anahtarlar|ar[sş]iv)([\\/]|$)/i;
+export const FORBIDDEN = /(^|[\\/])(anahtarlar|ar[sş]iv)([\\/]|$)/i;
 // Names that look like secret material are never copied, whatever their content.
 const SECRET_NAME = /(token|secret|credential|password|passwd|\.pem$|\.key$|\.pfx$|\.env|id_rsa|\.sandbox)/i;
 const FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$/;

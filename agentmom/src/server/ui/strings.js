@@ -153,9 +153,47 @@
     });
   };
 
+  // Faz 11 D9e (madde 26): diller. Türkçe asıl ve tamdır; diğer diller (şimdilik en) YALNIZ çevrilmiş anahtarları tutar, eksik anahtar Türkçe metne düşer (boş ya da ⟦anahtar⟧ görünmez).
+  // Çeviri, Türkçe anahtarla aynı {yer tutucu} kümesini taşımak zorundadır; uyumsuzluk AM_LANG_REPORT ile görünür (testler denetler). Dil seçimi kendiliğinden değişmez: kullanıcı seçer.
+  var LANGS = Object.create(null);
+  var current = "tr";
+  var LANG_NAMES = Object.freeze({ tr: "Türkçe", en: "English" });
+  window.AM_REGISTER_LANG = function (code, texts) {
+    var c = String(code);
+    if (!/^[a-z]{2}$/.test(c) || c === "tr" || !Object.prototype.hasOwnProperty.call(LANG_NAMES, c)) throw new Error("AM_REGISTER_LANG: desteklenmeyen dil " + c);
+    var dict = LANGS[c] || (LANGS[c] = Object.create(null));
+    Object.keys(texts || {}).forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(dict, key)) throw new Error("AM_REGISTER_LANG: anahtar çakışması " + c + ":" + key);
+      dict[key] = String(texts[key]);
+    });
+  };
+  window.AM_LANGS = function () { return ["tr"].concat(Object.keys(LANGS).sort()); };
+  window.AM_LANG_NAME = function (code) { return Object.prototype.hasOwnProperty.call(LANG_NAMES, code) ? LANG_NAMES[code] : String(code); };
+  window.AM_LANG = function () { return current; };
+  window.AM_SET_LANG = function (code) {
+    current = code === "tr" || (typeof code === "string" && LANGS[code]) ? code : "tr";
+    return current;
+  };
+  function trText(k) { return Object.prototype.hasOwnProperty.call(window.AM_TR, k) ? String(window.AM_TR[k]) : EXT[k]; }
+  function slots(t) { return (String(t).match(/\{[A-Za-z0-9_]+\}/g) || []).sort().join(","); }
+  // Yalnız okur: çevrilen / eksik / Türkçede karşılığı olmayan / yer tutucusu uyuşmayan anahtarlar.
+  window.AM_LANG_REPORT = function (code) {
+    var dict = LANGS[code] || Object.create(null);
+    var all = Object.keys(window.AM_TR).concat(Object.keys(EXT));
+    var rep = { total: all.length, translated: 0, missing: [], unknown: [], slotMismatch: [] };
+    all.forEach(function (k) {
+      if (Object.prototype.hasOwnProperty.call(dict, k)) {
+        rep.translated++;
+        if (slots(dict[k]) !== slots(trText(k))) rep.slotMismatch.push(k);
+      } else rep.missing.push(k);
+    });
+    Object.keys(dict).forEach(function (k) { if (trText(k) === undefined) rep.unknown.push(k); });
+    return rep;
+  };
+
   window.AM_T = function (key, vars) {
     var k = String(key);
-    var text = Object.prototype.hasOwnProperty.call(window.AM_TR, k) ? String(window.AM_TR[k]) : EXT[k];
+    var text = current !== "tr" && LANGS[current] && Object.prototype.hasOwnProperty.call(LANGS[current], k) ? LANGS[current][k] : trText(k);
     if (text === undefined) {
       return "⟦" + k + "⟧";
     }

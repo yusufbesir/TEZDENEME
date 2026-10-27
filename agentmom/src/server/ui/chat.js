@@ -915,7 +915,7 @@
     if (kind === "approval") { var t = taskFor(AM, item); extra = t ? t.state : "-"; }
     if (kind === "tool" || kind === "verify") extra = String(Math.floor(Date.now() / 60000));
     if (kind === "handoff") extra = (dismissed[key] ? "d" : "o") + (AM.actions && typeof AM.actions.startHandoff === "function" ? "s" : "n");
-    return hash(base) + "|" + extra;
+    return hash(base) + "|" + extra + "|" + (typeof window !== "undefined" && typeof window.AM_LANG === "function" ? window.AM_LANG() : "tr");
   }
 
   // Düğümleri yerinde bırakarak sıralar: yalnız gerçekten değişen yerler DOM'a dokunur (canlı bölge tüm akışı yeniden okumasın).
