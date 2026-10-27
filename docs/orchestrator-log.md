@@ -72,3 +72,4 @@
 | 2026-10-25 | Denetmen takibi 25.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~20.000 | Geçti: yeni dosya/mesaj yok, hatırlatma gönderilmedi |
 | 2026-10-26 | Haftalık Claude rehber taraması [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | general-purpose / claude-sonnet-5-5 | ~150.000 (tahmini) | Geçti: 5 öneri Yusuf onayını bekliyor, hiçbir ayar değiştirilmedi |
 | 2026-10-26 | Denetmen takibi + LibreOffice/FFmpeg Pazartesi kontrolü [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 + Haiku alt ajan | ~40 bin | Geçti: yeni CVE yok (sınırlı kanıt), hatırlatma gönderilmedi |
+| 2026-10-27 | Denetmen takibi 27.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~12 bin | Geçti: yeni istek yok, hatırlatma gönderilmedi |
