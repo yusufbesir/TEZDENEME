@@ -39,3 +39,6 @@ Boyut sınırları `tests/test_talimat_boyutu.py` ile denetlenir. `@import` bağ
 - Alt ajan kullanılmadı. Koordinatör oturumu brifi verdi: [İP:Koordinatör#bilinmiyor].
 - Kullanılan yapay zeka araçları: ana model Sonnet 5.5; Jev kullanılmadı (bulut oturumunda erişilemedi, "Jev'e erişilemedi").
 - Token: tahmini; girdi yaklaşık 60.000, çıktı yaklaşık 12.000 (kesin sayı alınamadı).
+
+## Program yazarken plan önce (Yusuf 2026-10-26 09:00)
+Kodlamadan önce plan yapılır ve nota yazılır (onay gerekmez), sonra sırayla kodlanır. Gerekli skill ve araçlar (plan, kod inceleme, güvenlik, tasarım, test) sormadan çağrılır; yerelde olmayan skill `yusufbesir/skill-kutuphanesi` deposundan çekilir.
