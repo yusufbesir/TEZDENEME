@@ -74,3 +74,4 @@
 | 2026-10-26 | Denetmen takibi + LibreOffice/FFmpeg Pazartesi kontrolü [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 + Haiku alt ajan | ~40 bin | Geçti: yeni CVE yok (sınırlı kanıt), hatırlatma gönderilmedi |
 | 2026-10-27 | Denetmen takibi 27.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~12 bin | Geçti: yeni istek yok, hatırlatma gönderilmedi |
 | 2026-10-28 | Denetmen takibi 28.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~12 bin | Geçti: yeni istek yok, hatırlatma gönderilmedi |
+| 2026-10-29 | Denetmen takibi 29.10 + koordinatöre hatırlatma [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~14 bin | Geçti: Tutaa 2.3.0 açık maddeleri 3 gündür yanıtsız, hatırlatma gönderildi |
