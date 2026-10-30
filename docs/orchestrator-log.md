@@ -75,3 +75,4 @@
 | 2026-10-27 | Denetmen takibi 27.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~12 bin | Geçti: yeni istek yok, hatırlatma gönderilmedi |
 | 2026-10-28 | Denetmen takibi 28.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~12 bin | Geçti: yeni istek yok, hatırlatma gönderilmedi |
 | 2026-10-29 | Denetmen takibi 29.10 + koordinatöre hatırlatma [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~14 bin | Geçti: Tutaa 2.3.0 açık maddeleri 3 gündür yanıtsız, hatırlatma gönderildi |
+| 2026-10-30 | Denetmen takibi 30.10 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~8 bin | Geçti: etkinlik yok, hatırlatma tekrarlanmadı (dünkü <24 s) |
