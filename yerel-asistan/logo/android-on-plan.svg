@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Pırıl"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a9a95"/><stop offset="1" stop-color="#14343a"/></linearGradient></defs><g transform="translate(256 256) scale(0.72) translate(-256 -256)">
+  <path fill="#ffffff" d="M152 112h208a56 56 0 0 1 56 56v152a56 56 0 0 1-56 56H236l-72 60v-60h-12a56 56 0 0 1-56-56V168a56 56 0 0 1 56-56z"/>
+  <path fill="#f2b84b" d="M248 148c6 54 24 72 78 78-54 6-72 24-78 78-6-54-24-72-78-78 54-6 72-24 78-78z"/>
+  <path fill="#ffd97a" d="M336 164c3 22 10 29 32 32-22 3-29 10-32 32-3-22-10-29-32-32 22-3 29-10 32-32z"/></g></svg>
