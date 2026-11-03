@@ -232,11 +232,17 @@ function webTercihleri() {
     devTools: !app.isPackaged
   };
 }
+// Pencere/görev çubuğu simgesi: logo (build/icon.png); dosya yoksa piksel çizimine düşer. Tepsi ayrı (uyarı rengi).
+function pencereIkonu() {
+  const yol = path.join(__dirname, 'build', 'icon.png');
+  const img = fs.existsSync(yol) ? nativeImage.createFromPath(yol) : null;
+  return img && !img.isEmpty() ? img : nativeImage.createFromBuffer(ikon.png(256, false));
+}
 function sohbetGoster() {
   if (!sohbetPenceresi || sohbetPenceresi.isDestroyed()) {
     sohbetPenceresi = new BrowserWindow({
       width: 440, height: 680, minWidth: 340, minHeight: 420, show: false, title: 'Pırıl', autoHideMenuBar: true,
-      icon: nativeImage.createFromBuffer(ikon.png(256, false)), webPreferences: webTercihleri()
+      icon: pencereIkonu(), webPreferences: webTercihleri()
     });
     sohbetPenceresi.setMenuBarVisibility(false);
     sohbetPenceresi.on('close', (e) => { if (!cikiyor) { e.preventDefault(); sohbetPenceresi.hide(); } });

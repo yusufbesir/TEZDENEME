@@ -90,8 +90,37 @@ function yaz(yol, icerik) {
   return true;
 }
 
-// androidDizin: `cap add android` ile üretilen android/ ; yamalarDizin: bu pakettaki yamalar/
-function yamala({ androidDizin, yamalarDizin, ipler = [] }) {
+const YOGUNLUKLAR = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'];
+const ADAPTIVE_XML = '<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
+  + '    <background android:drawable="@color/ic_launcher_background" />\n'
+  + '    <foreground android:drawable="@mipmap/ic_launcher_foreground" />\n</adaptive-icon>\n';
+const ARKA_PLAN_XML = (renk) => '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">' + renk + '</color>\n</resources>\n';
+
+function bayt(yol, icerik) {
+  if (fs.existsSync(yol) && fs.readFileSync(yol).equals(icerik)) return false;
+  fs.mkdirSync(path.dirname(yol), { recursive: true });
+  fs.writeFileSync(yol, icerik);
+  return true;
+}
+
+// Pırıl logosunu (logo/android/mipmap-*) Capacitor'un varsayılan simgelerinin üstüne yazar; adaptive icon XML'ini kurar.
+function logoYamala(ana, logoDizin, degisen) {
+  if (!fs.existsSync(path.join(logoDizin, 'mipmap-xxxhdpi', 'ic_launcher.png'))) hataFirlat('logo klasörü eksik: ' + logoDizin + ' (önce python3 logo/uret.py)');
+  for (const y of YOGUNLUKLAR) {
+    for (const d of ['ic_launcher.png', 'ic_launcher_round.png', 'ic_launcher_foreground.png']) {
+      const kaynak = path.join(logoDizin, 'mipmap-' + y, d);
+      if (!fs.existsSync(kaynak)) continue;
+      if (bayt(path.join(ana, 'res', 'mipmap-' + y, d), fs.readFileSync(kaynak))) degisen.push('res/mipmap-' + y + '/' + d);
+    }
+  }
+  for (const d of ['ic_launcher.xml', 'ic_launcher_round.xml']) {
+    if (yaz(path.join(ana, 'res', 'mipmap-anydpi-v26', d), ADAPTIVE_XML)) degisen.push('res/mipmap-anydpi-v26/' + d);
+  }
+  if (yaz(path.join(ana, 'res', 'values', 'ic_launcher_background.xml'), ARKA_PLAN_XML('#14343a'))) degisen.push('res/values/ic_launcher_background.xml');
+}
+
+// androidDizin: `cap add android` ile üretilen android/ ; yamalarDizin: bu pakettaki yamalar/ ; logoDizin: logo/android (isteğe bağlı)
+function yamala({ androidDizin, yamalarDizin, ipler = [], logoDizin }) {
   const ana = path.join(androidDizin, 'app', 'src', 'main');
   const manifestYol = path.join(ana, 'AndroidManifest.xml');
   if (!fs.existsSync(manifestYol)) hataFirlat(manifestYol + ' yok. Önce `npx cap add android` çalıştırın.');
@@ -111,10 +140,11 @@ function yamala({ androidDizin, yamalarDizin, ipler = [] }) {
   const manifest = fs.readFileSync(manifestYol, 'utf8');
   const yeni = manifestYamala(manifest, izinleriOku(yamalarDizin));
   if (yaz(manifestYol, yeni)) degisen.push('AndroidManifest.xml');
+  if (logoDizin) logoYamala(ana, logoDizin, degisen);
   return { degisen };
 }
 
-module.exports = { yamala, manifestYamala, YEDEK_OZNITELIKLERI, ipEkle, ipBloguOku, ozelIpv4 };
+module.exports = { yamala, logoYamala, manifestYamala, YEDEK_OZNITELIKLERI, ipEkle, ipBloguOku, ozelIpv4 };
 
 if (require.main === module) {
   const arg = process.argv.slice(2);
@@ -122,7 +152,8 @@ if (require.main === module) {
   try {
     const ipler = (al('--ip') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const androidDizin = path.resolve(al('--android') || path.join(__dirname, '..', 'android'));
-    const s = yamala({ androidDizin, yamalarDizin: path.join(__dirname, '..', 'yamalar'), ipler });
+    const logoDizin = path.join(__dirname, '..', '..', 'logo', 'android');
+    const s = yamala({ androidDizin, yamalarDizin: path.join(__dirname, '..', 'yamalar'), ipler, logoDizin: fs.existsSync(logoDizin) ? logoDizin : undefined });
     console.log(s.degisen.length ? 'Yamalandı: ' + s.degisen.join(', ') : 'Zaten yamalı, değişiklik yok.');
   } catch (e) {
     console.error(e.message);

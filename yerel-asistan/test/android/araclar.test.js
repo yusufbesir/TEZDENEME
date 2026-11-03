@@ -199,3 +199,22 @@ test('yapılandırma: capacitor.config.json ve package.json sabit sürümlü, ha
     assert.match(hepsi[ad], /^\d+\.\d+\.\d+$/, ad);
   }
 });
+
+test('yamala: logo verilirse mipmap ve adaptive icon yazılır, idempotent', () => {
+  const a = androidKur();
+  const LOGO = path.join(__dirname, '..', '..', 'logo', 'android');
+  const r1 = Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, logoDizin: LOGO });
+  for (const y of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
+    for (const d of ['ic_launcher.png', 'ic_launcher_round.png', 'ic_launcher_foreground.png']) {
+      assert.ok(r1.degisen.includes('res/mipmap-' + y + '/' + d), y + '/' + d);
+      assert.ok(fs.existsSync(path.join(a, 'app/src/main/res/mipmap-' + y, d)));
+    }
+  }
+  const xml = fs.readFileSync(path.join(a, 'app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml'), 'utf8');
+  assert.match(xml, /@mipmap\/ic_launcher_foreground/);
+  assert.match(fs.readFileSync(path.join(a, 'app/src/main/res/values/ic_launcher_background.xml'), 'utf8'), /#14343a/);
+  // xxxhdpi ön plan 432 px (108 dp) olmalı
+  assert.equal(fs.readFileSync(path.join(a, 'app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png')).readUInt32BE(16), 432);
+  assert.deepEqual(Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, logoDizin: LOGO }).degisen, []);
+  assert.throws(() => Y.yamala({ androidDizin: androidKur(), yamalarDizin: YAMALAR, logoDizin: path.join(a, 'yok') }), /logo klasörü eksik/);
+});
