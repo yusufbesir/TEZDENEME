@@ -98,6 +98,8 @@
 
   function eylemiUygula(eylem) {
     if (eylem && eylem.tip === 'sayac' && Number(eylem.saniye) > 0) sayacBaslat(Number(eylem.saniye));
+    // "Şunu mu demek istedin?" önerisi: bir sonraki "evet" bu metni gönderir.
+    durum.sonOneri = eylem && eylem.tip === 'oneri' && typeof eylem.metin === 'string' ? eylem.metin.slice(0, 200) : null;
   }
 
   // ---------- Sonuç gösterimi ----------
@@ -173,6 +175,9 @@
     if (durum.mesgul) return;
     metin = metin.trim();
     if (!metin) return;
+    const onaylanan = M.oneriOnayi(metin, durum.sonOneri);
+    if (onaylanan) metin = onaylanan;
+    durum.sonOneri = null;
     durum.mesgul = true;
     $('gonder').disabled = true;
     clearInterval(durum.sayacZamanlayici);
