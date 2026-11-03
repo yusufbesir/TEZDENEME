@@ -11,7 +11,7 @@ module.exports = {
   onayAciklama: () => 'Ekran kilitlenecek. Onaylıyor musun?',
   eslestir(norm) {
     const n = norm.split(' ');
-    if (n.some((x) => /^kilitle/.test(x)) || (n.some((x) => /^kilit/.test(x)) && n.some((x) => /^(ekran|bilgisayar|pc)/.test(x)))) {
+    if (n.some((x) => /^kilitle/.test(x)) || (n.some((x) => /^kili[td]/.test(x)) && n.some((x) => /^(ekran|bilgisayar|pc)/.test(x)))) {
       return { slots: {}, guven: 0.9 };
     }
     return null;

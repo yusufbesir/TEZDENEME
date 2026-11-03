@@ -3,6 +3,7 @@
 // işletim sistemi işleri yalnızca ctx.platform fonksiyonlarıyla yapılır.
 const { tokenla } = require('./turkce');
 const beceriler = require('./beceriler');
+const oneri = require('./oneri');
 
 const MAKS_UZUNLUK = 2000;
 const VARSAYILAN_GUVEN = 0.6;
@@ -33,13 +34,18 @@ function uzakKontrolAcikMi(c) {
   try { return typeof c.uzakKontrolAcik === 'function' && c.uzakKontrolAcik() === true; } catch (e) { return false; }
 }
 
-function bilinmiyor() {
-  const ornek = (ad) => {
-    const b = beceriler.find((x) => x.ad === ad);
-    return b && b.ornekler[0];
-  };
-  const liste = ['saat', 'sayac', 'hesap'].map(ornek).filter(Boolean).map((o) => `“${o}”`).join(', ');
+const ORNEK_SIRASI = ['saat', 'sayac', 'hesap', 'hatirlatici', 'not'];
+
+function bilinmiyor(metin) {
+  const liste = oneri.ornekler(metin, beceriler, ORNEK_SIRASI).map((o) => `“${o}”`).join(', ');
   return `Anlayamadım. Şunları deneyebilirsin: ${liste}.`;
+}
+
+// Yakın bir örnek varsa onu sorar; arayüz "evet" deyince önerilen metni gönderir.
+function sunuMu(metin) {
+  const o = oneri.oneriBul(metin, beceriler);
+  if (!o) return null;
+  return sonuc(`Şunu mu demek istedin: “${o.ornek}”?`, 'oneri', { eylem: { tip: 'oneri', metin: o.ornek } });
 }
 
 function guvenliAdimlar(a) {
@@ -67,10 +73,10 @@ async function calistir(metin, ctx) {
           return sonuc(y.trim(), 'bilinmiyor', { adimlar: [{ etiket: 'Yerel modele soruluyor', durum: 'bitti' }] });
         }
       } catch (err) {
-        return sonuc(bilinmiyor(), 'bilinmiyor', { adimlar: [{ etiket: 'Yerel modele soruluyor', durum: 'hata' }] });
+        return sunuMu(metin) || sonuc(bilinmiyor(metin), 'bilinmiyor', { adimlar: [{ etiket: 'Yerel modele soruluyor', durum: 'hata' }] });
       }
     }
-    return sonuc(bilinmiyor(), 'bilinmiyor');
+    return sunuMu(metin) || sonuc(bilinmiyor(metin), 'bilinmiyor');
   }
 
   const b = e.beceri;

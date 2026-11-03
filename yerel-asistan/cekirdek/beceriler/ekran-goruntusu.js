@@ -11,7 +11,7 @@ module.exports = {
     if (n.some((x) => /^kilit/.test(x))) return null;
     if (n.includes('screenshot') || n.includes('ss')) return { slots: {}, guven: 0.85 };
     const ekran = n.some((x) => /^ekran/.test(x));
-    if (ekran && n.some((x) => /^(goruntu|resim|fotograf|yakala|kopya)/.test(x))) return { slots: {}, guven: 0.85 };
+    if (ekran && n.some((x) => /^(goruntu|resim|resmi|fotograf|yakala|kopya)/.test(x))) return { slots: {}, guven: 0.85 };
     return null;
   },
   async calistir(slots, ctx) {
