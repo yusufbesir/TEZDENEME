@@ -13,7 +13,9 @@ import 'package:adim_adim/icerik/hikayeler.dart';
 import 'package:adim_adim/model/durum.dart';
 import 'package:adim_adim/model/icerik.dart';
 import 'package:adim_adim/uygulama.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'arayuz_yardimci.dart';
@@ -196,6 +198,113 @@ void main() {
       find.descendant(of: _kart, matching: find.text('Sahte A1')),
     );
     expect(_satir('hikaye-a1-kolay'), findsOneWidget);
+  });
+
+  Future<ProviderContainer> okumayaGit(
+    WidgetTester tester, {
+    Size boyut = const Size(800, 900),
+    double olcek = 1.0,
+  }) async {
+    final kap = await uygulamayiAc(
+      tester,
+      BellekDepo(const OgrenciDurumu(alan: 'dil')),
+      kurslar: [_a1],
+      boyut: boyut,
+      metinOlcegi: olcek,
+    );
+    kap.read(yonlendiriciProvider).push('/hikaye/hikaye-a1-kolay');
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 6; i++) {
+      await dokun(tester, find.byKey(const Key('biliyorum')));
+    }
+    await dokun(tester, find.byKey(const Key('okumaya-basla')));
+    return kap;
+  }
+
+  /// Metindeki ilk boşluk aralığının dokunma tanımlayıcısını çalıştırır.
+  Future<void> bosluguAc(WidgetTester tester) async {
+    TapGestureRecognizer? bul(InlineSpan span) {
+      TapGestureRecognizer? sonuc;
+      span.visitChildren((s) {
+        if (s is TextSpan &&
+            s.semanticsLabel?.startsWith('Boşluk 1') == true &&
+            s.recognizer is TapGestureRecognizer) {
+          sonuc = s.recognizer as TapGestureRecognizer;
+          return false;
+        }
+        return true;
+      });
+      return sonuc;
+    }
+
+    for (final w in tester.widgetList<RichText>(find.byType(RichText))) {
+      final t = bul(w.text);
+      if (t != null) {
+        t.onTap!();
+        await tester.pumpAndSettle();
+        return;
+      }
+    }
+    fail('boşluk bulunamadı');
+  }
+
+  final bosluk1 = find.textContaining('dokunup kelime seç', findRichText: true);
+
+  testWidgets('boşluklu okuma: varsayılan kapalı; aç, yanlış dene, doldur', (
+    tester,
+  ) async {
+    await okumayaGit(tester);
+    final bosluk = hikayeBul('hikaye-a1-kolay')!.boslukIndeksleri();
+    // Kapalıyken boşluk yok, çipler tam.
+    expect(
+      find.textContaining('dokunup kelime seç', findRichText: true),
+      findsNothing,
+    );
+    expect(find.byKey(const Key('kelime-cip-0')), findsOneWidget);
+
+    await dokun(tester, find.byKey(const Key('bosluklu-mod')));
+    expect(bosluk1, findsNWidgets(2)); // 4 boşluk, 2 paragraf
+    // Gizli kelimenin çipi yok (cevap açık edilmez).
+    for (final i in bosluk) {
+      expect(find.byKey(Key('kelime-cip-$i')), findsNothing);
+    }
+
+    // Boşluğa dokun: seçenekler; yanlış seçenek sheet'i açık bırakır.
+    final ilk = bosluk.first;
+    final yanlis = bosluk.firstWhere((i) => i != ilk);
+    await bosluguAc(tester);
+    expect(find.byKey(const Key('bosluk-secenekleri')), findsOneWidget);
+    await dokun(tester, find.byKey(Key('bosluk-secenek-$yanlis')));
+    expect(find.byKey(const Key('bosluk-secenekleri')), findsOneWidget);
+    expect(find.textContaining('(olmadı)'), findsOneWidget);
+    await dokun(tester, find.byKey(Key('bosluk-secenek-$ilk')));
+    expect(find.byKey(const Key('bosluk-secenekleri')), findsNothing);
+    expect(bosluk1, findsOneWidget); // yalnız 2. paragraf kaldı
+    expect(tester.takeException(), isNull);
+
+    // Doldurulan kelimenin çipi geri gelir; anlam balonu çalışır.
+    await dokun(tester, find.byKey(Key('kelime-cip-$ilk')));
+    expect(find.byKey(const Key('kelime-anlami')), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    // Kapatınca eski hâline döner; sorulara geçiş bozulmaz.
+    await dokun(tester, find.byKey(const Key('bosluklu-mod')));
+    expect(
+      find.textContaining('dokunup kelime seç', findRichText: true),
+      findsNothing,
+    );
+    await dokun(tester, find.byKey(const Key('sorulara-gec')));
+    expect(find.byType(AlistirmaOturumu), findsOneWidget);
+  });
+
+  testWidgets('boşluklu okuma 480x600 @1,5 taşmaz', (tester) async {
+    await okumayaGit(tester, boyut: const Size(480, 600), olcek: 1.5);
+    await dokun(tester, find.byKey(const Key('bosluklu-mod')));
+    expect(tester.takeException(), isNull);
+    await bosluguAc(tester);
+    expect(find.byKey(const Key('bosluk-secenekleri')), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   group('yerleşim 480x600 @1,5', () {

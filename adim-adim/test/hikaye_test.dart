@@ -247,4 +247,50 @@ void main() {
       expect(d.copyWith(tamamlananHikayeler: {'b': 2}).xp, 5);
     });
   });
+
+  group('boşluklu okuma seçimi', () {
+    test('her hikâyede 1-4 boşluk; kelimeler metinde geçer; tekrarsız', () {
+      for (final h in tumHikayeler) {
+        final b = h.boslukIndeksleri();
+        expect(b, isNotEmpty, reason: h.id);
+        expect(b.length, lessThanOrEqualTo(4), reason: h.id);
+        expect(b.toSet(), hasLength(b.length), reason: h.id);
+        final metin = h.paragraflar.join(' ');
+        for (final i in b) {
+          expect(_desen(h.anahtarKelimeler[i].kelime).hasMatch(metin), isTrue);
+        }
+        // Deterministik.
+        expect(h.boslukIndeksleri(), b, reason: h.id);
+      }
+    });
+
+    test('bosluklar alanı verilirse yalnız onlar (metinde bulunanlar)', () {
+      const kelimeler = [
+        (kelime: 'dog', anlam: 'köpek'),
+        (kelime: 'cat', anlam: 'kedi'),
+        (kelime: 'fish', anlam: 'balık'),
+      ];
+      const ayarli = Hikaye(
+        id: 'x',
+        kursId: 'ingilizce-1',
+        seviye: HikayeSeviyesi.kolay,
+        baslik: 'T',
+        paragraflar: ['A cat and a dog sat.'],
+        anahtarKelimeler: kelimeler,
+        sorular: [],
+        bosluklar: [0, 2],
+      );
+      expect(ayarli.boslukIndeksleri(), [0]); // fish metinde yok
+      const otomatik = Hikaye(
+        id: 'y',
+        kursId: 'ingilizce-1',
+        seviye: HikayeSeviyesi.kolay,
+        baslik: 'T',
+        paragraflar: ['A cat and a dog sat.'],
+        anahtarKelimeler: kelimeler,
+        sorular: [],
+      );
+      expect(otomatik.boslukIndeksleri(), [1, 0]); // metin sırası: cat, dog
+    });
+  });
 }
