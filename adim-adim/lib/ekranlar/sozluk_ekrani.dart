@@ -104,7 +104,7 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
   @override
   Widget build(BuildContext context) {
     final sozluk = ref.watch(sozlukProvider);
-    final paketler = sozluk.paketler(ref.watch(kurslarProvider));
+    final paketler = ref.watch(sozlukPaketleriProvider);
     final secili = _paketId == null
         ? null
         : paketler.where((p) => p.uniteId == _paketId).firstOrNull;
