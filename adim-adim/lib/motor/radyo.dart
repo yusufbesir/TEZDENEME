@@ -107,6 +107,8 @@ abstract final class Radyo {
                 ekle(metin, ceviri, dil);
               case Dinle(:final okunacak, :final dil):
                 ekle(okunacak, null, dil);
+              case Dikte(:final metin, :final sesDili):
+                ekle(metin, null, sesDili ?? varsayilan);
               case Sirala(:final dogru):
                 if (dogru.length >= 3) ekle(dogru.join(' '), null, varsayilan);
               case Eslestir(:final ciftler):
