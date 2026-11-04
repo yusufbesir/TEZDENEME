@@ -1,3 +1,4 @@
+import 'dart:async';
 // ÖZELLİK 69: kod çalıştırıcı arayüzü, JS güvenlik hazırlığı ve (kütüphane
 // varsa) gerçek QuickJS motoru.
 import 'dart:io';
@@ -113,6 +114,92 @@ void main() {
       expect(z.basarili, isFalse);
       expect(JsKoruma.sonucCoz('k', 'bozuk').hata, isNotNull);
     });
+  });
+
+  // SADE 4 (güvenlik): zaman aşımı ve çıktı sınırı regresyon testleri.
+  // Motor gerektirmez; bekçi betiği ve Dart tarafı çözümü sınanır.
+  group('JsKoruma zaman aşımı ve sınır regresyonu', () {
+    test('sonsuz döngü bekçisi: süre, adım sınırı ve ileti betiğe gömülür', () {
+      final h = JsKoruma.hazirla('while (true) { x(); }', sureMs: 123);
+      expect(h.hata, isNull);
+      final b = h.betik!;
+      expect(b, contains('Date.now() + 123'));
+      expect(b, contains('> ${JsKoruma.enCokAdim}'));
+      expect(b, contains('throw new Error("${JsKoruma.zamanIletisi}")'));
+      expect(b, contains('while (true) {__adimK();'));
+      // catch ile yutulsa bile __adimDur bayrağı zaman aşımı olarak döner.
+      expect(
+        b,
+        contains('if (__adimDur) __adimHata = "${JsKoruma.zamanIletisi}"'),
+      );
+      expect(b, contains('__adimSatir.length >= ${JsKoruma.ciktiEnCokSatir}'));
+      expect(b, contains('> ${JsKoruma.ciktiEnCokKarakter}'));
+    });
+
+    test('zaman aşımı iletisi tek ve tutarlıdır', () {
+      for (final ham in [
+        {'c': '', 'h': JsKoruma.zamanIletisi, 'z': false},
+        {'c': 'kısmi', 'h': null, 'z': true},
+        {'c': '', 'h': 'Error: başka', 'z': true},
+      ]) {
+        final s = JsKoruma.sonucCoz('k', ham);
+        expect(s.zamanAsimi, isTrue);
+        expect(s.basarili, isFalse);
+        expect(s.hata, JsKoruma.zamanAsimiAciklamasi);
+        expect(s.hata, isNot(contains(JsKoruma.zamanIletisi)));
+      }
+      final n = JsKoruma.sonucCoz('k', {'c': 'a', 'h': null, 'z': false});
+      expect(n.zamanAsimi, isFalse);
+      expect(n.hata, isNull);
+    });
+
+    test('Dart tarafı çıktı ve hata iletisi boyutunu da sınırlar', () {
+      final devCikti = 'y' * (JsKoruma.ciktiEnCokKarakter * 5);
+      final s = JsKoruma.sonucCoz('k', {'c': devCikti, 'h': null, 'z': false});
+      expect(
+        s.cikti.length,
+        lessThanOrEqualTo(JsKoruma.ciktiEnCokKarakter + 40),
+      );
+      expect(s.cikti, endsWith('(çıktı kısaltıldı)'));
+      // Sınır içindeki çıktı dokunulmadan geçer.
+      final kisa = 'z' * JsKoruma.ciktiEnCokKarakter;
+      expect(
+        JsKoruma.sonucCoz('k', {'c': kisa, 'h': null, 'z': false}).cikti,
+        kisa,
+      );
+      final devHata = 'Error: ${'h' * 100000}';
+      final e = JsKoruma.sonucCoz('k', {'c': '', 'h': devHata, 'z': false});
+      expect(e.hata!.length, JsKoruma.hataEnCokKarakter + 1);
+      expect(e.basarili, isFalse);
+    });
+
+    test('QuickJsCalistirici: süre sınırı Dart tarafında da paylıdır', () {
+      const m = QuickJsCalistirici(sureMs: 250);
+      expect(m.sureMs, 250);
+      expect(JsKoruma.varsayilanSureMs, 2000);
+      expect(JsKoruma.hazirla('1;').betik, contains('Date.now() + 2000'));
+    });
+  });
+
+  group('calistirIsolate zaman aşımı', () {
+    test(
+      'süre dolunca isolate öldürülür, sonraki iş temiz isolate\'te çalışır',
+      () async {
+        final bas = DateTime.now();
+        await expectLater(
+          calistirIsolate<int>(() {
+            while (true) {}
+          }, const Duration(milliseconds: 300)),
+          throwsA(isA<TimeoutException>()),
+        );
+        expect(DateTime.now().difference(bas).inSeconds, lessThan(5));
+        // Motor/isolate yeniden kurulur: sonraki çağrı sağlıklı sonuç verir.
+        expect(
+          await calistirIsolate<int>(() => 41 + 1, const Duration(seconds: 5)),
+          42,
+        );
+      },
+    );
   });
 
   test('MotorsuzCalistirici motor yok döner', () async {
