@@ -96,8 +96,63 @@
     durum.sayacZamanlayici = setInterval(guncelle, 500);
   }
 
+  // ---------- Hatırlatıcı / alarm vadesi ----------
+  // Telefon tek başına çalışırken depo bu cihazdadır: 15 sn'de bir çekirdek vade kontrolü; bildirim + sesli okuma.
+  // Bilgisayara bağlı modda vadeyi PC uygulaması bildirir (window.piril.onVade). Arka planda (uygulama kapalı)
+  // Android yerel bildirim eklentisi varsa zamanlanır (eylemiUygula).
+  const VADE_ARALIGI_MS = 15 * 1000;
+  function vadeGoster(v) {
+    mesajEkle(v.metin, false);
+    $('yanit').textContent = v.metin;
+    karakteriGuncelle('bitti', false);
+    sesliOku(v.metin);
+    if (v.tur === 'alarm') { setTimeout(() => sesliOku(v.metin), 4000); setTimeout(() => sesliOku(v.metin), 8000); }
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') new Notification('Pırıl', { body: v.metin, tag: 'piril-vade' });
+    } catch (e) { /* bildirim yoksa ekran yeter */ }
+  }
+  async function vadeKontrol() {
+    if (mod !== 'telefon') return;
+    try {
+      await cekirdekYukle();
+      const vade = window.PirilCekirdek.vade;
+      if (!vade) return;
+      const s = vade.vadesiGelenler(yerelCtx().depo, new Date());
+      for (const k of s.vadesiGelen) vadeGoster({ tur: k.tur, metin: vade.bildirimMetni(k) });
+    } catch (e) { /* çekirdek yüklenemediyse sessiz geç */ }
+  }
+  function vadeIzle() {
+    if (kopruVar && typeof window.piril.onVade === 'function') { window.piril.onVade(vadeGoster); return; }
+    setInterval(vadeKontrol, VADE_ARALIGI_MS);
+    vadeKontrol();
+  }
+  // Android arka plan bildirimi (Capacitor LocalNotifications varsa); yoksa uygulama açıkken vadeKontrol yeter.
+  function yerelBildirimBul() {
+    const C = window.Capacitor;
+    if (!C) return null;
+    try {
+      if (typeof C.registerPlugin === 'function') return C.registerPlugin('LocalNotifications');
+    } catch (e) { /* kayıt başarısızsa eski yola düş */ }
+    return (C.Plugins && C.Plugins.LocalNotifications) || null;
+  }
+  const yerelBildirim = yerelBildirimBul();
+  async function arkaPlanBildirimi(eylem) {
+    if (!yerelBildirim || mod !== 'telefon') return;
+    try {
+      if (eylem.tip === 'alarm-iptal') { await yerelBildirim.cancel({ notifications: [{ id: Number(eylem.id) }] }); return; }
+      const izin = await yerelBildirim.requestPermissions();
+      if (izin && izin.display && izin.display !== 'granted') return;
+      const body = eylem.tip === 'alarm' ? 'Alarm! Kurduğun saat geldi.' : 'Hatırlatma: ' + String(eylem.metin || '');
+      await yerelBildirim.schedule({ notifications: [{ id: Number(eylem.id), title: 'Pırıl', body, schedule: { at: new Date(eylem.zaman), allowWhileIdle: true } }] });
+    } catch (e) { /* eklenti hatası uygulamayı durdurmaz */ }
+  }
+
   function eylemiUygula(eylem) {
     if (eylem && eylem.tip === 'sayac' && Number(eylem.saniye) > 0) sayacBaslat(Number(eylem.saniye));
+    if (eylem && (eylem.tip === 'hatirlatici' || eylem.tip === 'alarm' || eylem.tip === 'alarm-iptal')) {
+      arkaPlanBildirimi(eylem);
+      if ('Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { /* yok say */ } }
+    }
     // "Şunu mu demek istedin?" önerisi: bir sonraki "evet" bu metni gönderir.
     durum.sonOneri = eylem && eylem.tip === 'oneri' && typeof eylem.metin === 'string' ? eylem.metin.slice(0, 200) : null;
   }
@@ -335,6 +390,7 @@
 
   function dinlemeyiBitir() {
     dinliyor = false;
+    document.body.classList.remove('dinliyor'); // kırmızı nokta söner
     $('mikrofon').setAttribute('aria-pressed', 'false');
     $('mikrofon').setAttribute('aria-label', 'Sesle söyle');
     if (durum.evre === 'dinliyor') karakteriGuncelle('bekliyor', false);
@@ -408,6 +464,7 @@
     }
     bilgi('');
     dinliyor = true;
+    document.body.classList.add('dinliyor'); // mikrofon açık: kırmızı nokta
     $('mikrofon').setAttribute('aria-pressed', 'true');
     $('mikrofon').setAttribute('aria-label', 'Dinlemeyi durdur');
     karakteriGuncelle('dinliyor', false);
@@ -443,7 +500,15 @@
       $('yazi').value = '';
       komutuCalistir(m);
     });
-    $('mikrofon').addEventListener('click', mikrofonDugmesi);
+    // Mikrofon yalnız basılı tutulurken açık: basınca başlar, bırakınca durur. Klavye (Enter/Boşluk) için tıklama da çalışır.
+    const mikBirak = () => { if (dinliyor) mikrofonDugmesi(); };
+    $('mikrofon').addEventListener('pointerdown', (ev) => { ev.preventDefault(); if (!dinliyor) mikrofonDugmesi(); });
+    $('mikrofon').addEventListener('pointerup', mikBirak);
+    $('mikrofon').addEventListener('pointercancel', mikBirak);
+    $('mikrofon').addEventListener('pointerleave', mikBirak);
+    $('mikrofon').addEventListener('keydown', (ev) => { if ((ev.key === 'Enter' || ev.key === ' ') && !dinliyor) { ev.preventDefault(); mikrofonDugmesi(); } });
+    $('mikrofon').addEventListener('keyup', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') mikBirak(); });
+    vadeIzle();
     $('mikrofon').hidden = !(sesEklentisi || TarayiciTanima);
 
     $('sekme-sohbet').addEventListener('click', () => sekmeSec('sohbet'));

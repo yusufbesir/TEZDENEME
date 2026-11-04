@@ -122,4 +122,4 @@ async function calistir(metin, ctx) {
   }
 }
 
-module.exports = { calistir };
+module.exports = { calistir, vade: require('./vade') };

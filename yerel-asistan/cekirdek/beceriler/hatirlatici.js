@@ -5,7 +5,7 @@ const { sureKos, gunBasi, zamanYaz, depoVar, adim } = require('./_yardimci');
 
 const ANAHTAR = 'hatirlaticilar';
 const HAFTA = [['pazartesi', 1], ['cumartesi', 6], ['carsamba', 3], ['persembe', 4], ['sali', 2], ['cuma', 5], ['pazar', 0]];
-const SONEK = new Set(['da', 'de', 'ta', 'te']);
+const SONEK = new Set(['da', 'de', 'ta', 'te', 'ya', 'ye', 'a', 'e']);
 const DOLGU = new Set(['diye', 'bana', 'beni', 'lutfen', 'ki', 'kur', 'ekle', 'olustur', 'benim', 'icin', 'misin', 'mi', 'sunu', 'bunu', 'yap']);
 
 function haftaGunu(n) {

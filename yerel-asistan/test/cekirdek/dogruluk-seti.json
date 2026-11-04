@@ -49,5 +49,10 @@
 ["hava durumu", "oneri"], ["ışıkları kapat", "bilinmiyor"], ["bana fıkra anlat", "bilinmiyor"], ["pizza sipariş et", "bilinmiyor"],
 ["saat 5'te sayaç kur", "sayac"], ["5 dakika sonra su iç diye hatırlat", "hatirlatici"], ["not defterini aç", "uygulama-ac"], ["dosya ara hesap", "dosya-ara"],
 ["ekranı kilitle lütfen", "ekran-kilitle"], ["sesi yüzde elli yap", "ses"], ["panoya kopyala", "pano"], ["yarın hatırlat doktor", "hatirlatici"],
-["saat kaçı gösterir misin", "saat"], ["sayaç 90 saniye", "sayac"], ["ekrankilitle", "oneri"], ["panoyu okur musun", "pano"]
+["saat kaçı gösterir misin", "saat"], ["sayaç 90 saniye", "sayac"], ["ekrankilitle", "oneri"], ["panoyu okur musun", "pano"],
+["sabah 7'ye alarm kur", "alarm"], ["alarm kur 6:30", "alarm"], ["yarın sabah 8'e alarm kur", "alarm"], ["saat 7 buçuğa alarm koy", "alarm"],
+["alarmları göster", "alarm"], ["kurulu alarmlar neler", "alarm"], ["alarmı iptal et", "alarm"], ["alarmı kapat", "alarm"],
+["akşam 9'a alarm kur", "alarm"], ["alarm kur", "alarm"], ["3 metre kaç santim", "birim"], ["5 kilo kaç gram", "birim"],
+["100 fahrenheit kaç derece", "birim"], ["3 inç kaç cm", "birim"], ["2 litre kaç mililitre", "birim"], ["90 dakika kaç saat", "birim"],
+["yüzde 20 KDV 250 lira", "birim"], ["1200 lira kdv hariç", "birim"], ["250 liranın kdv'si yüzde 20", "birim"], ["10 mil kaç kilometre", "birim"]
 ]
