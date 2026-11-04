@@ -289,6 +289,17 @@ const Kurs css3 = Kurs(
                 '.kart { flex-direction: row; }',
                 '}',
               ],
+              // İki kural bağımsızdır; @container bloğu önce de yazılabilir.
+              kabul: [
+                [
+                  '@container (min-width: 480px) {',
+                  '.kart { flex-direction: row; }',
+                  '}',
+                  '.raf {',
+                  'container-type: inline-size;',
+                  '}',
+                ],
+              ],
               aciklama: 'Önce kapsayıcı tanımlanır, sonra sorgu yazılır.',
             ),
             Eslestir(
@@ -513,6 +524,14 @@ const Kurs css3 = Kurs(
                 'perspective: 800px;',
                 'transform-style: preserve-3d;',
                 '}',
+              ],
+              kabul: [
+                [
+                  '.sahne {',
+                  'transform-style: preserve-3d;',
+                  'perspective: 800px;',
+                  '}',
+                ],
               ],
               aciklama: 'Perspective ve preserve-3d birlikte derinlik kurar.',
             ),
@@ -847,6 +866,44 @@ const Kurs css3 = Kurs(
                 'inherits: false;',
                 'initial-value: 0;',
                 '}',
+              ],
+              // Üç tanımlayıcının sırası serbesttir.
+              kabul: [
+                [
+                  '@property --oran {',
+                  'syntax: "<number>";',
+                  'initial-value: 0;',
+                  'inherits: false;',
+                  '}',
+                ],
+                [
+                  '@property --oran {',
+                  'inherits: false;',
+                  'syntax: "<number>";',
+                  'initial-value: 0;',
+                  '}',
+                ],
+                [
+                  '@property --oran {',
+                  'inherits: false;',
+                  'initial-value: 0;',
+                  'syntax: "<number>";',
+                  '}',
+                ],
+                [
+                  '@property --oran {',
+                  'initial-value: 0;',
+                  'syntax: "<number>";',
+                  'inherits: false;',
+                  '}',
+                ],
+                [
+                  '@property --oran {',
+                  'initial-value: 0;',
+                  'inherits: false;',
+                  'syntax: "<number>";',
+                  '}',
+                ],
               ],
               aciklama: 'syntax, inherits ve initial-value üç temel alandır.',
             ),

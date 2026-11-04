@@ -109,6 +109,12 @@ const Kurs ingilizceA2 = Kurs(
               aciklama:
                   '"Leave" ayrılmak, kalkmak demektir; "arrive" varmak. Saat sorusu "What time" ile başlar.',
             ),
+            Dikte(
+              soru: 'Dinle ve duyduğun cümleyi yaz.',
+              metin: 'She has lunch at half past nine.',
+              aciklama:
+                  'She ile has kullanılır; half past nine dokuz buçuk demektir.',
+            ),
           ],
         ),
         Ders(

@@ -135,6 +135,8 @@ class DersOgeleri {
           ekle(kelimeMiKalip(okunacak), okunacak, null, i, dil: dil);
         case Soyle(:final metin, :final ceviri, :final dil):
           ekle(kelimeMiKalip(metin), metin, ceviri, i, dil: dil);
+        case Dikte(:final metin, :final sesDili):
+          ekle(kelimeMiKalip(metin), metin, null, i, dil: sesDili);
         case Yaz(:final soru, :final cevaplar):
           if (cevaplar.isNotEmpty) {
             ekle(kelimeMiKalip(cevaplar.first), cevaplar.first, soru, i);

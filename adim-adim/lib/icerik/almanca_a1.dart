@@ -97,6 +97,14 @@ const Kurs almancaA1 = Kurs(
               aciklama:
                   'Abend = akşam. Cümle: İyi akşamlar, Bay Weber! (Herr = Bay)',
             ),
+            Dikte(
+              soru: 'Dinle ve duyduğun cümleyi yaz.',
+              metin: 'Hallo, wie geht es dir?',
+              sesDili: _de,
+              cevaplar: ['Hallo, wie geht es dir?', 'Hallo wie geht es dir?'],
+              aciklama:
+                  'Hallo, wie geht es dir? = Merhaba, nasılsın? (samimi). Virgül yazılmasa da olur.',
+            ),
           ],
         ),
         Ders(
@@ -169,6 +177,13 @@ const Kurs almancaA1 = Kurs(
               dogru: [3],
               aciklama:
                   'Buch = kitap; u sonrası ch gırtlaktan okunur. Ich = ben ise ince ch ile okunur. Cümle: Kitabı okuyorum.',
+            ),
+            Dikte(
+              soru: 'Dinle ve duyduğun cümleyi yaz.',
+              metin: 'Ich spreche schon Deutsch.',
+              sesDili: _de,
+              aciklama:
+                  'Ich spreche schon Deutsch. = Ben çoktan Almanca konuşuyorum. schon = çoktan (schön = güzel ile karıştırma).',
             ),
           ],
         ),

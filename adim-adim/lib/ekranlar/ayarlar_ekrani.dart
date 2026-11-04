@@ -1,4 +1,4 @@
-/// Ayarlar ekranı: ad, görünüm, ses, günlük hedef (yoğunluk çipleri: Rahat,
+/// Ayarlar ekranı: ad, görünüm, ses (açık/kapalı, dinleme hızı), günlük hedef (yoğunluk çipleri: Rahat,
 /// Orta, Yoğun, Ciddi ve XP kaydırıcısı), haftalık hedef, oturum başına kart
 /// sayısı (5/10/20), hatırlatma
 /// (günlük saat ve açılıştaki bekleyen tekrar bildirimi), veri sıfırlama.
@@ -14,9 +14,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ses_hiz_secici.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/kilit.dart';
+import '../motor/hatirlatici.dart';
 import '../motor/motor.dart';
 import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
@@ -321,6 +323,19 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 value: durum.sesAcik,
                 onChanged: (v) => notifier.ayarGuncelle(sesAcik: v),
               ),
+              ListTile(
+                key: const ValueKey('ayar-ses-hizi'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.speed, color: r.ana),
+                title: const Text('Dinleme hızı'),
+                subtitle: const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SesHizSecici(sikisik: false),
+                  ),
+                ),
+              ),
               bolum('Günlük hedef'),
               Semantics(
                 label: 'Günlük hedef: ${durum.gunlukHedef} XP',
@@ -533,6 +548,23 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 ),
                 value: durum.kilit != null,
                 onChanged: (v) => v ? _kilitKur() : _kilitKapat(),
+              ),
+              SwitchListTile(
+                key: const ValueKey('ayar-akilli-hatirlatici'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  Icons.notifications_active_outlined,
+                  color: r.ana,
+                ),
+                title: const Text('Akıllı hatırlatıcı (günde 1)'),
+                subtitle: Text(
+                  'Bugün çalışmadıysan, alıştığın saatten sonra '
+                  '(${Hatirlatici.onerilenSaat(durum).toString().padLeft(2, '0')}:00) '
+                  'bir kez hatırlatır',
+                ),
+                value: durum.akilliHatirlaticiAcik,
+                onChanged: (v) =>
+                    notifier.ayarGuncelle(akilliHatirlaticiAcik: v),
               ),
               bolum('Veriler'),
               Text(
