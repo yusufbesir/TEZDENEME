@@ -1248,6 +1248,7 @@ abstract final class Motor {
     Dinle() => a.secenekler[a.dogru],
     Kod() => a.secenekler[a.dogru],
     Soyle() => a.metin,
+    Dikte() => a.metin,
     Yaz() => a.cevaplar.isEmpty ? '' : a.cevaplar.first,
     Sirala() => a.dogru.join(' '),
     Eslestir() => a.ciftler.map((c) => '${c.sol} = ${c.sag}').join('; '),
@@ -1311,6 +1312,7 @@ abstract final class Motor {
       Dinle() => 'Bir kez daha dinle, sonra yaz',
       Kod() => 'Söz dizimini kontrol et',
       Soyle() => 'Önce dinle, sonra yavaş ve net söyle',
+      Dikte() => 'Yavaş dinle; her kelimeyi duyduğun sırayla yaz',
       Tablo() => 'Satır ve sütun başlıklarındaki örüntüye bak',
       Isaretle() => 'Cümleyi baştan oku; birden çok kelime doğru olabilir',
       Hamle() => 'Önce şah çeken, taş alan ve tehdit eden hamlelere bak',
@@ -1348,6 +1350,9 @@ abstract final class Motor {
       Dinle() => yanlisEle(a.secenekler, a.dogru),
       Kod() => yanlisEle(a.secenekler, a.dogru),
       Soyle() => 'İlk kelime: ${a.metin.split(' ').first}',
+      Dikte() =>
+        '${_kelimeler(a.metin).length} kelime; ilk kelime: '
+            '${_kelimeler(a.metin).firstOrNull ?? ''}',
       Sirala() =>
         a.dogru.isEmpty
             ? 'Cümle büyük harfle başlar, noktalama ile biter'
@@ -1692,6 +1697,80 @@ abstract final class Motor {
     return r;
   }
 
+  /// Metni kelimelere böler (boşluğa göre; boş parçalar atılır).
+  static List<String> _kelimeler(String s) =>
+      s.trim().split(RegExp(r'\s+')).where((k) => k.isNotEmpty).toList();
+
+  /// Dikte karşılaştırmasında tek kelimeyi normalleştirir: [_normalle] +
+  /// baştaki/sondaki noktalama atılır ("Friday." == "friday").
+  static String _dikteKelime(String k) => _normalle(
+    k,
+  ).replaceAll(RegExp(r'^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$', unicode: true), '');
+
+  /// Dikte farkı (saf): [dogru] cümlesiyle [verilen] yazımı kelime düzeyinde
+  /// karşılaştırır. En uzun ortak alt dizi (LCS) ile eşleşen kelimeler
+  /// [DikteDurum.dogru], doğru cümlede olup yazılmayanlar [DikteDurum.eksik],
+  /// yazılıp doğru cümlede olmayanlar (yanlış yazım dahil) [DikteDurum.fazla]
+  /// olarak, cümle sırasıyla döner. Kelimeler görüntü için özgün biçimiyle
+  /// tutulur; karşılaştırma büyük/küçük harf ve noktalamaya duyarsızdır.
+  static List<DikteKelime> dikteFarki(String dogru, String verilen) {
+    final d = _kelimeler(dogru);
+    final v = _kelimeler(verilen);
+    final dn = d.map(_dikteKelime).toList();
+    final vn = v.map(_dikteKelime).toList();
+    // LCS tablosu.
+    final t = List.generate(
+      d.length + 1,
+      (_) => List<int>.filled(v.length + 1, 0),
+    );
+    for (var i = d.length - 1; i >= 0; i--) {
+      for (var j = v.length - 1; j >= 0; j--) {
+        t[i][j] = dn[i] == vn[j]
+            ? t[i + 1][j + 1] + 1
+            : math.max(t[i + 1][j], t[i][j + 1]);
+      }
+    }
+    final sonuc = <DikteKelime>[];
+    var i = 0, j = 0;
+    while (i < d.length && j < v.length) {
+      if (dn[i] == vn[j]) {
+        sonuc.add(DikteKelime(d[i], DikteDurum.dogru));
+        i++;
+        j++;
+      } else if (t[i + 1][j] >= t[i][j + 1]) {
+        sonuc.add(DikteKelime(d[i], DikteDurum.eksik));
+        i++;
+      } else {
+        sonuc.add(DikteKelime(v[j], DikteDurum.fazla));
+        j++;
+      }
+    }
+    for (; i < d.length; i++) {
+      sonuc.add(DikteKelime(d[i], DikteDurum.eksik));
+    }
+    for (; j < v.length; j++) {
+      sonuc.add(DikteKelime(v[j], DikteDurum.fazla));
+    }
+    return sonuc;
+  }
+
+  /// [dikteFarki] sonucunun tek satırlık özeti: "Eksik: on, Friday · Fazla: in".
+  /// Fark yoksa boş dize.
+  static String dikteFarkMetni(List<DikteKelime> fark) {
+    final eksik = [
+      for (final k in fark)
+        if (k.durum == DikteDurum.eksik) k.kelime,
+    ];
+    final fazla = [
+      for (final k in fark)
+        if (k.durum == DikteDurum.fazla) k.kelime,
+    ];
+    return [
+      if (eksik.isNotEmpty) 'Eksik: ${eksik.join(', ')}',
+      if (fazla.isNotEmpty) 'Fazla: ${fazla.join(', ')}',
+    ].join(' · ');
+  }
+
   static bool cevapDogruMu(Alistirma a, Object? cevap) {
     switch (a) {
       case Secim():
@@ -1709,13 +1788,20 @@ abstract final class Motor {
         final c = _normalle(cevap);
         if (c.isEmpty) return false;
         return a.cevaplar.any((k) => _normalle(k) == c);
+      case Dikte():
+        if (cevap is! String) return false;
+        final c = _normalle(cevap);
+        if (c.isEmpty) return false;
+        return a.cevaplar.any((k) => _normalle(k) == c);
       case Sirala():
+        // `dogru` ya da `kabul` içindeki herhangi bir sırayla birebir eşleşme.
         if (cevap is! List || cevap.length != a.dogru.length) return false;
-        for (var i = 0; i < cevap.length; i++) {
-          final e = cevap[i];
-          if (e is! String || e != a.dogru[i]) return false;
+        final sira = <String>[];
+        for (final e in cevap) {
+          if (e is! String) return false;
+          sira.add(e);
         }
-        return true;
+        return a.siraGecerliMi(sira);
       case Eslestir():
         if (cevap is! List || cevap.length != a.ciftler.length) return false;
         final kalan = List<({String sol, String sag})>.of(a.ciftler);
@@ -1878,6 +1964,8 @@ abstract final class Motor {
             }
           case Sirala(:final dogru):
             if (dogru.length > 1) kalipEkle(dogru.join(' '));
+          case Dikte(:final metin):
+            kalipEkle(metin);
           case Bosluk(:final soru, :final secenekler, :final dogru):
             if (dogru >= 0 &&
                 dogru < secenekler.length &&
@@ -1911,6 +1999,24 @@ abstract final class Motor {
       notlar: List.unmodifiable(notlar),
     );
   }
+}
+
+/// [Motor.dikteFarki] sonucunda bir kelimenin durumu.
+enum DikteDurum { dogru, eksik, fazla }
+
+/// [Motor.dikteFarki] sonucundaki kelime (özgün yazımıyla) ve durumu.
+class DikteKelime {
+  const DikteKelime(this.kelime, this.durum);
+  final String kelime;
+  final DikteDurum durum;
+
+  @override
+  bool operator ==(Object other) =>
+      other is DikteKelime && other.kelime == kelime && other.durum == durum;
+  @override
+  int get hashCode => Object.hash(kelime, durum);
+  @override
+  String toString() => '$kelime(${durum.name})';
 }
 
 /// [Motor.uniteOzeti] sonucu. Kod kurslarında kelime yerine terim, kalıp
