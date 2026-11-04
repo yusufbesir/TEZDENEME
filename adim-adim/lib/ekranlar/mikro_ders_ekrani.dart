@@ -30,6 +30,7 @@ import '../model/icerik.dart';
 import '../motor/cekim_turu.dart';
 import '../motor/motor.dart';
 import '../motor/oturum_ozeti.dart';
+import '../motor/pratik.dart';
 import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
 
@@ -42,7 +43,8 @@ class MikroDersEkrani extends ConsumerStatefulWidget {
     this.donem,
   });
 
-  /// null: normal; 'zayif' | 'karisik' | 'quiz' | 'donem' | 'karisim'.
+  /// null: normal; 'zayif' | 'karisik' | 'quiz' | 'donem' | 'karisim' | 'yanlis'
+  /// (hata defterindeki kart hatalarından kısa tekrar).
   final String? mod;
 
   /// 'karisik' ve 'quiz' kiplerinde biten ders kimliği.
@@ -117,6 +119,12 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
         widget.dersId!,
         tohum: tohum,
       );
+    } else if (widget.mod == 'yanlis') {
+      _liste = Pratik.yanlisDestesi(
+        durum,
+        kurslar,
+        adet: durum.oturumKartSayisi,
+      );
     } else if (widget.mod == 'karisim') {
       _liste = GunlukKarisim.sec(durum, kurslar, bugun, tohum: tohum);
     } else {
@@ -147,7 +155,9 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                     ? '${Motor.donemAdi(_donem!)} bırakılsın mı?'
                     : (widget.mod == 'karisim'
                           ? 'Günlük karışımdan çıkılsın mı?'
-                          : 'Mikro dersten çıkılsın mı?')),
+                          : (widget.mod == 'yanlis'
+                                ? 'Yanlışları çözmekten çıkılsın mı?'
+                                : 'Mikro dersten çıkılsın mı?'))),
         ),
         content: const Text('Şimdi çıkarsan bu dersteki ilerleme kaydedilmez.'),
         actions: [
@@ -230,6 +240,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                   'cekim' => 'Çekim turu tamamlandı',
                   'donem' => '${Motor.donemAdi(_donem ?? '')} tamamlandı',
                   'karisim' => 'Günlük karışım tamamlandı',
+                  'yanlis' => 'Yanlışlar çözüldü',
                   _ => 'Mikro ders tamamlandı',
                 },
                 dogru: _ozet!.dogru,
