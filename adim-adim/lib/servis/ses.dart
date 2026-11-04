@@ -40,7 +40,9 @@ class Ses {
     final eski = hizCarpani;
     hizCarpani = carpan;
     try {
-      return yavas ? await okuYavas(metin, dil: dil) : await oku(metin, dil: dil);
+      return yavas
+          ? await okuYavas(metin, dil: dil)
+          : await oku(metin, dil: dil);
     } finally {
       hizCarpani = eski;
     }

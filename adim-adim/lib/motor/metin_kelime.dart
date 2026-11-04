@@ -109,11 +109,7 @@ abstract final class MetinKelime {
         isaretli.add(m);
       }
     }
-    return (
-      isaretli: isaretli,
-      ogrenilmis: ogrenilmis,
-      sozlukDisi: sozlukDisi,
-    );
+    return (isaretli: isaretli, ogrenilmis: ogrenilmis, sozlukDisi: sozlukDisi);
   }
 
   /// Sözlükten arama kümesi: normalize kelime → madde. Yalnız tek kelimeli

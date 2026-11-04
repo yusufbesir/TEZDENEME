@@ -612,6 +612,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? gunDersiBildirimiAcik,
     int? oturumKartSayisi,
     bool? akilliHatirlaticiAcik,
+    bool? kardesErteleAcik,
+    bool? emekliAcik,
+    int? yukButcesi,
     double? sesHizi,
   }) async {
     await _uygula(
@@ -631,6 +634,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         konusmaAcik: konusmaAcik,
         gunDersiBildirimiAcik: gunDersiBildirimiAcik,
         akilliHatirlaticiAcik: akilliHatirlaticiAcik,
+        kardesErteleAcik: kardesErteleAcik,
+        emekliAcik: emekliAcik,
+        yukButcesi: yukButcesi,
         // Yalnız 5/10/20 kabul edilir; başka değer yok sayılır.
         oturumKartSayisi:
             (oturumKartSayisi != null &&
@@ -661,7 +667,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   /// Uygulama kilidi: [kilit] verilirse açılır (PIN karması saklanır), null
   /// ise kapatılır. PIN doğrulaması çağıranda yapılır (ayarlar ekranı).
   Future<OgrenciDurumu> kilitAyarla(KilitAyari? kilit) => _uygula(
-    (d) => kilit == null ? d.copyWith(kilitSil: true) : d.copyWith(kilit: kilit),
+    (d) =>
+        kilit == null ? d.copyWith(kilitSil: true) : d.copyWith(kilit: kilit),
   );
 
   Future<void> sifirla() async {

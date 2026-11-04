@@ -566,6 +566,43 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 onChanged: (v) =>
                     notifier.ayarGuncelle(akilliHatirlaticiAcik: v),
               ),
+              SwitchListTile(
+                key: const ValueKey('ayar-kardes-ertele'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.layers_outlined, color: r.ana),
+                title: const Text('Kardeş alıştırmaları dağıt'),
+                subtitle: const Text(
+                  'Aynı dersin kartlarından günde en çok 3 tanesi gelir; '
+                  'kalanı ertesi güne kalır, silinmez',
+                ),
+                value: durum.kardesErteleAcik,
+                onChanged: (v) => notifier.ayarGuncelle(kardesErteleAcik: v),
+              ),
+              SwitchListTile(
+                key: const ValueKey('ayar-emekli'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.workspace_premium_outlined, color: r.ana),
+                title: const Text('Bilinen kelimeyi emekli et'),
+                subtitle: const Text(
+                  'Aralığı 60 günü aşan kelime 120 günde bir yoklanır',
+                ),
+                value: durum.emekliAcik,
+                onChanged: (v) => notifier.ayarGuncelle(emekliAcik: v),
+              ),
+              SwitchListTile(
+                key: const ValueKey('ayar-yuk-butcesi'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.speed_outlined, color: r.ana),
+                title: const Text('Günlük yük bütçesi'),
+                subtitle: Text(
+                  'Bekleyen tekrar ${OgrenciDurumu.varsayilanYukButcesi} '
+                  'kartı aşınca elle eklenen yeni kart yarına kalır',
+                ),
+                value: durum.yukButcesi > 0,
+                onChanged: (v) => notifier.ayarGuncelle(
+                  yukButcesi: v ? OgrenciDurumu.varsayilanYukButcesi : 0,
+                ),
+              ),
               bolum('Veriler'),
               Text(
                 'Tüm verilerin yalnızca bu cihazda saklanır.',
