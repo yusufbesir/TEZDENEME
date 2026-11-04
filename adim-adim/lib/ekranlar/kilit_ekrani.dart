@@ -312,10 +312,16 @@ class _KilitKapisiDurumu extends ConsumerState<KilitKapisi>
     return Stack(
       fit: StackFit.expand,
       children: [
-        widget.child,
-        KilitEkrani(
-          dogrula: kilit.dogrula,
-          acildi: () => setState(() => _kilitli = false),
+        ExcludeSemantics(
+          child: IgnorePointer(child: widget.child),
+        ),
+        // Geri tuşu kilitliyken alttaki Navigator'ı pop edemez.
+        PopScope(
+          canPop: false,
+          child: KilitEkrani(
+            dogrula: kilit.dogrula,
+            acildi: () => setState(() => _kilitli = false),
+          ),
         ),
       ],
     );

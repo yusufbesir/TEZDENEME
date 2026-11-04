@@ -1,7 +1,8 @@
 /// Uygulama kilidi (PIN): saf model ve saf işlevler. PIN düz metin SAKLANMAZ;
 /// rastgele tuz + yineli SHA-256 karması tutulur ([KilitAyari]). Yanlış
 /// deneme sayacı ve bekleme süresi [DenemeKilidi] içindedir (saf; zaman
-/// dışarıdan verilir). Biyometri yok (sonraki sürüm); yalnız 4-6 haneli PIN.
+/// dışarıdan verilir). Bekleme bitiş anı bilerek kalıcı DEĞİL (bellekte;
+/// uygulama yeniden başlayınca sıfırlanır, bilinen sınır). Biyometri yok (sonraki sürüm); yalnız 4-6 haneli PIN.
 /// Okuma asla fırlatmaz; bozuk kayıt "kilit yok" sayılır (fail-open: veri
 /// kaybı yerine kilitsiz açılış).
 ///
@@ -73,7 +74,8 @@ class KilitAyari {
   /// Geçerli PIN'den yeni ayar; geçersiz PIN [ArgumentError] fırlatır.
   static KilitAyari olustur(String pin, {Random? rastgele}) {
     if (!pinGecerli(pin)) {
-      throw ArgumentError.value(pin, 'pin', 'PIN 4-6 rakam olmalı');
+      // PIN değeri iletiye ASLA konmaz (log/çökme raporuna sızmasın).
+      throw ArgumentError('geçersiz PIN biçimi');
     }
     final tuz = tuzUret(rastgele);
     return KilitAyari(tuz: tuz, karma: karmaHesapla(pin, tuz));
@@ -118,6 +120,8 @@ class KilitAyari {
   }
 }
 
+/// Not: bekleme bitiş anı bilerek kalıcı değildir (yalnız bellekte; uygulama
+/// yeniden başlayınca sıfırlanır). Bilinen sınır.
 /// Yanlış deneme sayacı: [KilitAyari.enCokYanlis] üst üste yanlıştan sonra
 /// [KilitAyari.beklemeSuresi] boyunca deneme kabul edilmez. Saf; "şimdi"
 /// dışarıdan verilir. Bellekte tutulur, diske yazılmaz.

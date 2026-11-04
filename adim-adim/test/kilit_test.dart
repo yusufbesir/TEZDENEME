@@ -37,6 +37,15 @@ void main() {
       expect(KilitAyari.pinGecerli('123456'), isTrue);
     });
 
+    test('geçersiz PIN hata iletisi PIN değerini taşımaz', () {
+      try {
+        KilitAyari.olustur('12a4');
+        fail('fırlatmalıydı');
+      } on ArgumentError catch (e) {
+        expect(e.toString().contains('12a4'), isFalse);
+      }
+    });
+
     test('farklı tuz farklı karma verir', () {
       final a = KilitAyari.olustur('1234', rastgele: Random(1));
       final b = KilitAyari.olustur('1234', rastgele: Random(2));
@@ -143,6 +152,33 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('kilit-tus-tamam')));
       await tester.pumpAndSettle();
       expect(find.text('PIN gir'), findsNothing);
+    });
+
+    testWidgets('kilitliyken alt içerik semantics dışı, geri tuşu pop etmez', (
+      tester,
+    ) async {
+      final k = KilitAyari.olustur('1234', rastgele: Random(8));
+      await uygulamayiAc(
+        tester,
+        BellekDepo(const OgrenciDurumu(alan: 'dil').copyWith(kilit: k)),
+      );
+      expect(find.byType(ExcludeSemantics), findsWidgets);
+      expect(
+        find.ancestor(
+          of: find.byType(NavigationBar),
+          matching: find.byType(IgnorePointer),
+        ),
+        findsWidgets,
+      );
+      final pop = find.ancestor(
+        of: find.byType(KilitEkrani),
+        matching: find.byType(PopScope),
+      );
+      expect(pop, findsOneWidget);
+      expect(tester.widget<PopScope>(pop).canPop, isFalse);
+      await tester.binding.handlePopRoute();
+      await tester.pump();
+      expect(find.text('PIN gir'), findsOneWidget);
     });
 
     testWidgets('kilitsiz kayıtta kilit ekranı yok', (tester) async {

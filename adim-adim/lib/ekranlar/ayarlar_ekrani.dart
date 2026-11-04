@@ -164,9 +164,7 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
   Future<void> _kilitKur() async {
     final pin = await _pinSor('4 haneli PIN belirle', tekrarli: true);
     if (pin == null || !KilitAyari.pinGecerli(pin)) return;
-    await ref
-        .read(durumProvider.notifier)
-        .kilitAyarla(KilitAyari.olustur(pin));
+    await ref.read(durumProvider.notifier).kilitAyarla(KilitAyari.olustur(pin));
   }
 
   Future<void> _kilitKapat() async {
@@ -530,10 +528,8 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(Icons.lock_outline, color: r.ana),
                 title: const Text('Uygulama kilidi'),
-                subtitle: Text(
-                  durum.kilit != null
-                      ? 'Açık: uygulama açılırken PIN sorulur'
-                      : 'Kapalı: 4 haneli PIN ile korur',
+                subtitle: const Text(
+                  'Bu kilit uygulama arayüzünü korur, dosya şifrelemesi değildir.',
                 ),
                 value: durum.kilit != null,
                 onChanged: (v) => v ? _kilitKur() : _kilitKapat(),
