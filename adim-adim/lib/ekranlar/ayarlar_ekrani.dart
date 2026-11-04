@@ -572,8 +572,8 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 secondary: Icon(Icons.layers_outlined, color: r.ana),
                 title: const Text('Kardeş alıştırmaları dağıt'),
                 subtitle: const Text(
-                  'Aynı dersin kartlarından günde en çok 3 tanesi gelir; '
-                  'kalanı ertesi güne kalır, silinmez',
+                  'Aynı dersin kartlarından sırada en çok 3 tanesi görünür; '
+                  'kalanı sonraya kalır, silinmez',
                 ),
                 value: durum.kardesErteleAcik,
                 onChanged: (v) => notifier.ayarGuncelle(kardesErteleAcik: v),

@@ -470,8 +470,8 @@ class OgrenciDurumu {
     this.oturumKartSayisi = varsayilanOturumKarti,
     this.kilit,
     this.akilliHatirlaticiAcik = false,
-    this.kardesErteleAcik = true,
-    this.emekliAcik = true,
+    this.kardesErteleAcik = false,
+    this.emekliAcik = false,
     this.yukButcesi = varsayilanYukButcesi,
     this.sonHatirlatmaGunu,
     this.calismaSaatleri = const [],
@@ -701,12 +701,12 @@ class OgrenciDurumu {
   /// Akıllı hatırlatıcı (SADE 6; günde en çok bir bildirim); varsayılan kapalı.
   final bool akilliHatirlaticiAcik;
 
-  /// Kardeş alıştırma erteleme: aynı dersin kartlarından günde en çok
+  /// Kardeş alıştırma erteleme (varsayılan kapalı; Ayarlar'dan açılır): aynı dersin kartlarından günde en çok
   /// [kardesSiniri] tanesi kuyruğa girer, kalanı ertesi güne kalır (silinmez).
   final bool kardesErteleAcik;
   static const int kardesSiniri = 3;
 
-  /// Bilinen kelimeyi emekli etme açık mı? Kapalıyken kartlar normal aralıkla
+  /// Bilinen kelimeyi emekli etme açık mı (varsayılan kapalı)? Kapalıyken kartlar normal aralıkla
   /// gider; mevcut emekli kartlar vadesi gelince normale döner.
   final bool emekliAcik;
 
@@ -1371,8 +1371,8 @@ class OgrenciDurumu {
       // Eski kayıtta yoksa: kapalı, hiç gönderilmedi, saat kaydı yok.
       kardesErteleAcik: j['kardesErteleAcik'] is bool
           ? j['kardesErteleAcik'] as bool
-          : true,
-      emekliAcik: j['emekliAcik'] is bool ? j['emekliAcik'] as bool : true,
+          : false,
+      emekliAcik: j['emekliAcik'] is bool ? j['emekliAcik'] as bool : false,
       yukButcesi: j['yukButcesi'] is int
           ? (j['yukButcesi'] as int).clamp(0, enCokYukButcesi)
           : varsayilanYukButcesi,

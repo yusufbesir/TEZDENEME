@@ -133,13 +133,16 @@ void main() {
       expect(dosyalar.any((p) => p.contains('.bozuk-')), isTrue);
     });
 
-    test('bozuk JSON göç yolunu tetiklemez, eskisi gibi kenara alınır', () async {
-      await ana().parent.create(recursive: true);
-      await ana().writeAsString('{bozuk');
-      final d = await DosyaDepo(gecici).yukle();
-      expect(d.xp, 0);
-      expect(await yuva(0).exists(), isFalse);
-    });
+    test(
+      'bozuk JSON göç yolunu tetiklemez, eskisi gibi kenara alınır',
+      () async {
+        await ana().parent.create(recursive: true);
+        await ana().writeAsString('{bozuk');
+        final d = await DosyaDepo(gecici).yukle();
+        expect(d.xp, 0);
+        expect(await yuva(0).exists(), isFalse);
+      },
+    );
 
     test('kök harita değilse kopya yok, kenara alınır', () async {
       await yaz([1, 2, 3]);

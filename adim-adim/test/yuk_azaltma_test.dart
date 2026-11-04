@@ -23,6 +23,7 @@ void main() {
       final d = _kartli(7, ac: false);
       expect(Motor.tekrarBekleyen(d, '2026-11-04').length, 7);
       final iki = OgrenciDurumu(
+        kardesErteleAcik: true,
         kartlar: {
           for (var i = 0; i < 3; i++)
             'a.u1.d1#$i': const Kart(kutu: 1, sonraki: '2026-11-01'),
@@ -105,17 +106,17 @@ void main() {
       final r = OgrenciDurumu.fromJson(
         const OgrenciDurumu(
           yukButcesi: 0,
-          emekliAcik: false,
-          kardesErteleAcik: false,
+          emekliAcik: true,
+          kardesErteleAcik: true,
         ).toJson(),
       );
       expect(r.yukButcesi, 0);
-      expect(r.emekliAcik, isFalse);
-      expect(r.kardesErteleAcik, isFalse);
+      expect(r.emekliAcik, isTrue);
+      expect(r.kardesErteleAcik, isTrue);
       final eski = OgrenciDurumu.fromJson(const {});
       expect(eski.yukButcesi, 10);
-      expect(eski.emekliAcik, isTrue);
-      expect(eski.kardesErteleAcik, isTrue);
+      expect(eski.emekliAcik, isFalse);
+      expect(eski.kardesErteleAcik, isFalse);
     });
   });
 }

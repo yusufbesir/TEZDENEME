@@ -6,19 +6,23 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const kanal = MethodChannel('flutter_tts');
-  final mesgul = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  final mesgul =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
   tearDown(() => mesgul.setMockMethodCallHandler(kanal, null));
 
-  test('eklenti/motor yok: fırlatmaz, false döner (okuma ve okuBekle)', () async {
-    // Kanal için işleyici yok => MissingPluginException.
-    final ses = Ses();
-    expect(await ses.oku('hello'), isFalse);
-    expect(await ses.okuBekle('hello'), isFalse);
-    expect(await ses.okuYavas('hello'), isFalse);
-    expect(await ses.okuHizla('hello', carpan: 1.1), isFalse);
-    await ses.durdur();
-  });
+  test(
+    'eklenti/motor yok: fırlatmaz, false döner (okuma ve okuBekle)',
+    () async {
+      // Kanal için işleyici yok => MissingPluginException.
+      final ses = Ses();
+      expect(await ses.oku('hello'), isFalse);
+      expect(await ses.okuBekle('hello'), isFalse);
+      expect(await ses.okuYavas('hello'), isFalse);
+      expect(await ses.okuHizla('hello', carpan: 1.1), isFalse);
+      await ses.durdur();
+    },
+  );
 
   test('dil yok: false, konuşma başlatılmaz; öteki dil çalışır', () async {
     final cagrilar = <String>[];
