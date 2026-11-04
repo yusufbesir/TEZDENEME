@@ -20,7 +20,8 @@
 /// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
 /// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
 /// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
-/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5)
+/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5;
+/// `sesHizi`: dinleme konuşma hızı çarpanı 0,7..1,2, yoksa 1,0, aralık dışı kırpılır)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -405,6 +406,7 @@ class OgrenciDurumu {
     this.haftalikNotlar = const {},
     this.kelimeEklenme = const {},
     this.oturumKartSayisi = varsayilanOturumKarti,
+    this.sesHizi = varsayilanSesHizi,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -605,6 +607,25 @@ class OgrenciDurumu {
   static const List<int> oturumKartSecenekleri = [5, 10, 20];
   static const int varsayilanOturumKarti = 5;
 
+  /// Dinleme alıştırmalarında (Dinle, Dinle-yaz) konuşma hızı çarpanı:
+  /// [enAzSesHizi]..[enCokSesHizi], varsayılan 1,0 (mevcut temel hız).
+  /// Ses servisi flutter_tts hızını bu çarpanla ölçekler.
+  final double sesHizi;
+
+  static const double enAzSesHizi = 0.7;
+  static const double enCokSesHizi = 1.2;
+  static const double varsayilanSesHizi = 1.0;
+
+  /// Hız seçicide sunulan değerler (0,7x / 0,85x / 1x / 1,2x).
+  static const List<double> sesHiziSecenekleri = [0.7, 0.85, 1.0, 1.2];
+
+  /// Hızı [enAzSesHizi]..[enCokSesHizi] aralığına kırpar; NaN/sonsuz ya da
+  /// sayı değilse varsayılan (1,0).
+  static double sesHiziKirp(Object? ham) {
+    if (ham is! num || !ham.isFinite) return varsayilanSesHizi;
+    return ham.toDouble().clamp(enAzSesHizi, enCokSesHizi);
+  }
+
   /// Saklanan görev ödülü ve rozet kaydı sınırları.
   static const int alinanGorevEnCok = 120;
   static const int rozetEnCok = 100;
@@ -723,6 +744,7 @@ class OgrenciDurumu {
     Map<String, String>? haftalikNotlar,
     Map<String, String>? kelimeEklenme,
     int? oturumKartSayisi,
+    double? sesHizi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -792,6 +814,7 @@ class OgrenciDurumu {
       haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
       kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
       oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
+      sesHizi: sesHizi ?? this.sesHizi,
     );
   }
 
@@ -859,6 +882,7 @@ class OgrenciDurumu {
     'haftalikNotlar': haftalikNotlar,
     'kelimeEklenme': kelimeEklenme,
     'oturumKartSayisi': oturumKartSayisi,
+    'sesHizi': sesHizi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1164,6 +1188,8 @@ class OgrenciDurumu {
               oturumKartSecenekleri.contains(j['oturumKartSayisi']))
           ? j['oturumKartSayisi'] as int
           : varsayilanOturumKarti,
+      // Eski kayıtta yoksa 1,0; aralık dışıysa kırpılır.
+      sesHizi: sesHiziKirp(j['sesHizi']),
     );
   }
 
