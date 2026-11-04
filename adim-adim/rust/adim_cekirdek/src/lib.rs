@@ -3,4 +3,5 @@
 //! (bkz. `tests/altin/*.json`, `adim-adim/tool/altin_*.dart`).
 
 pub mod dikte;
+pub mod kart;
 pub mod sozluk;
