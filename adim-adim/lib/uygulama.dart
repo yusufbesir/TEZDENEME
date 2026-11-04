@@ -11,6 +11,8 @@
 /// [1,0 ; 1,3] aralığına kıstırır.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,6 +51,7 @@ import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/projeler_ekrani.dart';
 import 'ekranlar/kabuk.dart';
+import 'ekranlar/kilit_ekrani.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/pratik_etkinlikleri.dart';
 import 'ekranlar/pratik_merkezi_ekrani.dart';
@@ -91,8 +94,13 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       // seçimine (ilk açılışta "Hoş geldin" akışına) gider. (Alan seçiliyken
       // /alan-sec açık kalabilir: Profil'deki "Değiştir" oraya gider; seçim
       // sonrası alan seçim ekranı kendisi /yol'a geçer.)
+      // İstisna: ilk açılış akışında alan seçildiyse hızlı seviye testi
+      // (/yerlestirme) açılabilir; test bitince akışa geri dönülür.
+      final hizliTest =
+          durum.alan != null && state.matchedLocation == '/yerlestirme';
       if ((durum.alan == null || !durum.ilkAcilisTamam) &&
-          state.matchedLocation != '/alan-sec') {
+          state.matchedLocation != '/alan-sec' &&
+          !hizliTest) {
         return '/alan-sec';
       }
       return null;
@@ -237,8 +245,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/yerlestirme',
-        builder: (c, s) =>
-            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+        // hizli=1: ilk açılıştaki 5 soruluk hızlı seviye testi.
+        builder: (c, s) => YerlestirmeEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          hizli: s.uri.queryParameters['hizli'] == '1',
+        ),
       ),
       GoRoute(
         path: '/sinav',
@@ -447,11 +458,42 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
   return yonlendirici;
 });
 
-class AdimAdimUygulama extends ConsumerWidget {
+class AdimAdimUygulama extends ConsumerStatefulWidget {
   const AdimAdimUygulama({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdimAdimUygulama> createState() => _AdimAdimUygulamaState();
+}
+
+class _AdimAdimUygulamaState extends ConsumerState<AdimAdimUygulama>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Ön plana dönüşte akıllı hatırlatıcı denetimi (SADE 6; açılış denetimi
+  /// DurumNotifier.build içinde). Hata uygulamayı durdurmaz.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    unawaited(
+      ref
+          .read(durumProvider.notifier)
+          .akilliHatirlaticiKontrol()
+          .catchError((_) {}),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final durum = ref.watch(durumProvider);
     final koyu = durum.value?.koyuTema;
     return MaterialApp.router(
@@ -486,7 +528,7 @@ class AdimAdimUygulama extends ConsumerWidget {
             .toDouble();
         return MediaQuery(
           data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
-          child: child ?? const SizedBox.shrink(),
+          child: KilitKapisi(child: child ?? const SizedBox.shrink()),
         );
       },
     );

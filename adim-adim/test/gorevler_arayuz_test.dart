@@ -9,6 +9,7 @@ import 'package:adim_adim/bilesenler/hedef_halkasi.dart';
 import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
+import 'package:adim_adim/motor/basarimlar.dart';
 import 'package:adim_adim/motor/motor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -213,12 +214,12 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(find.text('2/20 rozet'), findsOneWidget);
+      expect(find.text('2/${Basarimlar.toplam} rozet'), findsOneWidget);
       await dokun(tester, find.byKey(const ValueKey('gorevler-basarimlar')));
 
       expect(find.text('Başarımlar'), findsOneWidget); // AppBar başlığı
       expect(find.byKey(const ValueKey('basarim-ozet')), findsOneWidget);
-      expect(find.text('2/20 rozet'), findsOneWidget);
+      expect(find.text('2/${Basarimlar.toplam} rozet'), findsOneWidget);
       // İlk ders ve tam puan kazanıldı; seri 30 kilitli.
       expect(
         find.descendant(
@@ -261,7 +262,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byKey(const ValueKey('profil-basarimlar')),
-          matching: find.text('2/20 rozet'),
+          matching: find.text('2/${Basarimlar.toplam} rozet'),
         ),
         findsOneWidget,
       );

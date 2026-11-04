@@ -9,7 +9,9 @@
 /// akışına dönüşür: 1) alan, 2) ad + günlük hedef + haftalık hedef,
 /// 3) hatırlatma (isteğe bağlı), sonra "Hazırsın" özeti ve "Başla". Tüm
 /// seçimler mevcut `alanSec` / `ayarGuncelle` ile yazılır; "Başla"
-/// `ilkAcilisTamamla` ile akışı kapatır. Mevcut kullanıcı (Profil'den
+/// `ilkAcilisTamamla` ile akışı kapatır. Özet adımında isteğe bağlı "5 soruluk
+/// hızlı seviye testi" kısayolu vardır: mevcut yerleştirme ekranını
+/// (`/yerlestirme?hizli=1`) 5 soruyla açar, yeni ekran eklenmez. Mevcut kullanıcı (Profil'den
 /// "Değiştir") yalnız tek adımlı alan seçimini görür.
 library;
 
@@ -20,6 +22,8 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../model/icerik.dart';
+import '../motor/motor.dart';
 import '../tema/alan_renkleri.dart';
 import '../tema/tema.dart';
 
@@ -178,7 +182,7 @@ class _AlanSecimiDurumu extends ConsumerState<AlanSecimiEkrani> {
       0 => _alanAdimi(yazi, r),
       1 => _hedefAdimi(yazi, r),
       2 => _hatirlatmaAdimi(yazi, r),
-      _ => _ozetAdimi(yazi, r, durum),
+      _ => _ozetAdimi(yazi, r, durum, _hizliTestKursu(durum)),
     };
 
     return Scaffold(
@@ -434,7 +438,27 @@ class _AlanSecimiDurumu extends ConsumerState<AlanSecimiEkrani> {
     ),
   ];
 
-  List<Widget> _ozetAdimi(TextTheme yazi, AdimRenkleri r, OgrenciDurumu durum) {
+  /// Hızlı seviye testi yapılabilecek ilk kurs (seçili alanda sorusu olan);
+  /// yoksa null ve kısayol gösterilmez.
+  Kurs? _hizliTestKursu(OgrenciDurumu durum) {
+    for (final k in ref.read(alanKurslariProvider)) {
+      if (Motor.yerlestirmeSec(
+        durum,
+        k,
+        enCok: Motor.yerlestirmeHizliSoru,
+      ).isNotEmpty) {
+        return k;
+      }
+    }
+    return null;
+  }
+
+  List<Widget> _ozetAdimi(
+    TextTheme yazi,
+    AdimRenkleri r,
+    OgrenciDurumu durum,
+    Kurs? hizliKurs,
+  ) {
     Widget satir(IconData simge, String etiket, String deger) => ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(simge, color: r.ana),
@@ -474,6 +498,21 @@ class _AlanSecimiDurumu extends ConsumerState<AlanSecimiEkrani> {
             ? 'Kapalı'
             : 'Her gün ${durum.hatirlatmaSaati}',
       ),
+      if (hizliKurs != null) ...[
+        const SizedBox(height: Olcu.b2),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const ValueKey('hizli-seviye-testi'),
+            style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
+            onPressed: () => context.push(
+              '/yerlestirme?kurs=${Uri.encodeComponent(hizliKurs.id)}&hizli=1',
+            ),
+            icon: const Icon(Icons.fast_forward),
+            label: const Text('5 soruluk hızlı seviye testi'),
+          ),
+        ),
+      ],
     ];
   }
 }
