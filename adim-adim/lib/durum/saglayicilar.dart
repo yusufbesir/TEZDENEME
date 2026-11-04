@@ -122,6 +122,9 @@ final secilenKursProvider = NotifierProvider<SecilenKurs, String?>(
   SecilenKurs.new,
 );
 
+/// Akıllı hatırlatıcının saati; testlerde sabit saatle değiştirilir.
+final saatProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   @override
   Future<OgrenciDurumu> build() async {
@@ -184,19 +187,15 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     // Akıllı hatırlatıcı (SADE 6): ayar açıksa, bugün XP yoksa, saat
     // geldiyse, günde en çok bir kez. Ön plana dönüşte de denetlenir
     // (akilliHatirlaticiKontrol).
-    d = await _akilliHatirlat(d, bugun, DateTime.now());
+    d = await _akilliHatirlat(d, ref.read(saatProvider)());
     return d;
   }
 
   /// Gerekiyorsa akıllı hatırlatıcıyı gösterir; gün hemen işaretlenip
   /// kaydedilir (başarısız olsa da aynı gün yeniden denenmez).
-  Future<OgrenciDurumu> _akilliHatirlat(
-    OgrenciDurumu d,
-    String bugun,
-    DateTime simdi,
-  ) async {
+  Future<OgrenciDurumu> _akilliHatirlat(OgrenciDurumu d, DateTime simdi) async {
     if (!Hatirlatici.gerekli(d, simdi)) return d;
-    d = d.copyWith(sonHatirlatmaGunu: bugun);
+    d = d.copyWith(sonHatirlatmaGunu: Motor.bugun(simdi));
     try {
       await ref.read(depoProvider).kaydet(d);
     } catch (e) {
@@ -216,8 +215,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<void> akilliHatirlaticiKontrol([DateTime? simdi]) async {
     final d = state.value;
     if (d == null) return;
-    final an = simdi ?? DateTime.now();
-    final yeni = await _akilliHatirlat(d, Motor.bugun(an), an);
+    final an = simdi ?? ref.read(saatProvider)();
+    final yeni = await _akilliHatirlat(d, an);
     if (!identical(yeni, d)) state = AsyncData(yeni);
   }
 
@@ -230,7 +229,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     var yeni = donustur(eski);
     // XP kazanıldıysa çalışma saati kaydedilir (akıllı hatırlatıcı saati).
     if (yeni.xp > eski.xp) {
-      yeni = Hatirlatici.calismaKaydet(yeni, DateTime.now().hour);
+      yeni = Hatirlatici.calismaKaydet(yeni, ref.read(saatProvider)().hour);
     }
     state = AsyncData(yeni);
     try {

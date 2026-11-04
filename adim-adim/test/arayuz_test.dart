@@ -513,7 +513,12 @@ void main() {
     expect(find.text('Haftalık hedef'), findsOneWidget);
     expect(find.text('Haftada 5 gün'), findsOneWidget);
     await tester.ensureVisible(find.text('Haftada 5 gün'));
-    final kaydirici = find.byType(Slider).at(1);
+    // Haftalık hedef kaydırıcısı (3..7); liste tembel olduğundan sıra yerine
+    // aralıkla bulunur.
+    final kaydirici = find.byWidgetPredicate(
+      (w) => w is Slider && w.min == 3 && w.max == 7,
+    );
+    expect(kaydirici, findsOneWidget);
     expect(tester.widget<Slider>(kaydirici).min, 3);
     expect(tester.widget<Slider>(kaydirici).max, 7);
     tester.widget<Slider>(kaydirici).onChanged!(6);

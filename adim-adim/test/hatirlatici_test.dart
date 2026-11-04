@@ -162,6 +162,7 @@ void main() {
         overrides: [
           depoProvider.overrideWithValue(depo),
           bildirimProvider.overrideWithValue(SahteBildirim()),
+          saatProvider.overrideWithValue(() => _aksam),
         ],
       );
       addTearDown(kap.dispose);
@@ -170,7 +171,7 @@ void main() {
       await notifier.mikroBitir(5, 5);
       final d = kap.read(durumProvider).value!;
       expect(d.xp, greaterThan(0));
-      expect(d.calismaSaatleri, [DateTime.now().hour]);
+      expect(d.calismaSaatleri, [_aksam.hour]);
     });
 
     test(
@@ -183,28 +184,21 @@ void main() {
           overrides: [
             depoProvider.overrideWithValue(depo),
             bildirimProvider.overrideWithValue(bildirim),
+            saatProvider.overrideWithValue(() => _aksam),
           ],
         );
         addTearDown(kap.dispose);
-        // Açılış denetimi gerçek saati kullanır; sessiz saatte gönderilmez.
-        final sessiz = Hatirlatici.sessizMi(DateTime.now().hour);
+        // Açılış denetimi enjekte edilen akşam saatini kullanır.
         await kap.read(durumProvider.future);
         await Future<void>.delayed(Duration.zero);
         int adet() => bildirim.cagrilar.where((c) => c == 'akilli').length;
-        expect(adet(), sessiz ? 0 : 1);
-        // Ön plan denetimi sabit akşam saatiyle: toplam bir kez gönderilir.
-        final su = DateTime.now();
-        final aksam = DateTime(su.year, su.month, su.day, 20, 30);
-        final n = kap.read(durumProvider.notifier);
-        await n.akilliHatirlaticiKontrol(aksam);
-        await Future<void>.delayed(Duration.zero);
         expect(adet(), 1);
         expect(
           kap.read(durumProvider).value!.sonHatirlatmaGunu,
-          Motor.bugun(aksam),
+          Motor.bugun(_aksam),
         );
-        // Aynı gün ikinci gönderim yok.
-        await n.akilliHatirlaticiKontrol(aksam);
+        // Aynı gün ön plana dönüş: ikinci gönderim yok.
+        await kap.read(durumProvider.notifier).akilliHatirlaticiKontrol();
         await Future<void>.delayed(Duration.zero);
         expect(adet(), 1);
       },
@@ -217,6 +211,7 @@ void main() {
         overrides: [
           depoProvider.overrideWithValue(depo),
           bildirimProvider.overrideWithValue(bildirim),
+          saatProvider.overrideWithValue(() => _aksam),
         ],
       );
       addTearDown(kap.dispose);

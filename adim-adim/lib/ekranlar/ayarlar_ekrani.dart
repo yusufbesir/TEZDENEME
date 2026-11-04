@@ -484,6 +484,18 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                     notifier.ayarGuncelle(gunDersiBildirimiAcik: v),
               ),
               SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.mic_none, color: r.ana),
+                title: const Text('Konuşma alıştırmaları'),
+                subtitle: Text(
+                  durum.konusmaAcik
+                      ? 'Derslerde cümleleri yüksek sesle söylersin'
+                      : 'Kapalı: konuşma alıştırmaları derste atlanır',
+                ),
+                value: durum.konusmaAcik,
+                onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
+              ),
+              SwitchListTile(
                 key: const ValueKey('ayar-akilli-hatirlatici'),
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(
@@ -499,18 +511,6 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 value: durum.akilliHatirlaticiAcik,
                 onChanged: (v) =>
                     notifier.ayarGuncelle(akilliHatirlaticiAcik: v),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                secondary: Icon(Icons.mic_none, color: r.ana),
-                title: const Text('Konuşma alıştırmaları'),
-                subtitle: Text(
-                  durum.konusmaAcik
-                      ? 'Derslerde cümleleri yüksek sesle söylersin'
-                      : 'Kapalı: konuşma alıştırmaları derste atlanır',
-                ),
-                value: durum.konusmaAcik,
-                onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
               ),
               bolum('Veriler'),
               Text(
