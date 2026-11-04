@@ -20,7 +20,11 @@
 /// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
 /// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
 /// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
-/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5)
+/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5;
+/// `kilit`: uygulama kilidi PIN karması (model/kilit.dart), yoksa/bozuksa null)
+/// `akilliHatirlaticiAcik`/`sonHatirlatmaGunu`/`calismaSaatleri`: akıllı
+/// hatırlatıcı (SADE 6), kapalı, hiç gönderilmemiş, boş liste;
+/// `sesHizi`: dinleme konuşma hızı çarpanı 0,7..1,2, yoksa 1,0, aralık dışı kırpılır)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -28,6 +32,7 @@
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
+import 'kilit.dart';
 import 'kod_projesi.dart';
 import 'satranc_durumu.dart';
 
@@ -39,7 +44,31 @@ class Kart {
     required this.sonraki,
     this.yariOmurGun = 1.0,
     this.sonCevap,
+    this.sonDerece,
+    this.yanlisSayisi = 0,
+    this.sakin = false,
+    this.emekli = false,
   });
+
+  /// Bilinen kelimeyi emekli etme: aralık bu günü aşınca kart "bilinen" sayılır
+  /// ve yalnız [emekliYoklamaGun] günde bir yoklanır.
+  static const double emekliEsigi = 60;
+  static const int emekliYoklamaGun = 120;
+
+  /// Kart emekli mi (bilinen)? Yanlış cevapta kalkar. Eski kayıtta false.
+  final bool emekli;
+
+  /// Sorunlu kelime sakinleştirme: bu kadar yanlıştan sonra kart [sakinGun]
+  /// gün kuyruktan çıkar (hata defterinde "ipucu kelime" rozetiyle kalır).
+  static const int sorunluEsik = 8;
+  static const int sakinGun = 14;
+
+  /// Kümülatif yanlış cevap sayısı (eşiğe varınca sıfırlanır). Eski kayıtta 0.
+  final int yanlisSayisi;
+
+  /// Kart şu an sakinleştirilmiş (sorunlu kelime) mi? Sonraki tekrar günü
+  /// gelince ilk cevapta kalkar.
+  final bool sakin;
 
   /// En kısa ve en uzun yarı ömür (gün).
   static const double enAzYariOmur = 0.5;
@@ -63,6 +92,11 @@ class Kart {
   /// Son cevap doğru muydu? null: bilinmiyor (eski kayıt ya da hiç cevaplanmadı).
   final bool? sonCevap;
 
+  /// Son doğru cevapta kullanıcının seçtiği güven derecesi (SM-2 kalitesi):
+  /// 'zor', 'iyi' ya da 'kolay'. null: derece seçilmedi (eski kayıt, yanlış
+  /// cevap ya da derece sorulmayan ekran). İsteğe bağlı; yalnız doluysa yazılır.
+  final String? sonDerece;
+
   /// Yarı ömürden 1..5 gösterge kutusu: <2 gün 1, <4 gün 2, <8 gün 3,
   /// <16 gün 4, daha fazlası 5.
   static int kutuHesapla(double yariOmur) {
@@ -83,6 +117,10 @@ class Kart {
     'sonraki': sonraki,
     'yariOmurGun': yariOmurGun,
     'sonCevap': sonCevap,
+    if (sonDerece != null) 'sonDerece': sonDerece,
+    if (yanlisSayisi > 0) 'yanlisSayisi': yanlisSayisi,
+    if (sakin) 'sakin': true,
+    if (emekli) 'emekli': true,
   };
 
   static Kart? fromJson(Object? j) {
@@ -100,13 +138,38 @@ class Kart {
         ? ham.toDouble()
         : kutudanYariOmur(kutu);
     final son = j['sonCevap'];
+    final derece = j['sonDerece'];
     return Kart(
       kutu: kutu,
       sonraki: sonraki,
       yariOmurGun: yariOmur,
       sonCevap: son is bool ? son : null,
+      sonDerece: (derece is String && GuvenDerecesi.kodlar.contains(derece))
+          ? derece
+          : null,
+      yanlisSayisi: (j['yanlisSayisi'] is int && j['yanlisSayisi'] >= 0)
+          ? (j['yanlisSayisi'] as int).clamp(0, sorunluEsik)
+          : 0,
+      sakin: j['sakin'] == true,
+      emekli: j['emekli'] == true,
     );
   }
+}
+
+/// Tekrar ekranındaki üç düğmeli güven derecesi (SM-2 mantığında üç kalite).
+/// Yalnız doğru cevaptan sonra sorulur; yarı ömür çarpanı: zor x1,3, iyi x2
+/// (eski "doğru" ile aynı), kolay x3.
+enum GuvenDerecesi {
+  zor('zor', 'Zor', 1.3),
+  iyi('iyi', 'İyi', 2.0),
+  kolay('kolay', 'Kolay', 3.0);
+
+  const GuvenDerecesi(this.kod, this.etiket, this.carpan);
+  final String kod;
+  final String etiket;
+  final double carpan;
+
+  static const List<String> kodlar = ['zor', 'iyi', 'kolay'];
 }
 
 /// Hata defteri kaydı: yanlış cevaplanan bir yarışma sorusu ya da alıştırma kartı.
@@ -405,6 +468,14 @@ class OgrenciDurumu {
     this.haftalikNotlar = const {},
     this.kelimeEklenme = const {},
     this.oturumKartSayisi = varsayilanOturumKarti,
+    this.kilit,
+    this.akilliHatirlaticiAcik = false,
+    this.kardesErteleAcik = false,
+    this.emekliAcik = false,
+    this.yukButcesi = varsayilanYukButcesi,
+    this.sonHatirlatmaGunu,
+    this.calismaSaatleri = const [],
+    this.sesHizi = varsayilanSesHizi,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -426,6 +497,27 @@ class OgrenciDurumu {
   static const int enCokDakikaHedefi = 240;
   static const int gunlukSureEnCok = 1000;
   static const int aylikEnCok = 600;
+
+  /// Yedek/ilerleme dosyası şema sınırları (SADE 4, güvenlik): bozuk ya da
+  /// şişirilmiş bir dosya belleği doldurmasın diye harita, küme ve liste boyutu
+  /// üst sınırları. Sınırlar gerçek kullanımın çok üstündedir; aşan girdiler
+  /// atlanır, kalan alanlar olduğu gibi yüklenir.
+  /// - [kartEnCok]: tekrar kartı sayısı (ilk gelenler tutulur).
+  /// - [sayacEnCok]: ders/hikâye/senaryo başına sayaç haritaları.
+  /// - [gunlukXpEnCok]: gün -> XP haritası (en yeni günler tutulur).
+  /// - [kumeEnCok]: ders/ünite/dönem kimlik kümeleri.
+  /// - [sinavEnCok]: ara sınav ve sertifika sonuç haritaları.
+  /// - [kimlikEnCokKarakter]: ders/kart/kurs kimliği dize uzunluğu.
+  static const int kartEnCok = 20000;
+  static const int sayacEnCok = 5000;
+  static const int gunlukXpEnCok = 4000;
+  static const int kumeEnCok = 2000;
+  static const int sinavEnCok = 2000;
+  static const int kimlikEnCokKarakter = 120;
+
+  /// Tarih anahtarlı haritaların okuma üst sınırı: önce bu kadar girdi
+  /// okunur, sonra en yeni N tutulur ([_enYeniKirp]).
+  static const int _tarihliEnCok = 1 << 18;
 
   final int xp;
   final int seri;
@@ -602,8 +694,58 @@ class OgrenciDurumu {
   /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
   final int oturumKartSayisi;
 
+  /// Uygulama kilidi (PIN karması; düz metin yok). null: kilit kapalı
+  /// (eski kayıtlar ve bozuk alan). Ayrıntı: model/kilit.dart.
+  final KilitAyari? kilit;
+
+  /// Akıllı hatırlatıcı (SADE 6; günde en çok bir bildirim); varsayılan kapalı.
+  final bool akilliHatirlaticiAcik;
+
+  /// Kardeş alıştırma erteleme (varsayılan kapalı; Ayarlar'dan açılır): aynı dersin kartlarından günde en çok
+  /// [kardesSiniri] tanesi kuyruğa girer, kalanı ertesi güne kalır (silinmez).
+  final bool kardesErteleAcik;
+  static const int kardesSiniri = 3;
+
+  /// Bilinen kelimeyi emekli etme açık mı (varsayılan kapalı)? Kapalıyken kartlar normal aralıkla
+  /// gider; mevcut emekli kartlar vadesi gelince normale döner.
+  final bool emekliAcik;
+
+  /// Günlük yük bütçesi: vadesi gelen kart sayısı bu sayıyı aşınca elle eklenen
+  /// yeni kart ertesi güne alınır. 0: kapalı.
+  final int yukButcesi;
+  static const int varsayilanYukButcesi = 10;
+  static const int enCokYukButcesi = 100;
+
+  /// Akıllı hatırlatıcının en son gönderildiği gün 'YYYY-MM-DD'; null: hiç.
+  final String? sonHatirlatmaGunu;
+
+  /// XP kazanılan son çalışmaların saati (0..23), eskiden yeniye; en çok
+  /// [calismaSaatiEnCok] kayıt. Hatırlatma saati bunların ortancasıdır.
+  final List<int> calismaSaatleri;
+
+  static const int calismaSaatiEnCok = 14;
+
   static const List<int> oturumKartSecenekleri = [5, 10, 20];
   static const int varsayilanOturumKarti = 5;
+
+  /// Dinleme alıştırmalarında (Dinle, Dinle-yaz) konuşma hızı çarpanı:
+  /// [enAzSesHizi]..[enCokSesHizi], varsayılan 1,0 (mevcut temel hız).
+  /// Ses servisi flutter_tts hızını bu çarpanla ölçekler.
+  final double sesHizi;
+
+  static const double enAzSesHizi = 0.7;
+  static const double enCokSesHizi = 1.2;
+  static const double varsayilanSesHizi = 1.0;
+
+  /// Hız seçicide sunulan değerler (0,7x / 0,85x / 1x / 1,2x).
+  static const List<double> sesHiziSecenekleri = [0.7, 0.85, 1.0, 1.2];
+
+  /// Hızı [enAzSesHizi]..[enCokSesHizi] aralığına kırpar; NaN/sonsuz ya da
+  /// sayı değilse varsayılan (1,0).
+  static double sesHiziKirp(Object? ham) {
+    if (ham is! num || !ham.isFinite) return varsayilanSesHizi;
+    return ham.toDouble().clamp(enAzSesHizi, enCokSesHizi);
+  }
 
   /// Saklanan görev ödülü ve rozet kaydı sınırları.
   static const int alinanGorevEnCok = 120;
@@ -723,6 +865,15 @@ class OgrenciDurumu {
     Map<String, String>? haftalikNotlar,
     Map<String, String>? kelimeEklenme,
     int? oturumKartSayisi,
+    KilitAyari? kilit,
+    bool kilitSil = false,
+    bool? akilliHatirlaticiAcik,
+    bool? kardesErteleAcik,
+    bool? emekliAcik,
+    int? yukButcesi,
+    String? sonHatirlatmaGunu,
+    List<int>? calismaSaatleri,
+    double? sesHizi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -792,6 +943,15 @@ class OgrenciDurumu {
       haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
       kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
       oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
+      kilit: kilitSil ? null : (kilit ?? this.kilit),
+      akilliHatirlaticiAcik:
+          akilliHatirlaticiAcik ?? this.akilliHatirlaticiAcik,
+      kardesErteleAcik: kardesErteleAcik ?? this.kardesErteleAcik,
+      emekliAcik: emekliAcik ?? this.emekliAcik,
+      yukButcesi: (yukButcesi ?? this.yukButcesi).clamp(0, enCokYukButcesi),
+      sonHatirlatmaGunu: sonHatirlatmaGunu ?? this.sonHatirlatmaGunu,
+      calismaSaatleri: calismaSaatleri ?? this.calismaSaatleri,
+      sesHizi: sesHizi ?? this.sesHizi,
     );
   }
 
@@ -859,6 +1019,14 @@ class OgrenciDurumu {
     'haftalikNotlar': haftalikNotlar,
     'kelimeEklenme': kelimeEklenme,
     'oturumKartSayisi': oturumKartSayisi,
+    'kilit': kilit?.toJson(),
+    'akilliHatirlaticiAcik': akilliHatirlaticiAcik,
+    'kardesErteleAcik': kardesErteleAcik,
+    'emekliAcik': emekliAcik,
+    'yukButcesi': yukButcesi,
+    'sonHatirlatmaGunu': sonHatirlatmaGunu,
+    'calismaSaatleri': calismaSaatleri,
+    'sesHizi': sesHizi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -896,8 +1064,31 @@ class OgrenciDurumu {
     };
   }
 
+  /// Kimlik kümesi (ders/ünite/dönem): metin olmayan, boş, uzun ya da
+  /// [uygun] olmayan girdiler atlanır; en çok [kumeEnCok] tane tutulur.
+  static Set<String> _kume(Object? ham, bool Function(String) uygun) {
+    final s = <String>{};
+    if (ham is List) {
+      for (final e in ham) {
+        if (s.length >= kumeEnCok) break;
+        if (e is String &&
+            e.isNotEmpty &&
+            e.length <= kimlikEnCokKarakter &&
+            uygun(e)) {
+          s.add(e);
+        }
+      }
+    }
+    return Set.unmodifiable(s);
+  }
+
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
   /// Anahtarlar yalnızca beklenen biçimde (ders/kart kimliği, gün) kabul edilir.
+  /// Şema doğrulama (SADE 4): her alan için tür denetimi, makul aralık, dize
+  /// uzunluğu ve liste/harita boyutu sınırı uygulanır; geçersiz bir alan yalnız
+  /// kendi varsayılanına döner, diğer alanlar korunur. Bilinmeyen alanlar yok
+  /// sayılır (kaydetmede yazılmaz). Kök harita değilse tüm durum varsayılandır;
+  /// dosyayı kenara alma kararı depodadır ([DosyaDepo]).
   static OgrenciDurumu fromJson(Object? j) {
     if (j is! Map) return const OgrenciDurumu();
     int tamsayi(Object? v, int varsayilan, {int min = 0, int max = 1 << 40}) =>
@@ -906,20 +1097,31 @@ class OgrenciDurumu {
     final hamKart = j['kartlar'];
     if (hamKart is Map) {
       for (final e in hamKart.entries) {
+        if (kartlar.length >= kartEnCok) break;
         final k = e.key;
-        if (k is! String || k.length > 120 || !k.contains('#')) continue;
+        if (k is! String ||
+            k.isEmpty ||
+            k.length > kimlikEnCokKarakter ||
+            !k.contains('#')) {
+          continue;
+        }
         final kart = Kart.fromJson(e.value);
         if (kart != null) kartlar[k] = kart;
       }
     }
-    Map<String, int> sayac(Object? v, bool Function(String) anahtarUygun) {
+    Map<String, int> sayac(
+      Object? v,
+      bool Function(String) anahtarUygun, {
+      int enCok = sayacEnCok,
+    }) {
       final m = <String, int>{};
       if (v is Map) {
         for (final e in v.entries) {
+          if (m.length >= enCok) break;
           final k = e.key;
           final d = e.value;
           if (k is String &&
-              k.length <= 120 &&
+              k.length <= kimlikEnCokKarakter &&
               anahtarUygun(k) &&
               d is int &&
               d >= 0 &&
@@ -983,7 +1185,14 @@ class OgrenciDurumu {
       sonGun: (sonGun is String && gunGecerli(sonGun)) ? sonGun : null,
       kartlar: kartlar,
       tamamlanan: sayac(j['tamamlanan'], (k) => !k.contains('#')),
-      gunlukXp: sayac(j['gunlukXp'], gunGecerli),
+      // Gün anahtarlı haritalar önce tümüyle okunur (dosya boyutu zaten
+      // sınırlı), sonra en yeni günler tutulur.
+      gunlukXp: Map.unmodifiable(
+        _enYeniKirp(
+          sayac(j['gunlukXp'], gunGecerli, enCok: _tarihliEnCok),
+          gunlukXpEnCok,
+        ),
+      ),
       gunlukHedef: tamsayi(j['gunlukHedef'], 30, min: 10, max: 500),
       ad: j['ad'] is String
           ? String.fromCharCodes((j['ad'] as String).runes.take(40))
@@ -1031,15 +1240,7 @@ class OgrenciDurumu {
       ),
       // Eski kayıtta yoksa boş; geçerli ders kimliği (en çok 120 karakter,
       // '#' içermez) olmayan girdiler atlanır.
-      atlananDersler: Set.unmodifiable({
-        if (j['atlananDersler'] is List)
-          for (final e in j['atlananDersler'] as List)
-            if (e is String &&
-                e.isNotEmpty &&
-                e.length <= 120 &&
-                !e.contains('#'))
-              e,
-      }),
+      atlananDersler: _kume(j['atlananDersler'], (e) => !e.contains('#')),
       // Eski kayıtta yoksa ya da bozuksa null (plan yok).
       calismaPlani: CalismaPlani.fromJson(j['calismaPlani']),
       // Eski kayıtta yoksa boş; bozuk girdiler atlanır.
@@ -1074,11 +1275,7 @@ class OgrenciDurumu {
           ? j['seriKorumaHafta'] as String
           : null,
       // Eski kayıtta yoksa boş; bozuk anahtarlar atlanır.
-      donemDersleri: Set.unmodifiable({
-        if (j['donemDersleri'] is List)
-          for (final e in j['donemDersleri'] as List)
-            if (e is String && donemAnahtariGecerli(e)) e,
-      }),
+      donemDersleri: _kume(j['donemDersleri'], donemAnahtariGecerli),
       gunDersiBildirimiAcik: j['gunDersiBildirimiAcik'] is bool
           ? j['gunDersiBildirimiAcik'] as bool
           : false,
@@ -1091,22 +1288,18 @@ class OgrenciDurumu {
       satranc: SatrancDurumu.fromJson(j['satranc']),
       // Eski kayıtta yoksa boş; geçerli ünite kimliği ('#' içermez) olmayan
       // girdiler atlanır.
-      altinUniteler: Set.unmodifiable({
-        if (j['altinUniteler'] is List)
-          for (final e in j['altinUniteler'] as List)
-            if (e is String &&
-                e.isNotEmpty &&
-                e.length <= 120 &&
-                !e.contains('#'))
-              e,
-      }),
+      altinUniteler: _kume(j['altinUniteler'], (e) => !e.contains('#')),
       senaryolar: Map.unmodifiable(
         sayac(j['senaryolar'], (k) => k.isNotEmpty && !k.contains('#')),
       ),
       // Eski kayıtta yoksa boş / 0; en çok 24 saat/gün, harita boyutu sınırlı.
       gunlukSureSn: Map.unmodifiable(
         _enYeniKirp({
-          for (final e in sayac(j['gunlukSureSn'], gunGecerli).entries)
+          for (final e in sayac(
+            j['gunlukSureSn'],
+            gunGecerli,
+            enCok: _tarihliEnCok,
+          ).entries)
             if (e.value <= 86400) e.key: e.value,
         }, gunlukSureEnCok),
       ),
@@ -1116,13 +1309,22 @@ class OgrenciDurumu {
         max: enCokDakikaHedefi,
       ),
       aylikDers: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikDers'], ayGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikDers'], ayGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikKart: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikKart'], ayGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikKart'], ayGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikKurs: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikKurs'], ayKursGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikKurs'], ayKursGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikHedefDers: tamsayi(
         j['aylikHedefDers'],
@@ -1164,7 +1366,40 @@ class OgrenciDurumu {
               oturumKartSecenekleri.contains(j['oturumKartSayisi']))
           ? j['oturumKartSayisi'] as int
           : varsayilanOturumKarti,
+      // Eski kayıtta yoksa ya da bozuksa kilit yok (kilitsiz açılış).
+      kilit: KilitAyari.fromJson(j['kilit']),
+      // Eski kayıtta yoksa: kapalı, hiç gönderilmedi, saat kaydı yok.
+      kardesErteleAcik: j['kardesErteleAcik'] is bool
+          ? j['kardesErteleAcik'] as bool
+          : false,
+      emekliAcik: j['emekliAcik'] is bool ? j['emekliAcik'] as bool : false,
+      yukButcesi: j['yukButcesi'] is int
+          ? (j['yukButcesi'] as int).clamp(0, enCokYukButcesi)
+          : varsayilanYukButcesi,
+      akilliHatirlaticiAcik: j['akilliHatirlaticiAcik'] is bool
+          ? j['akilliHatirlaticiAcik'] as bool
+          : false,
+      sonHatirlatmaGunu:
+          (j['sonHatirlatmaGunu'] is String &&
+              gunGecerli(j['sonHatirlatmaGunu'] as String))
+          ? j['sonHatirlatmaGunu'] as String
+          : null,
+      calismaSaatleri: calismaSaatleriCoz(j['calismaSaatleri']),
+      // Eski kayıtta yoksa 1,0; aralık dışıysa kırpılır.
+      sesHizi: sesHiziKirp(j['sesHizi']),
     );
+  }
+
+  /// Çalışma saatleri: 0..23 dışı ve sayı olmayan girdiler atılır, en yeni
+  /// [calismaSaatiEnCok] kayıt tutulur.
+  static List<int> calismaSaatleriCoz(Object? ham) {
+    if (ham is! List) return const [];
+    final saatler = [
+      for (final e in ham)
+        if (e is int && e >= 0 && e <= 23) e,
+    ];
+    final fazla = saatler.length - calismaSaatiEnCok;
+    return List.unmodifiable(fazla > 0 ? saatler.sublist(fazla) : saatler);
   }
 
   /// Haftalık notlar: geçersiz hafta anahtarı, boş/metin olmayan değer atılır,
@@ -1289,13 +1524,18 @@ class SinavSonucu {
     return SinavSonucu(dogru: d, toplam: t, gun: g);
   }
 
-  /// Kimlik -> sonuç haritası; geçersiz anahtar/değer sessizce atılır.
+  /// Kimlik -> sonuç haritası; geçersiz anahtar/değer sessizce atılır,
+  /// en çok [OgrenciDurumu.sinavEnCok] girdi tutulur.
   static Map<String, SinavSonucu> haritaCoz(Object? v) {
     final m = <String, SinavSonucu>{};
     if (v is Map) {
       for (final e in v.entries) {
+        if (m.length >= OgrenciDurumu.sinavEnCok) break;
         final k = e.key;
-        if (k is! String || k.isEmpty || k.length > 120 || k.contains('#')) {
+        if (k is! String ||
+            k.isEmpty ||
+            k.length > OgrenciDurumu.kimlikEnCokKarakter ||
+            k.contains('#')) {
           continue;
         }
         final s = fromJson(e.value);
@@ -1384,4 +1624,79 @@ class CalismaPlani {
     gunlukDakika,
     Object.hashAllUnordered(gunler),
   );
+}
+
+/// Durum dosyası sürüm göçü (SADE dayanıklılık). Sahibi: Yusuf; yazan: [Claude#goc-zinciri].
+/// Saf işlevler: dosya/IO yok, fırlatma yalnız adım işlevinden gelir.
+/// `surum` artınca eski sürümden yenisine adım adım dönüştürülür: adım
+/// tablosundaki `n` anahtarı "n sürümünden n+1 sürümüne" dönüştürücüdür.
+/// Şu an güncel sürüm 1'dir; tablo boştur, mekanizma bir sonraki artışta hazırdır.
+class DurumGocu {
+  const DurumGocu._();
+
+  /// [OgrenciDurumu.toJson]'un yazdığı sürüm.
+  static const int guncel = 1;
+
+  /// Varsayılan adım tablosu (şimdilik boş).
+  static const Map<int, Map<String, Object?> Function(Map<String, Object?>)>
+  varsayilanAdimlar = {};
+
+  /// Ham JSON'daki sürüm: `surum` yoksa, tamsayı değilse ya da 1'den küçükse 1.
+  static int surumuOku(Map<Object?, Object?> ham) {
+    final s = ham['surum'];
+    return (s is int && s >= 1) ? s : 1;
+  }
+
+  /// [ham] sürümünü [hedef] sürüme getirir. Girdi değiştirilmez.
+  /// - sürüm == hedef: aynen döner ([GocSonucu.gocYapildi] false).
+  /// - sürüm > hedef (gelecek sürüm): dokunulmaz, `gelecek` true; okuma
+  ///   mevcut hoşgörülü [OgrenciDurumu.fromJson] ile yapılır.
+  /// - sürüm < hedef: her adım sırayla uygulanır; eksik adım ya da adımın
+  ///   fırlatması [StateError] olarak yukarı çıkar (çağıran dosyayı korur).
+  static GocSonucu uygula(
+    Map<Object?, Object?> ham, {
+    int hedef = guncel,
+    Map<int, Map<String, Object?> Function(Map<String, Object?>)>? adimlar,
+  }) {
+    final tablo = adimlar ?? varsayilanAdimlar;
+    final eski = surumuOku(ham);
+    var json = <String, Object?>{
+      for (final e in ham.entries)
+        if (e.key is String) e.key as String: e.value,
+    };
+    if (eski > hedef) {
+      return GocSonucu(json, eskiSurum: eski, yeniSurum: eski, gelecek: true);
+    }
+    var s = eski;
+    while (s < hedef) {
+      final adim = tablo[s];
+      if (adim == null) {
+        throw StateError('$s sürümünden $hedef sürümüne göç adımı yok');
+      }
+      try {
+        json = Map<String, Object?>.of(adim(Map<String, Object?>.of(json)));
+      } catch (e) {
+        throw StateError('$s -> ${s + 1} göç adımı başarısız: $e');
+      }
+      s++;
+      json['surum'] = s;
+    }
+    return GocSonucu(json, eskiSurum: eski, yeniSurum: s, gelecek: false);
+  }
+}
+
+class GocSonucu {
+  const GocSonucu(
+    this.json, {
+    required this.eskiSurum,
+    required this.yeniSurum,
+    required this.gelecek,
+  });
+
+  final Map<String, Object?> json;
+  final int eskiSurum;
+  final int yeniSurum;
+  final bool gelecek;
+
+  bool get gocYapildi => yeniSurum != eskiSurum;
 }

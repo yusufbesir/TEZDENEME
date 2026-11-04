@@ -202,7 +202,7 @@ async function recordErrorCard(page: any): Promise<void> {
 // ================================================================ 1) sabit rotalar
 test("panel files: every route in UI_FILES serves with the strict CSP and hardening headers, carries no secret; everything else (retired v1 files, traversal, directory forms) stays closed", T60, async () => {
   const routes = Object.entries(UI_FILES);
-  assert.equal(routes.length, 44, "the list of served files is closed: 44 fixed routes (page, 11 css, 30 js, icon, favicon); a new file must be added here on purpose");
+  assert.equal(routes.length, 46, "the list of served files is closed: 46 fixed routes (page, 11 css, 32 js, icon, favicon); a new file must be added here on purpose");
   assert.deepEqual(MISSING, [], "no panel file is missing on disk");
   // CSP yalnız ui.ts'ten gelir; burada niyeti ayrıca doğrularız.
   assert.match(CSP, /default-src 'none'/);

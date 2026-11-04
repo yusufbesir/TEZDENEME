@@ -11,8 +11,8 @@ import 'package:adim_adim/yarisma/sorular/oyun_sorulari.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('toplam 414 soru var: 180 İngilizce + 6x24 programlama + 90 oyun', () {
-    expect(tumSorular.length, 414);
+  test('toplam 558 soru var: 180 İngilizce + 12x24 programlama + 90 oyun', () {
+    expect(tumSorular.length, 558);
     expect(sorulariBul('oyun', 'satranc-1').length, 30);
     expect(sorulariBul('oyun', 'satranc-2').length, 30);
     expect(sorulariBul('oyun', 'satranc-3').length, 30);
@@ -31,9 +31,11 @@ void main() {
     expect(sorulariBul('kod', 'css-1').length, 24);
     expect(sorulariBul('kod', 'js-1').length, 24);
     expect(sorulariBul('dil', 'ingilizce-5').length, 36);
-    expect(sorulariBul('kod', 'sql-1').length, 24);
-    expect(sorulariBul('kod', 'php-1').length, 24);
-    expect(sorulariBul('kod', 'go-1').length, 24);
+    for (final dil in ['sql', 'php', 'go']) {
+      for (final no in [1, 2, 3]) {
+        expect(sorulariBul('kod', '$dil-$no').length, 24, reason: '$dil-$no');
+      }
+    }
   });
 
   test('tüm sorular geçerli', () {
@@ -88,9 +90,15 @@ void main() {
       ('html-1', 'HTML'),
       ('css-1', 'CSS'),
       ('js-1', 'JS'),
-      ('sql-1', 'SQL'),
-      ('php-1', 'PHP'),
-      ('go-1', 'Go'),
+      ('sql-1', 'SQL1'),
+      ('sql-2', 'SQL2'),
+      ('sql-3', 'SQL3'),
+      ('php-1', 'PHP1'),
+      ('php-2', 'PHP2'),
+      ('php-3', 'PHP3'),
+      ('go-1', 'Go1'),
+      ('go-2', 'Go2'),
+      ('go-3', 'Go3'),
     ]);
     final oyun = seviyeler('oyun');
     expect(oyun.map((s) => (s.kursId, s.etiket)), [
@@ -202,7 +210,17 @@ void main() {
   });
 
   test('SQL, PHP ve Go soruları: alan kod, 24 soru, kategori başına 4', () {
-    for (final kurs in ['sql-1', 'php-1', 'go-1']) {
+    for (final kurs in [
+      'sql-1',
+      'sql-2',
+      'sql-3',
+      'php-1',
+      'php-2',
+      'php-3',
+      'go-1',
+      'go-2',
+      'go-3',
+    ]) {
       final liste = sorulariBul('kod', kurs);
       expect(liste.length, 24, reason: kurs);
       for (final s in liste) {
@@ -210,7 +228,11 @@ void main() {
         expect(s.id, startsWith('$kurs.${s.kategori.kimlik}.'));
       }
       for (final k in YarismaKategori.values) {
-        expect(liste.where((s) => s.kategori == k).length, 4, reason: '$kurs $k');
+        expect(
+          liste.where((s) => s.kategori == k).length,
+          4,
+          reason: '$kurs $k',
+        );
       }
       for (var i = 0; i < 4; i++) {
         expect(

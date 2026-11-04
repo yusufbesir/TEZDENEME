@@ -3,7 +3,7 @@ const { desteklenmiyor, platformFn } = require('./_yardimci');
 
 const PANO = /^pano(yu|ya|da|daki|dakini|m|mu|mdaki|)$/;
 const YAZ = new Set(['kopyala', 'yaz', 'koy', 'kaydet', 'aktar']);
-const OKU = new Set(['oku', 'soyle', 'goster', 'ne', 'var', 'nedir']);
+const OKU = new Set(['okur', 'oku', 'soyle', 'goster', 'ne', 'var', 'nedir']);
 const DOLGU = new Set(['bunu', 'sunu', 'diye', 'lutfen', 'bana']);
 
 module.exports = {

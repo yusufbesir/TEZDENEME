@@ -62,7 +62,7 @@
       selectedId: null, search: "", lastSeenCount: 0,
       selectedTopicId: null, panelOpen: prefs.panelOpen === true, panelWide: prefs.panelWide === true, panelTab: "topics", panelSearch: "", panelFilter: "",
       settingsOpen: false, settingsSection: "general", projectSettingsOpen: false, projectSettingsPage: "general",
-      theme: prefs.theme || "dark", density: "comfortable", complexity: prefs.complexity === "simple" ? "simple" : "advanced", advancedOpen: [], leftW: prefs.leftW || null, rightW: prefs.rightW || null, sidebarCollapsed: prefs.sidebarCollapsed === true,
+      theme: prefs.theme || "dark", density: "comfortable", complexity: prefs.complexity === "simple" ? "simple" : "advanced", lang: prefs.lang === "en" ? "en" : "tr", advancedOpen: [], leftW: prefs.leftW || null, rightW: prefs.rightW || null, sidebarCollapsed: prefs.sidebarCollapsed === true,
       page: "chat", pageParam: "", paletteOpen: false, focusComposer: false, draft: "", newSession: false, order: [], attachments: [], history: { stack: [], idx: -1 }
     },
     actions: null
@@ -271,7 +271,7 @@
   function normSkill(s) { s = obj(s); return { id: idOf(s.id), name: clean(s.name, 300), state: clean(s.state, 40), riskClass: clean(s.riskClass, 40) }; }
   function normProvider(p) {
     p = obj(p);
-    return { id: clean(p.id, 100), displayName: clean(p.displayName, 300), routeKind: clean(p.routeKind, 40), capabilities: arr(p.capabilities, 100).map(function (c) { c = obj(c); return { operation: clean(c.operation, 100), status: clean(c.status, 40) }; }) };
+    return { id: clean(p.id, 100), displayName: clean(p.displayName, 300), routeKind: clean(p.routeKind, 40), disabled: p.disabled === true, capabilities: arr(p.capabilities, 100).map(function (c) { c = obj(c); return { operation: clean(c.operation, 100), status: clean(c.status, 40) }; }) };
   }
   function normHealth(h) {
     h = obj(h);
@@ -1597,6 +1597,7 @@
     density: function (v) { return v === "comfortable" || v === "compact"; },
     // Madde 91: arayüz karmaşıklığı (kalıcı) ve bu oturumda açılan gelişmiş bölüm anahtarları (kalıcı DEĞİL).
     complexity: function (v) { return v === "simple" || v === "advanced"; },
+    lang: function (v) { return v === "tr" || v === "en"; },
     advancedOpen: function (v) { return Array.isArray(v) && v.length <= 20 && v.every(function (k) { return typeof k === "string" && /^[a-z][a-z-]{0,29}$/.test(k); }); },
     leftW: function (v) { return typeof v === "number" && isFinite(v) && v >= 200 && v <= 420; },
     rightW: function (v) { return typeof v === "number" && isFinite(v) && v >= 300 && v <= 640; },
@@ -1612,7 +1613,7 @@
     history: function (v) { return !!v && typeof v === "object" && Array.isArray(v.stack) && v.stack.length <= 50 && v.stack.every(function (x) { return typeof x === "string" && x.length <= 80; }) && typeof v.idx === "number" && isFinite(v.idx) && v.idx >= -1 && v.idx <= 50; },
     attachments: function (v) { return Array.isArray(v) && v.length <= 20 && v.every(function (x) { return x && typeof x === "object" && typeof x.name === "string" && x.name.length <= 200; }); }
   };
-  var PERSIST = ["theme", "leftW", "rightW", "panelOpen", "sidebarCollapsed", "panelWide", "complexity"];
+  var PERSIST = ["theme", "leftW", "rightW", "panelOpen", "sidebarCollapsed", "panelWide", "complexity", "lang"];
 
   // §14 ana navigasyon sayfaları (kimlik = sayfa modülünün kayıt adı). 'settings' modal açar, sayfa değildir.
   var PAGE_IDS = ["overview", "projects", "tasks", "providers", "models", "integrations", "skills", "research", "memory", "verify", "usage", "security", "audit"];
@@ -1625,12 +1626,20 @@
     if (e && e.sayfa === "integrations" && (b === "am-more-int-tb" || b === "am-more-int-rg")) return "registry";
     return "";
   }
+  // Dil değişince statik iskelet metinleri ve belge dili yeniden yazılır; sayfalar sonraki çizimde yeni dili kullanır.
+  function applyLang() {
+    var code = typeof window.AM_SET_LANG === "function" ? window.AM_SET_LANG(AM.view.lang) : "tr";
+    AM.view.lang = code;
+    try { document.documentElement.setAttribute("lang", code); } catch (e) { /* sahte DOM */ }
+    if (typeof applyStaticText === "function") applyStaticText();
+  }
   function setView(patch) {
     if (!patch || typeof patch !== "object") return;
     var changed = false, persist = false;
     Object.keys(patch).forEach(function (k) {
       if (!Object.prototype.hasOwnProperty.call(VIEW_SPEC, k) || !VIEW_SPEC[k](patch[k])) return;
       AM.view[k] = patch[k];
+      if (k === "lang") applyLang();
       changed = true;
       if (PERSIST.indexOf(k) >= 0) persist = true;
     });
@@ -1810,7 +1819,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     var boot = $("bootNote"); if (boot) boot.hidden = true; // betikler yüklendi: 'yükleniyor' notu kalkar
-    applyStaticText();
+    applyLang();
     loadToken();
 
     on("loginForm", "submit", function (ev) {

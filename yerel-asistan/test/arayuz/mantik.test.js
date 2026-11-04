@@ -148,3 +148,11 @@ test('index.html: CSP ve harici kaynak yok', () => {
   assert.match(css, /prefers-contrast/);
   assert.ok(!/url\(\s*['"]?https?:|@import/.test(css));
 });
+
+test('oneriOnayi: kısa onay önerilen metni döndürür', () => {
+  assert.equal(M.oneriOnayi('Evet', 'saat kaç'), 'saat kaç');
+  assert.equal(M.oneriOnayi('tamam.', 'saat kaç'), 'saat kaç');
+  assert.equal(M.oneriOnayi('hayır', 'saat kaç'), null);
+  assert.equal(M.oneriOnayi('evet', null), null);
+  assert.equal(M.oneriOnayi('evet ama sonra', 'saat kaç'), null);
+});

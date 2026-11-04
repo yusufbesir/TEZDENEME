@@ -13,6 +13,10 @@ abstract class Depo {
   Future<OgrenciDurumu> yukle();
   Future<void> kaydet(OgrenciDurumu d);
   Future<void> sifirla();
+
+  /// Sıradaki (bekleyen) yazmaların bitmesini bekler; yeni yazma başlatmaz.
+  /// Uygulama arka plana geçerken çağrılır. Hata fırlatmaz.
+  Future<void> bosalt();
 }
 
 /// Bellekte tutan depo; testler ve önizleme için.
@@ -33,11 +37,18 @@ class BellekDepo implements Depo {
   Future<void> sifirla() async {
     _durum = const OgrenciDurumu();
   }
+
+  @override
+  Future<void> bosalt() async {}
 }
 
 /// Dosyada tutan depo: `<klasor>/adimadim/durum.v1.json`.
 class DosyaDepo implements Depo {
-  DosyaDepo(this.klasor);
+  DosyaDepo(this.klasor, {this.goc, this.hedefSurum = DurumGocu.guncel});
+
+  /// Göç adım tablosu; null ise [DurumGocu.varsayilanAdimlar] (testler için).
+  final Map<int, Map<String, Object?> Function(Map<String, Object?>)>? goc;
+  final int hedefSurum;
 
   /// Uygulama destek klasörünü (path_provider) kullanır. Flutter gerekir.
   static Future<DosyaDepo> varsayilan() async =>
@@ -74,7 +85,22 @@ class DosyaDepo implements Depo {
         await _bozukKenaraAl(f);
         return const OgrenciDurumu();
       }
-      return OgrenciDurumu.fromJson(ham);
+      Map<String, Object?> json;
+      try {
+        final g = DurumGocu.uygula(ham, hedef: hedefSurum, adimlar: goc);
+        if (g.gocYapildi || g.gelecek) {
+          // Göçten (ya da gelecek sürüm dosyası üzerine yazılmadan) önce
+          // geri alma kopyası; kopya alınamazsa yükleme yine sürer.
+          await _geriAlmaKopyasi(baytlar);
+        }
+        json = g.json;
+      } on StateError {
+        // Göç başarısız: kopya alınır, asıl dosya kenara alınır (silinmez).
+        await _geriAlmaKopyasi(baytlar);
+        await _bozukKenaraAl(f);
+        return const OgrenciDurumu();
+      }
+      return OgrenciDurumu.fromJson(json);
     } on FormatException {
       await _bozukKenaraAl(_dosya);
       return const OgrenciDurumu();
@@ -94,8 +120,52 @@ class DosyaDepo implements Depo {
     }
   }
 
+  /// Geri alma kopyası yuva sayısı; sınır aşılınca en eskisinin üzerine
+  /// yazılır (hiçbir kopya silinmez).
+  static const int geriAlmaYuvasi = 3;
+
+  File _yuva(int i) => File('${_dosya.path}.geri-$i');
+
+  /// [baytlar] (göç öncesi dosya içeriği) için kopya yazar: boş yuva varsa o,
+  /// yoksa en eski yuva seçilir; geçici dosyaya yazılıp atomik yeniden
+  /// adlandırılır (rename hedefin üzerine yazar, silme yok).
+  /// Hata fırlatmaz; başarıysa true.
+  Future<bool> _geriAlmaKopyasi(List<int> baytlar) async {
+    try {
+      var secilen = 0;
+      DateTime? enEski;
+      for (var i = 0; i < geriAlmaYuvasi; i++) {
+        final y = _yuva(i);
+        if (!await y.exists()) {
+          secilen = i;
+          break;
+        }
+        final m = await y.lastModified();
+        if (enEski == null || m.isBefore(enEski)) {
+          enEski = m;
+          secilen = i;
+        }
+      }
+      await _dosya.parent.create(recursive: true);
+      final hedef = _yuva(secilen);
+      final gecici = File('${hedef.path}.tmp');
+      await gecici.writeAsBytes(baytlar, flush: true);
+      await gecici.rename(hedef.path);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Yazmalar sıraya alınır; iki kayıt aynı .tmp dosyasını paylaşmaz.
   Future<void> _kuyruk = Future.value();
+
+  @override
+  Future<void> bosalt() async {
+    try {
+      await _kuyruk;
+    } catch (_) {}
+  }
 
   @override
   Future<void> kaydet(OgrenciDurumu d) {
@@ -120,7 +190,7 @@ class DosyaDepo implements Depo {
   }
 
   /// Kullanıcının "verileri sıfırla" kararı: ana dosya, geçici dosya ve
-  /// `.bozuk-*` yedekleri birlikte silinir; eski ilerleme diskte kalmaz.
+  /// `.bozuk-*` yedekleri silinir; `.geri-*` kopyaları korunur.
   @override
   Future<void> sifirla() async {
     try {
@@ -133,6 +203,8 @@ class DosyaDepo implements Depo {
         await for (final e in klasorYolu.list()) {
           if (e is File && e.path.startsWith(onek)) await e.delete();
         }
+        // `.geri-*` kopyalarına dokunulmaz (silme yasağı; kalıcı silme
+        // yalnız kullanıcı kararıyla, ayrı bir adımda).
       }
     } catch (_) {
       // Silinemeyen dosya bir sonraki kayıtta ezilir.

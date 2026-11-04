@@ -1,8 +1,8 @@
 {
  "summary": {
   "dogrulandi": 30,
-  "kismi": 59,
-  "planli": 9,
+  "kismi": 67,
+  "planli": 1,
   "desteklenmiyor": 0,
   "kapsamdisi": 2,
   "total": 100
@@ -165,9 +165,15 @@
    "en": "Dependency and Impact Analysis",
    "tr": "Bağımlılık ve Etki Analizi",
    "sahip": "M8",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Bağımlılık/etki grafiği yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/capability-graph.ts",
+    "src/analysis/capability-graph.test.ts",
+    "scripts/yetenek-grafi.mjs",
+    "src/analysis/impact.ts",
+    "docs/testing/faz11-dilim10a.md"
+   ],
+   "eksik": "Komutla (kullanıcı çalıştırınca) değişen dosyaların etkilediği yetenekler ve çalıştırılacak testler: src içe aktarma grafiği + kanıt listesi. Çalışma zamanı bağımlılığı (dinamik ad, dosya okuma, HTTP), kanıtı olmayan dosya ve dosya dışı (SQL, belge) etki görünmez; arayüz/uç yok; sürüm ve görev planıyla bağlantısı yok.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -193,9 +199,14 @@
    "en": "Agent and Model Benchmark Center",
    "tr": "Ajan/Model Kıyaslama Merkezi",
    "sahip": "M4",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Ajan/model kıyaslama yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/benchmark.ts",
+    "src/analysis/benchmark.test.ts",
+    "scripts/kiyas.mjs",
+    "docs/testing/faz11-dilim10b.md"
+   ],
+   "eksik": "Kullanıcının getirdiği sabit vaka kümesi sonuçlarını sağlayıcı/model bazında karşılaştırır (ortak vakalar, Wilson %95 aralığı, ayırt edilemez kümeleri, süre/token, kategori). Sağlayıcıları KOŞTURMAZ: vakaları koşturup sonuç dosyasını üretmek kullanıcıya/aracına aittir; hazır vaka kümesi yok; arayüz yok; gerçek sağlayıcılarla denenmedi (örnek veriyle test edildi).",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -238,20 +249,31 @@
    "en": "Multi-Project Portfolio Management",
    "tr": "Çoklu Proje Portföyü",
    "sahip": "M2",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Tek proje; portföy yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/portfolio.ts",
+    "src/analysis/portfolio.test.ts",
+    "src/server/d8b-api.test.ts",
+    "docs/testing/faz11-dilim9b.md"
+   ],
+   "eksik": "Salt okunur portföy listesi (GET /api/analysis/portfolio): yalnız sözleşmedeki trustedRepos, dal/paket bilgisi dosyadan. Eksik: arayüz sayfası, kirli/temiz durum, proje başına görev sayısı, projeler arası geçiş ve çoklu proje yürütme.",
    "dilim": "D9",
-   "cagri": "—"
+   "cagri": "Yetenekler menüsü / kullanıcı isteği (kendiliğinden çalışmaz)"
   },
   {
    "n": 16,
    "en": "Visual Workflow Editor",
    "tr": "Görsel İş Akışı Editörü",
    "sahip": "M1",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Görsel iş akışı editörü yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/server/ui/wf-editor.js",
+    "src/server/ui/wf-editor.test.ts",
+    "src/server/ui/page-tasks.js",
+    "src/server/ui/pages.test.ts",
+    "docs/testing/faz11-dilim9c.md"
+   ],
+   "eksik": "Görevler sayfasında görsel iş akışı editörü: adım seçimi, sağlayıcı/yedek/deneme, akış önizlemesi, sunucu kurallarını aynalayan, sorunları birlikte listeleyen doğrulama ve JSON taslağı kopyalama. Eşlik testi sunucu validateDefinition ile 65536 kombinasyonda aynı karar (devre dışı sağlayıcılar elenir). Eksik: editörden doğrudan gönderme/başlatma (taslak yalnız kopyalanır), sürükle-bırak, kayıtlı şablonlar, gerçek tarayıcıda deneme.",
    "dilim": "D9",
    "cagri": "—"
   },
@@ -293,9 +315,13 @@
    "sahip": "M13",
    "durum": "Kısmi",
    "kanit": [
-    "src/workflows/handoff.ts"
+    "src/workflows/handoff.ts",
+    "src/ops/handoff-packet.ts",
+    "scripts/devir.mjs",
+    "src/ops/handoff-packet.test.ts",
+    "docs/testing/faz11-dilim9g.md"
    ],
-   "eksik": "Sağlayıcılar arası görev devri (nonce çevreli) var. Uzaktan çalışma/başka makineye devir yok.",
+   "eksik": "Sağlayıcılar arası görev devri (nonce çevreli) + komutla çalışan DEVİR PAKETİ: bir işin amacı, yapılanlar, sıradaki adımlar, açık sorular ve dosya ADLARI başka makinede okunmak üzere yeni klasöre yazılır, doğrulanır, okunur. Uzaktan çalıştırma, ağ/yükleme, otomatik eşitleme ve içerik taşıma yok; paket yalnız bilgi notudur.",
    "dilim": "D9",
    "cagri": "—"
   },
@@ -338,9 +364,13 @@
    "durum": "Kısmi",
    "kanit": [
     "src/desktop/launcher.ts",
-    "masaustu/AgentMom.vbs"
+    "masaustu/AgentMom.vbs",
+    "src/ops/release.ts",
+    "scripts/surum.mjs",
+    "src/ops/release.test.ts",
+    "docs/testing/faz11-dilim9f.md"
    ],
-   "eksik": "Yalnız yerel başlatıcı/kurulum klasörü. Kurulum/kaldırma programı, sürüm yönetimi, güncelleme yok.",
+   "eksik": "Yerel başlatıcı/kurulum klasörü + komutla çalışan SÜRÜM KAYDI (sürüm numarası kuralları, sonraki sürüm önizlemesi, git commit okuma, docs/surumler/<sürüm>.md yeni dosya). Kurulum/kaldırma programı, paketleme, etiketleme/yayınlama ve güncelleme yok; package.json kendiliğinden yükseltilmez.",
    "dilim": "D9",
    "cagri": "—"
   },
@@ -402,9 +432,11 @@
    "sahip": "M11",
    "durum": "Kısmi",
    "kanit": [
-    "src/server/ui/strings.js"
+    "src/server/ui/strings.js",
+    "src/server/ui/strings-en.js",
+    "src/server/ui/lang.test.ts"
    ],
-   "eksik": "Arayüz metinleri tek sözlükte (Türkçe). Başka dil ve proje içeriği çok dillilik yok.",
+   "eksik": "Arayüz dili seçilebilir (Türkçe asıl, İngilizce çok kısmi ≈%5: giriş, hata, durum, onay kartı, kenar çubuğu, Görünüm); çevrilmemiş metin Türkçe kalır. Diğer diller, proje içeriği ve tarih/sayı biçimleri çok dilli DEĞİL; tarayıcıda gerçek göz denetimi yapılmadı.",
    "dilim": "D9",
    "cagri": "—"
   },
@@ -499,9 +531,14 @@
    "en": "Trusted Tool Marketplace",
    "tr": "Güvenilir Araç Pazarı",
    "sahip": "M8",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Güvenilir araç pazarı yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/ops/tool-registry.ts",
+    "src/ops/tool-registry.test.ts",
+    "scripts/arac.mjs",
+    "docs/testing/faz11-dilim10b.md"
+   ],
+   "eksik": "Yerel, ağsız araç kaydı: katalog klasöründeki paketleri özetle doğrular, kullanıcı onayına (kimlik+sürüm+paket özeti+izinler, yalnız ekleme) bağlar, iptal eder. Aracı ÇALIŞTIRMAZ; uzak pazar, indirme, imza/yayıncı doğrulaması, sandbox ve izinlerin çalışma zamanında uygulanması yok (izin yalnız kayıt ve karar); arayüz yok.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -541,9 +578,12 @@
    "durum": "Kısmi",
    "kanit": [
     "src/skills/lifecycle.ts",
-    "src/skills/lifecycle.test.ts"
+    "src/skills/hunter.ts",
+    "src/skills/hunter.test.ts",
+    "scripts/beceri.mjs",
+    "docs/testing/faz11-dilim11.md"
    ],
-   "eksik": "Beceri ADAYI kaydı (araştırılıyor aşaması) var; otomatik arama/keşif yok (modül hiçbir şey indirmez, yalnız kayıt).",
+   "eksik": "Kullanıcının verdiği YEREL klasörde beceri adaylarını bulur ve ön süzgeçten geçirir (ad/açıklama, risk sınıfı, gizli bilgi, ikili/betik, aynı ad ya da içerik); çıktı yaşam döngüsüne öneri girdisidir. Web/depo araması, indirme ve otomatik kayıt YOK; ön süzgeç güvenlik incelemesinin yerine geçmez.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -555,11 +595,14 @@
    "durum": "Kısmi",
    "kanit": [
     "src/skills/lifecycle.ts",
-    "src/skills/lifecycle.test.ts",
+    "src/skills/factory.ts",
+    "src/skills/hunter.test.ts",
+    "scripts/beceri.mjs",
     "src/core/db/migrations/008_skills.sql",
-    "docs/decisions/ADR-006-bellek-ve-beceri.md"
+    "docs/decisions/ADR-006-bellek-ve-beceri.md",
+    "docs/testing/faz11-dilim11.md"
    ],
-   "eksik": "Yaşam döngüsü iskeleti (aday→güvenlik→yalıtılmış test→onay→yayın/ret/iptal) testli. Beceri ÜRETİMİ yok.",
+   "eksik": "Yaşam döngüsü iskeleti + yazılı tariften belirleyici SKILL.md üretimi (yalnız metin, betik yok, yeni klasöre, ezme yok). Model destekli beceri ÜRETİMİ ve yaşam döngüsüne otomatik kayıt yok.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -705,12 +748,16 @@
    "durum": "Kısmi",
    "kanit": [
     "src/providers/registry.ts",
+    "src/providers/integration-center.ts",
+    "src/providers/integration-center.test.ts",
+    "scripts/entegrasyon.mjs",
     "src/server/providers-api.ts",
     "src/server/providers-api.test.ts",
     "src/server/ui/page-providers.js",
-    "src/server/ui/page-integrations.js"
+    "src/server/ui/page-integrations.js",
+    "docs/testing/faz11-dilim11.md"
    ],
-   "eksik": "Sağlayıcı listesi + detay sayfası (yetenek kayıt defteri, modeller, limitler 'Bilinmiyor', son hatalar), yerel Test, Devre dışı/Etkinleştir (fail-closed). OpenCode/Cursor/Antigravity adaptörü yok; IDE/MCP entegrasyon ayrımı ve yaşam döngüsü eylemleri yok.",
+   "eksik": "Sağlayıcı sayfası + birleşik KAYIT: sağlayıcı/IDE/MCP/beceri/araç tek listede ve tek durum makinesiyle (komut satırı). Arayüz sayfasına bağlanmadı; hiçbir entegrasyon gerçekten bağlanmaz ya da çalıştırılmaz; OpenCode/Cursor/Antigravity adaptörü yok.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -719,9 +766,15 @@
    "en": "Capability and Dependency Graph",
    "tr": "Yetenek ve Bağımlılık Grafiği",
    "sahip": "M8",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Yetenek/bağımlılık grafiği yok.",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/analysis/capability-graph.ts",
+    "src/analysis/capability-graph.test.ts",
+    "scripts/yetenek-grafi.mjs",
+    "src/analysis/impact.ts",
+    "docs/testing/faz11-dilim10a.md"
+   ],
+   "eksik": "100 yetenek arası bağımlılık grafiği (kenar, ortak dosya, döngü, kenarsız yetenek) komutla özet ve Mermaid olarak üretilir. Kanıt listesi elle tutulduğu için grafik onun doğruluğu kadar doğrudur; test dosyaları ve 3'ten çok yeteneğin ortak dosyaları kenar üretmez (o dosyalar üzerinden bağımlılık görünmez); 300 KB'tan büyük ya da taranamayan dosya grafikte yoktur (uyarı verilir); arayüzde görsel grafik yok; kenarlar sürüm/çalışma zamanı verisinden değil yalnız kaynak içe aktarmalarından gelir.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -730,9 +783,14 @@
    "en": "Integration Lifecycle Manager",
    "tr": "Entegrasyon Yaşam Döngüsü",
    "sahip": "M8",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "Entegrasyon yaşam döngüsü yok (beceri yaşam döngüsü ayrı).",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/providers/integration-center.ts",
+    "src/providers/integration-center.test.ts",
+    "scripts/entegrasyon.mjs",
+    "docs/testing/faz11-dilim11.md"
+   ],
+   "eksik": "Keşif→yapılandır→onay→etkin→kapalı→kaldır durum makinesi, ekleme-yalnız olay günlüğü, yüksek riskte insan onayı, bozuk günlükte kapalı-varsayılan. Yalnız KAYIT ve KARAR: gerçek bağlama/kaldırma/yükseltme, sürüm izleme ve arayüz yok.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -823,9 +881,14 @@
    "en": "Optional TestSprite Provider",
    "tr": "İsteğe Bağlı TestSprite Sağlayıcısı",
    "sahip": "M10",
-   "durum": "Planlı",
-   "kanit": [],
-   "eksik": "İsteğe bağlı TestSprite sağlayıcısı yok (yalnız kayıtlı sağlayıcı kalıbı hazır; ağ/anahtar gerektirebilir, onay şart).",
+   "durum": "Kısmi",
+   "kanit": [
+    "src/providers/testsprite.ts",
+    "src/providers/integration-center.test.ts",
+    "scripts/entegrasyon.mjs",
+    "docs/testing/faz11-dilim11.md"
+   ],
+   "eksik": "İsteğe bağlı, yüksek riskli, KAPALI başlayan TestSprite bildirimi ve hazırlık engelleri; yetenekler doğrulanmamış/desteklenmiyor. TestSprite'a bağlanan kod YOK (ağ/anahtar/adaptör yok); gerçek bağlantı ayrı iştir ve kullanıcı onayı ister.",
    "dilim": "D10",
    "cagri": "—"
   },
@@ -1222,9 +1285,13 @@
    "sahip": "M2",
    "durum": "Kısmi",
    "kanit": [
-    "src/ops/backup.ts"
+    "src/ops/backup.ts",
+    "src/ops/capsule.ts",
+    "src/ops/capsule.test.ts",
+    "scripts/kapsul.mjs",
+    "docs/testing/faz11-dilim9d.md"
    ],
-   "eksik": "Yedek paketi taşınabilir (anahtarsız, doğrulamalı). Yeniden kurulabilir proje kapsülü (bağımlılık+yapılandırma+hafıza) yok.",
+   "eksik": "Yedek paketi taşınabilir (anahtarsız, doğrulamalı). Proje kapsülü (komut satırı: scripts/kapsul.mjs plan|olustur|dogrula|ac): bağımlılık bildirimi + kilit dosyası + tsconfig + node sürüm ipucu + ajan rehberi, izin listeli, gizli bilgi taramalı, doğrulanabilir, yeni klasöre geri açılır. Eksik: hafıza notları ve yerel veritabanı kapsülde YOK (yedek ayrı), arayüz/HTTP yüzü yok, kurulumu kendisi yapmaz (npm ci elle), başka makinede gerçek geri kurulum denenmedi.",
    "dilim": "D9",
    "cagri": "—"
   },

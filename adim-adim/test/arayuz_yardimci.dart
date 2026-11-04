@@ -29,6 +29,9 @@ class SahteSes extends Ses {
   /// Her `oku` çağrısındaki konuşma hızı (yavaş düğmesi testi).
   final hizlar = <double>[];
 
+  /// Her `oku` çağrısındaki hız çarpanı (dinleme hız seçici testi).
+  final carpanlar = <double>[];
+
   /// Kaç kez durdur çağrıldı (kelime oynatıcı duraklatma testi).
   int durdurmaSayisi = 0;
   @override
@@ -38,6 +41,7 @@ class SahteSes extends Ses {
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     okunanlar.add(metin);
     hizlar.add(konusmaHizi);
+    carpanlar.add(hizCarpani);
     return true;
   }
 
@@ -71,6 +75,12 @@ class SahteBildirim implements BildirimServisi {
   @override
   Future<bool> gunDersiBildirimi(int adet) async {
     cagrilar.add('gundersi:$adet');
+    return izin;
+  }
+
+  @override
+  Future<bool> akilliHatirlatma(String metin) async {
+    cagrilar.add('akilli');
     return izin;
   }
 

@@ -11,7 +11,7 @@ Bu belge depodan deterministik üretilir (tarih/saat içermez). Elle değiştirm
 
 ## Modül haritası
 
-src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk cümlesi.
+src altında 357 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk cümlesi.
 
 ### src/analysis/
 
@@ -19,8 +19,12 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | --- | --- |
 | absence.test.ts | Eksiklik / fazlalık dedektörü birim testleri (D8b, madde 83). |
 | absence.ts | Eksiklik / fazlalık dedektörü (madde 83, D8b). |
+| benchmark.test.ts | Ajan/model kıyaslama testleri (madde 12). |
+| benchmark.ts | Ajan/model kıyaslama merkezi (madde 12, D10). |
 | broker.test.ts | İç yetenek aracısı birim testleri (D8b, madde 99). |
 | broker.ts | İç yetenek aracısı (madde 99, D8b). |
+| capability-graph.test.ts | Yetenek bağımlılık grafiği ve yetenek düzeyinde etki testleri (madde 47 ve 10). |
+| capability-graph.ts | Yetenek ve bağımlılık grafiği + yetenek düzeyinde etki analizi (madde 47 ve 10, D10). |
 | continuity.test.ts | Yetenek süreklilik grafiği birim testleri (D8b, madde 73). |
 | continuity.ts | Yetenek süreklilik grafiği (madde 73, D8b). |
 | exit-plan.test.ts | Sağlayıcı çıkış / değiştirilebilirlik planlayıcı birim testleri (D8b, madde 80). |
@@ -32,6 +36,8 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | lock.ts | Analiz taramaları için tekil kilit (D8b). |
 | offline.test.ts | Çevrimdışı kip planı birim testleri (D8b, madde 74). |
 | offline.ts | Çevrimdışı kip planı (madde 74, D8b). |
+| portfolio.test.ts | Çoklu proje portföyü birim testleri (madde 15). |
+| portfolio.ts | Çoklu proje portföyü (madde 15, D9). |
 | quota.test.ts | Kota ve gösterge seviyesi birim testleri. |
 | quota.ts | Sağlayıcı kotası ve gösterge seviyeleri (Faz 11 durum göstergeleri + kota farkında öneri). |
 | release-impact.test.ts | Sürüm etki analizi birim testleri (madde 29, D8b). |
@@ -273,7 +279,15 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | backup-scheduler.ts | Kullanım-tabanlı DENETİMLİ yedek (Faz 11 dilim 4, madde 30/7/28). |
 | backup.test.ts | (açıklama yok) |
 | backup.ts | Local backup, verification and restore (Faz 9, #30). |
+| capsule.test.ts | (açıklama yok) |
+| capsule.ts | Portable project capsule (Faz 11, D9d, madde 79). |
+| handoff-packet.test.ts | (açıklama yok) |
+| handoff-packet.ts | Handoff packet for continuing work on another machine (Faz 11, D9g, madde 19). |
 | kontrol-listesi.test.ts | 100 yetenek kontrol listesi tutarlılığı (Faz 11). |
+| release.test.ts | (açıklama yok) |
+| release.ts | Release records (Faz 11, D9f, madde 22). |
+| tool-registry.test.ts | Güvenilir araç pazarı testleri (madde 32). |
+| tool-registry.ts | Güvenilir araç pazarı (madde 32, D10): YEREL, ağsız. |
 
 ### src/ops/testing/
 
@@ -300,9 +314,12 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | codex.ts | (açıklama yok) |
 | contract.ts | (açıklama yok) |
 | gemini.ts | (açıklama yok) |
+| integration-center.test.ts | Entegrasyon merkezi, yaşam döngüsü ve TestSprite bildirimi testleri (madde 46, 48, 54). |
+| integration-center.ts | Birleşik Entegrasyon ve Yetenek Merkezi (madde 46) + Entegrasyon Yaşam Döngüsü (madde 48). |
 | policy-map.ts | (açıklama yok) |
 | providers.test.ts | (açıklama yok) |
 | registry.ts | (açıklama yok) |
+| testsprite.ts | İsteğe bağlı TestSprite sağlayıcısı (madde 54). |
 
 ### src/providers/testing/
 
@@ -383,6 +400,7 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | lab-env.ts | D9 testleri için ortak ortam (karar laboratuvarı, sistem analitiği, dikkat sırası, yetenekler menüsü). |
 | lab-sysan2.test.ts | Sistem analitiği kartları (teknik borç 33, sürüm etkisi 29, veri profili 25) arayüz testleri. |
 | lab.test.ts | D9 testleri: Karar laboratuvarı (Araştırma), sistem analitiği (Entegrasyonlar), dikkat sırası (Görevler) ve çekirdek hesap eylemleri. |
+| lang.test.ts | (açıklama yok) |
 | layout.css | AgentMom masaüstü kabuğu ve ortak bileşenler (Faz 11, dilim 2). |
 | menu.css | AgentMom kullanıcı menüsü stilleri (Faz 11, Ekran 4). |
 | model.test.ts | D8c testleri: model yetenekleri (core.js modelRun, capabilities.js kayıtları, Araştırma sayfasındaki "Model yetenekleri" bölümü) ve internet ayarları eylemi (netSettingsSave, netDomainCheck). |
@@ -423,15 +441,21 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 | sidebar.css | AgentMom sol menü stilleri (Faz 11, Ekran 2). |
 | sidebar.js | AgentMom sol menü (Faz 11, dilim 2, Ekran 2). |
 | sidebar.test.ts | Sol menü ve kullanıcı menüsü saf mantık + güvenlik taraması testleri. |
+| strings-en.js | İngilizce arayüz metinleri (Faz 11 D9e, madde 26, Kısmi). |
 | strings.js | D9 eki (yetenekler menüsü, karar laboratuvarı, sistem analitiği, dikkat sırası): yazan: [Claude#agentmom-d9-yetenekler]. |
 | tokens.css | Sahip: Haiku (arayüz belirteçleri) [İP:AgentMom Faz 11, dilim 2] yazan: [Claude#agentmom-faz11-dilim2] Amaç: Masaüstü arayüzü görsel belirteçleri. |
 | usage.js | Sahip: Sonnet (Proje ayarları + Kullanım) [İP:AgentMom Faz 11, dilim 2] yazan: [Claude#agentmom-faz11-ayarlar] Amaç: window.AM_USAGE = { init(AM, host), render(AM), pure }. |
 | usermenu.js | AgentMom kullanıcı menüsü (Faz 11, dilim 2, Ekran 4). |
+| wf-editor.js | AgentMom görsel iş akışı editörü: saf mantık (Faz 11, D9c, madde 16). |
+| wf-editor.test.ts | Görsel iş akışı editörü (madde 16) saf mantık testleri: sunucu validateDefinition ile eşlik. |
 
 ### src/skills/
 
 | Dosya | Açıklama |
 | --- | --- |
+| factory.ts | Skill Factory (madde 36): yazılı bir tarif (spec) ile belirleyici (deterministik) bir SKILL.md üretir. |
+| hunter.test.ts | Skill Hunter ve Skill Factory testleri (madde 35, 36). |
+| hunter.ts | Skill Hunter (madde 35): kullanıcının verdiği YEREL klasörde beceri adaylarını bulur. |
 | lifecycle.test.ts | (açıklama yok) |
 | lifecycle.ts | Skill lifecycle skeleton (Faz 5c). |
 
@@ -518,7 +542,7 @@ src altında 333 dosya, 34 klasör. Açıklama = dosya başındaki yorumun ilk c
 
 ## HTTP uçları (src/server/app.ts)
 
-Ham çıkarım: 92 uç. Yöntem "*" = satırda yöntem koşulu yok. Yol parametreleri :id / :param / {a|b} olarak gösterilir.
+Ham çıkarım: 93 uç. Yöntem "*" = satırda yöntem koşulu yok. Yol parametreleri :id / :param / {a|b} olarak gösterilir.
 
 | Yöntem | Yol |
 | --- | --- |
@@ -533,6 +557,7 @@ Ham çıkarım: 92 uç. Yöntem "*" = satırda yöntem koşulu yok. Yol parametr
 | GET | /api/analysis/graph |
 | GET | /api/analysis/impact |
 | GET | /api/analysis/offline |
+| GET | /api/analysis/portfolio |
 | GET | /api/analysis/release-impact |
 | GET | /api/analysis/shadow-price |
 | GET | /api/analysis/switching |
@@ -647,8 +672,8 @@ Ham çıkarım: 92 uç. Yöntem "*" = satırda yöntem koşulu yok. Yol parametr
 | Durum | Sayı |
 | --- | --- |
 | Doğrulandı | 30 |
-| Kısmi | 59 |
-| Planlı | 9 |
+| Kısmi | 67 |
+| Planlı | 1 |
 | Desteklenmiyor | 0 |
 | Kapsam dışı | 2 |
 | Toplam | 100 |

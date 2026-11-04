@@ -356,7 +356,7 @@
 
   function drawPopover(force) {
     var d = popData();
-    var sig = JSON.stringify(d);
+    var sig = JSON.stringify(d) + (typeof window.AM_LANG === "function" ? window.AM_LANG() : "tr");
     if (!force && sig === R.sig && R.panel) return;
     var hadFocus = R.panel && R.panel.contains(document.activeElement);
     R.sig = sig;

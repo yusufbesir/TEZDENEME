@@ -192,6 +192,9 @@
 
     "settings.gorunum.title": "Görünüm",
     "settings.gorunum.desc": "Tema ve yoğunluk. Seçim bu tarayıcıda hatırlanır.",
+    "settings.gorunum.langRow": "Dil",
+    "settings.gorunum.langDesc": "Arayüz dili. Çevrilmemiş metinler Türkçe kalır; seçim bu tarayıcıda hatırlanır.",
+    "settings.gorunum.langGroup": "Dil seçimi",
     "settings.gorunum.themeRow": "Tema",
     "settings.gorunum.themeDesc": "Koyu, açık ya da sistem tercihini izle.",
     "settings.gorunum.themeGroup": "Tema seçimi",
@@ -574,7 +577,7 @@
   function sectionSig(id, state, view) {
     var st = state && typeof state === "object" ? state : {};
     var vw = view && typeof view === "object" ? view : {};
-    var parts = [id, String(vw.theme), String(vw.density), String(vw.complexity)];
+    var parts = [id, String(vw.theme), String(vw.density), String(vw.complexity), String(vw.lang)];
     try {
       if (Object.prototype.hasOwnProperty.call(DOC_OF, id)) {
         var d = st.docs && st.docs[DOC_OF[id]];
@@ -1268,6 +1271,15 @@
           { value: "system", label: T("settings.gorunum.system") }
         ],
         onChange: function (v) { setView(AM, { theme: v }); }
+      })
+    });
+    var lang = view.lang === "en" ? "en" : "tr";
+    row(b, {
+      title: T("settings.gorunum.langRow"), desc: T("settings.gorunum.langDesc"),
+      ctl: segmented({
+        label: T("settings.gorunum.langGroup"), value: lang,
+        options: [{ value: "tr", label: "Türkçe" }, { value: "en", label: "English" }],
+        onChange: function (v) { setView(AM, { lang: v === "en" ? "en" : "tr" }); }
       })
     });
     var cx = view.complexity === "simple" ? "simple" : "advanced";

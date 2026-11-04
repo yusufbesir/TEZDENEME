@@ -53,6 +53,7 @@ import { isBrokerCapability, isBrokerRole, brokerRequest } from "../analysis/bro
 import type { BrokerRole } from "../analysis/broker.ts";
 import { BUSY, exclusiveScan } from "../analysis/lock.ts";
 import { buildContinuity } from "../analysis/continuity.ts";
+import { buildPortfolio } from "../analysis/portfolio.ts";
 import { buildExitPlan } from "../analysis/exit-plan.ts";
 import { collectObservations, expertiseReport, buildExpertise, roleObservations } from "../analysis/expertise.ts";
 import { analyzeImpact, loadImportGraph, summarizeGraph, validateFileParam } from "../analysis/impact.ts";
@@ -556,6 +557,11 @@ export function createApp(deps: AppDeps): Server {
     if (method === "GET" && url.pathname === "/api/analysis/continuity") {
       onlyParams(url, []);
       return send(res, 200, { continuity: buildContinuity(providerSnapshots(deps.db, deps.registry, contract, now())) });
+    }
+    // D9: çoklu proje portföyü (madde 15). Salt okunur; yalnız sözleşmedeki trustedRepos, git çalıştırılmaz.
+    if (method === "GET" && url.pathname === "/api/analysis/portfolio") {
+      onlyParams(url, []);
+      return send(res, 200, { portfolio: buildPortfolio(contract.trustedRepos) });
     }
     if (method === "GET" && url.pathname === "/api/analysis/exit") {
       onlyParams(url, ["provider"]);

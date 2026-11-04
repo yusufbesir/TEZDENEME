@@ -432,6 +432,14 @@ const Kurs css1 = Kurs(
                 'grid-template-columns: 1fr 1fr;',
                 '}',
               ],
+              kabul: [
+                [
+                  '.urunler {',
+                  'grid-template-columns: 1fr 1fr;',
+                  'display: grid;',
+                  '}',
+                ],
+              ],
               aciklama:
                   'Önce seçici, sonra display, ardından sütun tanımı gelir.',
             ),

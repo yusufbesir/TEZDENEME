@@ -29,6 +29,9 @@
 - Kullanıcı adı 40 karaktere kırpılır (atılmaz).
 - Android yayın imzası: `key.properties` ile ayrı yayın anahtar deposu desteği eklendi; anahtar ve şifreler cihazda, depoda değil (docs/IMZA.md). Anahtar deposu henüz cihazda oluşturulmadı (Android araç zinciri yok).
 
+## Mikrofon izni (2026-11-04)
+- Android manifestine yalnız `RECORD_AUDIO` satırı eklendi (izin-minimal ilke: başka izin eklenmedi). İzin açılışta ya da ilk akışta istenmez; yalnızca mikrofon gerçekten kullanılacağı anda (konuşma tanıma) istenmelidir.
+
 ## Doğrulanamayanlar
 - Paket sürümleri için güncel güvenlik duyuruları bu ortamda pub.dev'e erişilemediği için denetlenemedi. İnternetli bir ortamda `dart pub outdated` ve bağımlılık duyuruları ayrıca kontrol edilmeli.
 - Gerçek cihazda bildirim ve ses denenmedi (bu ortamda Android/iOS/Windows derleyici yok).

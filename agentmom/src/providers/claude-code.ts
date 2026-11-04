@@ -88,6 +88,23 @@ export class ClaudeCodeAdapter extends CliAdapter {
       }
       return { events };
     }
+    // Quota binding: the real rate_limit_event reports per-window utilization (0..1) and an epoch-seconds reset. The most used window is the binding one;
+    // anything missing or out of range yields no event (analysis/quota.ts then keeps saying "unknown" instead of guessing).
+    if (o.type === "rate_limit_event") {
+      const windows = obj(obj(o.rate_limit_info)?.unifiedWindows);
+      let best: { used: number; resets: number | null } | null = null;
+      for (const w of windows ? Object.values(windows) : []) {
+        const win = obj(w);
+        const util = win ? num(win.utilization) : null;
+        if (util === null || util < 0 || util > 1) continue;
+        const reset = win ? num(win.resetsAt) : null;
+        if (!best || util > best.used) best = { used: util, resets: reset !== null && reset > 0 ? reset : null };
+      }
+      if (!best) return null;
+      const limits: Record<string, unknown> = { usedPct: Math.round(best.used * 1e6) / 1e4 };
+      if (best.resets !== null) limits.resetsAt = new Date(best.resets * 1000).toISOString();
+      return { events: [{ type: "usage", data: { limits } }] };
+    }
     if (o.type === "result") {
       const u = obj(o.usage);
       const modelUsage = obj(o.modelUsage);

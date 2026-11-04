@@ -330,6 +330,35 @@ void main() {
       );
       expect(Motor.tekrarBekleyen(d, '2025-01-01'), ['b#0', 'a#0']);
     });
+
+    // Ana sayfa "Bugün tekrar: N kelime" satırı bu listenin uzunluğunu kullanır.
+    test('bugün tekrar sayısı: bugün ve geçmiş tarihli kartlar sayılır', () {
+      const d = OgrenciDurumu(
+        kartlar: {
+          'a#0': Kart(kutu: 1, sonraki: '2026-11-04'), // bugün
+          'b#0': Kart(kutu: 1, sonraki: '2026-10-30'), // geçmiş
+          'c#0': Kart(kutu: 3, sonraki: '2026-11-05'), // gelecek
+        },
+      );
+      expect(Motor.tekrarBekleyen(d, '2026-11-04').length, 2);
+    });
+
+    test('bugün tekrar sayısı: yalnız gelecek tarihli kartlar varsa 0', () {
+      const d = OgrenciDurumu(
+        kartlar: {
+          'a#0': Kart(kutu: 2, sonraki: '2026-11-05'),
+          'b#0': Kart(kutu: 4, sonraki: '2026-12-01'),
+        },
+      );
+      expect(Motor.tekrarBekleyen(d, '2026-11-04').length, 0);
+    });
+
+    test('bugün tekrar sayısı: boş durumda 0', () {
+      expect(
+        Motor.tekrarBekleyen(const OgrenciDurumu(), '2026-11-04').length,
+        0,
+      );
+    });
   });
 
   group('cevapDogruMu: indeksli türler', () {
@@ -443,6 +472,57 @@ void main() {
     test('boş doğru listesine boş liste true', () {
       const b = Sirala(soru: 's', kelimeler: [], dogru: []);
       expect(Motor.cevapDogruMu(b, <String>[]), isTrue);
+    });
+  });
+
+  group('cevapDogruMu: Sirala kabul (alternatif sıralar)', () {
+    const a = Sirala(
+      soru: 's',
+      kelimeler: ['c', 'a', 'b'],
+      dogru: ['a', 'b', 'c'],
+      kabul: [
+        ['b', 'a', 'c'],
+        ['a', 'c', 'b'],
+      ],
+    );
+
+    test('dogru ve kabul içindeki her sıra true', () {
+      expect(Motor.cevapDogruMu(a, ['a', 'b', 'c']), isTrue);
+      expect(Motor.cevapDogruMu(a, ['b', 'a', 'c']), isTrue);
+      expect(Motor.cevapDogruMu(a, <Object?>['a', 'c', 'b']), isTrue);
+    });
+
+    test('kabul dışındaki sıra, eksik ve yanlış tip false', () {
+      expect(Motor.cevapDogruMu(a, ['c', 'b', 'a']), isFalse);
+      expect(Motor.cevapDogruMu(a, ['c', 'a', 'b']), isFalse);
+      expect(Motor.cevapDogruMu(a, ['b', 'a']), isFalse);
+      expect(Motor.cevapDogruMu(a, <Object?>['b', 'a', 1]), isFalse);
+      expect(Motor.cevapDogruMu(a, null), isFalse);
+    });
+
+    test('kabul boşken yalnız dogru kabul edilir (eski davranış)', () {
+      const b = Sirala(soru: 's', kelimeler: ['b', 'a'], dogru: ['a', 'b']);
+      expect(b.kabul, isEmpty);
+      expect(Motor.cevapDogruMu(b, ['a', 'b']), isTrue);
+      expect(Motor.cevapDogruMu(b, ['b', 'a']), isFalse);
+    });
+
+    test('siraGecerliMi uzunluğu farklı kabul girdisini eşleştirmez', () {
+      const c = Sirala(
+        soru: 's',
+        kelimeler: ['a', 'b'],
+        dogru: ['a', 'b'],
+        kabul: [
+          ['a'],
+        ],
+      );
+      expect(c.siraGecerliMi(['a']), isTrue);
+      expect(Motor.cevapDogruMu(c, ['a']), isFalse); // uzunluk dogru'ya göre
+      expect(Motor.cevapDogruMu(c, ['a', 'b']), isTrue);
+    });
+
+    test('kalıp ve çözüm metni yalnız dogru sırasını kullanır', () {
+      expect(Motor.dogruCevapMetni(a), 'a b c');
     });
   });
 

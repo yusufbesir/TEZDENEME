@@ -6,6 +6,8 @@
 /// 2) Okuma: başlık ve paragraflar; anahtar kelimeler kalın (bilinmeyenler
 ///    ana renkte) vurgulanır, dokununca alt sayfada anlamı çıkar. Aynı
 ///    kelimeler altta çip olarak da listelenir (erişilebilirlik).
+///    İsteğe bağlı "Boşluklu okuma" kipi: birkaç anahtar kelime gizlenir,
+///    boşluğa dokunup seçenekten doldurulur (yanlış seçim tekrar denenir).
 /// 3) Anlama soruları: AlistirmaOturumu (SRS kartı yok, onSonuc boş).
 /// 4) Özet: DersOzeti; XP Motor.hikayeXp, kayıt Motor.hikayeBitir.
 library;
@@ -324,13 +326,18 @@ class _OkumaDurumu extends State<_Okuma> {
   late final List<TapGestureRecognizer> _tanimlayicilar;
   late final RegExp _desen;
 
+  /// Boşluklu okuma kipi: gizlenecek kelime indeksleri ve doldurulanlar.
+  late final List<int> _bosluk = widget.hikaye.boslukIndeksleri();
+  final Set<int> _dolu = {};
+  bool _bosluklu = false;
+
   @override
   void initState() {
     super.initState();
     final kelimeler = widget.hikaye.anahtarKelimeler;
     _tanimlayicilar = [
       for (var i = 0; i < kelimeler.length; i++)
-        TapGestureRecognizer()..onTap = () => _anlamGoster(i),
+        TapGestureRecognizer()..onTap = () => _dokun(i),
     ];
     // Uzun kelime önce: "baggage claim" gibi çok sözcüklüler tam eşleşsin.
     final sirali = [...kelimeler.map((k) => k.kelime)]
@@ -351,6 +358,81 @@ class _OkumaDurumu extends State<_Okuma> {
 
   int _kelimeIndeksi(String bulunan) => widget.hikaye.anahtarKelimeler
       .indexWhere((k) => k.kelime.toLowerCase() == bulunan.toLowerCase());
+
+  bool _acikBosluk(int i) =>
+      _bosluklu && _bosluk.contains(i) && !_dolu.contains(i);
+
+  void _dokun(int i) => _acikBosluk(i) ? _bosluguDoldur(i) : _anlamGoster(i);
+
+  /// Seçenekler: gizli kelimeler + en çok 2 dikkat dağıtıcı anahtar kelime;
+  /// sıra kelime indeksine göre sabit karıştırılır.
+  List<int> _secenekler() {
+    final h = widget.hikaye;
+    final yedek = [
+      for (var i = 0; i < h.anahtarKelimeler.length; i++)
+        if (!_bosluk.contains(i)) i,
+    ].take(2);
+    final hepsi = [..._bosluk.where((i) => !_dolu.contains(i)), ...yedek]
+      ..sort((a, b) => ((a * 7 + 3) % 11).compareTo((b * 7 + 3) % 11));
+    return hepsi;
+  }
+
+  Future<void> _bosluguDoldur(int i) async {
+    final dogru = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (c) {
+        final denenen = <int>{};
+        return StatefulBuilder(
+          builder: (c, setSheet) => SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                Olcu.b3,
+                Olcu.b1,
+                Olcu.b3,
+                Olcu.b3,
+              ),
+              child: Column(
+                key: const Key('bosluk-secenekleri'),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Boşluğa hangi kelime uyar?',
+                    style: Theme.of(c).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: Olcu.b1),
+                  for (final s in _secenekler())
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: Olcu.b1),
+                      child: OutlinedButton(
+                        key: Key('bosluk-secenek-$s'),
+                        onPressed: denenen.contains(s)
+                            ? null
+                            : () {
+                                if (s == i) {
+                                  Navigator.pop(c, true);
+                                } else {
+                                  setSheet(() => denenen.add(s));
+                                }
+                              },
+                        child: Text(
+                          denenen.contains(s)
+                              ? '${widget.hikaye.anahtarKelimeler[s].kelime} (olmadı)'
+                              : widget.hikaye.anahtarKelimeler[s].kelime,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (dogru == true && mounted) setState(() => _dolu.add(i));
+  }
 
   void _anlamGoster(int i) {
     final k = widget.hikaye.anahtarKelimeler[i];
@@ -381,7 +463,12 @@ class _OkumaDurumu extends State<_Okuma> {
     );
   }
 
-  List<InlineSpan> _parcalar(String metin, TextStyle? temel, Color vurgu) {
+  List<InlineSpan> _parcalar(
+    String metin,
+    TextStyle? temel,
+    Color vurgu,
+    Set<int> gorulen,
+  ) {
     final sonuc = <InlineSpan>[];
     var son = 0;
     for (final m in _desen.allMatches(metin)) {
@@ -391,6 +478,25 @@ class _OkumaDurumu extends State<_Okuma> {
       final bulunan = metin.substring(m.start, m.end);
       final i = _kelimeIndeksi(bulunan);
       final bilinmiyor = widget.bilinmeyen.contains(i);
+      // Yalnız ilk geçiş gizlenir; sonrakiler (ve doldurulanlar) normal kalır.
+      if (i >= 0 && _acikBosluk(i) && gorulen.add(i)) {
+        final no = _bosluk.indexOf(i) + 1;
+        sonuc.add(
+          TextSpan(
+            text: '($no) ______',
+            recognizer: _tanimlayicilar[i],
+            semanticsLabel: 'Boşluk $no, dokunup kelime seç',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: vurgu,
+              decoration: TextDecoration.underline,
+              decorationColor: vurgu,
+            ),
+          ),
+        );
+        son = m.end;
+        continue;
+      }
       sonuc.add(
         TextSpan(
           text: bulunan,
@@ -417,6 +523,8 @@ class _OkumaDurumu extends State<_Okuma> {
     final yazi = Theme.of(context).textTheme;
     final h = widget.hikaye;
     final govde = yazi.bodyLarge?.copyWith(height: 1.6, color: r.metin);
+    final gorulen = <int>{};
+    final kalan = _bosluklu ? _bosluk.length - _dolu.length : 0;
     return Column(
       children: [
         _Ust(baslik: h.seviye.etiket, onKapat: widget.onKapat),
@@ -431,12 +539,30 @@ class _OkumaDurumu extends State<_Okuma> {
                     header: true,
                     child: Text(h.baslik, style: yazi.headlineSmall),
                   ),
+                  if (_bosluk.isNotEmpty)
+                    SwitchListTile(
+                      key: const Key('bosluklu-mod'),
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Boşluklu okuma'),
+                      subtitle: Text(
+                        _bosluklu
+                            ? (kalan > 0
+                                  ? '$kalan boşluk kaldı; boşluğa dokun.'
+                                  : 'Tüm boşluklar dolu.')
+                            : 'Birkaç kelime gizlenir, sen doldurursun.',
+                      ),
+                      value: _bosluklu,
+                      onChanged: (v) => setState(() {
+                        _bosluklu = v;
+                        _dolu.clear();
+                      }),
+                    ),
                   const SizedBox(height: Olcu.b2),
                   for (final p in h.paragraflar)
                     Padding(
                       padding: const EdgeInsets.only(bottom: Olcu.b2),
                       child: Text.rich(
-                        TextSpan(children: _parcalar(p, govde, r.ana)),
+                        TextSpan(children: _parcalar(p, govde, r.ana, gorulen)),
                         style: govde,
                       ),
                     ),
@@ -450,11 +576,13 @@ class _OkumaDurumu extends State<_Okuma> {
                     runSpacing: Olcu.b1,
                     children: [
                       for (var i = 0; i < h.anahtarKelimeler.length; i++)
-                        ActionChip(
-                          key: Key('kelime-cip-$i'),
-                          label: Text(h.anahtarKelimeler[i].kelime),
-                          onPressed: () => _anlamGoster(i),
-                        ),
+                        // Boşluk modunda cevabı açık etmemek için gizli kelime çipi yok.
+                        if (!_acikBosluk(i))
+                          ActionChip(
+                            key: Key('kelime-cip-$i'),
+                            label: Text(h.anahtarKelimeler[i].kelime),
+                            onPressed: () => _anlamGoster(i),
+                          ),
                     ],
                   ),
                 ],

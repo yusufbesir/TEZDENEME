@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../durum/saglayicilar.dart';
+import '../../model/durum.dart';
 import '../../model/icerik.dart';
 import '../../tema/tema.dart';
+import '../ses_hiz_secici.dart';
 import 'secenek_listesi.dart';
 import 'soru_basligi.dart';
 
 /// Dinleme: hoparlör düğmesi metni okur; kullanıcı duyduğunu seçer.
 /// Ses ayarda kapalıysa okunacak metin yazıyla gösterilir.
+/// Düğmelerin altında konuşma hızı seçici (ayar `sesHizi`; yazan: [Claude#tts-hiz]).
 class DinleGorunumu extends ConsumerStatefulWidget {
   const DinleGorunumu({
     super.key,
@@ -31,9 +34,15 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
   Future<void> _oku({bool yavas = false}) async {
     final ses = ref.read(sesProvider);
     final a = widget.alistirma;
-    final tamam = yavas
-        ? await ses.okuYavas(a.okunacak, dil: a.dil)
-        : await ses.oku(a.okunacak, dil: a.dil);
+    final carpan =
+        ref.read(durumProvider).value?.sesHizi ??
+        OgrenciDurumu.varsayilanSesHizi;
+    final tamam = await ses.okuHizla(
+      a.okunacak,
+      dil: a.dil,
+      carpan: carpan,
+      yavas: yavas,
+    );
     if (!tamam && mounted && !_sesHatasi) setState(() => _sesHatasi = true);
   }
 
@@ -84,6 +93,10 @@ class _DinleDurumu extends ConsumerState<DinleGorunumu> {
                   sesAcik ? 'Dinlemek için dokun' : 'Ses kapalı',
                   style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
                 ),
+                if (dugmeAktif) ...[
+                  const SizedBox(height: Olcu.b1),
+                  const SesHizSecici(),
+                ],
                 if (_sesHatasi && sesAcik) ...[
                   const SizedBox(height: Olcu.b1),
                   Text(

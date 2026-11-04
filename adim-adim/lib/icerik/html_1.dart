@@ -246,6 +246,9 @@ const Kurs html1 = Kurs(
                 '</label>',
                 '<input id="kod">',
               ],
+              kabul: [
+                ['<input id="kod">', '<label for="kod">', 'Barkod', '</label>'],
+              ],
               aciklama:
                   'Önce label ve metni, sonra for ile bağlanan input gelir.',
             ),

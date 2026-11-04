@@ -182,7 +182,7 @@ test("integrations.pure: gerçek 100 maddelik dosyada sayımlar özetle eşleşi
   const c = plain(p.countByStatus(items));
   assert.deepEqual([c.dogrulandi, c.kismi, c.planli, c.desteklenmiyor, c.kapsamdisi, c.total], [CAPS.summary.dogrulandi, CAPS.summary.kismi, CAPS.summary.planli, CAPS.summary.desteklenmiyor, CAPS.summary.kapsamdisi, 100]);
   assert.equal(p.summaryMismatch(CAPS.summary, c), false);
-  assert.equal(p.summaryMismatch({ ...CAPS.summary, planli: 1 }, c), true);
+  assert.equal(p.summaryMismatch({ ...CAPS.summary, planli: CAPS.summary.planli + 1 }, c), true);
 });
 
 test("integrations.pure: süzgeçler (metin, durum, dilim) ve Türkçe katlama", () => {

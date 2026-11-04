@@ -100,6 +100,7 @@ const ROUTES = [
   "/api/analysis/impact?file=src/providers/registry.ts",
   "/api/analysis/graph",
   "/api/analysis/continuity",
+  "/api/analysis/portfolio",
   "/api/analysis/exit?provider=claude-code",
   "/api/analysis/broker?capability=execute",
   "/api/analysis/offline",
@@ -189,6 +190,14 @@ test("continuity: nodes, edges, single points and loss summary from the registry
   assert.ok(lossLocal.retained.includes("execute"));
   assert.equal(c.summary.providers, 3);
   assert.equal((await get("/api/analysis/continuity?x=1")).status, 400);
+});
+
+test("portfolio: only the contract's trustedRepos (none here -> empty honest report), params rejected", async () => {
+  const r = await get("/api/analysis/portfolio");
+  assert.equal(r.status, 200);
+  assert.deepEqual([r.json.portfolio.projects.length, r.json.portfolio.truncated], [0, false]);
+  assert.ok(r.json.portfolio.notes.length > 0);
+  assert.equal((await get("/api/analysis/portfolio?x=1")).status, 400);
 });
 
 test("exit: paid route is closed, policy-denied is excluded, candidates are scored; 400 / 404", async () => {

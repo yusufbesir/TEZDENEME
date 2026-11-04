@@ -2,7 +2,7 @@
 // Pırıl PC uygulaması (Electron ana süreç).
 // Güvenlik özeti: tek örnek kilidi; contextIsolation+sandbox, nodeIntegration yok; yalnız file:// kaynağı; pencere açma/gezinme/izin
 // reddi; IPC yalnız kendi sayfalarımızdan; telefon bağlantısı kapalıyken hiç dinleme yok; eşleştirme sırrı safeStorage ile şifreli.
-const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, dialog, shell, session, safeStorage, clipboard, desktopCapturer, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, dialog, shell, session, safeStorage, clipboard, desktopCapturer, screen, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -232,11 +232,17 @@ function webTercihleri() {
     devTools: !app.isPackaged
   };
 }
+// Pencere/görev çubuğu simgesi: logo (build/icon.png); dosya yoksa piksel çizimine düşer. Tepsi ayrı (uyarı rengi).
+function pencereIkonu() {
+  const yol = path.join(__dirname, 'build', 'icon.png');
+  const img = fs.existsSync(yol) ? nativeImage.createFromPath(yol) : null;
+  return img && !img.isEmpty() ? img : nativeImage.createFromBuffer(ikon.png(256, false));
+}
 function sohbetGoster() {
   if (!sohbetPenceresi || sohbetPenceresi.isDestroyed()) {
     sohbetPenceresi = new BrowserWindow({
       width: 440, height: 680, minWidth: 340, minHeight: 420, show: false, title: 'Pırıl', autoHideMenuBar: true,
-      icon: nativeImage.createFromBuffer(ikon.png(256, false)), webPreferences: webTercihleri()
+      icon: pencereIkonu(), webPreferences: webTercihleri()
     });
     sohbetPenceresi.setMenuBarVisibility(false);
     sohbetPenceresi.on('close', (e) => { if (!cikiyor) { e.preventDefault(); sohbetPenceresi.hide(); } });
@@ -272,6 +278,40 @@ function karakterKur() {
     }, 500);
   });
   karakterPenceresi.loadFile(KARAKTER_HTML).catch(() => {});
+}
+
+// ---------- Hatırlatıcı / alarm vadesi ----------
+// Çekirdek yalnız kaydeder; bildirimi burada gösteririz. 20 sn'de bir depo taranır; vadesi gelen kayıt tamamlanır.
+const VADE_ARALIGI_MS = 20 * 1000;
+let vadeZamanlayici = null;
+function vadeKontrol() {
+  if (!depo) return;
+  let vade;
+  try { vade = modulYukle('cekirdek', 'vade.js'); } catch (e) { return; }
+  let sonuc;
+  try { sonuc = vade.vadesiGelenler(depo, new Date()); } catch (e) { return; }
+  for (const k of sonuc.vadesiGelen) {
+    const metin = vade.bildirimMetni(k);
+    try {
+      if (Notification.isSupported()) {
+        const n = new Notification({ title: 'Pırıl', body: metin, icon: pencereIkonu(), urgency: k.tur === 'alarm' ? 'critical' : 'normal' });
+        n.on('click', () => sohbetGoster());
+        n.show();
+      }
+    } catch (e) { /* bildirim yoksa pencereyle yetinilir */ }
+    if (k.tur === 'alarm') sohbetGoster();
+    const w = sohbetPenceresi;
+    if (w && !w.isDestroyed()) {
+      try { w.webContents.send('piril:vade', { tur: k.tur, metin }); } catch (e) { /* kapanıyor */ }
+      if (k.tur === 'alarm') { try { w.flashFrame(true); } catch (e) { /* desteklenmiyor */ } }
+    }
+  }
+}
+function vadeIzle() {
+  clearInterval(vadeZamanlayici);
+  vadeZamanlayici = setInterval(vadeKontrol, VADE_ARALIGI_MS);
+  if (typeof vadeZamanlayici.unref === 'function') vadeZamanlayici.unref();
+  vadeKontrol();
 }
 
 // ---------- Tepsi ----------
@@ -406,6 +446,7 @@ if (!app.requestSingleInstanceLock()) {
     trayIzle();
     karakterKur();
     sohbetGoster();
+    vadeIzle();
     // Açılış tamamlandıktan sonra (sayfa yüklendi) eski sürüm temizliği
     sohbetPenceresi.webContents.once('did-finish-load', () => { baslangicTemizligi().catch(() => {}); });
   });

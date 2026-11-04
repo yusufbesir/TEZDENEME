@@ -402,7 +402,10 @@ test("a recorded REAL claude run (2026-10-21, claude.ai subscription, --safe-mod
   assert.equal(u.source, "reported");
   assert.equal(u.costBasis, "list", "a subscription run reports a list-price equivalent, not a charge");
   assert.ok((u.inputTokens ?? 0) > 1000, "prompt size includes cache writes/reads");
-  assert.deepEqual(events.map((e) => e.type), ["started", "started", "message", "usage", "completed"], "only system/init counts as a start; rate_limit_event is ignored");
+  assert.deepEqual(events.map((e) => e.type), ["started", "started", "message", "usage", "usage", "completed"], "only system/init counts as a start; rate_limit_event becomes a limits-only usage event");
+  const lim = events.filter((e) => e.type === "usage").map((e) => (e.data as { limits?: Record<string, unknown> }).limits).find(Boolean);
+  assert.equal(lim?.usedPct, 11, "most used window (five_hour 0.11) is the binding one");
+  assert.equal(lim?.resetsAt, new Date(1792617600 * 1000).toISOString());
 });
 
 test("the REAL gemini stderr from a not-logged-in CLI (exit 41) is classified auth_required", async () => {
@@ -433,4 +436,19 @@ test("the REAL claude failure for an unknown model (2026-10-21: exit 1, 404 mode
   assert.match(r.summary ?? "", /no-such-model-xyz/);
   assert.equal(a.getUsage(h.executionId).inputTokens, 0);
   assert.ok(events.some((e) => e.type === "error"));
+});
+
+test("quota binding: the limits emitted from the REAL rate_limit_event are accepted by parseLimits (and a missing/invalid window emits nothing)", async () => {
+  const { parseLimits } = await import("../analysis/quota.ts");
+  const a = make("claude");
+  const file = join(import.meta.dirname, "testing", "claude-real-run.jsonl");
+  const h = a.execute(request("replay", {}, file));
+  const events = await collect(a, h.executionId);
+  await h.result;
+  const lim = events.filter((e) => e.type === "usage").map((e) => (e.data as { limits?: unknown }).limits).find(Boolean);
+  const at = new Date((1792617600 - 3600) * 1000);
+  const parsed = parseLimits(lim, at.toISOString(), at);
+  assert.equal(parsed?.usedPct, 11);
+  assert.equal(parsed?.remainingPct, 89);
+  assert.equal(parseLimits({ usedPct: 5, resetsAt: "x" }, at.toISOString(), at), null);
 });

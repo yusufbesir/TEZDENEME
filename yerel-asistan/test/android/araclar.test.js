@@ -110,7 +110,7 @@ test('yamala: izinler, ağ yapılandırması, idempotent', () => {
   assert.deepEqual(r1.degisen.sort(), ['AndroidManifest.xml', 'res/xml/data_extraction_rules.xml', 'res/xml/network_security_config.xml']);
   const mp = path.join(a, 'app/src/main/AndroidManifest.xml');
   const m = fs.readFileSync(mp, 'utf8');
-  for (const i of ['RECORD_AUDIO', 'INTERNET', 'ACCESS_NETWORK_STATE']) {
+  for (const i of ['RECORD_AUDIO', 'INTERNET', 'ACCESS_NETWORK_STATE', 'POST_NOTIFICATIONS']) {
     assert.equal((m.match(new RegExp('android.permission.' + i + '"', 'g')) || []).length, 1, i);
   }
   assert.match(m, /android:networkSecurityConfig="@xml\/network_security_config"/);
@@ -198,4 +198,39 @@ test('yapılandırma: capacitor.config.json ve package.json sabit sürümlü, ha
   for (const ad of ['@capacitor/core', '@capacitor/cli', '@capacitor/android', '@capacitor-community/speech-recognition']) {
     assert.match(hepsi[ad], /^\d+\.\d+\.\d+$/, ad);
   }
+});
+
+test('yamala: logo verilirse mipmap ve adaptive icon yazılır, idempotent', () => {
+  const a = androidKur();
+  const LOGO = path.join(__dirname, '..', '..', 'logo', 'android');
+  const r1 = Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, logoDizin: LOGO });
+  for (const y of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
+    for (const d of ['ic_launcher.png', 'ic_launcher_round.png', 'ic_launcher_foreground.png']) {
+      assert.ok(r1.degisen.includes('res/mipmap-' + y + '/' + d), y + '/' + d);
+      assert.ok(fs.existsSync(path.join(a, 'app/src/main/res/mipmap-' + y, d)));
+    }
+  }
+  const xml = fs.readFileSync(path.join(a, 'app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml'), 'utf8');
+  assert.match(xml, /@mipmap\/ic_launcher_foreground/);
+  assert.match(fs.readFileSync(path.join(a, 'app/src/main/res/values/ic_launcher_background.xml'), 'utf8'), /#14343a/);
+  // xxxhdpi ön plan 432 px (108 dp) olmalı
+  assert.equal(fs.readFileSync(path.join(a, 'app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png')).readUInt32BE(16), 432);
+  assert.deepEqual(Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, logoDizin: LOGO }).degisen, []);
+  assert.throws(() => Y.yamala({ androidDizin: androidKur(), yamalarDizin: YAMALAR, logoDizin: path.join(a, 'yok') }), /logo klasörü eksik/);
+});
+
+test('yamala: sürüm build.gradle içine yazılır, idempotent', () => {
+  const a = androidKur();
+  yaz(a, 'app/build.gradle', 'android {\n    defaultConfig {\n        versionCode 1\n        versionName "1.0"\n    }\n}\n');
+  const r1 = Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, surum: '0.1.2' });
+  assert.ok(r1.degisen.includes('app/build.gradle'));
+  const g = fs.readFileSync(path.join(a, 'app/build.gradle'), 'utf8');
+  assert.match(g, /versionName "0\.1\.2"/);
+  assert.match(g, /versionCode 102/);
+  assert.equal(Y.surumKodu('1.2.3'), 10203);
+  const r2 = Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, surum: '0.1.2' });
+  assert.ok(!r2.degisen.includes('app/build.gradle'));
+  // geçersiz sürüm dosyaya dokunmaz
+  Y.yamala({ androidDizin: a, yamalarDizin: YAMALAR, surum: 'abc' });
+  assert.equal(fs.readFileSync(path.join(a, 'app/build.gradle'), 'utf8'), g);
 });

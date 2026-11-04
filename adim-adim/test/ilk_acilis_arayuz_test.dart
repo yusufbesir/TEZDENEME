@@ -9,11 +9,41 @@ library;
 import 'package:adim_adim/depo/depo.dart';
 import 'package:adim_adim/durum/saglayicilar.dart';
 import 'package:adim_adim/model/durum.dart';
+import 'package:adim_adim/model/icerik.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'arayuz_yardimci.dart';
 import 'sahte_icerik.dart';
+
+/// Hızlı seviye testi için: 3 ünite, her ünitede 6 çoktan seçmeli soru.
+final Kurs _hizliKurs = Kurs(
+  id: 'hk-1',
+  ad: 'Hızlı Kurs',
+  aciklama: '',
+  alan: KursAlani.dil,
+  uniteler: [
+    for (var u = 1; u <= 3; u++)
+      Unite(
+        id: 'hk-1.u$u',
+        ad: 'Ünite $u',
+        dersler: [
+          Ders(
+            id: 'hk-1.u$u.d1',
+            ad: 'Ders $u',
+            alistirmalar: [
+              for (var i = 0; i < 6; i++)
+                Secim(
+                  soru: 'U$u S$i',
+                  secenekler: ['yanlış U$u S$i', 'doğru U$u S$i'],
+                  dogru: 1,
+                ),
+            ],
+          ),
+        ],
+      ),
+  ],
+);
 
 Future<void> _tasmaYok(WidgetTester tester, String nerede) async {
   final hata = tester.takeException();
@@ -218,5 +248,62 @@ void main() {
     await dokun(tester, find.text('Başla'));
     await _tasmaYok(tester, 'yol');
     expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('özette 5 soruluk hızlı seviye testi: yalnız ilk ünite, akış '
+      'bozulmaz', (tester) async {
+    final depo = BellekDepo();
+    final kap = await uygulamayiAc(tester, depo, kurslar: [_hizliKurs]);
+    await dokun(tester, find.text('İngilizce'));
+    await dokun(tester, find.text('Atla'));
+    await dokun(tester, find.text('Atla'));
+    expect(find.text('Hazırsın'), findsOneWidget);
+    await dokun(tester, find.byKey(const ValueKey('hizli-seviye-testi')));
+
+    expect(find.text('1/5'), findsOneWidget);
+    final sorular = <String>{};
+    for (var n = 0; n < 5; n++) {
+      final soru = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((w) => w.data)
+          .whereType<String>()
+          .firstWhere((t) => RegExp(r'^U\d S\d$').hasMatch(t));
+      sorular.add(soru);
+      await dokun(tester, find.text('doğru $soru'));
+      await dokun(tester, find.text('Kontrol et'));
+      await dokun(tester, find.text(n == 4 ? 'Bitir' : 'Devam'));
+    }
+    expect(sorular, hasLength(5));
+    expect(sorular.every((q) => q.startsWith('U1 ')), isTrue);
+    expect(find.text('Seviye belirlendi'), findsOneWidget);
+    expect(find.text('Atlanan ünite: 1'), findsOneWidget);
+    final d = kap.read(durumProvider).value!;
+    expect(d.atlananDersler, {'hk-1.u1.d1'});
+    expect(d.xp, 0);
+    expect(d.ilkAcilisTamam, isFalse);
+
+    // Sınavdan sihirbaza dönülür; "Başla" akışı kapatır.
+    await dokun(tester, find.byKey(const ValueKey('yerlestirme-don')));
+    expect(find.text('Hazırsın'), findsOneWidget);
+    await dokun(tester, find.text('Başla'));
+    expect(kap.read(durumProvider).value!.ilkAcilisTamam, isTrue);
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('hızlı seviye testi 480x600 @1.5 ölçekte taşmaz', (tester) async {
+    await uygulamayiAc(
+      tester,
+      BellekDepo(),
+      kurslar: [_hizliKurs],
+      boyut: const Size(480, 600),
+      metinOlcegi: 1.5,
+    );
+    await dokun(tester, find.text('İngilizce'));
+    await dokun(tester, find.text('Atla'));
+    await dokun(tester, find.text('Atla'));
+    await _tasmaYok(tester, 'özet');
+    await dokun(tester, find.byKey(const ValueKey('hizli-seviye-testi')));
+    await _tasmaYok(tester, 'hızlı test');
+    expect(find.text('1/5'), findsOneWidget);
   });
 }

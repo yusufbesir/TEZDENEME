@@ -1,0 +1,563 @@
+[
+ {
+  "dogru": "",
+  "verilen": "",
+  "sonuc": []
+ },
+ {
+  "dogru": "Hello world",
+  "verilen": "hello world",
+  "sonuc": [
+   [
+    "Hello",
+    "dogru"
+   ],
+   [
+    "world",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "See you on Friday.",
+  "verilen": "see you in friday",
+  "sonuc": [
+   [
+    "See",
+    "dogru"
+   ],
+   [
+    "you",
+    "dogru"
+   ],
+   [
+    "on",
+    "eksik"
+   ],
+   [
+    "in",
+    "fazla"
+   ],
+   [
+    "Friday.",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "I like apples",
+  "verilen": "I like",
+  "sonuc": [
+   [
+    "I",
+    "dogru"
+   ],
+   [
+    "like",
+    "dogru"
+   ],
+   [
+    "apples",
+    "eksik"
+   ]
+  ]
+ },
+ {
+  "dogru": "I like",
+  "verilen": "I like apples and pears",
+  "sonuc": [
+   [
+    "I",
+    "dogru"
+   ],
+   [
+    "like",
+    "dogru"
+   ],
+   [
+    "apples",
+    "fazla"
+   ],
+   [
+    "and",
+    "fazla"
+   ],
+   [
+    "pears",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "Bugün hava çok güzel!",
+  "verilen": "bugun hava cok guzel",
+  "sonuc": [
+   [
+    "Bugün",
+    "eksik"
+   ],
+   [
+    "bugun",
+    "fazla"
+   ],
+   [
+    "hava",
+    "dogru"
+   ],
+   [
+    "çok",
+    "eksik"
+   ],
+   [
+    "güzel!",
+    "eksik"
+   ],
+   [
+    "cok",
+    "fazla"
+   ],
+   [
+    "guzel",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "İstanbul’da yaşıyorum.",
+  "verilen": "istanbul'da yasiyorum",
+  "sonuc": [
+   [
+    "İstanbul’da",
+    "dogru"
+   ],
+   [
+    "yaşıyorum.",
+    "eksik"
+   ],
+   [
+    "yasiyorum",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "ISPARTA ışık",
+  "verilen": "isparta ISIK",
+  "sonuc": [
+   [
+    "ISPARTA",
+    "dogru"
+   ],
+   [
+    "ışık",
+    "eksik"
+   ],
+   [
+    "ISIK",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "«Merci» beaucoup, ça va ?",
+  "verilen": "merci beaucoup ca va",
+  "sonuc": [
+   [
+    "«Merci»",
+    "dogru"
+   ],
+   [
+    "beaucoup,",
+    "dogru"
+   ],
+   [
+    "ça",
+    "eksik"
+   ],
+   [
+    "ca",
+    "fazla"
+   ],
+   [
+    "va",
+    "dogru"
+   ],
+   [
+    "?",
+    "eksik"
+   ]
+  ]
+ },
+ {
+  "dogru": "مرحبا بالعالم",
+  "verilen": "مرحبا العالم",
+  "sonuc": [
+   [
+    "مرحبا",
+    "dogru"
+   ],
+   [
+    "بالعالم",
+    "eksik"
+   ],
+   [
+    "العالم",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "안녕하세요 반갑습니다",
+  "verilen": "안녕하세요 반갑습니다",
+  "sonuc": [
+   [
+    "안녕하세요",
+    "dogru"
+   ],
+   [
+    "반갑습니다",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "こんにちは 世界",
+  "verilen": "こんにちは",
+  "sonuc": [
+   [
+    "こんにちは",
+    "dogru"
+   ],
+   [
+    "世界",
+    "eksik"
+   ]
+  ]
+ },
+ {
+  "dogru": "one  two\tthree\nfour",
+  "verilen": "one two three four",
+  "sonuc": [
+   [
+    "one",
+    "dogru"
+   ],
+   [
+    "two",
+    "dogru"
+   ],
+   [
+    "three",
+    "dogru"
+   ],
+   [
+    "four",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "a b c d e f",
+  "verilen": "f e d c b a",
+  "sonuc": [
+   [
+    "a",
+    "eksik"
+   ],
+   [
+    "b",
+    "eksik"
+   ],
+   [
+    "c",
+    "eksik"
+   ],
+   [
+    "d",
+    "eksik"
+   ],
+   [
+    "e",
+    "eksik"
+   ],
+   [
+    "f",
+    "dogru"
+   ],
+   [
+    "e",
+    "fazla"
+   ],
+   [
+    "d",
+    "fazla"
+   ],
+   [
+    "c",
+    "fazla"
+   ],
+   [
+    "b",
+    "fazla"
+   ],
+   [
+    "a",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "the the the cat",
+  "verilen": "the cat the",
+  "sonuc": [
+   [
+    "the",
+    "dogru"
+   ],
+   [
+    "the",
+    "eksik"
+   ],
+   [
+    "the",
+    "eksik"
+   ],
+   [
+    "cat",
+    "dogru"
+   ],
+   [
+    "the",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "...hello---",
+  "verilen": "hello",
+  "sonuc": [
+   [
+    "...hello---",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "\"quoted\" `tick´ word",
+  "verilen": "quoted tick word",
+  "sonuc": [
+   [
+    "\"quoted\"",
+    "dogru"
+   ],
+   [
+    "`tick´",
+    "dogru"
+   ],
+   [
+    "word",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": " nbsp word",
+  "verilen": "word",
+  "sonuc": [
+   [
+    "nbsp",
+    "eksik"
+   ],
+   [
+    "word",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "x y　z",
+  "verilen": "x y z",
+  "sonuc": [
+   [
+    "x",
+    "dogru"
+   ],
+   [
+    "y",
+    "dogru"
+   ],
+   [
+    "z",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "﻿feff word",
+  "verilen": "feff word",
+  "sonuc": [
+   [
+    "feff",
+    "dogru"
+   ],
+   [
+    "word",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "Привет, МИР!",
+  "verilen": "привет мир",
+  "sonuc": [
+   [
+    "Привет,",
+    "dogru"
+   ],
+   [
+    "МИР!",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "a1 b2 c3",
+  "verilen": "A1 B2 C3",
+  "sonuc": [
+   [
+    "a1",
+    "dogru"
+   ],
+   [
+    "b2",
+    "dogru"
+   ],
+   [
+    "c3",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "!!! ???",
+  "verilen": "hello",
+  "sonuc": [
+   [
+    "!!!",
+    "eksik"
+   ],
+   [
+    "???",
+    "eksik"
+   ],
+   [
+    "hello",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "hello",
+  "verilen": "!!! ???",
+  "sonuc": [
+   [
+    "hello",
+    "eksik"
+   ],
+   [
+    "!!!",
+    "fazla"
+   ],
+   [
+    "???",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "ΣΊΣΥΦΟΣ",
+  "verilen": "σίσυφος",
+  "sonuc": [
+   [
+    "ΣΊΣΥΦΟΣ",
+    "eksik"
+   ],
+   [
+    "σίσυφος",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "straße",
+  "verilen": "STRASSE",
+  "sonuc": [
+   [
+    "straße",
+    "eksik"
+   ],
+   [
+    "STRASSE",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "नमस्ते दुनिया",
+  "verilen": "नमस्ते दुनिया",
+  "sonuc": [
+   [
+    "नमस्ते",
+    "dogru"
+   ],
+   [
+    "दुनिया",
+    "dogru"
+   ]
+  ]
+ },
+ {
+  "dogru": "café",
+  "verilen": "café",
+  "sonuc": [
+   [
+    "café",
+    "eksik"
+   ],
+   [
+    "café",
+    "fazla"
+   ]
+  ]
+ },
+ {
+  "dogru": "go-to well-known",
+  "verilen": "go to well known",
+  "sonuc": [
+   [
+    "go-to",
+    "eksik"
+   ],
+   [
+    "well-known",
+    "eksik"
+   ],
+   [
+    "go",
+    "fazla"
+   ],
+   [
+    "to",
+    "fazla"
+   ],
+   [
+    "well",
+    "fazla"
+   ],
+   [
+    "known",
+    "fazla"
+   ]
+  ]
+ }
+]

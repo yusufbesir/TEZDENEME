@@ -1,5 +1,6 @@
 /// Yol sekmesi: alan şeridi (alan adı, seri, hedef halkası), "2 dakikalık
-/// ders" düğmesi, "Kaldığın yerden devam" kartı (DevamKarti), dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
+/// ders" düğmesi, yan paneldeki günlük hedef kartında "Bugün tekrar: N kelime"
+/// satırı (dokununca `/tekrar`), "Kaldığın yerden devam" kartı (DevamKarti), dil alanında küçük "Günün kelimesi" kartı (kelime, anlam,
 /// ses, "Kartlara ekle"; kaydırılabilir alanda), her alanda hemen altında
 /// "Günün bilmecesi" kartı (BilmeceKarti), dil alanında hemen altında
 /// "Okuma hikâyeleri" kartı (HikayeKarti) ve alan kurslarının tek
@@ -174,24 +175,55 @@ class _GunlukKart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final yazi = Theme.of(context).textTheme;
+    // Bugün vadesi gelen (sonraki <= bugün) kart sayısı; mevcut motor işlevi.
+    final tekrar = Motor.tekrarBekleyen(durum, bugun).length;
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(Olcu.b3),
-        child: Row(
-          children: [
-            HedefHalkasi(
-              xp: durum.gunlukXp[bugun] ?? 0,
-              hedef: durum.gunlukHedef,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(Olcu.b3),
+            child: Row(
+              children: [
+                HedefHalkasi(
+                  xp: durum.gunlukXp[bugun] ?? 0,
+                  hedef: durum.gunlukHedef,
+                ),
+                const SizedBox(width: Olcu.b3),
+                Expanded(
+                  child: Text(
+                    'Bugünkü hedefin ${durum.gunlukHedef} XP',
+                    style: yazi.titleMedium,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: Olcu.b3),
-            Expanded(
-              child: Text(
-                'Bugünkü hedefin ${durum.gunlukHedef} XP',
-                style: Theme.of(context).textTheme.titleMedium,
+          ),
+          // Tek satır: bugün tekrar edilecek kelime; dokununca Tekrar ekranı.
+          InkWell(
+            key: const ValueKey('gunluk-tekrar'),
+            onTap: () => context.push('/tekrar'),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(Olcu.b3, 0, Olcu.b3, Olcu.b2),
+              child: Row(
+                children: [
+                  const Icon(Icons.replay, size: 18),
+                  const SizedBox(width: Olcu.b1),
+                  Expanded(
+                    child: Text(
+                      tekrar == 0
+                          ? 'Bugün tekrar yok'
+                          : 'Bugün tekrar: $tekrar kelime',
+                      style: yazi.bodyMedium,
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right, size: 18),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -79,6 +79,9 @@ class DersMeta {
       case Soyle(:final metin):
         puan = 3;
         sn = 25 + metin.length ~/ 3;
+      case Dikte(:final metin):
+        puan = 3;
+        sn = 25 + metin.length ~/ 3;
       case Hamle(:final oyuncuHamleleri):
         puan = oyuncuHamleleri.length >= 2 ? 4 : 3;
         sn = 30 + 20 * oyuncuHamleleri.length;

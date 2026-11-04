@@ -1,8 +1,9 @@
-// build/icon.png (256x256) dosyasını pc/ikon.js çizimiyle üretir. Kullanım: node scripts/ikon-uret.js
+// build/icon.png dosyasını logo/ikon-256.png'den kopyalar (kurulum ve pencere simgesi). Kullanım: node scripts/ikon-uret.js
+// Tepsi simgesi ayrıdır: pc/ikon.js piksel çizimi (uzaktan kontrol açıkken uyarı rengi).
 const fs = require('fs');
 const path = require('path');
-const { png } = require('../ikon');
+const kaynak = path.join(__dirname, '..', '..', 'logo', 'ikon-256.png');
 const hedef = path.join(__dirname, '..', 'build', 'icon.png');
 fs.mkdirSync(path.dirname(hedef), { recursive: true });
-fs.writeFileSync(hedef, png(256, false));
-console.log('Yazildi: ' + hedef);
+fs.copyFileSync(kaynak, hedef);
+console.log('Kopyalandi: ' + kaynak + ' -> ' + hedef);

@@ -5,11 +5,13 @@ Yerel öncelikli yapay zeka orkestrasyon platformu. Bu klasör AgentMom işinin 
 ## Çalışma düzeni
 - İş kalemleri GitHub issue'larıdır (etiket: `agentmom`). Sıradaki iş, açık issue listesinden alınır; iş bitince issue kapanır.
 - Her dilim için PR açılır, testler ve typecheck yeşil olmadan "Doğrulandı" denmez.
-- Kaynak kod bu klasördedir (#50). Kaynak: özel `yusufbesir/agentmom` deposu (main 7bb4483 + PR #1, cihazda kalan 24 Ekim değişiklikleri).
-- Durum kaynağı: `docs/status/100-yetenek-durum.json` (30 Doğrulandı, 59 Kısmi, 9 Planlı, 2 Kapsam dışı; 2026-10-25).
+- Kaynak kod bu klasördedir (#50). Kaynak: özel `yusufbesir/agentmom` deposunun main'i (d685d4d; PR #2–#12 birleşmiş). Yusuf kararı (2026-10-25): kod TEZDENEME altında durur, sonra her uygulama kendi adıyla ayrı repoya taşınır.
+- Durum kaynağı: `docs/status/100-yetenek-durum.json` (30 Doğrulandı, 67 Kısmi, 1 Planlı, 2 Kapsam dışı; 2026-10-25).
 - Kurallar: ADR-016 (yetenekler çağrılan araçtır), Jev/REA için yeni geliştirme yok, kalıcı silme yok.
 
 ## AgentMom'un kendi README'si (yusufbesir/agentmom)
+
+# AgentMom
 
 AgentMom, yerel-öncelikli bir yapay zeka orkestrasyon platformudur: Claude Code, Codex ve Gemini gibi komut satırı ajanlarını ve yerel modelleri tek bir çekirdek altında toplar, katmanlı ayarlar, izin kipleri ve oturum kayıtlarıyla görevleri güvenli biçimde dağıtır. Bu depo Faz 0 (keşif ve tasarım) aşamasındadır. [İP:AgentMom Faz 0]
 
