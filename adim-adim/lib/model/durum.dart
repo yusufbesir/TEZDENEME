@@ -45,7 +45,21 @@ class Kart {
     this.yariOmurGun = 1.0,
     this.sonCevap,
     this.sonDerece,
+    this.yanlisSayisi = 0,
+    this.sakin = false,
   });
+
+  /// Sorunlu kelime sakinleştirme: bu kadar yanlıştan sonra kart [sakinGun]
+  /// gün kuyruktan çıkar (hata defterinde "ipucu kelime" rozetiyle kalır).
+  static const int sorunluEsik = 8;
+  static const int sakinGun = 14;
+
+  /// Kümülatif yanlış cevap sayısı (eşiğe varınca sıfırlanır). Eski kayıtta 0.
+  final int yanlisSayisi;
+
+  /// Kart şu an sakinleştirilmiş (sorunlu kelime) mi? Sonraki tekrar günü
+  /// gelince ilk cevapta kalkar.
+  final bool sakin;
 
   /// En kısa ve en uzun yarı ömür (gün).
   static const double enAzYariOmur = 0.5;
@@ -95,6 +109,8 @@ class Kart {
     'yariOmurGun': yariOmurGun,
     'sonCevap': sonCevap,
     if (sonDerece != null) 'sonDerece': sonDerece,
+    if (yanlisSayisi > 0) 'yanlisSayisi': yanlisSayisi,
+    if (sakin) 'sakin': true,
   };
 
   static Kart? fromJson(Object? j) {
@@ -121,6 +137,10 @@ class Kart {
       sonDerece: (derece is String && GuvenDerecesi.kodlar.contains(derece))
           ? derece
           : null,
+      yanlisSayisi: (j['yanlisSayisi'] is int && j['yanlisSayisi'] >= 0)
+          ? (j['yanlisSayisi'] as int).clamp(0, sorunluEsik)
+          : 0,
+      sakin: j['sakin'] == true,
     );
   }
 }

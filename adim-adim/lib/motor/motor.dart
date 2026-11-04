@@ -1419,13 +1419,26 @@ abstract final class Motor {
     final yariOmur = ham < Kart.enAzYariOmur
         ? Kart.enAzYariOmur
         : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
-    final aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
+    var aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
+    var yanlis = onceki?.yanlisSayisi ?? 0;
+    var sakin = false;
+    if (!dogruMu) {
+      yanlis++;
+      if (yanlis >= Kart.sorunluEsik) {
+        // Sorunlu kelime: 14 gün kuyruktan çık, sayaç sıfırlansın.
+        yanlis = 0;
+        sakin = true;
+        aralik = Kart.sakinGun;
+      }
+    }
     return Kart(
       kutu: Kart.kutuHesapla(yariOmur),
       sonraki: _gunEkle(bugun, aralik),
       yariOmurGun: yariOmur,
       sonCevap: dogruMu,
       sonDerece: d?.kod,
+      yanlisSayisi: yanlis,
+      sakin: sakin,
     );
   }
 
