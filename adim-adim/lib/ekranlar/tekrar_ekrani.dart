@@ -312,7 +312,7 @@ class _HataDefteri extends StatelessWidget {
               metin: s.metin,
               ayrinti:
                   '${s.kat?.ad ?? 'Alıştırma'} · ${s.hata.seviye} · ${s.hata.gun}'
-                  '${durum.kartlar[s.hata.id]?.sakin == true ? ' · İpucu kelime (14 gün dinleniyor)' : ''}',
+                  '${(durum.kartlar[s.hata.id]?.sakin == true && durum.kartlar[s.hata.id]!.sonraki.compareTo(bugun) > 0) ? ' · İpucu kelime (14 gün dinleniyor)' : ''}',
               renk: s.kat == null
                   ? r.ana
                   : KategoriRenkleri.renk(s.kat!, parlaklik),

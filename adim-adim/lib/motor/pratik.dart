@@ -66,6 +66,19 @@ abstract final class Pratik {
   /// kümesindeki kartları, vadesi en yakın önce.
   /// Yalnız fiiller: tamamlanmış derslerin ya da kart kümesindeki kartların
   /// fiil (kod kursunda söz dizimi) öğeleri.
+  /// Sorunlu kelime olarak dinlenen (sakin ve vadesi gelmemiş) kart mı?
+  static bool _dinleniyor(Kart k, String bugun) =>
+      k.sakin && k.sonraki.compareTo(bugun) > 0;
+
+  static List<String> _dinlenmeyen(
+    OgrenciDurumu d,
+    List<String> idler,
+    String bugun,
+  ) => [
+    for (final id in idler)
+      if (d.kartlar[id] == null || !_dinleniyor(d.kartlar[id]!, bugun)) id,
+  ];
+
   static List<PratikKarti> desteSec(
     OgrenciDurumu d,
     List<Kurs> kurslar,
@@ -75,9 +88,15 @@ abstract final class Pratik {
   }) {
     switch (filtre) {
       case TekrarFiltresi.sonYediGunYanlis:
-        return _coz(kurslar, Motor.zayifKartlar(d, bugun));
+        return _coz(
+          kurslar,
+          _dinlenmeyen(d, Motor.zayifKartlar(d, bugun), bugun),
+        );
       case TekrarFiltresi.zayifKartlar:
-        return _coz(kurslar, Motor.kelimeSagligi(d, kurslar).zayif);
+        return _coz(
+          kurslar,
+          _dinlenmeyen(d, Motor.kelimeSagligi(d, kurslar).zayif, bugun),
+        );
       case TekrarFiltresi.kurs:
         if (kursId == null) return const [];
         final kurs = kurslar.where((k) => k.id == kursId);
@@ -85,7 +104,9 @@ abstract final class Pratik {
         final k = kurs.first;
         final idler = [
           for (final e in d.kartlar.entries)
-            if (k.dersBul(_dersId(e.key) ?? '') != null) e.key,
+            if (k.dersBul(_dersId(e.key) ?? '') != null &&
+                !_dinleniyor(e.value, bugun))
+              e.key,
         ];
         idler.sort((x, y) {
           final c = d.kartlar[x]!.sonraki.compareTo(d.kartlar[y]!.sonraki);
