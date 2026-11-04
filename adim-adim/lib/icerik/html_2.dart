@@ -145,6 +145,9 @@ const Kurs html2 = Kurs(
               soru: '0 ile 100 arası sayı alanını sırala.',
               kelimeler: ['max="100">', '<input', 'min="0"', 'type="number"'],
               dogru: ['<input', 'type="number"', 'min="0"', 'max="100">'],
+              kabul: [
+                ['<input', 'min="0"', 'type="number"', 'max="100">'],
+              ],
               aciklama:
                   'Etiket adı, tür, alt sınır, üst sınır sırasıyla yazıldı.',
             ),

@@ -70,6 +70,9 @@ const Kurs css2 = Kurs(
                 'display: flex;',
               ],
               dogru: ['.urunler {', 'display: flex;', 'flex-wrap: wrap;', '}'],
+              kabul: [
+                ['.urunler {', 'flex-wrap: wrap;', 'display: flex;', '}'],
+              ],
               aciklama:
                   'Önce seçici, sonra flex bildirimleri, en sonda kapanış parantezi gelir.',
             ),
@@ -187,6 +190,14 @@ const Kurs css2 = Kurs(
                 'display: grid;',
                 'grid-template-columns: 1fr 2fr;',
                 '}',
+              ],
+              kabul: [
+                [
+                  '.vitrin {',
+                  'grid-template-columns: 1fr 2fr;',
+                  'display: grid;',
+                  '}',
+                ],
               ],
               aciklama: 'Önce display: grid, sonra sütun şablonu yazılır.',
             ),
@@ -308,6 +319,44 @@ const Kurs css2 = Kurs(
                 'top: 0;',
                 'width: 100%;',
                 '}',
+              ],
+              // Üç bildirim birbirinden bağımsızdır; her sıralaması geçerlidir.
+              kabul: [
+                [
+                  '.ust-bar {',
+                  'position: fixed;',
+                  'width: 100%;',
+                  'top: 0;',
+                  '}',
+                ],
+                [
+                  '.ust-bar {',
+                  'top: 0;',
+                  'position: fixed;',
+                  'width: 100%;',
+                  '}',
+                ],
+                [
+                  '.ust-bar {',
+                  'top: 0;',
+                  'width: 100%;',
+                  'position: fixed;',
+                  '}',
+                ],
+                [
+                  '.ust-bar {',
+                  'width: 100%;',
+                  'position: fixed;',
+                  'top: 0;',
+                  '}',
+                ],
+                [
+                  '.ust-bar {',
+                  'width: 100%;',
+                  'top: 0;',
+                  'position: fixed;',
+                  '}',
+                ],
               ],
               aciklama: 'fixed öğe görünüm penceresine göre konumlanır.',
             ),

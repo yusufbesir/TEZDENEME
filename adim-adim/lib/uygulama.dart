@@ -91,8 +91,13 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       // seçimine (ilk açılışta "Hoş geldin" akışına) gider. (Alan seçiliyken
       // /alan-sec açık kalabilir: Profil'deki "Değiştir" oraya gider; seçim
       // sonrası alan seçim ekranı kendisi /yol'a geçer.)
+      // İstisna: ilk açılış akışında alan seçildiyse hızlı seviye testi
+      // (/yerlestirme) açılabilir; test bitince akışa geri dönülür.
+      final hizliTest =
+          durum.alan != null && state.matchedLocation == '/yerlestirme';
       if ((durum.alan == null || !durum.ilkAcilisTamam) &&
-          state.matchedLocation != '/alan-sec') {
+          state.matchedLocation != '/alan-sec' &&
+          !hizliTest) {
         return '/alan-sec';
       }
       return null;
@@ -237,8 +242,11 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/yerlestirme',
-        builder: (c, s) =>
-            YerlestirmeEkrani(kursId: s.uri.queryParameters['kurs'] ?? ''),
+        // hizli=1: ilk açılıştaki 5 soruluk hızlı seviye testi.
+        builder: (c, s) => YerlestirmeEkrani(
+          kursId: s.uri.queryParameters['kurs'] ?? '',
+          hizli: s.uri.queryParameters['hizli'] == '1',
+        ),
       ),
       GoRoute(
         path: '/sinav',

@@ -128,7 +128,17 @@ void main() {
       'paket kurs listesi: ilgili dil, kullanılanlar yalnız dolu paketler',
       () {
         final p = DilPaketleri([sahteKurs, sahteKodKurs]);
-        expect(p.kodlar, ['en', 'de', 'fr', 'ru', 'ar', 'ko', 'ja', 'zh', 'kod']);
+        expect(p.kodlar, [
+          'en',
+          'de',
+          'fr',
+          'ru',
+          'ar',
+          'ko',
+          'ja',
+          'zh',
+          'kod',
+        ]);
         expect(p.kullanilanlar.map((x) => x.tanim.kod), ['en', 'kod']);
         expect(p.paket('en')!.kurslar.single.id, sahteKursId);
         expect(p.paket('de')!.maddeler, isEmpty);

@@ -3,6 +3,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 /// flutter_tts sarmalayıcısı. Hatalar yutulur; ses yoksa uygulama çalışmaya devam eder.
 /// Testte bu sınıf genişletilip `oku` geçersiz kılınır.
+/// Dinleme hızı (SADE 8): [hizCarpani] temel hızı ölçekler; [okuHizla]
+/// çarpanı yalnız o çağrı için uygular. yazan: [Claude#tts-hiz]
 class Ses {
   Ses();
 
@@ -11,6 +13,37 @@ class Ses {
   /// Konuşma hızı (0..1; flutter_tts ölçeği). Kelime defteri oynatıcısı
   /// (ÖZELLİK 82) hızı değiştirir; varsayılan 0,45.
   double konusmaHizi = 0.45;
+
+  /// Kullanıcı hız çarpanı (ayar `sesHizi`, 0,7..1,2; 1,0 = temel hız).
+  /// flutter_tts'e giden değer [ttsHizi] ile hesaplanır.
+  double hizCarpani = 1.0;
+
+  /// flutter_tts'e verilecek hız: temel hız × çarpan, 0..1 aralığına kırpılır.
+  /// flutter_tts ölçeği platformlar arası 0..1'dir (Android/iOS'ta 0,5 doğal
+  /// hız); temel hız (0,45) korunur, çarpan onu oransal ölçekler. Geçersiz
+  /// (NaN, sonsuz, ≤0) çarpan 1,0 sayılır.
+  static double ttsHizi(double temel, double carpan) {
+    final c = (carpan.isFinite && carpan > 0) ? carpan : 1.0;
+    return (temel * c).clamp(0.0, 1.0);
+  }
+
+  /// [oku] (ya da `yavas` ise [okuYavas]) gibi okur; [carpan] yalnız bu
+  /// çağrı için uygulanır, sonra eski çarpan geri gelir. Böylece dinleme
+  /// ekranındaki hız seçimi başka ekranlara (radyo, oynatıcı) sızmaz.
+  Future<bool> okuHizla(
+    String metin, {
+    String dil = 'en-US',
+    required double carpan,
+    bool yavas = false,
+  }) async {
+    final eski = hizCarpani;
+    hizCarpani = carpan;
+    try {
+      return yavas ? await okuYavas(metin, dil: dil) : await oku(metin, dil: dil);
+    } finally {
+      hizCarpani = eski;
+    }
+  }
 
   /// Süren okumayı keser (oynatıcı duraklatınca). Hata yutulur.
   Future<void> durdur() async {
@@ -49,7 +82,7 @@ class Ses {
     try {
       final tts = _tts ??= FlutterTts();
       await tts.setLanguage(dil);
-      await tts.setSpeechRate(konusmaHizi);
+      await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
       await tts.speak(metin);
       return true;
@@ -71,7 +104,7 @@ class Ses {
       final tts = _tts ??= FlutterTts();
       await tts.awaitSpeakCompletion(true);
       await tts.setLanguage(dil);
-      await tts.setSpeechRate(konusmaHizi);
+      await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
       await tts.speak(metin).timeout(enCok);
       return true;
