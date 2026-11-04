@@ -199,10 +199,12 @@ void main() {
     test('iki hafta sonra 0', () {
       expect(Motor.gosterilenSeri(d, '2026-10-26'), 0);
     });
-    test('hedef tutulmadıysa iki gün sonra 0 (eski davranış)', () {
+    test('hedef tutulmadıysa üç gün sonra 0 (eski davranış)', () {
       final az = calis([pzt, sal]);
       expect(Motor.gosterilenSeri(az, car), 2);
-      expect(Motor.gosterilenSeri(az, per), 0);
+      // Tek atlanan gün seri koruma hakkıyla korunur.
+      expect(Motor.gosterilenSeri(az, per), 2);
+      expect(Motor.gosterilenSeri(az, '2026-10-09'), 0);
     });
     test('sonGun gelecekteyse 0', () {
       expect(Motor.gosterilenSeri(d, '2026-10-10'), 0);

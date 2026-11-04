@@ -81,7 +81,12 @@ button[aria-pressed="true"] { background: var(--odak); color: #000; border-color
 
 .komut-formu { display: flex; gap: 8px; margin-top: 8px; }
 .komut-formu input[type="text"] { flex: 1; min-width: 0; }
-.mikrofon { width: 52px; padding: 0; font-size: 1.3rem; }
+.mikrofon { width: 52px; padding: 0; font-size: 1.3rem; position: relative; touch-action: none; user-select: none; }
+/* Mikrofon açıkken kırmızı nokta: ses yalnız bu nokta yanarken dinlenir, kayıt diske yazılmaz. */
+.kayit-noktasi { display: none; position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%; background: #d7263d; box-shadow: 0 0 0 2px var(--kart); }
+body.dinliyor .kayit-noktasi { display: block; animation: kayit-yanip 1s ease-in-out infinite; }
+body.dinliyor .mikrofon { outline: 2px solid #d7263d; }
+@keyframes kayit-yanip { 50% { opacity: .25; } }
 .baglanti-formu { display: flex; flex-direction: column; gap: 8px; }
 .dugmeler { display: flex; gap: 8px; }
 

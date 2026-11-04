@@ -1,0 +1,1 @@
+2026-10-25 | 1.4.0: Barkod türleri sekmesi (EAN-8/5/2, UPC-A/E, Codabar, MSI, Pharmacode, Code 128 A/B/C, GS1 önek uyarısı) | orchestrator/sonnet ~330k + bağımsız denetim ajanı/sonnet ~151k | 203+55 test, denetim Geçti; Windows kurulum+taşınabilir 1.4.0 derlendi

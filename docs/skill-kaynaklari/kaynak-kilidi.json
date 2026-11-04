@@ -65,11 +65,11 @@
       "depo": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
       "kisa_commit": "dbd4588",
-      "hedef": ".claude/skills",
-      "kaynak_dosya": "KAYNAKLAR.md",
+      "hedef": "skill-kutuphanesi/anthropics__skills",
+      "kaynak_dosya": "INDEKS.md",
       "tam_commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
       "dosya_sayisi": 161,
-      "icerik_ozeti": "1745b23a5ddc04a8d91dbf8e5a2e7012409619cf547348566ab35a669d692665"
+      "icerik_ozeti": "0485e77e56403ff0d193f55f0b9346d6c18f503476bbab0d83b8020f0110c661"
     },
     {
       "depo": "blader/humanizer",
@@ -195,11 +195,11 @@
       "depo": "kepano/obsidian-skills",
       "url": "https://github.com/kepano/obsidian-skills",
       "kisa_commit": "3ccff53",
-      "hedef": ".claude/skills",
-      "kaynak_dosya": "KAYNAKLAR.md",
+      "hedef": "skill-kutuphanesi/kepano__obsidian-skills",
+      "kaynak_dosya": "INDEKS.md",
       "tam_commit": "3ccff5338ea700537839b21900aa5358a0402c98",
       "dosya_sayisi": 11,
-      "icerik_ozeti": "47d00af59eefbbb6c0b7bcf369893eaa5d3e18214259518a21df956e6ba17361"
+      "icerik_ozeti": "553fc7402b5bd91ca054b076dda00d953f0ea8640cf310d0aea04f2344f1ed38"
     },
     {
       "depo": "KKKKhazix/khazix-skills",
@@ -228,8 +228,8 @@
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
       "tam_commit": "49dd158d1076134a641b33efb035946536778336",
-      "dosya_sayisi": 79,
-      "icerik_ozeti": "9d10b2dc2a801ff1ffc26f3393fdd6ae758c87a11eba09bb85b18a11b655e938"
+      "dosya_sayisi": 3,
+      "icerik_ozeti": "0f5fd4c14080b3541cc85a172a19be298c14d50c10b875c383edba008cd4d3ef"
     },
     {
       "depo": "mattpocock/skills",
@@ -238,8 +238,8 @@
       "hedef": "skill-kutuphanesi/mattpocock__skills",
       "kaynak_dosya": "INDEKS.md",
       "tam_commit": "49dd158d1076134a641b33efb035946536778336",
-      "dosya_sayisi": 25,
-      "icerik_ozeti": "6d965ad842bf9f4e39df1f4c75ac6bcde989db6e559296b95b7fcdf31d7a64a4"
+      "dosya_sayisi": 101,
+      "icerik_ozeti": "1a57a40eff18d189e9251f059da423233662eaabfc8e0568865230e3e89281b0"
     },
     {
       "depo": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -278,8 +278,18 @@
       "hedef": ".claude/skills",
       "kaynak_dosya": "KAYNAKLAR.md",
       "tam_commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
-      "dosya_sayisi": 74,
-      "icerik_ozeti": "5ede696031691e4a6a59b80d99284d587c33c356f2d78aa3068ffbc1c08762b8"
+      "dosya_sayisi": 14,
+      "icerik_ozeti": "68f46a80519ae88a1b32c389585ea17d0892a7a261d42feb94a56f8734b9eddc"
+    },
+    {
+      "depo": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "kisa_commit": "bb92a77",
+      "hedef": "skill-kutuphanesi/obra__superpowers",
+      "kaynak_dosya": "INDEKS.md",
+      "tam_commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+      "dosya_sayisi": 60,
+      "icerik_ozeti": "38c7dd4d172e9c604ca94e59ee4ff5d67e27519d7f4fefee06251d2c99ec6368"
     },
     {
       "depo": "openai/skills",
@@ -305,11 +315,11 @@
       "depo": "OthmanAdi/planning-with-files",
       "url": "https://github.com/OthmanAdi/planning-with-files",
       "kisa_commit": "7056ed2",
-      "hedef": ".claude/skills",
-      "kaynak_dosya": "KAYNAKLAR.md",
+      "hedef": "skill-kutuphanesi/OthmanAdi__planning-with-files",
+      "kaynak_dosya": "INDEKS.md",
       "tam_commit": "7056ed2f2b86a8a9e18840f625ac66a48fa07693",
       "dosya_sayisi": 32,
-      "icerik_ozeti": "67be2ae586035af51b73d36082796e4bb6b602be99bbd282c6ebbf0ca725ece3"
+      "icerik_ozeti": "b955da1dfe02060aca5af5442a0c1a3ca8840551265363095712c1ca6b2ff6c0"
     },
     {
       "depo": "phuryn/pm-skills",

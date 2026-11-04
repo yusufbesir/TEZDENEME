@@ -33,7 +33,7 @@ class Hikaye {
   /// Ör. 'hikaye-a1-kolay'.
   final String id;
 
-  /// 'ingilizce-1' .. 'ingilizce-4'.
+  /// 'ingilizce-1' .. 'ingilizce-5' (C1 için henüz hikâye yok).
   final String kursId;
   final HikayeSeviyesi seviye;
   final String baslik;

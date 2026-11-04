@@ -5,7 +5,8 @@
 /// duyduğunu seçer), soyle (yeni: cümleyi yüksek sesle söyler, telaffuz puanlanır), kod (yeni: kod parçasındaki boşluğu doldurur),
 /// tablo (yeni: çekim tablosundaki boş hücreleri doldurur), isaretle (yeni:
 /// cümlede doğru kelime(ler)e dokunur), hamle (yeni: oyun tahtasında doğru
-/// hamleyi ya da hamle dizisini oynar; ilk sürümde satranç).
+/// hamleyi ya da hamle dizisini oynar; ilk sürümde satranç), dikte (yeni:
+/// cümle okunur, kullanıcı duyduğu cümleyi yazar; ders içi cümle diktesi).
 ///
 /// Kodda etkileşimli türler (ÖZELLİK 68, 69): kodbosluk (birden çok boşluğa
 /// parça yerleştirir), kodsec (koddaki doğru satır(lar)a dokunur), kodyaz
@@ -83,6 +84,7 @@ sealed class Alistirma {
           soru: soru,
           kelimeler: metinler('kelimeler'),
           dogru: metinler('dogru'),
+          kabul: Sirala.kabulOku(j['kabul']),
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -102,6 +104,15 @@ sealed class Alistirma {
           secenekler: metinler('secenekler'),
           dogru: j['dogru'] as int,
           dil: j['dil'] as String? ?? varsayilanSesDili,
+          aciklama: aciklama,
+          ipuclari: ipuclari,
+        );
+      case 'dikte':
+        return Dikte(
+          soru: soru,
+          metin: j['metin'] as String,
+          sesDili: j['sesDili'] as String?,
+          cevaplar: j['cevaplar'] == null ? null : metinler('cevaplar'),
           aciklama: aciklama,
           ipuclari: ipuclari,
         );
@@ -296,11 +307,43 @@ class Sirala extends Alistirma {
     required super.soru,
     required this.kelimeler,
     required this.dogru,
+    this.kabul = const [],
     super.aciklama,
     super.ipuclari,
   });
   final List<String> kelimeler; // karışık
-  final List<String> dogru; // doğru sıra
+  final List<String> dogru; // doğru sıra (kalıp/özet için kullanılan ana sıra)
+
+  /// Ek geçerli sıralar (SADE 1; yazan: [Claude#sirala-kabul]). `dogru` ile
+  /// aynı parçaları içeren, anlamca eşdeğer alternatifler (örn. CSS bildirim
+  /// sırası, HTML nitelik sırası). Boşsa yalnız `dogru` kabul edilir.
+  final List<List<String>> kabul;
+
+  /// Verilen sıra `dogru` ya da `kabul` içindeki sıralardan biriyle eşleşiyor mu?
+  bool siraGecerliMi(List<String> sira) =>
+      _ayni(sira, dogru) || kabul.any((k) => _ayni(sira, k));
+
+  static bool _ayni(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  /// JSON'daki `kabul` alanını okur; geçersiz girdiler (liste olmayan değer,
+  /// dize olmayan parça içeren alt listeler) sessizce atlanır.
+  static List<List<String>> kabulOku(Object? ham) {
+    if (ham is! List) return const [];
+    final sonuc = <List<String>>[];
+    for (final e in ham) {
+      if (e is! List) continue;
+      if (e.any((p) => p is! String)) continue;
+      sonuc.add(e.cast<String>().toList());
+    }
+    return sonuc;
+  }
+
   @override
   String get tur => 'sirala';
   @override
@@ -309,6 +352,7 @@ class Sirala extends Alistirma {
     'soru': soru,
     'kelimeler': kelimeler,
     'dogru': dogru,
+    if (kabul.isNotEmpty) 'kabul': kabul,
     'aciklama': aciklama,
     if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };
@@ -406,6 +450,45 @@ class Soyle extends Alistirma {
     'metin': metin,
     'ceviri': ceviri,
     if (dil != varsayilanSesDili) 'dil': dil,
+    'aciklama': aciklama,
+    if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
+  };
+}
+
+/// Dikte (ders içi, cümle düzeyi): `metin` sesli okunur, kullanıcı duyduğu
+/// cümleyi yazar. Pratik merkezindeki kelime düzeyli "Dinle ve yaz"dan
+/// (lib/motor/dinle_yaz.dart) ayrıdır. `sesDili` null ise kursun dili
+/// kullanılır. `cevaplar` kabul edilen yazımlardır; verilmezse [metin].
+/// Cevap: [String]; karşılaştırma [Motor.cevapDogruMu] içinde Yaz türünün
+/// normalizasyonuyla yapılır; kelime farkı [Motor.dikteFarki] ile gösterilir.
+/// yazan: [Claude#dikte]
+class Dikte extends Alistirma {
+  const Dikte({
+    required super.soru,
+    required this.metin,
+    this.sesDili,
+    List<String>? cevaplar,
+    super.aciklama,
+    super.ipuclari,
+  }) : _cevaplar = cevaplar;
+  final String metin;
+
+  /// Okuma (TTS) dili; null ise kursun dili (DersOgeleri.kursSesDili).
+  final String? sesDili;
+  final List<String>? _cevaplar;
+
+  /// Kabul edilen yazımlar; açıkça verilmemişse yalnız [metin].
+  List<String> get cevaplar => _cevaplar ?? [metin];
+
+  @override
+  String get tur => 'dikte';
+  @override
+  Map<String, Object?> toJson() => {
+    'tur': tur,
+    'soru': soru,
+    'metin': metin,
+    if (sesDili != null) 'sesDili': sesDili,
+    if (_cevaplar != null) 'cevaplar': _cevaplar,
     'aciklama': aciklama,
     if (ipuclari.isNotEmpty) 'ipuclari': ipuclari,
   };

@@ -17,9 +17,13 @@ void main() {
       'ingilizce-2',
       'ingilizce-3',
       'ingilizce-4',
+      'ingilizce-5',
       'almanca-1',
       'almanca-2',
       'almanca-3',
+      'fransizca-1',
+      'rusca-1',
+      'arapca-1',
       'korece-1',
       'japonca-1',
       'cince-1',
@@ -41,6 +45,9 @@ void main() {
       'php-1',
       'php-2',
       'php-3',
+      'go-1',
+      'go-2',
+      'go-3',
       'satranc-1',
       'satranc-2',
       'satranc-3',
@@ -51,10 +58,14 @@ void main() {
     expect(ingilizceA2.alan, KursAlani.dil);
     expect(ingilizceB1.alan, KursAlani.dil);
     expect(ingilizceB2.alan, KursAlani.dil);
+    expect(ingilizceC1.alan, KursAlani.dil);
     for (final k in [
       almancaA1,
       almancaA2,
       almancaB1,
+      fransizcaA1,
+      ruscaA1,
+      arapcaA1,
       koreceA1,
       japoncaA1,
       cinceA1,
@@ -80,6 +91,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.alan, KursAlani.kod);
     }
@@ -107,6 +121,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       expect(k.tumDersler.length, greaterThanOrEqualTo(6));
     }
@@ -122,9 +139,11 @@ void main() {
     expect(idler.toSet().length, idler.length);
   });
 
-  test('her ders 8-10 alıştırma içerir (konuşma alıştırması ayrı sayılır)', () {
+  test('her ders 8-10 alıştırma içerir (konuşma ve dikte ayrı sayılır)', () {
     for (final d in _dersler()) {
-      final sayi = d.alistirmalar.where((a) => a is! Soyle).length;
+      final sayi = d.alistirmalar
+          .where((a) => a is! Soyle && a is! Dikte)
+          .length;
       expect(sayi, inInclusiveRange(8, 10), reason: d.id);
     }
   });
@@ -154,6 +173,74 @@ void main() {
     expect(sayi, greaterThan(0));
   });
 
+  test('Sirala.kabul: her alternatif kelimelerle aynı çoklu küme, dogru ile '
+      'aynı değil, tekrar yok; en az 10 alıştırmada var', () {
+    var kabullu = 0;
+    for (final a in _alistirmalar()) {
+      if (a is! Sirala) continue;
+      if (a.kabul.isNotEmpty) kabullu++;
+      final gorulen = <String>{jsonEncode(a.dogru)};
+      for (final k in a.kabul) {
+        expect(_sirali(k), _sirali(a.kelimeler), reason: a.soru);
+        expect(k, isNot(equals(a.dogru)), reason: 'kabul = dogru: ${a.soru}');
+        expect(gorulen.add(jsonEncode(k)), isTrue, reason: 'tekrar: ${a.soru}');
+      }
+    }
+    expect(kabullu, greaterThanOrEqualTo(10));
+  });
+
+  test('Sirala JSON: kabul gidiş-dönüşte korunur, boşsa yazılmaz', () {
+    const a = Sirala(
+      soru: 's',
+      kelimeler: ['b', 'a'],
+      dogru: ['a', 'b'],
+      kabul: [
+        ['b', 'a'],
+      ],
+    );
+    final j = a.toJson();
+    expect(j['kabul'], [
+      ['b', 'a'],
+    ]);
+    final geri = Alistirma.fromJson(
+      (jsonDecode(jsonEncode(j)) as Map).cast<String, Object?>(),
+    );
+    expect(geri, isA<Sirala>());
+    expect((geri as Sirala).kabul, [
+      ['b', 'a'],
+    ]);
+    expect(jsonEncode(geri.toJson()), jsonEncode(j));
+
+    const bos = Sirala(soru: 's', kelimeler: ['a'], dogru: ['a']);
+    expect(bos.toJson().containsKey('kabul'), isFalse);
+  });
+
+  test('Sirala JSON: kabul yoksa ya da geçersizse boş okunur', () {
+    Sirala oku(Object? kabul) =>
+        Alistirma.fromJson({
+              'tur': 'sirala',
+              'soru': 's',
+              'kelimeler': ['a', 'b'],
+              'dogru': ['a', 'b'],
+              if (kabul != null) 'kabul': kabul,
+            })
+            as Sirala;
+    expect(oku(null).kabul, isEmpty);
+    expect(oku('x').kabul, isEmpty);
+    expect(oku(42).kabul, isEmpty);
+    expect(oku(['a', 'b']).kabul, isEmpty); // düz dize listesi: alt liste değil
+    expect(
+      oku([
+        ['b', 'a'],
+        ['b', 1],
+        'x',
+      ]).kabul,
+      [
+        ['b', 'a'],
+      ],
+    );
+  });
+
   test('Eslestir 3-5 çift', () {
     for (final a in _alistirmalar()) {
       if (a is Eslestir) {
@@ -175,6 +262,7 @@ void main() {
       ...ingilizceA2.tumDersler,
       ...ingilizceB1.tumDersler,
       ...ingilizceB2.tumDersler,
+      ...ingilizceC1.tumDersler,
     ]) {
       final dinle = d.alistirmalar.whereType<Dinle>().toList();
       expect(dinle, isNotEmpty, reason: d.id);
@@ -203,6 +291,9 @@ void main() {
       php1,
       php2,
       php3,
+      go1,
+      go2,
+      go3,
     ]) {
       final dil = k.id.split('-').first;
       for (final d in k.tumDersler) {

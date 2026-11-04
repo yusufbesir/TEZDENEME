@@ -1,0 +1,22 @@
+{
+  "name": "agentmom",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentMom: local-first AI orchestration platform (phase 1 foundation)",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=4 \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "start": "node src/server/main.ts",
+    "agentmom": "node src/cli/agentmom.ts",
+    "yedek": "node src/cli/yedek.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.9.0"
+  }
+}

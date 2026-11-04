@@ -1,16 +1,23 @@
 /// Soru bankası: tüm soruları toplar; alan ve seviyeye göre bulucular sunar.
-/// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Sahibi: Yusuf (yusufbesir); yazan (SQL, PHP, Go, C1 seviyeleri): [İP:Adım Adım Windows sürümü#cihaz] Claude; yazan (SQL2-3, PHP2-3, Go2-3): [Claude#dalga14]. Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
 
 import 'model.dart';
+import 'sorular/go_sorulari.dart';
 import 'sorular/ingilizce_a1.dart';
 import 'sorular/ingilizce_a2.dart';
 import 'sorular/ingilizce_b1.dart';
 import 'sorular/ingilizce_b2.dart';
+import 'sorular/ingilizce_c1.dart';
 import 'sorular/oyun_sorulari.dart';
+import 'sorular/php_sorulari.dart';
 import 'sorular/programlama_1.dart';
 import 'sorular/programlama_2.dart';
 import 'sorular/programlama_3.dart';
+import 'sorular/programlama_4.dart';
+import 'sorular/programlama_5.dart';
+import 'sorular/programlama_6.dart';
+import 'sorular/sql_sorulari.dart';
 
 /// Tüm sorular (değiştirilemez liste).
 final List<YarismaSorusu> tumSorular = List.unmodifiable([
@@ -18,9 +25,16 @@ final List<YarismaSorusu> tumSorular = List.unmodifiable([
   ...ingilizceA2Sorulari,
   ...ingilizceB1Sorulari,
   ...ingilizceB2Sorulari,
+  ...ingilizceC1Sorulari,
   ...programlama1Sorulari,
   ...programlama2Sorulari,
   ...programlama3Sorulari,
+  ...programlama4Sorulari,
+  ...programlama5Sorulari,
+  ...programlama6Sorulari,
+  ...sqlSorulari,
+  ...phpSorulari,
+  ...goSorulari,
   ...oyunSorulari,
 ]);
 
@@ -38,11 +52,21 @@ List<YarismaSeviye> seviyeler(String alan) => switch (alan) {
     YarismaSeviye(kursId: 'ingilizce-2', etiket: 'A2'),
     YarismaSeviye(kursId: 'ingilizce-3', etiket: 'B1'),
     YarismaSeviye(kursId: 'ingilizce-4', etiket: 'B2'),
+    YarismaSeviye(kursId: 'ingilizce-5', etiket: 'C1'),
   ],
   'kod' => const [
     YarismaSeviye(kursId: 'html-1', etiket: 'HTML'),
     YarismaSeviye(kursId: 'css-1', etiket: 'CSS'),
     YarismaSeviye(kursId: 'js-1', etiket: 'JS'),
+    YarismaSeviye(kursId: 'sql-1', etiket: 'SQL1'),
+    YarismaSeviye(kursId: 'sql-2', etiket: 'SQL2'),
+    YarismaSeviye(kursId: 'sql-3', etiket: 'SQL3'),
+    YarismaSeviye(kursId: 'php-1', etiket: 'PHP1'),
+    YarismaSeviye(kursId: 'php-2', etiket: 'PHP2'),
+    YarismaSeviye(kursId: 'php-3', etiket: 'PHP3'),
+    YarismaSeviye(kursId: 'go-1', etiket: 'Go1'),
+    YarismaSeviye(kursId: 'go-2', etiket: 'Go2'),
+    YarismaSeviye(kursId: 'go-3', etiket: 'Go3'),
   ],
   'oyun' => const [
     YarismaSeviye(kursId: 'satranc-1', etiket: 'Başlangıç'),

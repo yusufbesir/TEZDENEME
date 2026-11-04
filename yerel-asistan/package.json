@@ -1,10 +1,11 @@
 {
   "name": "piril-yerel-asistan",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Pırıl: tamamen yerel asistan (Windows + Android)",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "node --test test/cekirdek/index.js test/protokol/index.js test/pc/index.js \"test/arayuz/*.test.js\" \"test/android/*.test.js\""
+    "test": "node --test test/cekirdek/index.js test/protokol/index.js test/pc/index.js \"test/arayuz/*.test.js\" \"test/android/*.test.js\"",
+    "dogruluk": "node scripts/dogruluk-raporu.js"
   }
 }

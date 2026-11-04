@@ -62,6 +62,9 @@ class DersOgeleri {
   static String kursSesDili(String kursId) {
     final k = kursId.toLowerCase();
     if (k.startsWith('almanca')) return 'de-DE';
+    if (k.startsWith('fransizca')) return 'fr-FR';
+    if (k.startsWith('rusca')) return 'ru-RU';
+    if (k.startsWith('arapca')) return 'ar-SA';
     if (k.startsWith('korece')) return 'ko-KR';
     if (k.startsWith('japonca')) return 'ja-JP';
     if (k.startsWith('cince')) return 'zh-CN';
@@ -132,6 +135,8 @@ class DersOgeleri {
           ekle(kelimeMiKalip(okunacak), okunacak, null, i, dil: dil);
         case Soyle(:final metin, :final ceviri, :final dil):
           ekle(kelimeMiKalip(metin), metin, ceviri, i, dil: dil);
+        case Dikte(:final metin, :final sesDili):
+          ekle(kelimeMiKalip(metin), metin, null, i, dil: sesDili);
         case Yaz(:final soru, :final cevaplar):
           if (cevaplar.isNotEmpty) {
             ekle(kelimeMiKalip(cevaplar.first), cevaplar.first, soru, i);

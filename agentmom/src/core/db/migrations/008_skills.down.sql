@@ -1,0 +1,20 @@
+-- Down for 008 removes the skill lifecycle records (rollback only; released versions are lost with it).
+DROP TRIGGER IF EXISTS skill_candidates_no_delete;
+DROP TRIGGER IF EXISTS skill_candidates_state_guard;
+DROP TRIGGER IF EXISTS skill_candidates_version_forward;
+DROP TRIGGER IF EXISTS skill_versions_revoke_once;
+DROP TRIGGER IF EXISTS skill_no_replace_candidates;
+DROP TRIGGER IF EXISTS skill_no_replace_gates;
+DROP TRIGGER IF EXISTS skill_no_replace_events;
+DROP TRIGGER IF EXISTS skill_no_replace_versions;
+DROP TRIGGER IF EXISTS skill_candidates_artifact_immutable;
+DROP TRIGGER IF EXISTS skill_versions_no_delete;
+DROP TRIGGER IF EXISTS skill_versions_hash_immutable;
+DROP TRIGGER IF EXISTS skill_events_no_delete;
+DROP TRIGGER IF EXISTS skill_events_immutable;
+DROP TRIGGER IF EXISTS skill_gate_records_no_delete;
+DROP TRIGGER IF EXISTS skill_gate_records_immutable;
+DROP TABLE IF EXISTS skill_events;
+DROP TABLE IF EXISTS skill_versions;
+DROP TABLE IF EXISTS skill_gate_records;
+DROP TABLE IF EXISTS skill_candidates;

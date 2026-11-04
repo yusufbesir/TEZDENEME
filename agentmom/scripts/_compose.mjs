@@ -1,0 +1,13 @@
+import { chromium } from "playwright-core";
+import { readFileSync } from "node:fs";
+const ref = "D:/YusufII/HAFIZAM1/kasa/notlar/ekler/AgentMom-hedef-tasarim-referans-yusuf-2026-10-21.png";
+const mine = "D:/YusufII/Projeler/agentmom/docs/testing/faz11/ui-masaustu-demo-topic2-panel.png";
+const out = "D:/YusufII/HAFIZAM1/kasa/notlar/ekler/AgentMom-faz11-karsilastirma-referans-yan-yana-2026-10-22.png";
+const uri = (f) => "data:image/png;base64," + readFileSync(f).toString("base64");
+const b = await chromium.launch({ channel: "msedge", headless: true });
+const p = await b.newPage({ viewport: { width: 2400, height: 1000 } });
+await p.setContent(`<body style="margin:0;background:#111;display:flex;gap:12px;padding:12px;font:14px Segoe UI;color:#ddd"><div><div>Yusuf'un referansı (Claude, önceki turdan)</div><img style="max-height:900px;max-width:1150px;display:block" src="${uri(ref)}"></div><div><div>AgentMom Faz 11 (örnek veri)</div><img style="max-height:900px;max-width:1150px;display:block" src="${uri(mine)}"></div></body>`);
+await p.waitForTimeout(1200);
+await p.screenshot({ path: out, fullPage: true });
+console.log("yazildi");
+await b.close();

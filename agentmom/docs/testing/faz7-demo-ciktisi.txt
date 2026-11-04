@@ -1,0 +1,16 @@
+== recording real decisions (user) with the assumptions they rest on
+== recording real MEASUREMENTS as evidence against assumptions (recorded through the user token; the unit tests prove an agent token can only report BROKEN)
+== decisions and their review state
+at_risk    Tek yapay zeka inceleyicisine guvenilmez; testler karar verici | broken | 1 assumption(s) broken: the reasoning no longer holds
+at_risk    Codex elevated sandbox kuruldu | broken,holds | 1 assumption(s) broken: the reasoning no longer holds
+ok         Gemini beklemede, yurutme kapali | unvalidated | 
+ok         Docker bilincli ertelendi | unvalidated | 
+== assumption debt (worst first)
+broken   broken       Codex elevated sandbox kuruldu -> Elevated sandbox yazma kapsamini yalniz Projeler ile sinirlar
+broken   broken       Tek yapay zeka inceleyicisine guvenilmez; testler karar verici -> Codex incelemesi ayni girdide kararli sonuc verir
+pending  unvalidated  Docker bilincli ertelendi -> Node izin modeli ve worktree yerel dogrulama icin yeterli
+pending  unvalidated  Gemini beklemede, yurutme kapali -> Claude ve Codex Gemini olmadan yeterli kapsam saglar
+== calibration report with no predictions yet (must say insufficient data, not 'good')
+insufficient_data | 0 resolved prediction(s); at least 20 are needed before any verdict (too little data is not "well calibrated").
+0
+outputs in: /d/YusufII/Projeler/agentmom-state/reasoning-run-221129

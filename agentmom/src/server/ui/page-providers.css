@@ -1,0 +1,119 @@
+/*
+ * Sahip: Sonnet (D3 sayfaları: Sağlayıcılar, Modeller, Kullanım ortak stilleri) [İP:AgentMom Faz 11, D3]
+ * yazan: [Claude#agentmom-faz11-d3-saglayicilar]
+ * Amaç: page-providers.js, page-models.js ve page-usage.js sayfalarının biçimi. Sınıf öneki: am-pp-.
+ * Kurallar: yalnız var(--am-*) belirteçleri (tokens.css); dış kaynak, yazı tipi dosyası, @import ve url(...) yok; satır içi stil yok.
+ *       Durum yalnız renkle verilmez (rozetlerde simge + metin). Hareket yok; prefers-reduced-motion altında da sabit.
+ *       320px'e kadar duyarlı; görünür odak halkası; dokunma hedefi >= 32px.
+ * Değiştirme: yalnız sahibi ya da ana oturum.
+ */
+
+.am-pp-page { display: flex; flex-direction: column; gap: var(--am-gap-4); max-width: 1000px; margin: 0 auto; padding: var(--am-gap-5) var(--am-gap-4); color: var(--am-text); font-family: var(--am-font-sans); line-height: var(--am-lh-ui); min-width: 0; }
+.am-pp-h2 { font-family: var(--am-font-display); font-size: var(--am-fs-6); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; overflow-wrap: anywhere; }
+.am-pp-h2:focus-visible { outline: 2px solid var(--am-focus); outline-offset: 3px; border-radius: var(--am-radius-chip); }
+.am-pp-h3 { font-size: var(--am-fs-4); font-weight: 600; margin-bottom: var(--am-gap-2); }
+.am-pp-desc { color: var(--am-muted); font-size: var(--am-fs-3); max-width: 70ch; }
+.am-pp-muted { color: var(--am-muted); font-size: var(--am-fs-2); overflow-wrap: anywhere; }
+.am-pp-strong { font-weight: 600; overflow-wrap: anywhere; }
+.am-pp-sub { display: block; color: var(--am-muted); font-size: var(--am-fs-2); overflow-wrap: anywhere; }
+.am-pp-sec { display: flex; flex-direction: column; gap: var(--am-gap-2); padding-top: var(--am-gap-4); border-top: 1px solid var(--am-line); min-width: 0; }
+.am-pp-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Rozet: simge + metin */
+.am-pp-chip { display: inline-flex; align-items: center; gap: var(--am-gap-1); max-width: 100%; padding: 2px var(--am-gap-2); border: 1px solid var(--am-line); border-radius: var(--am-radius-chip); background: var(--am-surface-2); font-size: var(--am-fs-1); font-weight: 600; line-height: 1.4; }
+.am-pp-chip > svg { flex: 0 0 auto; }
+.am-pp-chip-t { min-width: 0; overflow-wrap: anywhere; }
+.am-pp-chip--ok { border-color: var(--am-ok); color: var(--am-ok); }
+.am-pp-chip--warn { border-color: var(--am-warn); color: var(--am-warn); }
+.am-pp-chip--bad { border-color: var(--am-bad); color: var(--am-bad); }
+.am-pp-chip--info { border-color: var(--am-info); color: var(--am-info); }
+.am-pp-chip--muted { color: var(--am-muted); }
+
+/* Not kutusu */
+.am-pp-note { display: flex; align-items: flex-start; gap: var(--am-gap-2); padding: var(--am-gap-3); border: 1px solid var(--am-line); border-left-width: 4px; border-radius: var(--am-radius-row); background: var(--am-surface); font-size: var(--am-fs-2); }
+.am-pp-note > svg { flex: 0 0 auto; margin-top: 2px; }
+.am-pp-note-t { min-width: 0; overflow-wrap: anywhere; }
+.am-pp-note--info { border-left-color: var(--am-info); }
+.am-pp-note--warn { border-left-color: var(--am-warn); }
+.am-pp-note--bad { border-left-color: var(--am-bad); }
+.am-pp-note--ok { border-left-color: var(--am-ok); }
+.am-pp-note--muted { border-left-color: var(--am-muted); }
+
+/* Düğmeler */
+.am-pp-btn { min-height: 32px; padding: var(--am-gap-1) var(--am-gap-3); border: 1px solid var(--am-line); border-radius: var(--am-radius-row); background: var(--am-surface-2); color: var(--am-text); font: inherit; font-size: var(--am-fs-2); font-weight: 600; cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+.am-pp-btn:hover { border-color: var(--am-accent); }
+.am-pp-btn:focus-visible, .am-pp-rowbtn:focus-visible, .am-pp-doc:focus-visible { outline: 2px solid var(--am-focus); outline-offset: 2px; }
+.am-pp-btn--ghost { align-self: flex-start; background: transparent; }
+.am-pp-btn--danger { border-color: var(--am-bad); color: var(--am-bad); }
+.am-pp-actions { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); }
+
+/* Sağlayıcı listesi */
+.am-pp-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--am-gap-3); padding: 0; margin: 0; }
+.am-pp-li { min-width: 0; display: flex; }
+.am-pp-rowbtn { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: var(--am-radius-card); }
+.am-pp-card { display: flex; flex-direction: column; gap: var(--am-gap-2); width: 100%; height: 100%; padding: var(--am-gap-4); border: 1px solid var(--am-line); border-radius: var(--am-radius-card); background: var(--am-surface); min-width: 0; box-sizing: border-box; }
+.am-pp-rowbtn:hover .am-pp-card { border-color: var(--am-accent); }
+.am-pp-card-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--am-gap-2); }
+.am-pp-name { font-weight: 600; font-size: var(--am-fs-4); overflow-wrap: anywhere; }
+.am-pp-meta { display: flex; flex-wrap: wrap; gap: var(--am-gap-1); }
+.am-pp-counts { display: flex; flex-wrap: wrap; gap: var(--am-gap-1); }
+.am-pp-headchips { display: flex; flex-wrap: wrap; gap: var(--am-gap-2); }
+
+/* Boş / iskelet / hata */
+.am-pp-empty { padding: var(--am-gap-5); border: 1px dashed var(--am-line); border-radius: var(--am-radius-card); text-align: center; background: var(--am-surface); }
+.am-pp-empty-t { display: block; font-weight: 600; }
+.am-pp-empty-d { margin-top: var(--am-gap-1); color: var(--am-muted); font-size: var(--am-fs-2); }
+.am-pp-skel { display: flex; flex-direction: column; gap: var(--am-gap-2); padding: var(--am-gap-4); border: 1px solid var(--am-line); border-radius: var(--am-radius-card); background: var(--am-surface); }
+.am-pp-skel-line { height: 12px; border-radius: var(--am-radius-chip); background: var(--am-surface-2); }
+.am-pp-skel-line--short { width: 60%; }
+.am-pp-skel-t { color: var(--am-muted); font-size: var(--am-fs-2); }
+.am-pp-err { display: flex; align-items: flex-start; gap: var(--am-gap-3); padding: var(--am-gap-4); border: 1px solid var(--am-bad); border-radius: var(--am-radius-card); background: var(--am-surface); }
+.am-pp-err > svg { flex: 0 0 auto; color: var(--am-bad); margin-top: 2px; }
+.am-pp-err-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--am-gap-2); align-items: flex-start; }
+.am-pp-err-title { font-weight: 600; overflow-wrap: anywhere; }
+.am-pp-err-detail { color: var(--am-muted); font-size: var(--am-fs-2); overflow-wrap: anywhere; }
+
+/* Ad-değer satırları */
+.am-pp-kv { display: flex; flex-wrap: wrap; gap: var(--am-gap-2) var(--am-gap-4); padding: var(--am-gap-2) 0; border-bottom: 1px solid var(--am-line); }
+.am-pp-k { flex: 0 0 min(100%, 220px); color: var(--am-muted); font-size: var(--am-fs-2); overflow-wrap: anywhere; }
+.am-pp-v { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+
+/* Tablolar */
+.am-pp-tablewrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--am-line); border-radius: var(--am-radius-row); }
+.am-pp-table { width: 100%; border-collapse: collapse; font-size: var(--am-fs-2); }
+.am-pp-th { padding: var(--am-gap-2) var(--am-gap-3); text-align: left; color: var(--am-muted); font-weight: 600; font-size: var(--am-fs-1); border-bottom: 1px solid var(--am-line); background: var(--am-surface-2); white-space: nowrap; }
+.am-pp-th--right { text-align: right; }
+.am-pp-td { padding: var(--am-gap-2) var(--am-gap-3); border-bottom: 1px solid var(--am-line); vertical-align: top; text-align: left; font-weight: 400; overflow-wrap: anywhere; min-width: 80px; }
+.am-pp-td--head { font-weight: 600; min-width: 120px; }
+.am-pp-td--right { text-align: right; font-variant-numeric: tabular-nums; }
+.am-pp-tr--no .am-pp-td { background: var(--am-surface); }
+.am-pp-tr--no .am-pp-td--head { box-shadow: inset 3px 0 0 var(--am-bad); }
+.am-pp-namecell, .am-pp-modelcell { display: flex; flex-direction: column; align-items: flex-start; gap: var(--am-gap-1); }
+
+/* Belge ve komutlar */
+.am-pp-doc { max-height: 420px; overflow: auto; padding: var(--am-gap-3) var(--am-gap-4); border: 1px solid var(--am-line); border-radius: var(--am-radius-row); background: var(--am-surface); line-height: var(--am-lh-body); overflow-wrap: anywhere; }
+.am-pp-pre { white-space: pre-wrap; font-family: var(--am-font-mono); font-size: var(--am-fs-2); }
+.am-pp-cmd { display: flex; flex-direction: column; align-items: flex-start; gap: var(--am-gap-2); padding: var(--am-gap-3); border: 1px solid var(--am-line); border-radius: var(--am-radius-row); background: var(--am-surface); }
+.am-pp-cmd-t { font-weight: 600; }
+.am-pp-code { display: block; max-width: 100%; padding: var(--am-gap-2) var(--am-gap-3); border-radius: var(--am-radius-chip); background: var(--am-code-bg); color: var(--am-code-fg); font-family: var(--am-font-mono); font-size: var(--am-fs-2); overflow-wrap: anywhere; user-select: all; }
+
+/* Kullanım özeti */
+.am-pp-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: var(--am-gap-3); }
+.am-pp-stat { padding: var(--am-gap-3) var(--am-gap-4); border: 1px solid var(--am-line); border-radius: var(--am-radius-card); background: var(--am-surface); min-width: 0; }
+.am-pp-stat-k { color: var(--am-muted); font-size: var(--am-fs-2); }
+.am-pp-stat-v { font-family: var(--am-font-display); font-size: var(--am-fs-6); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.am-pp-stat-s { color: var(--am-muted); font-size: var(--am-fs-1); overflow-wrap: anywhere; }
+.am-pp-kinds { list-style: none; display: flex; flex-wrap: wrap; gap: var(--am-gap-2) var(--am-gap-5); padding: 0; margin: var(--am-gap-2) 0 0; }
+.am-pp-kind { display: flex; gap: var(--am-gap-2); font-size: var(--am-fs-2); }
+.am-pp-kind-k { color: var(--am-muted); }
+.am-pp-kind-v { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Açıklama kutusu */
+.am-pp-explain { padding: var(--am-gap-4); border: 1px solid var(--am-line); border-left: 4px solid var(--am-info); border-radius: var(--am-radius-card); background: var(--am-surface); }
+.am-pp-explain-list { list-style: none; display: flex; flex-direction: column; gap: var(--am-gap-2); padding: 0; margin: 0; font-size: var(--am-fs-3); line-height: var(--am-lh-body); }
+.am-pp-explain-li { overflow-wrap: anywhere; }
+
+@media (max-width: 480px) {
+  .am-pp-page { padding: var(--am-gap-4) var(--am-gap-3); }
+  .am-pp-k { flex-basis: 100%; }
+}

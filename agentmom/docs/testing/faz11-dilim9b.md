@@ -1,0 +1,9 @@
+---
+description: AgentMom Faz 11 D9b dilimi (madde 15 çoklu proje portföyü) kapsam, güvenlik ve sınır özeti. Sahip: Claude [İP:AgentMom devam]. Yalnız ekleme ile güncellenir.
+---
+# Faz 11 · D9b — madde 15 (Çoklu Proje Portföyü) — KISMİ
+**İlke (ADR-016):** kullanıcı isteğiyle çağrılır; salt okunur, yerel, model/ağ yok, git çalıştırılmaz, denetim satırı yazmaz, anonim 401 / ajan 403.
+**Ne yapar:** `GET /api/analysis/portfolio` — projeler yalnız sözleşmenin `trustedRepos` listesinden gelir (yol uydurulmaz). Proje başına: durum (ok / yok / klasör değil / reddedildi), git deposu mu, dal (`.git/HEAD`) ya da ayrık sha, `package.json` ad ve sürüm. Bilinmeyen alan `null`.
+**Güvenlik:** yalnız MUTLAK yollar; UNC, `\\?\`, `\\??\`, `\\.\`, `..`, ADS (`:`), boş bayt, aygıt adı (CON, NUL, COMn, LPTn…) ve sonu nokta/boşluk bileşenleri dosya sistemine dokunmadan reddedilir. Proje kökü sembolik bağ/junction ise reddedilir; `.git` sembolik bağ ise izlenmez (depo durumu bilinmiyor); `package.json`/`HEAD` sembolik bağ ise okunmaz. Dosyalar açılmış tanıtıcı üzerinden (fstat + en çok 64 KB) okunur. En çok 50 proje. `.git` bir dosyaysa (worktree/submodule) depo sayılır, dal bilinmez. Bozuk/BOM'lu `package.json` ve CRLF HEAD işlenir.
+**Test:** `src/analysis/portfolio.test.ts` (6 test) ve `d8b-api.test.ts` (yetki + boş rapor + parametre reddi) geçti.
+**Sınır / dürüstlük:** arayüz sayfası yok; kirli/temiz durum ve proje başına görev sayısı yok; projeler arası geçiş ve çoklu proje yürütme yok. Bu yüzden madde **Kısmi**. Bağımsız (Opus) denetim ilk turda KALDI (2 Orta: worktree `.git` dosyası yanlış "git değil", junction/UNC dolaylı geçiş; belge abartısı; 3 Düşük). Düzeltildi ve testlendi. Bilinen kalan sınır: eşlenmiş AĞ SÜRÜCÜSÜ (Z:\\) yerel diskten ayırt edilemez, yavaşsa eşzamanlı okuma isteği geciktirebilir; bidi/U+2028 karakterleri paket adında temizlenmez. İkinci tur denetim yapılmadı.
