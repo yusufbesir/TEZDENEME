@@ -1559,3 +1559,78 @@ class CalismaPlani {
     Object.hashAllUnordered(gunler),
   );
 }
+
+/// Durum dosyası sürüm göçü (SADE dayanıklılık). Sahibi: Yusuf; yazan: [Claude#goc-zinciri].
+/// Saf işlevler: dosya/IO yok, fırlatma yalnız adım işlevinden gelir.
+/// `surum` artınca eski sürümden yenisine adım adım dönüştürülür: adım
+/// tablosundaki `n` anahtarı "n sürümünden n+1 sürümüne" dönüştürücüdür.
+/// Şu an güncel sürüm 1'dir; tablo boştur, mekanizma bir sonraki artışta hazırdır.
+class DurumGocu {
+  const DurumGocu._();
+
+  /// [OgrenciDurumu.toJson]'un yazdığı sürüm.
+  static const int guncel = 1;
+
+  /// Varsayılan adım tablosu (şimdilik boş).
+  static const Map<int, Map<String, Object?> Function(Map<String, Object?>)>
+  varsayilanAdimlar = {};
+
+  /// Ham JSON'daki sürüm: `surum` yoksa, tamsayı değilse ya da 1'den küçükse 1.
+  static int surumuOku(Map<Object?, Object?> ham) {
+    final s = ham['surum'];
+    return (s is int && s >= 1) ? s : 1;
+  }
+
+  /// [ham] sürümünü [hedef] sürüme getirir. Girdi değiştirilmez.
+  /// - sürüm == hedef: aynen döner ([GocSonucu.gocYapildi] false).
+  /// - sürüm > hedef (gelecek sürüm): dokunulmaz, `gelecek` true; okuma
+  ///   mevcut hoşgörülü [OgrenciDurumu.fromJson] ile yapılır.
+  /// - sürüm < hedef: her adım sırayla uygulanır; eksik adım ya da adımın
+  ///   fırlatması [StateError] olarak yukarı çıkar (çağıran dosyayı korur).
+  static GocSonucu uygula(
+    Map<Object?, Object?> ham, {
+    int hedef = guncel,
+    Map<int, Map<String, Object?> Function(Map<String, Object?>)>? adimlar,
+  }) {
+    final tablo = adimlar ?? varsayilanAdimlar;
+    final eski = surumuOku(ham);
+    var json = <String, Object?>{
+      for (final e in ham.entries)
+        if (e.key is String) e.key as String: e.value,
+    };
+    if (eski > hedef) {
+      return GocSonucu(json, eskiSurum: eski, yeniSurum: eski, gelecek: true);
+    }
+    var s = eski;
+    while (s < hedef) {
+      final adim = tablo[s];
+      if (adim == null) {
+        throw StateError('$s sürümünden $hedef sürümüne göç adımı yok');
+      }
+      try {
+        json = Map<String, Object?>.of(adim(Map<String, Object?>.of(json)));
+      } catch (e) {
+        throw StateError('$s -> ${s + 1} göç adımı başarısız: $e');
+      }
+      s++;
+      json['surum'] = s;
+    }
+    return GocSonucu(json, eskiSurum: eski, yeniSurum: s, gelecek: false);
+  }
+}
+
+class GocSonucu {
+  const GocSonucu(
+    this.json, {
+    required this.eskiSurum,
+    required this.yeniSurum,
+    required this.gelecek,
+  });
+
+  final Map<String, Object?> json;
+  final int eskiSurum;
+  final int yeniSurum;
+  final bool gelecek;
+
+  bool get gocYapildi => yeniSurum != eskiSurum;
+}

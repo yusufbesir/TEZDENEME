@@ -479,10 +479,15 @@ class _AdimAdimUygulamaState extends ConsumerState<AdimAdimUygulama>
     super.dispose();
   }
 
-  /// Ön plana dönüşte akıllı hatırlatıcı denetimi (SADE 6; açılış denetimi
-  /// DurumNotifier.build içinde). Hata uygulamayı durdurmaz.
+  /// Arka plana geçişte bekleyen ilerleme diske indirilir (mevcut yazma
+  /// kuyruğu); ön plana dönüşte akıllı hatırlatıcı denetimi (SADE 6; açılış
+  /// denetimi DurumNotifier.build içinde). Hata uygulamayı durdurmaz.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      unawaited(ref.read(durumProvider.notifier).arkaPlanaGecti());
+      return;
+    }
     if (state != AppLifecycleState.resumed) return;
     unawaited(
       ref
