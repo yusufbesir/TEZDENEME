@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../motor/hatirlatici.dart';
 import '../motor/motor.dart';
 import '../motor/pratik_oturumlari.dart';
 import '../tema/tema.dart';
@@ -481,6 +482,23 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 value: durum.gunDersiBildirimiAcik,
                 onChanged: (v) =>
                     notifier.ayarGuncelle(gunDersiBildirimiAcik: v),
+              ),
+              SwitchListTile(
+                key: const ValueKey('ayar-akilli-hatirlatici'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  Icons.notifications_active_outlined,
+                  color: r.ana,
+                ),
+                title: const Text('Akıllı hatırlatıcı (günde 1)'),
+                subtitle: Text(
+                  'Bugün çalışmadıysan, alıştığın saatten sonra '
+                  '(${Hatirlatici.onerilenSaat(durum).toString().padLeft(2, '0')}:00) '
+                  'bir kez hatırlatır',
+                ),
+                value: durum.akilliHatirlaticiAcik,
+                onChanged: (v) =>
+                    notifier.ayarGuncelle(akilliHatirlaticiAcik: v),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
