@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_tts/flutter_tts.dart';
 
 /// flutter_tts sarmalayıcısı. Hatalar yutulur; ses yoksa uygulama çalışmaya devam eder.
@@ -77,15 +78,48 @@ class Ses {
 
   double? _kayitliHiz;
 
-  /// Başarıyla konuşma başlatıldıysa true; hata olursa false.
+  /// Ses motoru bu cihazda yok (eklenti/motor bulunamadı); sonraki çağrılar
+  /// boşuna denemez, sessizce false döner ("ses yok" durumu gösterilir).
+  bool _motorYok = false;
+
+  /// Motorun desteklemediği diller (ör. cihazda Türkçe ses paketi yok).
+  final Set<String> _dilYok = {};
+
+  /// flutter_tts bazı platformlarda başarısızlığı 0/false döndürür.
+  static bool _basarisiz(Object? sonuc) => sonuc == 0 || sonuc == false;
+
+  /// Motoru ve [dil]'i hazırlar. Motor ya da dil yoksa istisna fırlatmadan
+  /// false döner (çağıran false'u "ses yok" olarak gösterir).
+  Future<bool> _dilHazirla(FlutterTts tts, String dil) async {
+    if (_motorYok || _dilYok.contains(dil)) return false;
+    try {
+      final uygun = await tts.isLanguageAvailable(dil);
+      if (_basarisiz(uygun) || await tts.setLanguage(dil) == 0) {
+        _dilYok.add(dil);
+        debugPrint('Ses dili yok, sessiz geçildi: $dil');
+        return false;
+      }
+      return true;
+    } on MissingPluginException {
+      _motorYok = true;
+      debugPrint('Ses motoru yok, sessiz geçildi');
+      return false;
+    }
+  }
+
+  /// Başarıyla konuşma başlatıldıysa true; motor/dil yoksa ya da hata olursa
+  /// fırlatmadan false.
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     try {
       final tts = _tts ??= FlutterTts();
-      await tts.setLanguage(dil);
+      if (!await _dilHazirla(tts, dil)) return false;
       await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
-      await tts.speak(metin);
+      if (_basarisiz(await tts.speak(metin))) return false;
       return true;
+    } on MissingPluginException {
+      _motorYok = true;
+      return false;
     } catch (e) {
       debugPrint('Ses okunamadı: $e');
       return false;
@@ -102,12 +136,16 @@ class Ses {
   }) async {
     try {
       final tts = _tts ??= FlutterTts();
+      if (_motorYok) return false;
       await tts.awaitSpeakCompletion(true);
-      await tts.setLanguage(dil);
+      if (!await _dilHazirla(tts, dil)) return false;
       await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
-      await tts.speak(metin).timeout(enCok);
+      if (_basarisiz(await tts.speak(metin).timeout(enCok))) return false;
       return true;
+    } on MissingPluginException {
+      _motorYok = true;
+      return false;
     } catch (e) {
       debugPrint('Ses okunamadı: $e');
       return false;
