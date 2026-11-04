@@ -1,6 +1,6 @@
 # Skill ve araç güvenlik incelemesi (2026-10-24)
 
-> Yöntem: depolar yalnız okundu (shallow klon, kod çalıştırılmadı). Lisans, hook/betik, ağ çağrısı ve prompt enjeksiyonu kalıpları tarandı. Bu bir statik tarama; tüm kodun satır satır denetimi değildir. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
+> **Özet:** 7 dış skill/araç deposunun güvenlik incelemesi ve kurulum kararları. Yöntem: depolar yalnız okundu (shallow klon, kod çalıştırılmadı). Lisans, hook/betik, ağ çağrısı ve prompt enjeksiyonu kalıpları tarandı. Bu bir statik tarama; tüm kodun satır satır denetimi değildir. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
 
 | Depo | Lisans | Yıldız | Son commit | Bulgu | Karar |
 |---|---|---|---|---|---|

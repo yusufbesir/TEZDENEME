@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/icerik.dart';
 import '../../tema/tema.dart';
 import 'soru_basligi.dart';
+import 'yon.dart';
 
 /// Cümlede işaretleme: cümle kelimelere bölünür; doğru kelime(ler)e dokunulur
 /// (tekrar dokunmak seçimi kaldırır). Kontrol sonrası doğru kelimeler onay
@@ -42,6 +43,8 @@ class _IsaretleDurumu extends State<IsaretleGorunumu> {
           ipucu: 'Doğru kelimeye dokun (birden çok olabilir).',
         ),
         Wrap(
+          // Arapça cümle sağdan sola akar (ilk kelime sağda).
+          textDirection: parcaYonu(kelimeler),
           spacing: Olcu.b1,
           runSpacing: Olcu.b1,
           children: [

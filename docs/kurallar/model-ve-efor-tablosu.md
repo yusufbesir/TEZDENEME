@@ -30,11 +30,11 @@
 | Ofis işi: belge, sunum, tablo üretimi | claude-sonnet-5-5 | medium | Anthropic Sonnet 5.5'i rutin kodlama ve ofis işi için konumlandırıyor |
 | Çok dosyalı refactor, bilinmeyen kod tabanı, karmaşık hata ayıklama | claude-opus-5-5 | high | Zor kodlamada Opus; önce high |
 | Mimari karar, güvenlik incelemesi, veri bütünlüğü, çok adımlı analiz | claude-opus-5-5 | high | Hatanın bedeli yüksek; low ile başla, gerekirse high |
-| Orkestrasyon (beyin), planlama, uzun ajan oturumu | claude-opus-5-5 | medium-high | Tavan high; uzun oturumlarda bağlam 150k'da parçalanır |
+| Orkestrasyon (beyin), planlama, uzun ajan oturumu | claude-opus-5-5 | medium-high | Tavan high; uzun oturumlarda bağlam 200k'da parçalanır |
 | Geri alınamaz/riskli işlem (üretim, toplu silme, taşıma) planı | claude-opus-5-5 | high | Doğruluk önemli; tavan high, kullanıcı onayı şart |
 | Opus high'da da çözülemeyen açık uçlu çok zor sorun, ilk seferde doğru olması gereken kritik teslimat | claude-fable-5-1 | medium-high | Yalnız Yusuf açıkça isterse; Opus 5.5'ten ~2,5 kat pahalı ($10/$50 ve $4/$20 milyon token), haftalık limitin %50 tavanına yazılır. Düşünme her eforda açık; varsayılanı high olduğundan eforu elle medium'a çek, low'da bile Opus'tan iyi olabilir |
 | Fable 5.1 ile uzun otonom ajan koşusu (depo çapında kodlama) | claude-fable-5-1 | high | Yalnız Yusuf isterse; bağlamı küçük tut, `[1m]` kullanma |
-| Çok uzun belge/bağlam okuma ve karşılaştırma | claude-sonnet-5-5 veya Opus 5.5 | medium-high | Claude 4.6+ 1M bağlam; yine de bağlam 150k'da parçalanır (proje kuralı) |
+| Çok uzun belge/bağlam okuma ve karşılaştırma | claude-sonnet-5-5 veya Opus 5.5 | medium-high | Claude 4.6+ 1M bağlam; yine de bağlam 200k'da parçalanır (proje kuralı) |
 | Görsel/video/ses ağırlıklı çok kipli iş | Gemini (beklemede) | - | Kaynaklarda Gemini çok kiplilikte öne çıkıyor; projede Gemini beklemede olduğundan yalnız öneri |
 | Hızlı yinelemeli depo düzenlemesi, ikinci görüş | Codex (kurulu) | medium | Bazı kıyaslarda Terminal-Bench'te önde; ikinci görüş için |
 

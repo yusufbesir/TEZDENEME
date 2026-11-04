@@ -1,0 +1,26 @@
+/* AgentMom kullanıcı menüsü stilleri (Faz 11, Ekran 4). Yazan: Claude [İP:AgentMom Faz 11 / usermenu]. Yalnız usermenu.js'in sınıfları (am-um-*, am-usermenu).
+   Kural: yalnız var(--am-*) belirteçleri; dış kaynak yok; satır içi stil yok. Menü, #userMenuRoot (kullanıcı satırının üstünde, mutlak konum) içinde yukarı açılır. */
+#userMenuRoot { z-index: 30; }
+.am-usermenu { display: flex; flex-direction: column; min-width: 0; max-width: 100%; padding: var(--am-gap-1); border: 1px solid var(--am-line); border-radius: var(--am-radius-l); background: var(--am-surface-2); color: var(--am-text); font-family: var(--am-font-sans); font-size: var(--am-fs-m); box-shadow: var(--am-shadow); margin-bottom: var(--am-gap-1); }
+.am-usermenu button { font: inherit; color: inherit; }
+.am-um-head { padding: var(--am-gap-2) var(--am-gap-3) var(--am-gap-2); }
+.am-um-mode { color: var(--am-muted); font-size: var(--am-fs-s); font-weight: 600; }
+.am-um-note { color: var(--am-muted); font-size: var(--am-fs-s); overflow-wrap: anywhere; }
+.am-um-sep { height: 1px; margin: var(--am-gap-1) var(--am-gap-2); background: var(--am-line); }
+.am-um-item { display: flex; align-items: center; gap: var(--am-gap-3); width: 100%; min-height: 36px; padding: 0 var(--am-gap-3); border: 0; border-radius: var(--am-radius-m); background: transparent; text-align: left; cursor: pointer; min-width: 0; }
+.am-um-item:hover { background: var(--am-surface); }
+.am-um-item:focus-visible { outline: 2px solid var(--am-focus); outline-offset: -2px; background: var(--am-surface); }
+.am-um-ico { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--am-muted); flex: 0 0 auto; line-height: 1; }
+.am-um-ico svg { width: 16px; height: 16px; }
+.am-um-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.am-um-value, .am-um-kbd { flex: 0 0 auto; color: var(--am-muted); font-size: var(--am-fs-s); white-space: nowrap; }
+.am-um-kbd { border: 1px solid var(--am-line); border-radius: var(--am-radius-s); padding: 0 var(--am-gap-1); }
+.am-um-error { padding: var(--am-gap-3); border: 1px solid var(--am-bad); border-radius: var(--am-radius-m); background: var(--am-surface); color: var(--am-bad); overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .am-usermenu { animation: am-um-in 140ms ease-out; }
+  @keyframes am-um-in { from { opacity: 0; } to { opacity: 1; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .am-usermenu, .am-usermenu * { animation: none !important; transition: none !important; }
+}

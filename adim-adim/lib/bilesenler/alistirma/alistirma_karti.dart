@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/icerik.dart';
 import 'bosluk.dart';
+import 'dikte.dart';
 import 'dinle.dart';
 import 'eslestir.dart';
 import 'hamle.dart';
@@ -67,6 +68,13 @@ class AlistirmaKarti extends StatelessWidget {
       alistirma: a,
       kontrolEdildi: kontrolEdildi,
       onCevap: onCevap,
+    ),
+    final Dikte a => DikteGorunumu(
+      alistirma: a,
+      kontrolEdildi: kontrolEdildi,
+      dogruMu: dogruMu,
+      onCevap: onCevap,
+      onGonder: onGonder,
     ),
     final Soyle a => SoyleGorunumu(
       alistirma: a,

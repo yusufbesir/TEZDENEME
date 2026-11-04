@@ -152,6 +152,16 @@
     return mesaj ? String(mesaj) : 'Bilgisayardan bir hata bildirildi.';
   }
 
+  // Önerilen komuta kısa onay: "evet", "tamam", "olur" vb. Önerilen metni döndürür; değilse null.
+  var ONAY = ['evet', 'tamam', 'olur', 'aynen', 'evet lutfen', 'onayla', 'he', 'ok'];
+  function oneriOnayi(metin, sonOneri) {
+    if (!sonOneri) return null;
+    var n = String(metin || '').replace(/İ/g, 'i').toLowerCase().replace(/[çğıöşü]/g, function (c) {
+      return { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u' }[c];
+    }).replace(/[^a-z ]/g, ' ').trim().replace(/\s+/g, ' ');
+    return ONAY.indexOf(n) >= 0 ? sonOneri : null;
+  }
+
   function sayacMetni(saniye) {
     const s = Math.max(0, Math.floor(saniye));
     const dk = Math.floor(s / 60);
@@ -162,6 +172,6 @@
   return {
     modSec, komutYolu, ozelIpv4mu, adresCoz, kodNormallestir, baglantiDurumu,
     uzaktanSekmesiGorunur, adimListesi, karakterDurumu, normalKoordinat,
-    uzakHataMetni, sayacMetni,
+    uzakHataMetni, sayacMetni, oneriOnayi,
   };
 });

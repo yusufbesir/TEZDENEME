@@ -1,6 +1,6 @@
 # Benimle nasıl konuşmalısın (Yusuf için kısa rehber)
 
-> Amaç: aynı sonucu daha az mesajla ve daha az token ile almak. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
+> **Özet:** Yusuf için iyi istek şablonu ve ipuçları. Amaç: aynı sonucu daha az mesajla ve daha az token ile almak. [İP:Dürüstlük kuralı ve yeni skill'leri ekle#P1czsj]
 
 ## İyi istek şablonu (4 satır yeter)
 1. **Amaç:** Ne olsun? ("Barkod uygulamasına toplu yazdırma ekle")

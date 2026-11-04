@@ -7,6 +7,10 @@
 /// sıklık rozeti ("Çok sık" ≤100, "Sık" ≤300) ve kök farklıysa "kök: go"
 /// bilgisi görünür. İngilizce maddelerde ses simgesi kelimeyi `Ses.oku` ile
 /// okur; kod maddelerinde ses yok. Dar pencerede (480) taşmaz.
+/// Katlanabilir "Metin yapıştır" bölümü (SADE 5, yazan [Claude#pano-kelime]):
+/// çok satırlı kutu + "Panodan yapıştır" + "İşaretle"; sözlükte olup
+/// öğrenilmemiş kelimeler çip olur (dokununca tekrar kartı eklenir),
+/// sözlükte olmayanlar soluk gösterilir. Yeni sayfa yoktur.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -24,6 +28,7 @@ import '../bilesenler/yer_imi_dugmesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/kelime_defteri.dart';
+import '../motor/metin_kelime.dart';
 import '../motor/yer_imi.dart';
 import '../sozluk/dil_tanimi.dart';
 import '../sozluk/sozluk.dart';
@@ -72,6 +77,12 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'İng.$no';
       case 'almanca':
         return 'Alm.$no';
+      case 'fransizca':
+        return 'Fra.$no';
+      case 'rusca':
+        return 'Rus.$no';
+      case 'arapca':
+        return 'Ara.$no';
       case 'korece':
         return 'Kor.$no';
       case 'japonca':
@@ -88,6 +99,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
         return 'SQL$no';
       case 'php':
         return 'PHP$no';
+      case 'go':
+        return 'Go$no';
       default:
         return kursId;
     }
@@ -230,6 +243,8 @@ class _SozlukDurumu extends ConsumerState<SozlukEkrani> {
                     },
                   ),
                 ),
+              // Metinden kelime yakalama (SADE 5): katlanabilir bölüm.
+              _MetinBolumu(dil: _dil),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   Olcu.b3,
@@ -504,6 +519,223 @@ class SiklikRozeti extends StatelessWidget {
       child: Text(
         etiket,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(color: r.ana),
+      ),
+    );
+  }
+}
+
+/// Katlanabilir "Metin yapıştır" bölümü (SADE 5): metin kutusu (en çok
+/// [MetinKelime.enCokKarakter]), "Panodan yapıştır" (Clipboard.getData) ve
+/// "İşaretle". Sonuç: sözlükte olup öğrenilmemiş kelimeler ana renkte
+/// dokunulabilir çip (dokununca `kartEkle`; kart eklenmişse onay simgesi),
+/// sözlükte olmayanlar soluk, dokunulamaz çip. Bölüm kapalıyken içerik
+/// kurulmaz; sonuç listesi sabit yükseklikte kayar (dar ekranda taşmaz).
+class _MetinBolumu extends ConsumerStatefulWidget {
+  const _MetinBolumu({required this.dil});
+
+  /// Ekrandaki dil süzgeci (null: Tümü).
+  final String? dil;
+
+  @override
+  ConsumerState<_MetinBolumu> createState() => _MetinBolumuDurumu();
+}
+
+class _MetinBolumuDurumu extends ConsumerState<_MetinBolumu> {
+  final _metin = TextEditingController();
+  KelimeAyrimi? _sonuc;
+
+  @override
+  void dispose() {
+    _metin.dispose();
+    super.dispose();
+  }
+
+  Future<void> _panodanYapistir() async {
+    final veri = await Clipboard.getData(Clipboard.kTextPlain);
+    final t = veri?.text ?? '';
+    if (!mounted) return;
+    if (t.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Panoda metin yok'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      return;
+    }
+    _metin.text = t.length > MetinKelime.enCokKarakter
+        ? t.substring(0, MetinKelime.enCokKarakter)
+        : t;
+    _isaretle();
+  }
+
+  void _isaretle() {
+    final sozluk = ref.read(sozlukProvider);
+    final kartlar =
+        ref.read(durumProvider).value?.kartlar ?? const <String, Kart>{};
+    // Ayrıştırma dili: Latin dışı süzgeçte (ko/ja/zh) boş döner; Tümü'de
+    // İngilizce kuralı kullanılır. Sözlük kümesi ekrandaki süzgece uyar.
+    setState(() {
+      _sonuc = MetinKelime.isaretle(
+        _metin.text,
+        widget.dil ?? 'en',
+        sozluk,
+        kartlar,
+        sozlukDili: widget.dil,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    final sonuc = _sonuc;
+    final kartlar = ref.watch(
+      durumProvider.select((d) => d.value?.kartlar ?? const <String, Kart>{}),
+    );
+    return ExpansionTile(
+      key: const ValueKey('sozluk-metin-bolumu'),
+      leading: const Icon(Icons.content_paste_search),
+      title: const Text('Metin yapıştır'),
+      subtitle: Text(
+        'Bilmediğin kelimeleri işaretle, dokunarak karta ekle',
+        style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+      ),
+      tilePadding: const EdgeInsets.symmetric(horizontal: Olcu.b3),
+      childrenPadding: const EdgeInsets.fromLTRB(Olcu.b3, 0, Olcu.b3, Olcu.b2),
+      children: [
+        // Açık bölüm ekran yüksekliğinin ~%35'ini aşmaz, içi kayar; altındaki
+        // madde listesi dar/kısa pencerede taşmaya itilmez.
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.35,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  key: const ValueKey('sozluk-metin-kutusu'),
+                  controller: _metin,
+                  minLines: 2,
+                  maxLines: 4,
+                  maxLength: MetinKelime.enCokKarakter,
+                  decoration: const InputDecoration(
+                    hintText:
+                        'Okuduğun bir cümleyi ya da paragrafı buraya yapıştır',
+                    counterText: '',
+                  ),
+                ),
+                const SizedBox(height: Olcu.b1),
+                Wrap(
+                  spacing: Olcu.b1,
+                  runSpacing: Olcu.b1,
+                  children: [
+                    OutlinedButton.icon(
+                      key: const ValueKey('sozluk-panodan'),
+                      onPressed: _panodanYapistir,
+                      icon: const Icon(Icons.content_paste),
+                      label: const Text('Panodan yapıştır'),
+                    ),
+                    FilledButton.icon(
+                      key: const ValueKey('sozluk-isaretle'),
+                      onPressed: _isaretle,
+                      icon: const Icon(Icons.highlight_alt),
+                      label: const Text('İşaretle'),
+                    ),
+                  ],
+                ),
+                if (sonuc != null) ...[
+                  const SizedBox(height: Olcu.b1),
+                  Text(
+                    sonuc.isaretli.isEmpty && sonuc.sozlukDisi.isEmpty
+                        ? (sonuc.ogrenilmis.isEmpty
+                              ? 'Kelime bulunamadı'
+                              : 'Hepsi öğrenilmiş: ${sonuc.ogrenilmis.length} kelime')
+                        : '${sonuc.isaretli.length} işaretli · '
+                              '${sonuc.ogrenilmis.length} öğrenilmiş · '
+                              '${sonuc.sozlukDisi.length} sözlükte yok',
+                    style: yazi.bodySmall?.copyWith(color: r.metinIkincil),
+                  ),
+                  const SizedBox(height: Olcu.b1),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 120),
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: Olcu.b1,
+                        runSpacing: Olcu.b1,
+                        children: [
+                          for (final m in sonuc.isaretli)
+                            _KelimeCipi(
+                              madde: m,
+                              kartlarda: kartlar.containsKey(m.kartKimligi),
+                            ),
+                          for (final k in sonuc.sozlukDisi)
+                            Chip(
+                              key: ValueKey('sozluk-disi-$k'),
+                              label: Text(k),
+                              labelStyle: yazi.labelLarge?.copyWith(
+                                color: r.metinIkincil.withValues(alpha: 0.6),
+                              ),
+                              side: BorderSide(
+                                color: r.metinIkincil.withValues(alpha: 0.3),
+                              ),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// İşaretli kelime çipi: dokununca tekrar kartı eklenir; eklenmişse onay
+/// simgesi görünür ve dokunma pasif olur. İpucu olarak anlam gösterilir.
+class _KelimeCipi extends ConsumerWidget {
+  const _KelimeCipi({required this.madde, required this.kartlarda});
+  final SozlukMaddesi madde;
+  final bool kartlarda;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.renkler;
+    return Tooltip(
+      message: madde.anlam,
+      child: ActionChip(
+        key: ValueKey('sozluk-isaretli-${madde.kelime}'),
+        avatar: Icon(
+          kartlarda ? Icons.check_circle : Icons.add_card,
+          size: 18,
+          color: kartlarda ? r.dogru : r.ana,
+        ),
+        label: Text(madde.kelime),
+        visualDensity: VisualDensity.compact,
+        onPressed: kartlarda
+            ? null
+            : () async {
+                final mesajci = ScaffoldMessenger.of(context);
+                await ref
+                    .read(durumProvider.notifier)
+                    .kartEkle(madde.kartKimligi);
+                mesajci
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Tekrar kartı eklendi: ${madde.kelime}'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+              },
       ),
     );
   }

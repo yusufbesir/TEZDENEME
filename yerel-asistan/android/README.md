@@ -41,7 +41,8 @@ Betiğin yaptığı:
 
 | Dosya | Değişiklik |
 |---|---|
-| `android\app\src\main\AndroidManifest.xml` | `RECORD_AUDIO`, `INTERNET`, `ACCESS_NETWORK_STATE` izinleri eklenir; `<application>` etiketine `android:networkSecurityConfig="@xml/network_security_config"` eklenir; varsa `usesCleartextTraffic="true"` `false` yapılır. |
+| `android\app\src\main\AndroidManifest.xml` | `RECORD_AUDIO`, `INTERNET`, `ACCESS_NETWORK_STATE`, `POST_NOTIFICATIONS` (hatırlatıcı/alarm bildirimi) izinleri eklenir; `<application>` etiketine `android:networkSecurityConfig="@xml/network_security_config"` eklenir; varsa `usesCleartextTraffic="true"` `false` yapılır. |
+| `android\app\build.gradle` | `versionName` / `versionCode`, `package.json` sürümünden yazılır (0.1.2 → `versionCode 102`). |
 | `android\app\src\main\res\xml\network_security_config.xml` | Açık metin (cleartext) varsayılan olarak **kapalı**. Yalnızca `localhost`, `10.0.2.2` (emülatör), `*.local` ve `--ip` ile verdiğiniz adreslere `ws://` izni verilir. |
 
 **Önemli sınırlama:** Android'in ağ güvenlik yapılandırması IP aralığı (192.168.0.0/16 gibi) yazmaya izin vermez, yalnızca tek tek alan adı/IP yazılabilir. Bu yüzden PC'nizin adresini `--ip` ile eklemeniz gerekir. Adres değişirse betiği yeni adresle yeniden çalıştırıp APK'yı yeniden derleyin (öncekiler korunur). Yönlendiricinizde bilgisayara sabit (DHCP rezervasyonu) adres vermeniz önerilir. Ayrıca arayüz kodu, ws adresinin yerel/özel aralıkta olduğunu kendisi de doğrular.

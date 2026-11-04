@@ -58,7 +58,7 @@ void main() {
       expect(idler.toSet().length, idler.length);
       expect(
         idler.indexOf('korece-1'),
-        greaterThan(idler.indexOf('ingilizce-4')),
+        greaterThan(idler.indexOf('ingilizce-5')),
       );
       expect(kursBul('korece-1'), same(koreceA1));
       expect(kursBul('japonca-1'), same(japoncaA1));
@@ -342,7 +342,13 @@ void main() {
     test(
       'eski İngilizce içerik değişmedi: hiçbir İngilizce alıştırmada dil yok',
       () {
-        for (final k in [ingilizceA1, ingilizceA2, ingilizceB1, ingilizceB2]) {
+        for (final k in [
+          ingilizceA1,
+          ingilizceA2,
+          ingilizceB1,
+          ingilizceB2,
+          ingilizceC1,
+        ]) {
           for (final a in k.tumDersler.expand((d) => d.alistirmalar)) {
             expect(a.toJson().containsKey('dil'), isFalse, reason: a.soru);
           }

@@ -1,0 +1,16 @@
+== source (local vault note)
+source: 984d87cc-36f8-47bb-8bcc-d4be3bfb48cc
+findings: 9394cc69-3e2d-4ed0-832e-dd49bb7ab429 829c6d60-f60e-49f9-b3e0-dbad6f266696 3b73b562-467e-48bb-b5ef-bfe25ce4f3e8 471bd2a2-7cd9-4b51-84b4-bfa6f029d1a5 55c3ff5c-9fd8-4f03-a814-0825cf978124 eef4d5b0-15e1-4edb-9336-fc862d6029f4 a97cc247-06a9-4394-a9fc-ddcccd7507d1
+== recommendation (REA records it; REA cannot change policy; zero model calls)
+state: user_decision_required | policy-touching: true | priority: -2
+   ok   evidence - 7 finding(s) from 1 source(s)
+   ok   freshness - all sources fresh
+   ok   reliability - all sources at or above trust 0.6
+   ok   license - licenses known (ideas only; nothing is copied)
+   ok   security - no executable or instruction-like content
+   ok   compatibility - affected paths are repository-relative
+   ok   overlap - no overlap with listed existing features
+   FLAG policy_boundary - would change policy, permissions, approval, sandbox or REA's own guard: user decision only
+rec.json:0
+server.log:0
+outputs in: /d/YusufII/Projeler/agentmom-state/rea-tasarim-230850

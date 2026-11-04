@@ -344,6 +344,222 @@ final List<Senaryo> tumSenaryolar = List.unmodifiable(<Senaryo>[
       ),
     ],
   ),
+  Senaryo(
+    id: 'senaryo-en-market',
+    kursOnek: 'ingilizce',
+    dil: 'en-US',
+    baslik: 'Markette alışveriş',
+    aciklama: 'Kasiyere fiyat sor, poşet ve ödeme şeklini seç.',
+    dugumler: [
+      SenaryoDugumu(
+        id: 'basla',
+        karsi: [
+          _mesaj(
+            'Hi! Did you find everything?',
+            'Merhaba! Her şeyi buldunuz mu?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'Yes, thank you. How much is it?',
+            anlam: 'Evet, teşekkürler. Ne kadar?',
+            sonraki: 'fiyat',
+          ),
+          SenaryoCevabi(
+            metin: 'Yes, I did. Where is the milk?',
+            anlam: 'Evet, buldum. Süt nerede?',
+            uygun: false,
+            not:
+                'Kasada "Did you find everything?" sorusuna "Yes, thank you." '
+                'diye cevap verilir; süt sorusu bu aşamaya uymaz.',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'fiyat',
+        karsi: [
+          _mesaj(
+            'That is twelve dollars. Do you need a bag?',
+            'On iki dolar. Poşet ister misiniz?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'Yes, please.',
+            anlam: 'Evet, lütfen.',
+            sonraki: 'odeme',
+          ),
+          SenaryoCevabi(
+            metin: 'No, I have my own bag.',
+            anlam: 'Hayır, kendi çantam var.',
+            sonraki: 'odeme',
+          ),
+          SenaryoCevabi(
+            metin: 'It is twelve dollars.',
+            anlam: 'On iki dolar.',
+            uygun: false,
+            not:
+                'Fiyatı söyleyen kasiyerdi; sen poşet sorusuna "Yes, please." '
+                'ya da "No, thank you." diye cevap verirsin.',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'odeme',
+        karsi: [
+          _mesaj(
+            'Would you like to pay by card or cash?',
+            'Kartla mı nakit mi ödemek istersiniz?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'By card, please.',
+            anlam: 'Kartla, lütfen.',
+            sonraki: 'bitis',
+          ),
+          SenaryoCevabi(
+            metin: 'Cash, please.',
+            anlam: 'Nakit, lütfen.',
+            sonraki: 'bitis',
+          ),
+          SenaryoCevabi(
+            metin: 'Yes, I would.',
+            anlam: 'Evet, isterim.',
+            uygun: false,
+            not:
+                '"... or ...?" sorusuna evet/hayır denmez; seçeneklerden '
+                'birini söylersin: "By card" ya da "Cash".',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'bitis',
+        karsi: [
+          _mesaj('Thank you! Have a great day.', 'Teşekkürler! İyi günler.'),
+        ],
+      ),
+    ],
+  ),
+  Senaryo(
+    id: 'senaryo-en-otel',
+    kursOnek: 'ingilizce',
+    dil: 'en-US',
+    baslik: 'Otelde giriş',
+    aciklama: 'Rezervasyonunu söyle, kaç gece kalacağını ve kahvaltıyı sor.',
+    dugumler: [
+      SenaryoDugumu(
+        id: 'basla',
+        karsi: [
+          _mesaj(
+            'Good evening. Welcome to our hotel. How can I help you?',
+            'İyi akşamlar. Otelimize hoş geldiniz. Nasıl yardımcı olabilirim?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'I have a reservation.',
+            anlam: 'Rezervasyonum var.',
+            sonraki: 'ad',
+          ),
+          SenaryoCevabi(
+            metin: 'I am a reservation.',
+            anlam: 'Ben bir rezervasyonum.',
+            uygun: false,
+            not:
+                '"I have a reservation." rezervasyonun olduğunu söyler; '
+                '"I am ..." kim olduğunu anlatır.',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'ad',
+        karsi: [
+          _mesaj(
+            'Great. May I have your name, please?',
+            'Harika. Adınızı alabilir miyim?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'My name is Ali Yilmaz.',
+            anlam: 'Adım Ali Yılmaz.',
+            sonraki: 'gece',
+          ),
+          SenaryoCevabi(
+            metin: 'I am fine, thank you.',
+            anlam: 'İyiyim, teşekkürler.',
+            uygun: false,
+            not:
+                'Adın sorulunca "My name is ..." denir; "I am fine" '
+                '"How are you?" sorusunun cevabıdır.',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'gece',
+        karsi: [
+          _mesaj(
+            'Thank you. How many nights are you staying?',
+            'Teşekkürler. Kaç gece kalacaksınız?',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'Two nights, please.',
+            anlam: 'İki gece, lütfen.',
+            sonraki: 'kahvalti',
+          ),
+          SenaryoCevabi(
+            metin: 'Three nights, please.',
+            anlam: 'Üç gece, lütfen.',
+            sonraki: 'kahvalti',
+          ),
+          SenaryoCevabi(
+            metin: 'I am staying, yes.',
+            anlam: 'Kalıyorum, evet.',
+            uygun: false,
+            not:
+                '"How many ...?" sayı sorar; cevap bir sayı içerir: '
+                '"Two nights, please."',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'kahvalti',
+        karsi: [
+          _mesaj(
+            'Here is your key. Room 204.',
+            'Anahtarınız burada. 204 numaralı oda.',
+          ),
+        ],
+        cevaplar: const [
+          SenaryoCevabi(
+            metin: 'Thank you. Is breakfast included?',
+            anlam: 'Teşekkürler. Kahvaltı dahil mi?',
+            sonraki: 'bitis',
+          ),
+          SenaryoCevabi(
+            metin: 'You are welcome.',
+            anlam: 'Rica ederim.',
+            uygun: false,
+            not:
+                '"You are welcome." teşekkür edildiğinde söylenir; anahtarı '
+                'alan sensin, önce teşekkür edersin.',
+          ),
+        ],
+      ),
+      SenaryoDugumu(
+        id: 'bitis',
+        karsi: [
+          _mesaj(
+            'Yes, breakfast is from seven to ten. Enjoy your stay!',
+            'Evet, kahvaltı yedi ile on arası. İyi konaklamalar!',
+          ),
+        ],
+      ),
+    ],
+  ),
   // ------------------------------------------------------------- Almanca
   Senaryo(
     id: 'senaryo-de-cafe',

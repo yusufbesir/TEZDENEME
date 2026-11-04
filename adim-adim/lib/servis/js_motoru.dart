@@ -5,10 +5,11 @@
 ///
 /// Sınırlar (dürüst not):
 /// - flutter_js'in `timeout` parametresi çalışmayı kesmez (Linux'ta denendi);
-///   süre sınırını [JsKoruma] bekçileri sağlar. Bekçinin göremediği tek bir
-///   uzun yerel işlem (ör. dev bir `"x".repeat(1e9)`) Dart tarafındaki süre
-///   dolunca "zaman aşımı" olarak bildirilir, ancak arka plandaki isolate
-///   yerel kod bitene kadar kapanmaz.
+///   süre sınırını [JsKoruma] bekçileri sağlar. Dart tarafındaki süre
+///   dolunca isolate öldürülür ([calistirIsolate]); bekçinin göremediği tek
+///   bir uzun yerel işlem bile bir sonraki çalıştırmayı etkilemez, çünkü
+///   motor her çalıştırmada yeniden kurulur. Yerel kod içinde askıdaki
+///   iş parçacığı işletim sistemi kesene kadar sürebilir.
 /// - Bellek sınırı uygulanamaz: paketle gelen kütüphane `jsSetMemoryLimit`
 ///   simgesini dışa aktarmıyor.
 /// - Kütüphane yüklenemezse (test ortamı, eksik DLL) sonuç "motor yok"tur.
@@ -38,22 +39,65 @@ class QuickJsCalistirici extends KodCalistirici {
     if (h.hata != null) return KodCalismaSonucu(kod: kod, hata: h.hata);
     final betik = h.betik!;
     try {
-      final ham = await Isolate.run(
+      final ham = await calistirIsolate(
         () => _calistirSenkron(betik),
-      ).timeout(Duration(milliseconds: sureMs + 3000));
+        Duration(milliseconds: sureMs + 3000),
+      );
       if (ham == null) return KodCalismaSonucu.motorsuz(kod);
       return JsKoruma.sonucCoz(kod, jsonDecode(ham));
     } on TimeoutException {
       return KodCalismaSonucu(
         kod: kod,
         zamanAsimi: true,
-        hata: 'Süre sınırı aşıldı (sonsuz döngü olabilir)',
+        hata: JsKoruma.zamanAsimiAciklamasi,
       );
     } catch (e) {
       return KodCalismaSonucu(kod: kod, hata: 'Çalıştırılamadı: $e');
     }
   }
 }
+
+/// [is_] işini ayrı isolate'te çalıştırır; [sure] dolarsa isolate ÖLDÜRÜLÜR
+/// (`Isolate.kill(immediate)`) ve [TimeoutException] fırlatılır. Her çağrı
+/// kendi isolate'ini ve motorunu kurar; zaman aşımından sonra bir sonraki
+/// çalıştırma temiz bir motorla başlar (asılı kalmış motor yeniden
+/// kullanılmaz). Test edilebilsin diye motordan bağımsızdır.
+Future<T> calistirIsolate<T>(T Function() is_, Duration sure) async {
+  final alici = ReceivePort();
+  final hata = ReceivePort();
+  final isolate = await Isolate.spawn<_Is<T>>(
+    _isleCalistir<T>,
+    _Is<T>(is_, alici.sendPort),
+    onError: hata.sendPort,
+    errorsAreFatal: true,
+  );
+  final tamam = Completer<T>();
+  final a = alici.listen((m) {
+    if (!tamam.isCompleted) tamam.complete(m as T);
+  });
+  final h = hata.listen((m) {
+    if (!tamam.isCompleted) {
+      tamam.completeError(StateError('isolate hatası: $m'));
+    }
+  });
+  try {
+    return await tamam.future.timeout(sure);
+  } finally {
+    isolate.kill(priority: Isolate.immediate);
+    await a.cancel();
+    await h.cancel();
+    alici.close();
+    hata.close();
+  }
+}
+
+class _Is<T> {
+  const _Is(this.is_, this.port);
+  final T Function() is_;
+  final SendPort port;
+}
+
+void _isleCalistir<T>(_Is<T> i) => i.port.send(i.is_());
 
 /// Isolate içinde: motoru kurar, betiği çalıştırır, JSON dizesi döndürür.
 /// Kütüphane yüklenemezse null (motor yok).
