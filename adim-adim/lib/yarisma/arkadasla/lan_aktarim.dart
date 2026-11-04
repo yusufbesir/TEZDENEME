@@ -15,14 +15,25 @@ const int lanKesifPortu = 45871;
 const String _duyuruOnEki = 'ADIMADIM1';
 const Duration lanBaglantiZamanAsimi = Duration(seconds: 5);
 
+/// Bir oturumda kabul edilen en çok gelen mesaj (düello ~20 soru; fazlası kuyruk şişirme sayılır).
+const int lanEnFazlaGelenMesaj = 100;
+
+/// Keşifte bellekte tutulan en çok ilan.
+const int lanEnFazlaIlan = 64;
+
 /// Satır tabanlı TCP taşıması. Satır [enFazlaMesajBayt]'ı aşarsa bağlantı kesilir.
 class LanAktarimi implements DuelloAktarimi {
   LanAktarimi._(this._soket) {
     final tampon = <int>[];
+    var sayac = 0;
     _soket.listen(
       (parca) {
         for (final b in parca) {
           if (b == 10) {
+            if (++sayac > lanEnFazlaGelenMesaj) {
+              kapat();
+              return;
+            }
             final metin = utf8.decode(tampon, allowMalformed: true);
             tampon.clear();
             if (!_denetci.isClosed) _denetci.add(metin);
@@ -177,6 +188,7 @@ Stream<LanIlani> lanKesfet({int kesifPortu = lanKesifPortu}) async* {
       if (d == null) continue;
       final ilan = lanDuyurusunuCoz(d.data, d.address);
       if (ilan == null) continue;
+      if (gorulen.length >= lanEnFazlaIlan) continue;
       if (gorulen.add('${ilan.adres.address}:${ilan.port}')) yield ilan;
     }
   } finally {
