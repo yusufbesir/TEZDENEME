@@ -171,12 +171,12 @@ void main() {
       expect(await File('${yuva(0).path}.tmp').exists(), isFalse);
     });
 
-    test('sifirla geri alma kopyalarını da kaldırır', () async {
+    test('sifirla geri alma kopyalarını korur', () async {
       await yaz({'surum': 1, 'xp': 7});
       final depo = DosyaDepo(gecici, goc: adimlar, hedefSurum: 2);
       await depo.yukle();
       await depo.sifirla();
-      expect(await yuva(0).exists(), isFalse);
+      expect(await yuva(0).exists(), isTrue);
     });
 
     test('bosalt bekleyen yazmaları bitirir', () async {
