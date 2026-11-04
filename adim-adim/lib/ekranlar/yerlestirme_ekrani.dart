@@ -3,6 +3,7 @@
 /// doğru oranı %80 ve üstüyse ünite "atlandı" olur; ilk başarısız üniteden
 /// sonrası atlanmaz. Atlanan dersler tamamlanmış sayılır ama XP, seri ve
 /// aralıklı tekrar kartlarına dokunulmaz (Motor.yerlestirmeUygula).
+/// `hizli` açıkken (ilk açılış kısayolu) aynı ekran yalnız 5 soru sorar.
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -20,8 +21,15 @@ import '../motor/motor.dart';
 import '../tema/tema.dart';
 
 class YerlestirmeEkrani extends ConsumerStatefulWidget {
-  const YerlestirmeEkrani({super.key, required this.kursId});
+  const YerlestirmeEkrani({
+    super.key,
+    required this.kursId,
+    this.hizli = false,
+  });
   final String kursId;
+
+  /// true: ilk açılıştaki 5 soruluk hızlı seviye testi (ilk açık ünite).
+  final bool hizli;
 
   @override
   ConsumerState<YerlestirmeEkrani> createState() => _YerlestirmeDurumu();
@@ -46,6 +54,9 @@ class _YerlestirmeDurumu extends ConsumerState<YerlestirmeEkrani> {
         durum,
         _kurs!,
         tohum: DateTime.now().millisecondsSinceEpoch,
+        enCok: widget.hizli
+            ? Motor.yerlestirmeHizliSoru
+            : Motor.yerlestirmeEnCok,
       );
     }
   }

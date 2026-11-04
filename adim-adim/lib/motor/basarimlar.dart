@@ -8,6 +8,7 @@
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
+/// Yarışma turu rozetleri (oyna/hatasız/3 gün) yazan: [Claude#yarisma-rozet].
 library;
 
 import '../model/durum.dart';
@@ -155,6 +156,34 @@ abstract final class Basarimlar {
       hedef: 1,
     ),
     (
+      id: 'yarisma_oyna_1',
+      ad: 'İlk yarışma',
+      aciklama: 'Bir yarışma turu oyna.',
+      simge: 'yarisma',
+      hedef: 1,
+    ),
+    (
+      id: 'yarisma_oyna_10',
+      ad: '10 yarışma',
+      aciklama: '10 yarışma turu oyna.',
+      simge: 'yarisma',
+      hedef: 10,
+    ),
+    (
+      id: 'yarisma_hatasiz',
+      ad: 'Hatasız tur',
+      aciklama: 'Bir yarışma turunu hiç yanlış yapmadan bitir.',
+      simge: 'yarisma',
+      hedef: 1,
+    ),
+    (
+      id: 'yarisma_seri_3',
+      ad: '3 gün yarışma',
+      aciklama: 'Üst üste 3 gün yarışma oyna.',
+      simge: 'yarisma',
+      hedef: 3,
+    ),
+    (
       id: 'gun_hedefi',
       ad: 'Hedefe ulaştın',
       aciklama: 'Bir günde günlük XP hedefini tamamla.',
@@ -213,6 +242,32 @@ abstract final class Basarimlar {
         dersler.every((x) => Motor.dersBitmis(d, x.id));
   }
 
+  static Iterable<GunlukKayit> _yarismaKayitlari(OgrenciDurumu d) =>
+      d.gunluk.where((k) => k.tur == GunlukKayit.turYarisma);
+
+  /// Yarışma oynanan günler arasındaki en uzun ardışık gün sayısı
+  /// (aynı gün birden çok tur tek gün sayılır; bozuk tarih atlanır).
+  static int yarismaGunSerisi(OgrenciDurumu d) {
+    final gunler = <DateTime>{};
+    for (final k in _yarismaKayitlari(d)) {
+      final t = DateTime.tryParse(k.gun);
+      if (t != null) gunler.add(DateTime.utc(t.year, t.month, t.day));
+    }
+    if (gunler.isEmpty) return 0;
+    final sirali = gunler.toList()..sort();
+    var enUzun = 1;
+    var seri = 1;
+    for (var i = 1; i < sirali.length; i++) {
+      if (sirali[i].difference(sirali[i - 1]).inDays == 1) {
+        seri++;
+        if (seri > enUzun) enUzun = seri;
+      } else {
+        seri = 1;
+      }
+    }
+    return enUzun;
+  }
+
   /// Her rozetin ilerlemesi (hedefe oranla). Bool koşullar 0/1 döner.
   static int _ilerleme(String id, OgrenciDurumu d, List<Kurs> kurslar) {
     int bir(bool b) => b ? 1 : 0;
@@ -248,6 +303,15 @@ abstract final class Basarimlar {
                 !Motor.basarisizMi(k.dogru, k.toplam),
           ),
         );
+      case 'yarisma_oyna_1':
+      case 'yarisma_oyna_10':
+        return _yarismaKayitlari(d).length;
+      case 'yarisma_hatasiz':
+        return bir(
+          _yarismaKayitlari(d).any((k) => k.toplam > 0 && k.dogru >= k.toplam),
+        );
+      case 'yarisma_seri_3':
+        return yarismaGunSerisi(d);
       case 'gun_hedefi':
         return bir(d.gunlukXp.values.any((v) => v > 0 && v >= d.gunlukHedef));
       case 'bilmece':

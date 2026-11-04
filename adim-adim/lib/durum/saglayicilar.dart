@@ -583,6 +583,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? gunDersiBildirimiAcik,
     int? oturumKartSayisi,
     bool? akilliHatirlaticiAcik,
+    double? sesHizi,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -607,6 +608,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
                 OgrenciDurumu.oturumKartSecenekleri.contains(oturumKartSayisi))
             ? oturumKartSayisi
             : null,
+        // Dinleme hızı 0,7..1,2 aralığına kırpılır.
+        sesHizi: sesHizi == null ? null : OgrenciDurumu.sesHiziKirp(sesHizi),
       ),
     );
     final bildirim = ref.read(bildirimProvider);

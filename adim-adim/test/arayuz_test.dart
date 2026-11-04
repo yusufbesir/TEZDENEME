@@ -159,6 +159,32 @@ void main() {
     expect(find.text('Sahte Ünite'), findsOneWidget);
   });
 
+  testWidgets('geniş ekranda günlük kartta bugün tekrar satırı', (
+    tester,
+  ) async {
+    // Bugün 2026-10-15: iki kart vadesi gelmiş, biri gelecekte.
+    final depo = BellekDepo(
+      const OgrenciDurumu(
+        alan: 'dil',
+        kartlar: {
+          'a#0': Kart(kutu: 1, sonraki: '2026-10-15'),
+          'b#0': Kart(kutu: 1, sonraki: '2026-10-01'),
+          'c#0': Kart(kutu: 3, sonraki: '2026-10-20'),
+        },
+      ),
+    );
+    await uygulamayiAc(tester, depo, boyut: const Size(1200, 900));
+    expect(find.text('Bugün tekrar: 2 kelime'), findsOneWidget);
+    await dokun(tester, find.byKey(const ValueKey('gunluk-tekrar')));
+    expect(find.text('Bugün tekrar: 2 kelime'), findsNothing);
+    expect(find.byTooltip('Geri'), findsOneWidget);
+  });
+
+  testWidgets('geniş ekranda kart yoksa "Bugün tekrar yok"', (tester) async {
+    await uygulamayiAc(tester, null, boyut: const Size(1200, 900));
+    expect(find.text('Bugün tekrar yok'), findsOneWidget);
+  });
+
   testWidgets('dar ekranda alt gezinme çubuğu', (tester) async {
     await uygulamayiAc(tester, null, boyut: const Size(400, 800));
     expect(find.byType(NavigationBar), findsOneWidget);

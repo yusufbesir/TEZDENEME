@@ -162,4 +162,22 @@ void main() {
       );
     },
   );
+
+  test('hızlı test: enCok 5 → yalnız ilk açık üniteden 5 soru; varsayılan '
+      'davranış değişmez', () {
+    final k = _kurs(3);
+    final s = Motor.yerlestirmeSec(
+      const OgrenciDurumu(),
+      k,
+      tohum: 7,
+      enCok: Motor.yerlestirmeHizliSoru,
+    );
+    expect(s, hasLength(5));
+    expect(s.every((x) => x.unite == 0), isTrue);
+    expect(s.any((x) => x.alistirma is Soyle), isFalse);
+    expect(
+      Motor.yerlestirmeSec(const OgrenciDurumu(), k, tohum: 7),
+      hasLength(15),
+    );
+  });
 }
