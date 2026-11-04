@@ -49,6 +49,7 @@ import 'ekranlar/kelime_oynatici_ekrani.dart';
 import 'ekranlar/ornek_programlar_ekrani.dart';
 import 'ekranlar/projeler_ekrani.dart';
 import 'ekranlar/kabuk.dart';
+import 'ekranlar/kilit_ekrani.dart';
 import 'ekranlar/mikro_ders_ekrani.dart';
 import 'ekranlar/pratik_etkinlikleri.dart';
 import 'ekranlar/pratik_merkezi_ekrani.dart';
@@ -486,7 +487,7 @@ class AdimAdimUygulama extends ConsumerWidget {
             .toDouble();
         return MediaQuery(
           data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
-          child: child ?? const SizedBox.shrink(),
+          child: KilitKapisi(child: child ?? const SizedBox.shrink()),
         );
       },
     );

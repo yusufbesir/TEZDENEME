@@ -20,7 +20,8 @@
 /// hepsi boş liste; `kodProjeleri`: çok dosyalı kod projeleri ve oyun
 /// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
 /// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
-/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5)
+/// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5;
+/// `kilit`: uygulama kilidi PIN karması (model/kilit.dart), yoksa/bozuksa null)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
 /// `ilkAcilisTamam` alanı yoksa alan doluysa true sayılır: mevcut kullanıcı
@@ -28,6 +29,7 @@
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
+import 'kilit.dart';
 import 'kod_projesi.dart';
 import 'satranc_durumu.dart';
 
@@ -405,6 +407,7 @@ class OgrenciDurumu {
     this.haftalikNotlar = const {},
     this.kelimeEklenme = const {},
     this.oturumKartSayisi = varsayilanOturumKarti,
+    this.kilit,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -602,6 +605,10 @@ class OgrenciDurumu {
   /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
   final int oturumKartSayisi;
 
+  /// Uygulama kilidi (PIN karması; düz metin yok). null: kilit kapalı
+  /// (eski kayıtlar ve bozuk alan). Ayrıntı: model/kilit.dart.
+  final KilitAyari? kilit;
+
   static const List<int> oturumKartSecenekleri = [5, 10, 20];
   static const int varsayilanOturumKarti = 5;
 
@@ -723,6 +730,8 @@ class OgrenciDurumu {
     Map<String, String>? haftalikNotlar,
     Map<String, String>? kelimeEklenme,
     int? oturumKartSayisi,
+    KilitAyari? kilit,
+    bool kilitSil = false,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -792,6 +801,7 @@ class OgrenciDurumu {
       haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
       kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
       oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
+      kilit: kilitSil ? null : (kilit ?? this.kilit),
     );
   }
 
@@ -859,6 +869,7 @@ class OgrenciDurumu {
     'haftalikNotlar': haftalikNotlar,
     'kelimeEklenme': kelimeEklenme,
     'oturumKartSayisi': oturumKartSayisi,
+    'kilit': kilit?.toJson(),
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1164,6 +1175,8 @@ class OgrenciDurumu {
               oturumKartSecenekleri.contains(j['oturumKartSayisi']))
           ? j['oturumKartSayisi'] as int
           : varsayilanOturumKarti,
+      // Eski kayıtta yoksa ya da bozuksa kilit yok (kilitsiz açılış).
+      kilit: KilitAyari.fromJson(j['kilit']),
     );
   }
 
