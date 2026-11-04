@@ -108,6 +108,14 @@ class Sozluk {
         liste.add(m._kokle(normalize(m.kelime), null));
       }
     }
+    // Normalize metinler madde başına bir kez hesaplanır (sıralama ve arama
+    // her karşılaştırmada yeniden normalize etmesin).
+    _nKelime = Map.identity();
+    _nAnlam = Map.identity();
+    for (final m in liste) {
+      _nKelime[m] = normalize(m.kelime);
+      _nAnlam[m] = normalize(m.anlam);
+    }
     liste.sort(_alfabetik);
     this.maddeler = List.unmodifiable(liste);
     // Arama için kelime bazlı ifade kökü ("zebra crossing" → "zebra cross").
@@ -123,6 +131,10 @@ class Sozluk {
   late final List<SozlukMaddesi> maddeler;
 
   late final Set<String> _bilinen;
+
+  /// Madde başına önceden normalize edilmiş kelime ve anlam (kimlik anahtarlı).
+  late final Map<SozlukMaddesi, String> _nKelime;
+  late final Map<SozlukMaddesi, String> _nAnlam;
 
   /// İngilizce maddelerin kelime bazlı ifade kökü (yalnız aramada kullanılır).
   late final Map<SozlukMaddesi, String> _ifadeKoku;
@@ -227,6 +239,16 @@ class Sozluk {
   /// kenar boşlukları atılır. ("İ"→"i", "ı"→"i", "ş"→"s", "ğ"→"g",
   /// "ü"→"u", "ö"→"o", "ç"→"c".)
   static String normalize(String s) {
+    // Hızlı yol: yalnız ASCII ise sonuç küçük harfli kırpılmış metindir
+    // (I/i -> i zaten küçük harf eşlemesidir).
+    var ascii = true;
+    for (var i = 0; i < s.length; i++) {
+      if (s.codeUnitAt(i) > 127) {
+        ascii = false;
+        break;
+      }
+    }
+    if (ascii) return s.trim().toLowerCase();
     final b = StringBuffer();
     for (final r in s.trim().runes) {
       final ch = String.fromCharCode(r);
@@ -250,14 +272,14 @@ class Sozluk {
     return b.toString();
   }
 
-  static int _alfabetik(SozlukMaddesi a, SozlukMaddesi b) {
-    final k = normalize(a.kelime).compareTo(normalize(b.kelime));
+  int _alfabetik(SozlukMaddesi a, SozlukMaddesi b) {
+    final k = _nKelime[a]!.compareTo(_nKelime[b]!);
     if (k != 0) return k;
-    return normalize(a.anlam).compareTo(normalize(b.anlam));
+    return _nAnlam[a]!.compareTo(_nAnlam[b]!);
   }
 
   /// Sıklık (sık kelimeler önce, listede olmayanlar sonda), sonra alfabetik.
-  static int _siklikSonraAlfabetik(SozlukMaddesi a, SozlukMaddesi b) {
+  int _siklikSonraAlfabetik(SozlukMaddesi a, SozlukMaddesi b) {
     final sa = a.siklik, sb = b.siklik;
     if (sa != sb) {
       if (sa == null) return 1;
@@ -282,8 +304,8 @@ class Sozluk {
     final bas = <SozlukMaddesi>[];
     final ic = <SozlukMaddesi>[];
     for (final m in kaynak) {
-      final k = normalize(m.kelime);
-      final a = normalize(m.anlam);
+      final k = _nKelime[m]!;
+      final a = _nAnlam[m]!;
       final kokEsit = m.dil == 'en' && _ifadeKoku[m] == qKok;
       if (k.startsWith(q) || a.startsWith(q) || kokEsit) {
         bas.add(m);

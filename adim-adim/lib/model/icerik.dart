@@ -870,10 +870,20 @@ class Kurs {
 
   Iterable<Ders> get tumDersler => uniteler.expand((u) => u.dersler);
 
+  /// Kimliğe göre ders; ilk çağrıda kurs başına bir kez dizinlenir (Kurs
+  /// sabit olduğundan dizin geçerli kalır). Yinelenen kimlikte ilk ders döner.
   Ders? dersBul(String dersId) {
-    for (final d in tumDersler) {
-      if (d.id == dersId) return d;
+    var dizin = _dersDizinleri[this];
+    if (dizin == null) {
+      dizin = <String, Ders>{};
+      for (final d in tumDersler) {
+        dizin.putIfAbsent(d.id, () => d);
+      }
+      _dersDizinleri[this] = dizin;
     }
-    return null;
+    return dizin[dersId];
   }
+
+  static final Expando<Map<String, Ders>> _dersDizinleri =
+      Expando<Map<String, Ders>>('kursDersDizini');
 }

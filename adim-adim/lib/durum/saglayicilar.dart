@@ -93,6 +93,12 @@ final sozlukProvider = Provider<Sozluk>(
   (ref) => ref.watch(dilPaketleriProvider).sozluk,
 );
 
+/// Ünite bazlı kelime paketleri; sözlük ya da kurs listesi değişmedikçe bir
+/// kez hesaplanır (Sözlük ekranı her tuş vuruşunda yeniden kurmasın).
+final sozlukPaketleriProvider = Provider<List<KelimePaketi>>(
+  (ref) => ref.watch(sozlukProvider).paketler(ref.watch(kurslarProvider)),
+);
+
 /// Fiil çekim sözlüğü (ÖZELLİK 61): kurs tablolarından derlenen doğrulanmış
 /// çekimler; uydurma çekim yok.
 final fiilCekimleriProvider = Provider<FiilCekimleri>(
