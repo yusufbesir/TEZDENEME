@@ -4,6 +4,20 @@ import '../../model/icerik.dart';
 import '../../tema/tema.dart';
 import 'soru_basligi.dart';
 
+/// Eşleşen çiftin rengi (numara 1'den başlar). Renk tek başına işaret değildir:
+/// numara ve bağ simgesi her zaman yanındadır. Orta tonlar açık/koyu temada okunur.
+const List<Color> eslesmeRenkleri = [
+  Color(0xFF1E88E5), // mavi
+  Color(0xFFF57C00), // turuncu
+  Color(0xFF8E24AA), // mor
+  Color(0xFF00897B), // yeşil-mavi
+  Color(0xFFD81B60), // pembe
+  Color(0xFF6D4C41), // kahve
+];
+
+Color eslesmeRengi(int numara) =>
+    eslesmeRenkleri[(numara - 1) % eslesmeRenkleri.length];
+
 /// Eşleştirme: soldan bir öğe seç, sağdan eşini seç. Eşleşen çiftler aynı
 /// numarayı taşır (renge ek olarak sayı + simge). Eşleşmiş öğeye dokunmak eşi bozar.
 class EslestirGorunumu extends StatefulWidget {
@@ -164,13 +178,16 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
     required VoidCallback onTap,
   }) {
     final r = context.renkler;
+    // Eşleşmiş ama henüz kontrol edilmemiş öğe, çiftinin rengini taşır.
+    final ciftRengi = numara != null ? eslesmeRengi(numara) : null;
     final kenar = dogru
         ? r.dogru
         : yanlis
         ? r.hata
-        : (secili || numara != null)
-        ? r.ana
-        : r.kenar;
+        : ciftRengi ?? (secili ? r.ana : r.kenar);
+    final dolgu = (ciftRengi != null && !dogru && !yanlis)
+        ? ciftRengi.withValues(alpha: 0.14)
+        : null;
     final durum = dogru
         ? 'doğru eşleşme'
         : yanlis
@@ -189,7 +206,7 @@ class _EslestirDurumu extends State<EslestirGorunumu> {
         excludeSemantics: true,
         onTap: widget.kontrolEdildi ? null : onTap,
         child: Material(
-          color: secili ? r.yuzey : r.zemin,
+          color: dolgu ?? (secili ? r.yuzey : r.zemin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(Olcu.kose),
             side: BorderSide(
