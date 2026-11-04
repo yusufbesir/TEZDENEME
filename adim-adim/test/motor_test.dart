@@ -330,6 +330,35 @@ void main() {
       );
       expect(Motor.tekrarBekleyen(d, '2025-01-01'), ['b#0', 'a#0']);
     });
+
+    // Ana sayfa "Bugün tekrar: N kelime" satırı bu listenin uzunluğunu kullanır.
+    test('bugün tekrar sayısı: bugün ve geçmiş tarihli kartlar sayılır', () {
+      const d = OgrenciDurumu(
+        kartlar: {
+          'a#0': Kart(kutu: 1, sonraki: '2026-11-04'), // bugün
+          'b#0': Kart(kutu: 1, sonraki: '2026-10-30'), // geçmiş
+          'c#0': Kart(kutu: 3, sonraki: '2026-11-05'), // gelecek
+        },
+      );
+      expect(Motor.tekrarBekleyen(d, '2026-11-04').length, 2);
+    });
+
+    test('bugün tekrar sayısı: yalnız gelecek tarihli kartlar varsa 0', () {
+      const d = OgrenciDurumu(
+        kartlar: {
+          'a#0': Kart(kutu: 2, sonraki: '2026-11-05'),
+          'b#0': Kart(kutu: 4, sonraki: '2026-12-01'),
+        },
+      );
+      expect(Motor.tekrarBekleyen(d, '2026-11-04').length, 0);
+    });
+
+    test('bugün tekrar sayısı: boş durumda 0', () {
+      expect(
+        Motor.tekrarBekleyen(const OgrenciDurumu(), '2026-11-04').length,
+        0,
+      );
+    });
   });
 
   group('cevapDogruMu: indeksli türler', () {
