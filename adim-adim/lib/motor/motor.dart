@@ -467,6 +467,9 @@ abstract final class Motor {
   static const int yerlestirmeEnCok = 20;
   static const int yerlestirmeUniteEnAz = 3;
   static const int yerlestirmeUniteEnCok = 5;
+
+  /// İlk açılıştaki "hızlı seviye testi" soru sayısı (tek ünite, 5 soru).
+  static const int yerlestirmeHizliSoru = 5;
   static const double yerlestirmeEsik = 0.8;
 
   /// Ünite henüz tam bitmemiş mi (en az bir dersi bitmiş değil)?
@@ -512,18 +515,22 @@ abstract final class Motor {
   /// dolaşarak 3..5 mevcut alıştırma; toplam en çok [yerlestirmeEnCok] (çok
   /// ünite varsa ilk 6 ünite). Konuşma ([Soyle]) alıştırmaları seçilmez.
   /// `unite` = kurs.uniteler içindeki indeks. Aynı [tohum] aynı sonucu verir.
+  /// [enCok] toplam soru üst sınırını değiştirir (varsayılan
+  /// [yerlestirmeEnCok]); hızlı test için [yerlestirmeHizliSoru] verilir ve
+  /// yalnız ilk açık ünite yoklanır.
   static List<({int unite, String kartId, Alistirma alistirma})> yerlestirmeSec(
     OgrenciDurumu d,
     Kurs kurs, {
     int tohum = 0,
+    int enCok = yerlestirmeEnCok,
   }) {
     final acik = [
       for (var i = 0; i < kurs.uniteler.length; i++)
         if (_uniteAcik(d, kurs.uniteler[i])) i,
     ];
-    final kullanilan = acik.take(yerlestirmeEnCok ~/ yerlestirmeUniteEnAz);
+    final kullanilan = acik.take(enCok ~/ yerlestirmeUniteEnAz);
     if (kullanilan.isEmpty) return const [];
-    final adet = (yerlestirmeEnCok ~/ kullanilan.length).clamp(
+    final adet = (enCok ~/ kullanilan.length).clamp(
       yerlestirmeUniteEnAz,
       yerlestirmeUniteEnCok,
     );
