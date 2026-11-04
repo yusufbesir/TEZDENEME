@@ -16,6 +16,7 @@ import '../depo/depo.dart';
 import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../model/kilit.dart';
 import '../model/satranc_durumu.dart';
 import '../motor/basarimlar.dart';
 import '../motor/efsanevi.dart';
@@ -628,6 +629,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     }
     return true;
   }
+
+  /// Uygulama kilidi: [kilit] verilirse açılır (PIN karması saklanır), null
+  /// ise kapatılır. PIN doğrulaması çağıranda yapılır (ayarlar ekranı).
+  Future<OgrenciDurumu> kilitAyarla(KilitAyari? kilit) => _uygula(
+    (d) => kilit == null ? d.copyWith(kilitSil: true) : d.copyWith(kilit: kilit),
+  );
 
   Future<void> sifirla() async {
     try {

@@ -17,6 +17,7 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../bilesenler/ses_hiz_secici.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
+import '../model/kilit.dart';
 import '../motor/hatirlatici.dart';
 import '../motor/motor.dart';
 import '../motor/pratik_oturumlari.dart';
@@ -150,6 +151,34 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
             ],
           ),
         ),
+      );
+    }
+  }
+
+  /// PIN iletişim kutusu; [pin] girilen değeri döndürür (iptalde null).
+  Future<String?> _pinSor(String baslik, {bool tekrarli = false}) {
+    return showDialog<String>(
+      context: context,
+      builder: (c) => _PinDiyalogu(baslik: baslik, tekrarli: tekrarli),
+    );
+  }
+
+  Future<void> _kilitKur() async {
+    final pin = await _pinSor('4 haneli PIN belirle', tekrarli: true);
+    if (pin == null || !KilitAyari.pinGecerli(pin)) return;
+    await ref.read(durumProvider.notifier).kilitAyarla(KilitAyari.olustur(pin));
+  }
+
+  Future<void> _kilitKapat() async {
+    final kilit = ref.read(durumProvider).value?.kilit;
+    if (kilit == null) return;
+    final pin = await _pinSor('Kilidi kapatmak için PIN gir');
+    if (pin == null) return;
+    if (kilit.dogrula(pin)) {
+      await ref.read(durumProvider.notifier).kilitAyarla(null);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Yanlış PIN, kilit açık kaldı')),
       );
     }
   }
@@ -510,6 +539,17 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                 onChanged: (v) => notifier.ayarGuncelle(konusmaAcik: v),
               ),
               SwitchListTile(
+                key: const ValueKey('ayar-kilit'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.lock_outline, color: r.ana),
+                title: const Text('Uygulama kilidi'),
+                subtitle: const Text(
+                  'Bu kilit uygulama arayüzünü korur, dosya şifrelemesi değildir.',
+                ),
+                value: durum.kilit != null,
+                onChanged: (v) => v ? _kilitKur() : _kilitKapat(),
+              ),
+              SwitchListTile(
                 key: const ValueKey('ayar-akilli-hatirlatici'),
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(
@@ -558,6 +598,90 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// PIN girişi (gizli alan). [tekrarli]: ikinci kez doğrulatır. PIN yalnız
+/// iletişim kutusunun ömründe bellekte durur; loglanmaz.
+class _PinDiyalogu extends StatefulWidget {
+  const _PinDiyalogu({required this.baslik, required this.tekrarli});
+
+  final String baslik;
+  final bool tekrarli;
+
+  @override
+  State<_PinDiyalogu> createState() => _PinDiyalogDurumu();
+}
+
+class _PinDiyalogDurumu extends State<_PinDiyalogu> {
+  final _pin = TextEditingController();
+  final _tekrar = TextEditingController();
+  String? _hata;
+
+  @override
+  void dispose() {
+    _pin.dispose();
+    _tekrar.dispose();
+    super.dispose();
+  }
+
+  void _tamam() {
+    if (!KilitAyari.pinGecerli(_pin.text)) {
+      setState(() => _hata = 'PIN 4-6 rakam olmalı');
+      return;
+    }
+    if (widget.tekrarli && _pin.text != _tekrar.text) {
+      setState(() => _hata = 'PIN\'ler aynı değil');
+      return;
+    }
+    Navigator.pop(context, _pin.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.baslik),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            key: const ValueKey('pin-alan'),
+            controller: _pin,
+            autofocus: true,
+            obscureText: true,
+            keyboardType: TextInputType.number,
+            maxLength: KilitAyari.enCokPin,
+            decoration: const InputDecoration(labelText: 'PIN'),
+          ),
+          if (widget.tekrarli)
+            TextField(
+              key: const ValueKey('pin-tekrar'),
+              controller: _tekrar,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: KilitAyari.enCokPin,
+              decoration: const InputDecoration(labelText: 'PIN (tekrar)'),
+            ),
+          if (_hata != null)
+            Text(
+              _hata!,
+              key: const ValueKey('pin-hata'),
+              style: TextStyle(color: context.renkler.hata),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Vazgeç'),
+        ),
+        FilledButton(
+          key: const ValueKey('pin-tamam'),
+          onPressed: _tamam,
+          child: const Text('Tamam'),
+        ),
+      ],
     );
   }
 }
