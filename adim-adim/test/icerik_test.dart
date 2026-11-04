@@ -139,9 +139,11 @@ void main() {
     expect(idler.toSet().length, idler.length);
   });
 
-  test('her ders 8-10 alıştırma içerir (konuşma alıştırması ayrı sayılır)', () {
+  test('her ders 8-10 alıştırma içerir (konuşma ve dikte ayrı sayılır)', () {
     for (final d in _dersler()) {
-      final sayi = d.alistirmalar.where((a) => a is! Soyle).length;
+      final sayi = d.alistirmalar
+          .where((a) => a is! Soyle && a is! Dikte)
+          .length;
       expect(sayi, inInclusiveRange(8, 10), reason: d.id);
     }
   });
