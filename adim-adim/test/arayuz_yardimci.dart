@@ -79,6 +79,12 @@ class SahteBildirim implements BildirimServisi {
   }
 
   @override
+  Future<bool> akilliHatirlatma(String metin) async {
+    cagrilar.add('akilli');
+    return izin;
+  }
+
+  @override
   Future<void> iptal() async => cagrilar.add('iptal');
 }
 
