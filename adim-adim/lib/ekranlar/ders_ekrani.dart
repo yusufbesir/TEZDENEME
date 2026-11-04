@@ -26,6 +26,7 @@ import '../motor/ders_meta.dart';
 import '../motor/ders_ogeleri.dart';
 import '../motor/dilbilgisi_ipucu.dart';
 import '../motor/kolaylastirma.dart';
+import '../motor/cekim_turu.dart';
 import '../motor/motor.dart';
 import '../motor/oturum_ozeti.dart';
 import '../motor/satranc_calisma.dart';
@@ -246,6 +247,12 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
                     ? () => context.push(
                         '/ders-ogeleri/${Uri.encodeComponent(ders.id)}',
                       )
+                    : null,
+                ek4Etiket: CekimTuru.soruSayisi(ders, _yanlislar) > 0
+                    ? '${CekimTuru.adet} soruluk çekim turu'
+                    : null,
+                onEk4: CekimTuru.soruSayisi(ders, _yanlislar) > 0
+                    ? () => context.push(CekimTuru.rota(ders.id, _yanlislar))
                     : null,
                 bilgi: _ustalik(ders),
                 oturum: _veri == null ? null : OturumOzeti(veri: _veri!),
