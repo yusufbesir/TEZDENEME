@@ -1794,12 +1794,14 @@ abstract final class Motor {
         if (c.isEmpty) return false;
         return a.cevaplar.any((k) => _normalle(k) == c);
       case Sirala():
+        // `dogru` ya da `kabul` içindeki herhangi bir sırayla birebir eşleşme.
         if (cevap is! List || cevap.length != a.dogru.length) return false;
-        for (var i = 0; i < cevap.length; i++) {
-          final e = cevap[i];
-          if (e is! String || e != a.dogru[i]) return false;
+        final sira = <String>[];
+        for (final e in cevap) {
+          if (e is! String) return false;
+          sira.add(e);
         }
-        return true;
+        return a.siraGecerliMi(sira);
       case Eslestir():
         if (cevap is! List || cevap.length != a.ciftler.length) return false;
         final kalan = List<({String sol, String sag})>.of(a.ciftler);

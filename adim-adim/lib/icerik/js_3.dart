@@ -860,6 +860,9 @@ const Kurs js3 = Kurs(
               soru: 'Jest i geliştirme bağımlılığı olarak kuran komutu sırala.',
               kelimeler: ['jest', 'npm', '--save-dev', 'install'],
               dogru: ['npm', 'install', '--save-dev', 'jest'],
+              kabul: [
+                ['npm', 'install', 'jest', '--save-dev'],
+              ],
               aciklama:
                   '--save-dev paketi yalnız geliştirme bağımlılığı olarak kaydeder.',
             ),
