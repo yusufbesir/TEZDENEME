@@ -17,6 +17,10 @@ abstract class BildirimServisi {
   /// Hemen gösterilen "günün dersi hazır" bildirimi ([adet]: alıştırma sayısı).
   /// İzin yoksa ya da başlatılamadıysa false; hata fırlatmaz.
   Future<bool> gunDersiBildirimi(int adet);
+
+  /// Hemen gösterilen akıllı hatırlatıcı (SADE 6; günde en çok bir kez, karar
+  /// Hatirlatici'de). İzin yoksa ya da başlatılamadıysa false; hata fırlatmaz.
+  Future<bool> akilliHatirlatma(String metin);
   Future<void> iptal();
 }
 
@@ -30,6 +34,9 @@ class GercekBildirim implements BildirimServisi {
   Future<bool> tekrarBildirimi(int sayi) => Bildirim.tekrarBildirimi(sayi);
   @override
   Future<bool> gunDersiBildirimi(int adet) => Bildirim.gunDersiBildirimi(adet);
+  @override
+  Future<bool> akilliHatirlatma(String metin) =>
+      Bildirim.akilliHatirlatma(metin);
   @override
   Future<void> iptal() => Bildirim.iptal();
 }
@@ -50,6 +57,9 @@ abstract final class Bildirim {
 
   /// "Günün dersi" bildiriminin kimliği (öbürlerini ezmesin).
   static const int _gunDersiKimlik = 3;
+
+  /// Akıllı hatırlatıcının kimliği (öbürlerini ezmesin).
+  static const int _akilliKimlik = 4;
 
   /// Windows toast etkinleştirme geri çağrısını tanımlayan GUID. Sabit
   /// olmalı: Windows, bildirimi uygulamayla bu GUID (ve appUserModelId) ile
@@ -188,6 +198,34 @@ abstract final class Bildirim {
       return true;
     } catch (e) {
       debugPrint('Günün dersi bildirimi gösterilemedi: $e');
+      return false;
+    }
+  }
+
+  /// Akıllı hatırlatıcıyı hemen gösterir (zamanlanmaz); günün dersi
+  /// bildirimiyle aynı kurallar (izin penceresi açmaz, hata fırlatmaz).
+  static Future<bool> akilliHatirlatma(String metin) async {
+    try {
+      if (metin.trim().isEmpty) return false;
+      if (!await _baslat()) return false;
+      await _eklenti.show(
+        id: _akilliKimlik,
+        title: 'Adım Adım',
+        body: metin,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'akilli_hatirlatici',
+            'Akıllı hatırlatıcı',
+            channelDescription: 'Günde en çok bir çalışma hatırlatması',
+          ),
+          iOS: DarwinNotificationDetails(),
+          macOS: DarwinNotificationDetails(),
+          windows: WindowsNotificationDetails(),
+        ),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Akıllı hatırlatıcı gösterilemedi: $e');
       return false;
     }
   }
