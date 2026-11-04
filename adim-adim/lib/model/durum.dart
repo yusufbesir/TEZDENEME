@@ -40,6 +40,7 @@ class Kart {
     required this.sonraki,
     this.yariOmurGun = 1.0,
     this.sonCevap,
+    this.sonDerece,
   });
 
   /// En kısa ve en uzun yarı ömür (gün).
@@ -64,6 +65,11 @@ class Kart {
   /// Son cevap doğru muydu? null: bilinmiyor (eski kayıt ya da hiç cevaplanmadı).
   final bool? sonCevap;
 
+  /// Son doğru cevapta kullanıcının seçtiği güven derecesi (SM-2 kalitesi):
+  /// 'zor', 'iyi' ya da 'kolay'. null: derece seçilmedi (eski kayıt, yanlış
+  /// cevap ya da derece sorulmayan ekran). İsteğe bağlı; yalnız doluysa yazılır.
+  final String? sonDerece;
+
   /// Yarı ömürden 1..5 gösterge kutusu: <2 gün 1, <4 gün 2, <8 gün 3,
   /// <16 gün 4, daha fazlası 5.
   static int kutuHesapla(double yariOmur) {
@@ -84,6 +90,7 @@ class Kart {
     'sonraki': sonraki,
     'yariOmurGun': yariOmurGun,
     'sonCevap': sonCevap,
+    if (sonDerece != null) 'sonDerece': sonDerece,
   };
 
   static Kart? fromJson(Object? j) {
@@ -101,13 +108,33 @@ class Kart {
         ? ham.toDouble()
         : kutudanYariOmur(kutu);
     final son = j['sonCevap'];
+    final derece = j['sonDerece'];
     return Kart(
       kutu: kutu,
       sonraki: sonraki,
       yariOmurGun: yariOmur,
       sonCevap: son is bool ? son : null,
+      sonDerece: (derece is String && GuvenDerecesi.kodlar.contains(derece))
+          ? derece
+          : null,
     );
   }
+}
+
+/// Tekrar ekranındaki üç düğmeli güven derecesi (SM-2 mantığında üç kalite).
+/// Yalnız doğru cevaptan sonra sorulur; yarı ömür çarpanı: zor x1,3, iyi x2
+/// (eski "doğru" ile aynı), kolay x3.
+enum GuvenDerecesi {
+  zor('zor', 'Zor', 1.3),
+  iyi('iyi', 'İyi', 2.0),
+  kolay('kolay', 'Kolay', 3.0);
+
+  const GuvenDerecesi(this.kod, this.etiket, this.carpan);
+  final String kod;
+  final String etiket;
+  final double carpan;
+
+  static const List<String> kodlar = ['zor', 'iyi', 'kolay'];
 }
 
 /// Hata defteri kaydı: yanlış cevaplanan bir yarışma sorusu ya da alıştırma kartı.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/dilbilgisi_ipucu.dart';
+import '../model/durum.dart';
 import '../model/icerik.dart';
 import '../motor/motor.dart';
 import '../tema/tema.dart';
@@ -31,6 +32,8 @@ class AlistirmaOturumu extends StatefulWidget {
     this.ust,
     this.dilbilgisiIpucu,
     this.cikisOnayi = true,
+    this.guvenSor = false,
+    this.onGuven,
   });
 
   final List<Alistirma> alistirmalar;
@@ -66,6 +69,14 @@ class AlistirmaOturumu extends StatefulWidget {
   /// sormadan [onKapat] çağrılır. Kendi onay penceresi olan ekranlar false verir.
   final bool cikisOnayi;
 
+  /// true: ilk cevabı doğru olan sorudan sonra bantta üç düğmeli güven derecesi
+  /// ("Zor / İyi / Kolay") satırı görünür (Tekrar ekranı). Seçilmezse "İyi"
+  /// sayılır (eski doğru davranışı); seçim [onGuven]'e gider.
+  final bool guvenSor;
+
+  /// Güven derecesi seçilince çağrılır: (alıştırma indeksi, derece).
+  final void Function(int indeks, GuvenDerecesi derece)? onGuven;
+
   @override
   State<AlistirmaOturumu> createState() => _OturumDurumu();
 }
@@ -82,6 +93,12 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
 
   /// Bu sorunun ilk cevabı onSonuc'a bildirildi mi?
   bool _bildirildi = false;
+
+  /// Bu sorunun ilk cevabı doğru muydu (güven derecesi yalnız o zaman sorulur)?
+  bool _ilkDogru = false;
+
+  /// Bu soruda seçilen güven derecesi (null: seçilmedi = iyi).
+  GuvenDerecesi? _derece;
 
   /// Bu oturumda cevaplanan (ilk cevabı verilen) soru sayısı.
   int _cevaplanan = 0;
@@ -129,6 +146,8 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
       if (dogru && ilk) _dogru++;
       _bildirildi = true;
       if (ilk) {
+        _ilkDogru = dogru;
+        _derece = null;
         _cevaplanan++;
         _kombo = Kombo.sonraki(_kombo, dogru);
       }
@@ -176,7 +195,14 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
       _dogruMu = false;
       _ipucuAdim = 0;
       _bildirildi = false;
+      _ilkDogru = false;
+      _derece = null;
     });
+  }
+
+  void _guvenSec(GuvenDerecesi g) {
+    setState(() => _derece = g);
+    widget.onGuven?.call(_indeks, g);
   }
 
   /// Alıştırma kartı; [AlistirmaOturumu.ust] varsa onun altında.
@@ -296,6 +322,8 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
             ),
           ),
         ),
+        if (_kontrolEdildi && widget.guvenSor && _ilkDogru && _dogruMu)
+          _GuvenSatiri(secili: _derece, onSec: _guvenSec),
         if (_kontrolEdildi)
           GeriBildirimBandi(
             dogruMu: _dogruMu,
@@ -354,6 +382,61 @@ class _OturumDurumu extends State<AlistirmaOturumu> {
         if (!gecti) _cikisIste();
       },
       child: icerik,
+    );
+  }
+}
+
+/// Güven derecesi satırı: "Ne kadar kolaydı?" ve Zor / İyi / Kolay düğmeleri.
+class _GuvenSatiri extends StatelessWidget {
+  const _GuvenSatiri({required this.secili, required this.onSec});
+
+  final GuvenDerecesi? secili;
+  final void Function(GuvenDerecesi) onSec;
+
+  @override
+  Widget build(BuildContext context) {
+    final yazi = Theme.of(context).textTheme;
+    final r = context.renkler;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(Olcu.b2, Olcu.b1, Olcu.b2, 0),
+      child: Align(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Olcu.icerikGenislik),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Ne kadar kolaydı?',
+                style: yazi.labelLarge?.copyWith(color: r.metinIkincil),
+              ),
+              const SizedBox(height: Olcu.b1),
+              Row(
+                children: [
+                  for (final g in GuvenDerecesi.values) ...[
+                    Expanded(
+                      child: secili == g
+                          ? FilledButton(
+                              key: Key('guven-${g.kod}'),
+                              onPressed: () => onSec(g),
+                              child: Text(g.etiket),
+                            )
+                          : OutlinedButton(
+                              key: Key('guven-${g.kod}'),
+                              onPressed: () => onSec(g),
+                              child: Text(g.etiket),
+                            ),
+                    ),
+                    if (g != GuvenDerecesi.values.last)
+                      const SizedBox(width: Olcu.b1),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
