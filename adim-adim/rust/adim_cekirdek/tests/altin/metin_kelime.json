@@ -1,0 +1,432 @@
+[
+ {
+  "metin": "",
+  "dil": "en",
+  "sonuc": []
+ },
+ {
+  "metin": "   ",
+  "dil": "en",
+  "sonuc": []
+ },
+ {
+  "metin": "Hello, hello World! 123",
+  "dil": "en",
+  "sonuc": [
+   "hello",
+   "world"
+  ]
+ },
+ {
+  "metin": "Don't stop; they’re here. Can’t",
+  "dil": "en",
+  "sonuc": [
+   "don't",
+   "stop",
+   "they're",
+   "here",
+   "can't"
+  ]
+ },
+ {
+  "metin": "IŞIK İzmir ılık İNCE",
+  "dil": "tr",
+  "sonuc": [
+   "ışık",
+   "izmir",
+   "ılık",
+   "ince"
+  ]
+ },
+ {
+  "metin": "IŞIK İzmir ılık İNCE",
+  "dil": "en",
+  "sonuc": [
+   "işik",
+   "izmir",
+   "ılık",
+   "ince"
+  ]
+ },
+ {
+  "metin": "Straße ÀÉÎÕÜ àéîõü ß",
+  "dil": "de",
+  "sonuc": [
+   "straße",
+   "àéîõü",
+   "ß"
+  ]
+ },
+ {
+  "metin": "naïve café résumé",
+  "dil": "fr",
+  "sonuc": [
+   "naïve",
+   "café",
+   "résumé"
+  ]
+ },
+ {
+  "metin": "Привет мир hello",
+  "dil": "ru",
+  "sonuc": []
+ },
+ {
+  "metin": "こんにちは world",
+  "dil": "ja",
+  "sonuc": []
+ },
+ {
+  "metin": "你好 hello",
+  "dil": "zh",
+  "sonuc": []
+ },
+ {
+  "metin": "안녕 hello",
+  "dil": "ko",
+  "sonuc": []
+ },
+ {
+  "metin": "مرحبا hello",
+  "dil": "ar",
+  "sonuc": []
+ },
+ {
+  "metin": "Привет мир hello",
+  "dil": "en",
+  "sonuc": [
+   "hello"
+  ]
+ },
+ {
+  "metin": "a1b2c3 x_y-z",
+  "dil": "en",
+  "sonuc": [
+   "a",
+   "b",
+   "c",
+   "x",
+   "y",
+   "z"
+  ]
+ },
+ {
+  "metin": "''quote'' 'a' a'b' a''b",
+  "dil": "en",
+  "sonuc": [
+   "quote",
+   "a",
+   "a'b",
+   "b"
+  ]
+ },
+ {
+  "metin": "ǅ ǆ ǈ ﬃ ŉ ſ",
+  "dil": "en",
+  "sonuc": [
+   "ǆ",
+   "ǉ",
+   "ﬃ",
+   "ŉ",
+   "ſ"
+  ]
+ },
+ {
+  "metin": "Ελληνικά abc",
+  "dil": "en",
+  "sonuc": [
+   "abc"
+  ]
+ },
+ {
+  "metin": "ÇOK şeker ĞÜŞİÖÇ",
+  "dil": "tr",
+  "sonuc": [
+   "çok",
+   "şeker",
+   "ğüşiöç"
+  ]
+ },
+ {
+  "metin": "ΣΊΣΥΦΟΣ latin",
+  "dil": "en",
+  "sonuc": [
+   "latin"
+  ]
+ },
+ {
+  "metin": "word́ acute",
+  "dil": "en",
+  "sonuc": [
+   "word",
+   "acute"
+  ]
+ },
+ {
+  "metin": "école",
+  "dil": "fr",
+  "sonuc": [
+   "e",
+   "cole"
+  ]
+ },
+ {
+  "metin": "tab\tnewline\nword",
+  "dil": "en",
+  "sonuc": [
+   "tab",
+   "newline",
+   "word"
+  ]
+ },
+ {
+  "metin": "kelimeaax kelimebax kelimecax kelimedax kelimeeax kelimefax kelimegax kelimehax kelimeiax kelimejax kelimekax kelimelax kelimemax kelimenax kelimeoax kelimepax kelimeqax kelimerax kelimesax kelimetax kelimeuax kelimevax kelimewax kelimexax kelimeyax kelimezax kelimeabx kelimebbx kelimecbx kelimedbx kelimeebx kelimefbx kelimegbx kelimehbx kelimeibx kelimejbx kelimekbx kelimelbx kelimembx kelimenbx kelimeobx kelimepbx kelimeqbx kelimerbx kelimesbx kelimetbx kelimeubx kelimevbx kelimewbx kelimexbx kelimeybx kelimezbx kelimeacx kelimebcx kelimeccx kelimedcx kelimeecx kelimefcx kelimegcx kelimehcx kelimeicx kelimejcx kelimekcx kelimelcx kelimemcx kelimencx kelimeocx kelimepcx kelimeqcx kelimercx kelimescx kelimetcx kelimeucx kelimevcx kelimewcx kelimexcx kelimeycx kelimezcx kelimeadx kelimebdx kelimecdx kelimeddx kelimeedx kelimefdx kelimegdx kelimehdx kelimeidx kelimejdx kelimekdx kelimeldx kelimemdx kelimendx kelimeodx kelimepdx kelimeqdx kelimerdx kelimesdx kelimetdx kelimeudx kelimevdx kelimewdx kelimexdx kelimeydx kelimezdx kelimeaex kelimebex kelimecex kelimedex kelimeeex kelimefex kelimegex kelimehex kelimeiex kelimejex kelimekex kelimelex kelimemex kelimenex kelimeoex kelimepex kelimeqex kelimerex kelimesex kelimetex kelimeuex kelimevex kelimewex kelimexex kelimeyex kelimezex kelimeafx kelimebfx kelimecfx kelimedfx kelimeefx kelimeffx kelimegfx kelimehfx kelimeifx kelimejfx kelimekfx kelimelfx kelimemfx kelimenfx kelimeofx kelimepfx kelimeqfx kelimerfx kelimesfx kelimetfx kelimeufx kelimevfx kelimewfx kelimexfx kelimeyfx kelimezfx kelimeagx kelimebgx kelimecgx kelimedgx kelimeegx kelimefgx kelimeggx kelimehgx kelimeigx kelimejgx kelimekgx kelimelgx kelimemgx kelimengx kelimeogx kelimepgx kelimeqgx kelimergx kelimesgx kelimetgx kelimeugx kelimevgx kelimewgx kelimexgx kelimeygx kelimezgx kelimeahx kelimebhx kelimechx kelimedhx kelimeehx kelimefhx kelimeghx kelimehhx kelimeihx kelimejhx kelimekhx kelimelhx kelimemhx kelimenhx kelimeohx kelimephx kelimeqhx kelimerhx kelimeshx kelimethx kelimeuhx kelimevhx kelimewhx kelimexhx kelimeyhx kelimezhx kelimeaix kelimebix kelimecix kelimedix kelimeeix kelimefix kelimegix kelimehix kelimeiix kelimejix kelimekix kelimelix kelimemix kelimenix kelimeoix kelimepix kelimeqix kelimerix kelimesix kelimetix kelimeuix kelimevix kelimewix kelimexix kelimeyix kelimezix kelimeajx kelimebjx kelimecjx kelimedjx kelimeejx kelimefjx kelimegjx kelimehjx kelimeijx kelimejjx kelimekjx kelimeljx kelimemjx kelimenjx kelimeojx kelimepjx kelimeqjx kelimerjx kelimesjx kelimetjx kelimeujx kelimevjx kelimewjx kelimexjx kelimeyjx kelimezjx kelimeakx kelimebkx kelimeckx kelimedkx kelimeekx kelimefkx kelimegkx kelimehkx kelimeikx kelimejkx kelimekkx kelimelkx kelimemkx kelimenkx kelimeokx kelimepkx kelimeqkx kelimerkx kelimeskx kelimetkx kelimeukx kelimevkx kelimewkx kelimexkx kelimeykx kelimezkx kelimealx kelimeblx kelimeclx kelimedlx kelimeelx kelimeflx kelimeglx kelimehlx kelimeilx kelimejlx kelimeklx kelimellx kelimemlx kelimenlx",
+  "dil": "en",
+  "sonuc": [
+   "kelimeaax",
+   "kelimebax",
+   "kelimecax",
+   "kelimedax",
+   "kelimeeax",
+   "kelimefax",
+   "kelimegax",
+   "kelimehax",
+   "kelimeiax",
+   "kelimejax",
+   "kelimekax",
+   "kelimelax",
+   "kelimemax",
+   "kelimenax",
+   "kelimeoax",
+   "kelimepax",
+   "kelimeqax",
+   "kelimerax",
+   "kelimesax",
+   "kelimetax",
+   "kelimeuax",
+   "kelimevax",
+   "kelimewax",
+   "kelimexax",
+   "kelimeyax",
+   "kelimezax",
+   "kelimeabx",
+   "kelimebbx",
+   "kelimecbx",
+   "kelimedbx",
+   "kelimeebx",
+   "kelimefbx",
+   "kelimegbx",
+   "kelimehbx",
+   "kelimeibx",
+   "kelimejbx",
+   "kelimekbx",
+   "kelimelbx",
+   "kelimembx",
+   "kelimenbx",
+   "kelimeobx",
+   "kelimepbx",
+   "kelimeqbx",
+   "kelimerbx",
+   "kelimesbx",
+   "kelimetbx",
+   "kelimeubx",
+   "kelimevbx",
+   "kelimewbx",
+   "kelimexbx",
+   "kelimeybx",
+   "kelimezbx",
+   "kelimeacx",
+   "kelimebcx",
+   "kelimeccx",
+   "kelimedcx",
+   "kelimeecx",
+   "kelimefcx",
+   "kelimegcx",
+   "kelimehcx",
+   "kelimeicx",
+   "kelimejcx",
+   "kelimekcx",
+   "kelimelcx",
+   "kelimemcx",
+   "kelimencx",
+   "kelimeocx",
+   "kelimepcx",
+   "kelimeqcx",
+   "kelimercx",
+   "kelimescx",
+   "kelimetcx",
+   "kelimeucx",
+   "kelimevcx",
+   "kelimewcx",
+   "kelimexcx",
+   "kelimeycx",
+   "kelimezcx",
+   "kelimeadx",
+   "kelimebdx",
+   "kelimecdx",
+   "kelimeddx",
+   "kelimeedx",
+   "kelimefdx",
+   "kelimegdx",
+   "kelimehdx",
+   "kelimeidx",
+   "kelimejdx",
+   "kelimekdx",
+   "kelimeldx",
+   "kelimemdx",
+   "kelimendx",
+   "kelimeodx",
+   "kelimepdx",
+   "kelimeqdx",
+   "kelimerdx",
+   "kelimesdx",
+   "kelimetdx",
+   "kelimeudx",
+   "kelimevdx",
+   "kelimewdx",
+   "kelimexdx",
+   "kelimeydx",
+   "kelimezdx",
+   "kelimeaex",
+   "kelimebex",
+   "kelimecex",
+   "kelimedex",
+   "kelimeeex",
+   "kelimefex",
+   "kelimegex",
+   "kelimehex",
+   "kelimeiex",
+   "kelimejex",
+   "kelimekex",
+   "kelimelex",
+   "kelimemex",
+   "kelimenex",
+   "kelimeoex",
+   "kelimepex",
+   "kelimeqex",
+   "kelimerex",
+   "kelimesex",
+   "kelimetex",
+   "kelimeuex",
+   "kelimevex",
+   "kelimewex",
+   "kelimexex",
+   "kelimeyex",
+   "kelimezex",
+   "kelimeafx",
+   "kelimebfx",
+   "kelimecfx",
+   "kelimedfx",
+   "kelimeefx",
+   "kelimeffx",
+   "kelimegfx",
+   "kelimehfx",
+   "kelimeifx",
+   "kelimejfx",
+   "kelimekfx",
+   "kelimelfx",
+   "kelimemfx",
+   "kelimenfx",
+   "kelimeofx",
+   "kelimepfx",
+   "kelimeqfx",
+   "kelimerfx",
+   "kelimesfx",
+   "kelimetfx",
+   "kelimeufx",
+   "kelimevfx",
+   "kelimewfx",
+   "kelimexfx",
+   "kelimeyfx",
+   "kelimezfx",
+   "kelimeagx",
+   "kelimebgx",
+   "kelimecgx",
+   "kelimedgx",
+   "kelimeegx",
+   "kelimefgx",
+   "kelimeggx",
+   "kelimehgx",
+   "kelimeigx",
+   "kelimejgx",
+   "kelimekgx",
+   "kelimelgx",
+   "kelimemgx",
+   "kelimengx",
+   "kelimeogx",
+   "kelimepgx",
+   "kelimeqgx",
+   "kelimergx",
+   "kelimesgx",
+   "kelimetgx",
+   "kelimeugx",
+   "kelimevgx",
+   "kelimewgx",
+   "kelimexgx",
+   "kelimeygx",
+   "kelimezgx",
+   "kelimeahx",
+   "kelimebhx",
+   "kelimechx",
+   "kelimedhx",
+   "kelimeehx",
+   "kelimefhx",
+   "kelimeghx",
+   "kelimehhx",
+   "kelimeihx",
+   "kelimejhx",
+   "kelimekhx",
+   "kelimelhx",
+   "kelimemhx",
+   "kelimenhx",
+   "kelimeohx",
+   "kelimephx",
+   "kelimeqhx",
+   "kelimerhx"
+  ]
+ },
+ {
+  "metin": "abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc sonkelime",
+  "dil": "en",
+  "sonuc": [
+   "abc"
+  ]
+ },
+ {
+  "metin": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀 kelimeA kelimeB kelimeC",
+  "dil": "en",
+  "sonuc": [
+   "kelimea",
+   "kelimeb",
+   "kel"
+  ]
+ },
+ {
+  "metin": "Ǆ",
+  "dil": "tr",
+  "sonuc": [
+   "ǆ"
+  ]
+ },
+ {
+  "metin": "İİİ",
+  "dil": "tr",
+  "sonuc": [
+   "iii"
+  ]
+ },
+ {
+  "metin": "İİİ",
+  "dil": "en",
+  "sonuc": [
+   "iii"
+  ]
+ },
+ {
+  "metin": "ẞ",
+  "dil": "de",
+  "sonuc": [
+   "ß"
+  ]
+ }
+]

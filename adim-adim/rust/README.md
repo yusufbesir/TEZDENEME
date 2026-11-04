@@ -8,4 +8,4 @@ cd rust && cargo test && cargo clippy --all-targets -- -D warnings && cargo fmt 
 dart run tool/altin_normalize.dart   # çıktının ilk `[` öncesi Flutter satırlarını ayıkla
 ```
 
-Plan: `docs/PLAN-RUST-PYTHON-GECIS.md`. Aşama 1 ilerlemesi: sozluk::normalize ✓, dikte::dikte_farki ✓, kart::kart_hesapla + gün işlemleri ✓ (kalan: yerleştirme seçimi, karışık sıra [Dart Random(tohum) algoritması gerekir], metin_kelime).
+Plan: `docs/PLAN-RUST-PYTHON-GECIS.md`. Aşama 1 ilerlemesi: sozluk::normalize ✓, dikte::dikte_farki ✓, kart::kart_hesapla + gün işlemleri ✓, metin_kelime::kelimeleri_ayir ✓ (30 vektör; sözlük eşleme Dart'ta kalır). Kalan: yerleştirme seçimi, karışık sıra [Dart Random(tohum) algoritması gerekir].
