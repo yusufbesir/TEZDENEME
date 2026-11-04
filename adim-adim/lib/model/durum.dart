@@ -427,6 +427,27 @@ class OgrenciDurumu {
   static const int gunlukSureEnCok = 1000;
   static const int aylikEnCok = 600;
 
+  /// Yedek/ilerleme dosyası şema sınırları (SADE 4, güvenlik): bozuk ya da
+  /// şişirilmiş bir dosya belleği doldurmasın diye harita, küme ve liste boyutu
+  /// üst sınırları. Sınırlar gerçek kullanımın çok üstündedir; aşan girdiler
+  /// atlanır, kalan alanlar olduğu gibi yüklenir.
+  /// - [kartEnCok]: tekrar kartı sayısı (ilk gelenler tutulur).
+  /// - [sayacEnCok]: ders/hikâye/senaryo başına sayaç haritaları.
+  /// - [gunlukXpEnCok]: gün -> XP haritası (en yeni günler tutulur).
+  /// - [kumeEnCok]: ders/ünite/dönem kimlik kümeleri.
+  /// - [sinavEnCok]: ara sınav ve sertifika sonuç haritaları.
+  /// - [kimlikEnCokKarakter]: ders/kart/kurs kimliği dize uzunluğu.
+  static const int kartEnCok = 20000;
+  static const int sayacEnCok = 5000;
+  static const int gunlukXpEnCok = 4000;
+  static const int kumeEnCok = 2000;
+  static const int sinavEnCok = 2000;
+  static const int kimlikEnCokKarakter = 120;
+
+  /// Tarih anahtarlı haritaların okuma üst sınırı: önce bu kadar girdi
+  /// okunur, sonra en yeni N tutulur ([_enYeniKirp]).
+  static const int _tarihliEnCok = 1 << 18;
+
   final int xp;
   final int seri;
   final int enSeri;
@@ -896,8 +917,31 @@ class OgrenciDurumu {
     };
   }
 
+  /// Kimlik kümesi (ders/ünite/dönem): metin olmayan, boş, uzun ya da
+  /// [uygun] olmayan girdiler atlanır; en çok [kumeEnCok] tane tutulur.
+  static Set<String> _kume(Object? ham, bool Function(String) uygun) {
+    final s = <String>{};
+    if (ham is List) {
+      for (final e in ham) {
+        if (s.length >= kumeEnCok) break;
+        if (e is String &&
+            e.isNotEmpty &&
+            e.length <= kimlikEnCokKarakter &&
+            uygun(e)) {
+          s.add(e);
+        }
+      }
+    }
+    return Set.unmodifiable(s);
+  }
+
   /// Bozuk ya da eksik alanları sessizce varsayılana çeker; asla fırlatmaz.
   /// Anahtarlar yalnızca beklenen biçimde (ders/kart kimliği, gün) kabul edilir.
+  /// Şema doğrulama (SADE 4): her alan için tür denetimi, makul aralık, dize
+  /// uzunluğu ve liste/harita boyutu sınırı uygulanır; geçersiz bir alan yalnız
+  /// kendi varsayılanına döner, diğer alanlar korunur. Bilinmeyen alanlar yok
+  /// sayılır (kaydetmede yazılmaz). Kök harita değilse tüm durum varsayılandır;
+  /// dosyayı kenara alma kararı depodadır ([DosyaDepo]).
   static OgrenciDurumu fromJson(Object? j) {
     if (j is! Map) return const OgrenciDurumu();
     int tamsayi(Object? v, int varsayilan, {int min = 0, int max = 1 << 40}) =>
@@ -906,20 +950,31 @@ class OgrenciDurumu {
     final hamKart = j['kartlar'];
     if (hamKart is Map) {
       for (final e in hamKart.entries) {
+        if (kartlar.length >= kartEnCok) break;
         final k = e.key;
-        if (k is! String || k.length > 120 || !k.contains('#')) continue;
+        if (k is! String ||
+            k.isEmpty ||
+            k.length > kimlikEnCokKarakter ||
+            !k.contains('#')) {
+          continue;
+        }
         final kart = Kart.fromJson(e.value);
         if (kart != null) kartlar[k] = kart;
       }
     }
-    Map<String, int> sayac(Object? v, bool Function(String) anahtarUygun) {
+    Map<String, int> sayac(
+      Object? v,
+      bool Function(String) anahtarUygun, {
+      int enCok = sayacEnCok,
+    }) {
       final m = <String, int>{};
       if (v is Map) {
         for (final e in v.entries) {
+          if (m.length >= enCok) break;
           final k = e.key;
           final d = e.value;
           if (k is String &&
-              k.length <= 120 &&
+              k.length <= kimlikEnCokKarakter &&
               anahtarUygun(k) &&
               d is int &&
               d >= 0 &&
@@ -983,7 +1038,14 @@ class OgrenciDurumu {
       sonGun: (sonGun is String && gunGecerli(sonGun)) ? sonGun : null,
       kartlar: kartlar,
       tamamlanan: sayac(j['tamamlanan'], (k) => !k.contains('#')),
-      gunlukXp: sayac(j['gunlukXp'], gunGecerli),
+      // Gün anahtarlı haritalar önce tümüyle okunur (dosya boyutu zaten
+      // sınırlı), sonra en yeni günler tutulur.
+      gunlukXp: Map.unmodifiable(
+        _enYeniKirp(
+          sayac(j['gunlukXp'], gunGecerli, enCok: _tarihliEnCok),
+          gunlukXpEnCok,
+        ),
+      ),
       gunlukHedef: tamsayi(j['gunlukHedef'], 30, min: 10, max: 500),
       ad: j['ad'] is String
           ? String.fromCharCodes((j['ad'] as String).runes.take(40))
@@ -1031,15 +1093,7 @@ class OgrenciDurumu {
       ),
       // Eski kayıtta yoksa boş; geçerli ders kimliği (en çok 120 karakter,
       // '#' içermez) olmayan girdiler atlanır.
-      atlananDersler: Set.unmodifiable({
-        if (j['atlananDersler'] is List)
-          for (final e in j['atlananDersler'] as List)
-            if (e is String &&
-                e.isNotEmpty &&
-                e.length <= 120 &&
-                !e.contains('#'))
-              e,
-      }),
+      atlananDersler: _kume(j['atlananDersler'], (e) => !e.contains('#')),
       // Eski kayıtta yoksa ya da bozuksa null (plan yok).
       calismaPlani: CalismaPlani.fromJson(j['calismaPlani']),
       // Eski kayıtta yoksa boş; bozuk girdiler atlanır.
@@ -1074,11 +1128,7 @@ class OgrenciDurumu {
           ? j['seriKorumaHafta'] as String
           : null,
       // Eski kayıtta yoksa boş; bozuk anahtarlar atlanır.
-      donemDersleri: Set.unmodifiable({
-        if (j['donemDersleri'] is List)
-          for (final e in j['donemDersleri'] as List)
-            if (e is String && donemAnahtariGecerli(e)) e,
-      }),
+      donemDersleri: _kume(j['donemDersleri'], donemAnahtariGecerli),
       gunDersiBildirimiAcik: j['gunDersiBildirimiAcik'] is bool
           ? j['gunDersiBildirimiAcik'] as bool
           : false,
@@ -1091,22 +1141,18 @@ class OgrenciDurumu {
       satranc: SatrancDurumu.fromJson(j['satranc']),
       // Eski kayıtta yoksa boş; geçerli ünite kimliği ('#' içermez) olmayan
       // girdiler atlanır.
-      altinUniteler: Set.unmodifiable({
-        if (j['altinUniteler'] is List)
-          for (final e in j['altinUniteler'] as List)
-            if (e is String &&
-                e.isNotEmpty &&
-                e.length <= 120 &&
-                !e.contains('#'))
-              e,
-      }),
+      altinUniteler: _kume(j['altinUniteler'], (e) => !e.contains('#')),
       senaryolar: Map.unmodifiable(
         sayac(j['senaryolar'], (k) => k.isNotEmpty && !k.contains('#')),
       ),
       // Eski kayıtta yoksa boş / 0; en çok 24 saat/gün, harita boyutu sınırlı.
       gunlukSureSn: Map.unmodifiable(
         _enYeniKirp({
-          for (final e in sayac(j['gunlukSureSn'], gunGecerli).entries)
+          for (final e in sayac(
+            j['gunlukSureSn'],
+            gunGecerli,
+            enCok: _tarihliEnCok,
+          ).entries)
             if (e.value <= 86400) e.key: e.value,
         }, gunlukSureEnCok),
       ),
@@ -1116,13 +1162,22 @@ class OgrenciDurumu {
         max: enCokDakikaHedefi,
       ),
       aylikDers: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikDers'], ayGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikDers'], ayGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikKart: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikKart'], ayGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikKart'], ayGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikKurs: Map.unmodifiable(
-        _enYeniKirp(sayac(j['aylikKurs'], ayKursGecerli), aylikEnCok),
+        _enYeniKirp(
+          sayac(j['aylikKurs'], ayKursGecerli, enCok: _tarihliEnCok),
+          aylikEnCok,
+        ),
       ),
       aylikHedefDers: tamsayi(
         j['aylikHedefDers'],
@@ -1289,13 +1344,18 @@ class SinavSonucu {
     return SinavSonucu(dogru: d, toplam: t, gun: g);
   }
 
-  /// Kimlik -> sonuç haritası; geçersiz anahtar/değer sessizce atılır.
+  /// Kimlik -> sonuç haritası; geçersiz anahtar/değer sessizce atılır,
+  /// en çok [OgrenciDurumu.sinavEnCok] girdi tutulur.
   static Map<String, SinavSonucu> haritaCoz(Object? v) {
     final m = <String, SinavSonucu>{};
     if (v is Map) {
       for (final e in v.entries) {
+        if (m.length >= OgrenciDurumu.sinavEnCok) break;
         final k = e.key;
-        if (k is! String || k.isEmpty || k.length > 120 || k.contains('#')) {
+        if (k is! String ||
+            k.isEmpty ||
+            k.length > OgrenciDurumu.kimlikEnCokKarakter ||
+            k.contains('#')) {
           continue;
         }
         final s = fromJson(e.value);
