@@ -445,6 +445,8 @@ class OgrenciDurumu {
     this.geriKazanmaGun = 0,
     this.geriKazanmaSon,
     this.seriKorumaHafta,
+    this.seriKorumaAcik = true,
+    this.hataTuruAcik = true,
     this.donemDersleri = const {},
     this.gunDersiBildirimiAcik = false,
     this.sonGunDersiBildirimGunu,
@@ -610,6 +612,13 @@ class OgrenciDurumu {
   /// Seri koruma hakkı: haftada bir atlanan gün seriyi bozmaz. En son hakkın
   /// kullanıldığı haftanın Pazartesi'si; null: hiç kullanılmadı (eski kayıt).
   final String? seriKorumaHafta;
+
+  /// Seri koruma (tatil günü) açık mı? Kapalıyken atlanan gün seriyi bozar.
+  final bool seriKorumaAcik;
+
+  /// Hata defterinde hata türü etiketi (yazım / anlam / dinleme) gösterilsin mi?
+  /// Etiket kayıttan değil, alıştırma türünden türetilir; veriye yazılmaz.
+  final bool hataTuruAcik;
 
   /// Tamamlanan günün/haftanın/ayın dersleri (ÖZELLİK 63): dönem anahtarı
   /// ('g:2026-10-21', 'h:2026-10-19' (Pazartesi), 'a:2026-10'); eski kayıtta boş.
@@ -841,6 +850,8 @@ class OgrenciDurumu {
     int? geriKazanmaGun,
     String? geriKazanmaSon,
     String? seriKorumaHafta,
+    bool? seriKorumaAcik,
+    bool? hataTuruAcik,
     Set<String>? donemDersleri,
     bool? gunDersiBildirimiAcik,
     String? sonGunDersiBildirimGunu,
@@ -916,6 +927,8 @@ class OgrenciDurumu {
       geriKazanmaGun: geriKazanmaGun ?? this.geriKazanmaGun,
       geriKazanmaSon: geriKazanmaSon ?? this.geriKazanmaSon,
       seriKorumaHafta: seriKorumaHafta ?? this.seriKorumaHafta,
+      seriKorumaAcik: seriKorumaAcik ?? this.seriKorumaAcik,
+      hataTuruAcik: hataTuruAcik ?? this.hataTuruAcik,
       donemDersleri: donemDersleri ?? this.donemDersleri,
       gunDersiBildirimiAcik:
           gunDersiBildirimiAcik ?? this.gunDersiBildirimiAcik,
@@ -996,6 +1009,8 @@ class OgrenciDurumu {
     'geriKazanmaGun': geriKazanmaGun,
     'geriKazanmaSon': geriKazanmaSon,
     'seriKorumaHafta': seriKorumaHafta,
+    'seriKorumaAcik': seriKorumaAcik,
+    'hataTuruAcik': hataTuruAcik,
     'donemDersleri': donemDersleri.toList()..sort(),
     'gunDersiBildirimiAcik': gunDersiBildirimiAcik,
     'sonGunDersiBildirimGunu': sonGunDersiBildirimGunu,
@@ -1269,6 +1284,12 @@ class OgrenciDurumu {
               gunGecerli(j['geriKazanmaSon'] as String))
           ? j['geriKazanmaSon'] as String
           : null,
+      seriKorumaAcik: j['seriKorumaAcik'] is bool
+          ? j['seriKorumaAcik'] as bool
+          : true,
+      hataTuruAcik: j['hataTuruAcik'] is bool
+          ? j['hataTuruAcik'] as bool
+          : true,
       seriKorumaHafta:
           (j['seriKorumaHafta'] is String &&
               gunGecerli(j['seriKorumaHafta'] as String))

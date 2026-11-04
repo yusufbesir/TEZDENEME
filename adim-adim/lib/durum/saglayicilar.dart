@@ -613,6 +613,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     int? oturumKartSayisi,
     bool? akilliHatirlaticiAcik,
     bool? kardesErteleAcik,
+    bool? seriKorumaAcik,
+    bool? hataTuruAcik,
     bool? emekliAcik,
     int? yukButcesi,
     double? sesHizi,
@@ -635,6 +637,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         gunDersiBildirimiAcik: gunDersiBildirimiAcik,
         akilliHatirlaticiAcik: akilliHatirlaticiAcik,
         kardesErteleAcik: kardesErteleAcik,
+        seriKorumaAcik: seriKorumaAcik,
+        hataTuruAcik: hataTuruAcik,
         emekliAcik: emekliAcik,
         yukButcesi: yukButcesi,
         // Yalnız 5/10/20 kabul edilir; başka değer yok sayılır.
