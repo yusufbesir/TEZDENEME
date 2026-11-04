@@ -42,10 +42,10 @@ void main() {
   group('CekimTuru.sec', () {
     test('yalnız yanlışlar, verilen sırayla; boşluk doldurulmaz', () {
       final s = CekimTuru.sec(_ders, [3, 1]);
-      expect([for (final o in s) o.kartId], [
-        _ders.kartKimligi(3),
-        _ders.kartKimligi(1),
-      ]);
+      expect(
+        [for (final o in s) o.kartId],
+        [_ders.kartKimligi(3), _ders.kartKimligi(1)],
+      );
     });
 
     test('en çok 5; geçersiz ve yinelenenler atlanır', () {
@@ -70,42 +70,43 @@ void main() {
     });
   });
 
-  testWidgets('ders sonunda yanlış varsa çekim turu düğmesi; kartlar değişmez', (
-    tester,
-  ) async {
-    final depo = BellekDepo(const OgrenciDurumu(alan: 'dil'));
-    final kap = await uygulamayiAc(tester, depo, kurslar: [_kurs]);
-    await dokun(tester, find.textContaining('Ders Çekim'));
+  testWidgets(
+    'ders sonunda yanlış varsa çekim turu düğmesi; kartlar değişmez',
+    (tester) async {
+      final depo = BellekDepo(const OgrenciDurumu(alan: 'dil'));
+      final kap = await uygulamayiAc(tester, depo, kurslar: [_kurs]);
+      await dokun(tester, find.textContaining('Ders Çekim'));
 
-    // Soru 0 doğru, Soru 1 yanlış, kalanı doğru.
-    await dokun(tester, find.text('doğru0'));
-    await _kontrolVeDevam(tester);
-    await dokun(tester, find.text('yanlış1'));
-    await dokun(tester, find.text('Kontrol et'));
-    await dokun(tester, find.text('Yine de geç'));
-    for (var i = 2; i < 8; i++) {
-      await dokun(tester, find.text('doğru$i'));
-      await _kontrolVeDevam(tester, son: i == 7);
-    }
-    expect(find.text('Ders tamamlandı'), findsOneWidget);
-    expect(find.text('5 soruluk çekim turu'), findsOneWidget);
+      // Soru 0 doğru, Soru 1 yanlış, kalanı doğru.
+      await dokun(tester, find.text('doğru0'));
+      await _kontrolVeDevam(tester);
+      await dokun(tester, find.text('yanlış1'));
+      await dokun(tester, find.text('Kontrol et'));
+      await dokun(tester, find.text('Yine de geç'));
+      for (var i = 2; i < 8; i++) {
+        await dokun(tester, find.text('doğru$i'));
+        await _kontrolVeDevam(tester, son: i == 7);
+      }
+      expect(find.text('Ders tamamlandı'), findsOneWidget);
+      expect(find.text('5 soruluk çekim turu'), findsOneWidget);
 
-    final onceki = kap.read(durumProvider).value!;
-    await dokun(tester, find.text('5 soruluk çekim turu'));
-    expect(find.byType(AlistirmaOturumu), findsOneWidget);
-    expect(find.text('Soru 1'), findsOneWidget);
-    expect(find.text('1/1'), findsOneWidget);
-    await dokun(tester, find.text('doğru1'));
-    await dokun(tester, find.text('Kontrol et'));
-    await dokun(tester, find.text('Bitir'));
+      final onceki = kap.read(durumProvider).value!;
+      await dokun(tester, find.text('5 soruluk çekim turu'));
+      expect(find.byType(AlistirmaOturumu), findsOneWidget);
+      expect(find.text('Soru 1'), findsOneWidget);
+      expect(find.text('1/1'), findsOneWidget);
+      await dokun(tester, find.text('doğru1'));
+      await dokun(tester, find.text('Kontrol et'));
+      await dokun(tester, find.text('Bitir'));
 
-    expect(find.text('Çekim turu tamamlandı'), findsOneWidget);
-    final sonra = kap.read(durumProvider).value!;
-    expect(sonra.kartlar, onceki.kartlar); // SRS değişmedi
-    expect(sonra.tamamlanan, onceki.tamamlanan);
-    expect(sonra.xp, onceki.xp + 1); // yalnız doğru başına 1 (quiz akışı)
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.text('Çekim turu tamamlandı'), findsOneWidget);
+      final sonra = kap.read(durumProvider).value!;
+      expect(sonra.kartlar, onceki.kartlar); // SRS değişmedi
+      expect(sonra.tamamlanan, onceki.tamamlanan);
+      expect(sonra.xp, onceki.xp + 1); // yalnız doğru başına 1 (quiz akışı)
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('hiç yanlış yoksa çekim turu düğmesi yok', (tester) async {
     final depo = BellekDepo(const OgrenciDurumu(alan: 'dil'));

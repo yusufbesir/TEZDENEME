@@ -44,11 +44,7 @@ class BellekDepo implements Depo {
 
 /// Dosyada tutan depo: `<klasor>/adimadim/durum.v1.json`.
 class DosyaDepo implements Depo {
-  DosyaDepo(
-    this.klasor, {
-    this.goc,
-    this.hedefSurum = DurumGocu.guncel,
-  });
+  DosyaDepo(this.klasor, {this.goc, this.hedefSurum = DurumGocu.guncel});
 
   /// Göç adım tablosu; null ise [DurumGocu.varsayilanAdimlar] (testler için).
   final Map<int, Map<String, Object?> Function(Map<String, Object?>)>? goc;

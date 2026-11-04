@@ -162,6 +162,19 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                           runSpacing: Olcu.b1,
                           alignment: WrapAlignment.center,
                           children: [
+                            if (bekleyen.isNotEmpty)
+                              OutlinedButton.icon(
+                                key: const ValueKey('mini-oturum-ac'),
+                                icon: const Icon(Icons.timer_outlined),
+                                label: const Text('2 dk'),
+                                onPressed: () => setState(() {
+                                  // En çok vadesi geçmiş 5 kart (liste zaten
+                                  // eskiden yeniye sıralı), karıştırmadan.
+                                  _oturum = bekleyen.take(5).toList();
+                                  _onceki.clear();
+                                  _sonuc = null;
+                                }),
+                              ),
                             OutlinedButton.icon(
                               key: const ValueKey('filtreli-tekrar-ac'),
                               icon: const Icon(Icons.filter_alt_outlined),
@@ -312,7 +325,8 @@ class _HataDefteri extends StatelessWidget {
               metin: s.metin,
               ayrinti:
                   '${s.kat?.ad ?? 'Alıştırma'} · ${s.hata.seviye} · ${s.hata.gun}'
-                  '${(durum.kartlar[s.hata.id]?.sakin == true && durum.kartlar[s.hata.id]!.sonraki.compareTo(bugun) > 0) ? ' · İpucu kelime (14 gün dinleniyor)' : ''}',
+                  '${(durum.kartlar[s.hata.id]?.sakin == true && durum.kartlar[s.hata.id]!.sonraki.compareTo(bugun) > 0) ? ' · İpucu kelime (14 gün dinleniyor)' : ''}'
+                  '${durum.kelimeNotlari[s.hata.id] != null ? ' · Not: ${durum.kelimeNotlari[s.hata.id]}' : ''}',
               renk: s.kat == null
                   ? r.ana
                   : KategoriRenkleri.renk(s.kat!, parlaklik),

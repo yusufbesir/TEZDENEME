@@ -137,17 +137,20 @@ class _KilitEkraniDurumu extends State<KilitEkrani> {
         );
 
     final satirlar = <List<Widget>>[
-      [for (final d in ['1', '2', '3']) tus(d, basinca: () => _tus(d))],
-      [for (final d in ['4', '5', '6']) tus(d, basinca: () => _tus(d))],
-      [for (final d in ['7', '8', '9']) tus(d, basinca: () => _tus(d))],
+      [
+        for (final d in ['1', '2', '3']) tus(d, basinca: () => _tus(d)),
+      ],
+      [
+        for (final d in ['4', '5', '6']) tus(d, basinca: () => _tus(d)),
+      ],
+      [
+        for (final d in ['7', '8', '9']) tus(d, basinca: () => _tus(d)),
+      ],
       [
         tus(
           'sil',
           basinca: _giris.isEmpty ? null : _sil,
-          simge: Semantics(
-            label: 'Sil',
-            child: Icon(Icons.backspace_outlined),
-          ),
+          simge: Semantics(label: 'Sil', child: Icon(Icons.backspace_outlined)),
         ),
         tus('0', basinca: () => _tus('0')),
         tus(
@@ -215,7 +218,10 @@ class _KilitEkraniDurumu extends State<KilitEkrani> {
                   ),
                   const SizedBox(height: Olcu.b1),
                   for (final s in satirlar)
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: s),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: s,
+                    ),
                   const SizedBox(height: Olcu.b2),
                   TextButton(
                     key: const ValueKey('kilit-unuttum'),
@@ -312,9 +318,7 @@ class _KilitKapisiDurumu extends ConsumerState<KilitKapisi>
     return Stack(
       fit: StackFit.expand,
       children: [
-        ExcludeSemantics(
-          child: IgnorePointer(child: widget.child),
-        ),
+        ExcludeSemantics(child: IgnorePointer(child: widget.child)),
         // Geri tuşu kilitliyken alttaki Navigator'ı pop edemez.
         PopScope(
           canPop: false,

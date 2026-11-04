@@ -47,7 +47,16 @@ class Kart {
     this.sonDerece,
     this.yanlisSayisi = 0,
     this.sakin = false,
+    this.emekli = false,
   });
+
+  /// Bilinen kelimeyi emekli etme: aralık bu günü aşınca kart "bilinen" sayılır
+  /// ve yalnız [emekliYoklamaGun] günde bir yoklanır.
+  static const double emekliEsigi = 60;
+  static const int emekliYoklamaGun = 120;
+
+  /// Kart emekli mi (bilinen)? Yanlış cevapta kalkar. Eski kayıtta false.
+  final bool emekli;
 
   /// Sorunlu kelime sakinleştirme: bu kadar yanlıştan sonra kart [sakinGun]
   /// gün kuyruktan çıkar (hata defterinde "ipucu kelime" rozetiyle kalır).
@@ -111,6 +120,7 @@ class Kart {
     if (sonDerece != null) 'sonDerece': sonDerece,
     if (yanlisSayisi > 0) 'yanlisSayisi': yanlisSayisi,
     if (sakin) 'sakin': true,
+    if (emekli) 'emekli': true,
   };
 
   static Kart? fromJson(Object? j) {
@@ -141,6 +151,7 @@ class Kart {
           ? (j['yanlisSayisi'] as int).clamp(0, sorunluEsik)
           : 0,
       sakin: j['sakin'] == true,
+      emekli: j['emekli'] == true,
     );
   }
 }
@@ -459,6 +470,9 @@ class OgrenciDurumu {
     this.oturumKartSayisi = varsayilanOturumKarti,
     this.kilit,
     this.akilliHatirlaticiAcik = false,
+    this.kardesErteleAcik = false,
+    this.emekliAcik = false,
+    this.yukButcesi = varsayilanYukButcesi,
     this.sonHatirlatmaGunu,
     this.calismaSaatleri = const [],
     this.sesHizi = varsayilanSesHizi,
@@ -683,8 +697,24 @@ class OgrenciDurumu {
   /// Uygulama kilidi (PIN karması; düz metin yok). null: kilit kapalı
   /// (eski kayıtlar ve bozuk alan). Ayrıntı: model/kilit.dart.
   final KilitAyari? kilit;
+
   /// Akıllı hatırlatıcı (SADE 6; günde en çok bir bildirim); varsayılan kapalı.
   final bool akilliHatirlaticiAcik;
+
+  /// Kardeş alıştırma erteleme (varsayılan kapalı; Ayarlar'dan açılır): aynı dersin kartlarından günde en çok
+  /// [kardesSiniri] tanesi kuyruğa girer, kalanı ertesi güne kalır (silinmez).
+  final bool kardesErteleAcik;
+  static const int kardesSiniri = 3;
+
+  /// Bilinen kelimeyi emekli etme açık mı (varsayılan kapalı)? Kapalıyken kartlar normal aralıkla
+  /// gider; mevcut emekli kartlar vadesi gelince normale döner.
+  final bool emekliAcik;
+
+  /// Günlük yük bütçesi: vadesi gelen kart sayısı bu sayıyı aşınca elle eklenen
+  /// yeni kart ertesi güne alınır. 0: kapalı.
+  final int yukButcesi;
+  static const int varsayilanYukButcesi = 10;
+  static const int enCokYukButcesi = 100;
 
   /// Akıllı hatırlatıcının en son gönderildiği gün 'YYYY-MM-DD'; null: hiç.
   final String? sonHatirlatmaGunu;
@@ -838,6 +868,9 @@ class OgrenciDurumu {
     KilitAyari? kilit,
     bool kilitSil = false,
     bool? akilliHatirlaticiAcik,
+    bool? kardesErteleAcik,
+    bool? emekliAcik,
+    int? yukButcesi,
     String? sonHatirlatmaGunu,
     List<int>? calismaSaatleri,
     double? sesHizi,
@@ -913,6 +946,9 @@ class OgrenciDurumu {
       kilit: kilitSil ? null : (kilit ?? this.kilit),
       akilliHatirlaticiAcik:
           akilliHatirlaticiAcik ?? this.akilliHatirlaticiAcik,
+      kardesErteleAcik: kardesErteleAcik ?? this.kardesErteleAcik,
+      emekliAcik: emekliAcik ?? this.emekliAcik,
+      yukButcesi: (yukButcesi ?? this.yukButcesi).clamp(0, enCokYukButcesi),
       sonHatirlatmaGunu: sonHatirlatmaGunu ?? this.sonHatirlatmaGunu,
       calismaSaatleri: calismaSaatleri ?? this.calismaSaatleri,
       sesHizi: sesHizi ?? this.sesHizi,
@@ -985,6 +1021,9 @@ class OgrenciDurumu {
     'oturumKartSayisi': oturumKartSayisi,
     'kilit': kilit?.toJson(),
     'akilliHatirlaticiAcik': akilliHatirlaticiAcik,
+    'kardesErteleAcik': kardesErteleAcik,
+    'emekliAcik': emekliAcik,
+    'yukButcesi': yukButcesi,
     'sonHatirlatmaGunu': sonHatirlatmaGunu,
     'calismaSaatleri': calismaSaatleri,
     'sesHizi': sesHizi,
@@ -1330,6 +1369,13 @@ class OgrenciDurumu {
       // Eski kayıtta yoksa ya da bozuksa kilit yok (kilitsiz açılış).
       kilit: KilitAyari.fromJson(j['kilit']),
       // Eski kayıtta yoksa: kapalı, hiç gönderilmedi, saat kaydı yok.
+      kardesErteleAcik: j['kardesErteleAcik'] is bool
+          ? j['kardesErteleAcik'] as bool
+          : false,
+      emekliAcik: j['emekliAcik'] is bool ? j['emekliAcik'] as bool : false,
+      yukButcesi: j['yukButcesi'] is int
+          ? (j['yukButcesi'] as int).clamp(0, enCokYukButcesi)
+          : varsayilanYukButcesi,
       akilliHatirlaticiAcik: j['akilliHatirlaticiAcik'] is bool
           ? j['akilliHatirlaticiAcik'] as bool
           : false,

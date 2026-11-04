@@ -1178,12 +1178,17 @@ abstract final class Motor {
   /// Kart zaten varsa durum değişmeden döner.
   static OgrenciDurumu kartEkle(OgrenciDurumu d, String kartId, String bugun) {
     if (d.kartlar.containsKey(kartId)) return d;
+    // Günlük yük bütçesi: tekrar yığını bütçeyi aşmışsa yeni kart yarına kalır.
+    final yuk =
+        d.yukButcesi > 0 &&
+        d.kartlar.values.where((k) => k.sonraki.compareTo(bugun) <= 0).length >
+            d.yukButcesi;
     return d.copyWith(
       kartlar: {
         ...d.kartlar,
         kartId: Kart(
           kutu: Kart.kutuHesapla(Kart.enAzYariOmur),
-          sonraki: bugun,
+          sonraki: yuk ? _gunEkle(bugun, 1) : bugun,
           yariOmurGun: Kart.enAzYariOmur,
         ),
       },
@@ -1412,6 +1417,7 @@ abstract final class Motor {
     bool dogruMu,
     String bugun, {
     GuvenDerecesi? derece,
+    bool emekliAcik = false,
   }) {
     final mevcut = onceki?.yariOmurGun ?? 1.0;
     final d = dogruMu ? derece : null;
@@ -1422,6 +1428,9 @@ abstract final class Motor {
     var aralik = yariOmur.round() < 1 ? 1 : yariOmur.round();
     var yanlis = onceki?.yanlisSayisi ?? 0;
     var sakin = false;
+    // Bilinen kelime: aralık eşiği aşınca emekli, 120 günde bir yoklama.
+    final emekli = emekliAcik && dogruMu && yariOmur > Kart.emekliEsigi;
+    if (emekli) aralik = Kart.emekliYoklamaGun;
     if (!dogruMu) {
       yanlis++;
       if (yanlis >= Kart.sorunluEsik) {
@@ -1439,6 +1448,7 @@ abstract final class Motor {
       sonDerece: d?.kod,
       yanlisSayisi: yanlis,
       sakin: sakin,
+      emekli: emekli,
     );
   }
 
@@ -1457,7 +1467,13 @@ abstract final class Motor {
     return d.copyWith(
       kartlar: {
         ...d.kartlar,
-        kartId: kartHesapla(onceki, true, bugun, derece: derece),
+        kartId: kartHesapla(
+          onceki,
+          true,
+          bugun,
+          derece: derece,
+          emekliAcik: d.emekliAcik,
+        ),
       },
     );
   }
@@ -1477,7 +1493,12 @@ abstract final class Motor {
         .copyWith(
           kartlar: {
             ...d.kartlar,
-            kartId: kartHesapla(d.kartlar[kartId], dogruMu, bugun),
+            kartId: kartHesapla(
+              d.kartlar[kartId],
+              dogruMu,
+              bugun,
+              emekliAcik: d.emekliAcik,
+            ),
           },
         )
         .copyWith(
@@ -1573,7 +1594,19 @@ abstract final class Motor {
             final c = x.value.sonraki.compareTo(y.value.sonraki);
             return c != 0 ? c : x.key.compareTo(y.key);
           });
-    return [for (final e in liste) e.key];
+    if (!d.kardesErteleAcik) return [for (final e in liste) e.key];
+    // Kardeş erteleme: aynı dersten günde en çok kardesSiniri kart; kalanı
+    // silinmez, yarın yine vadesi geçmiş olarak sıraya girer.
+    final sayac = <String, int>{};
+    final sonuc = <String>[];
+    for (final e in liste) {
+      final ayrac = e.key.lastIndexOf('#');
+      final ders = ayrac > 0 ? e.key.substring(0, ayrac) : e.key;
+      final n = (sayac[ders] ?? 0) + 1;
+      sayac[ders] = n;
+      if (n <= OgrenciDurumu.kardesSiniri) sonuc.add(e.key);
+    }
+    return sonuc;
   }
 
   /// Açılışta "bekleyen tekrar" bildirimi gösterilmeli mi? Gösterilecek
