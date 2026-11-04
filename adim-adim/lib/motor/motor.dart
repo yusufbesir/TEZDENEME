@@ -480,6 +480,9 @@ abstract final class Motor {
   static const int yerlestirmeEnCok = 20;
   static const int yerlestirmeUniteEnAz = 3;
   static const int yerlestirmeUniteEnCok = 5;
+
+  /// İlk açılıştaki "hızlı seviye testi" soru sayısı (tek ünite, 5 soru).
+  static const int yerlestirmeHizliSoru = 5;
   static const double yerlestirmeEsik = 0.8;
 
   /// Ünite henüz tam bitmemiş mi (en az bir dersi bitmiş değil)?
@@ -525,18 +528,22 @@ abstract final class Motor {
   /// dolaşarak 3..5 mevcut alıştırma; toplam en çok [yerlestirmeEnCok] (çok
   /// ünite varsa ilk 6 ünite). Konuşma ([Soyle]) alıştırmaları seçilmez.
   /// `unite` = kurs.uniteler içindeki indeks. Aynı [tohum] aynı sonucu verir.
+  /// [enCok] toplam soru üst sınırını değiştirir (varsayılan
+  /// [yerlestirmeEnCok]); hızlı test için [yerlestirmeHizliSoru] verilir ve
+  /// yalnız ilk açık ünite yoklanır.
   static List<({int unite, String kartId, Alistirma alistirma})> yerlestirmeSec(
     OgrenciDurumu d,
     Kurs kurs, {
     int tohum = 0,
+    int enCok = yerlestirmeEnCok,
   }) {
     final acik = [
       for (var i = 0; i < kurs.uniteler.length; i++)
         if (_uniteAcik(d, kurs.uniteler[i])) i,
     ];
-    final kullanilan = acik.take(yerlestirmeEnCok ~/ yerlestirmeUniteEnAz);
+    final kullanilan = acik.take(enCok ~/ yerlestirmeUniteEnAz);
     if (kullanilan.isEmpty) return const [];
-    final adet = (yerlestirmeEnCok ~/ kullanilan.length).clamp(
+    final adet = (enCok ~/ kullanilan.length).clamp(
       yerlestirmeUniteEnAz,
       yerlestirmeUniteEnCok,
     );
@@ -1397,9 +1404,18 @@ abstract final class Motor {
   /// ortak kullanır): doğruda x2, yanlışta /2 (0,5..180 gün); sonraki tekrar
   /// yarı ömrün yuvarlanmışı kadar gün sonra (en az 1). [onceki] null ise
   /// başlangıç yarı ömrü 1 gündür.
-  static Kart kartHesapla(Kart? onceki, bool dogruMu, String bugun) {
+  ///
+  /// [derece] yalnız doğru cevapta anlamlıdır (SM-2 üç kalitesi): yarı ömür
+  /// çarpanı [GuvenDerecesi.carpan]; null ya da iyi = eski x2 davranışı.
+  static Kart kartHesapla(
+    Kart? onceki,
+    bool dogruMu,
+    String bugun, {
+    GuvenDerecesi? derece,
+  }) {
     final mevcut = onceki?.yariOmurGun ?? 1.0;
-    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
+    final d = dogruMu ? derece : null;
+    final ham = dogruMu ? mevcut * (d?.carpan ?? 2.0) : mevcut / 2;
     final yariOmur = ham < Kart.enAzYariOmur
         ? Kart.enAzYariOmur
         : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
@@ -1409,6 +1425,27 @@ abstract final class Motor {
       sonraki: _gunEkle(bugun, aralik),
       yariOmurGun: yariOmur,
       sonCevap: dogruMu,
+      sonDerece: d?.kod,
+    );
+  }
+
+  /// Doğru cevaptan sonra seçilen güven derecesini uygular: kartı, cevaptan
+  /// ÖNCEKİ hâli [onceki] üzerinden [derece] ile yeniden hesaplar (kartIsle
+  /// zaten x2 yazmıştır; iyi = aynı sonuç). Hata defterine, XP'ye ve yeni kart
+  /// sayacına dokunmaz. Kart yoksa durum aynen döner.
+  static OgrenciDurumu kartDerecele(
+    OgrenciDurumu d,
+    String kartId,
+    Kart? onceki,
+    GuvenDerecesi derece,
+    String bugun,
+  ) {
+    if (!d.kartlar.containsKey(kartId)) return d;
+    return d.copyWith(
+      kartlar: {
+        ...d.kartlar,
+        kartId: kartHesapla(onceki, true, bugun, derece: derece),
+      },
     );
   }
 

@@ -271,6 +271,25 @@ abstract final class Pratik {
     return sirali;
   }
 
+  /// "Yanlışları çöz" destesi: hata defterindeki kart hataları (en yeni önce,
+  /// tekrarsız, süre sınırı yok), çözülebilenler, en çok [adet] kart. Hata
+  /// sayısı her çağrıda defterden hesaplanır (saklanmaz).
+  static List<PratikKarti> yanlisDestesi(
+    OgrenciDurumu d,
+    List<Kurs> kurslar, {
+    int adet = 5,
+  }) {
+    final sonuc = <PratikKarti>[];
+    final gorulen = <String>{};
+    for (final h in d.hatalar.reversed) {
+      if (sonuc.length >= adet) break;
+      if (h.tur != HataKaydi.turKart || !gorulen.add(h.id)) continue;
+      final a = Motor.kartCoz(kurslar, h.id);
+      if (a != null) sonuc.add((kartId: h.id, alistirma: a));
+    }
+    return sonuc;
+  }
+
   /// Kelime kartları destesi (çevirme): zayıf kartlar önce, en çok
   /// [kartDesteEnCok] kart.
   static List<KelimeCifti> kartDestesi(

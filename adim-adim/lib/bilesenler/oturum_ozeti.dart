@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../motor/oturum_ozeti.dart';
 import '../tema/tema.dart';
@@ -139,6 +140,32 @@ class OturumOzeti extends StatelessWidget {
                   style: yazi.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
+                if (veri.yanlis > 0) ...[
+                  const SizedBox(height: Olcu.b1 / 2),
+                  Center(
+                    child: TextButton(
+                      key: const ValueKey('oturum-yanlis'),
+                      style: TextButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: () =>
+                          GoRouter.maybeOf(context)?.push('/tekrar'),
+                      child: Text(
+                        'Bu oturumda ${veri.yanlis} yanlış → Hatalarım',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+                if (veri.enSikHece != null) ...[
+                  const SizedBox(height: Olcu.b1 / 2),
+                  Text(
+                    'En sık hatalı hece: ${veri.enSikHece}',
+                    key: const ValueKey('oturum-hece'),
+                    style: yazi.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 if (veri.yeniKelime > 0) ...[
                   const SizedBox(height: Olcu.b1 / 2),
                   Text(
