@@ -1,0 +1,12 @@
+[package]
+name = "adim_cekirdek"
+version = "0.1.0"
+edition = "2021"
+description = "Adım Adım hesap çekirdeği (saf, yan etkisiz); Dart ile eşdeğerlik altın vektörlerle sınanır."
+license = "UNLICENSED"
+
+[dependencies]
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
