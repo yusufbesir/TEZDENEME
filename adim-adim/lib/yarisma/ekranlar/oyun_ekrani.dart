@@ -268,14 +268,19 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
         await kayitHazir;
         await kayit.oyunuIsle(alan, kursId, oyun);
       } catch (_) {}
+      // Rozet farkı için kayıttan önceki rozetler.
+      var onceki = const <String>[];
       try {
-        final onceki = (await durumHazir).rozetler;
+        onceki = (await durumHazir).rozetler.toList();
         await durum.yarismaBitir(
           oyun.puan,
           yanlisSorular: oyun.sonuc.yanlisBilinenler,
           dogru: oyun.cevapGecmisi.where((c) => c.dogru).length,
           toplam: oyun.cevapGecmisi.length,
         );
+      } catch (_) {}
+      // Rozet işleme puan/kayıttan ayrı: hatası kaydı etkilemez.
+      try {
         // Rozetler kalıcı kayda bu akışta geçer; yeni olanlar çip olur.
         final sonra = await durum.rozetleriIsle(kurslar);
         final yeni = [

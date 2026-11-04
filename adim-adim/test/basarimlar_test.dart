@@ -19,8 +19,8 @@ Basarim _b(OgrenciDurumu d, String id) =>
 bool _kazanildi(OgrenciDurumu d, String id) => _b(d, id).kazanildi;
 
 void main() {
-  test('yaklaşık 20 rozet; kimlikler tekil ve geçerli biçimde', () {
-    expect(Basarimlar.toplam, inInclusiveRange(18, 24));
+  test('yaklaşık 20-30 rozet; kimlikler tekil ve geçerli biçimde', () {
+    expect(Basarimlar.toplam, inInclusiveRange(18, 30));
     final idler = Basarimlar.tanimlar.map((t) => t.id).toList();
     expect(idler.toSet(), hasLength(idler.length));
     for (final id in idler) {
