@@ -4,7 +4,9 @@
 /// turu ve Kelime kartları gibi etkinlikler. Hepsi çevrimdışı ve cezasızdır;
 /// etkinlikler kart aralıklarını (SRS) ve hata defterini değiştirmez. Tekrar
 /// ekranına (`/tekrar`, kabuk dışı) bu sekmeden `push` ile girilir; Tekrar
-/// sekmesindeki bekleyen kart rozeti artık Pratik sekmesindedir.
+/// sekmesindeki bekleyen kart rozeti artık Pratik sekmesindedir. Hatalarım
+/// kartındaki "Yanlışları çöz" düğmesi hata defterinden kısa tekrar açar
+/// (`/mikro?mod=yanlis`). [Claude#yanlislari-coz]
 ///
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
@@ -33,6 +35,7 @@ class PratikMerkeziEkrani extends ConsumerWidget {
     final kurslar = ref.watch(alanKurslariProvider);
     final enIyi = durum.eslestirmeEnIyiMs;
     final hataSayisi = durum.hatalar.length;
+    final yanlisVar = Pratik.yanlisDestesi(durum, kurslar, adet: 1).isNotEmpty;
     final kelimeSayisi = Pratik.kelimeHavuzu(durum, kurslar).length;
 
     Widget kart({
@@ -113,14 +116,40 @@ class PratikMerkeziEkrani extends ConsumerWidget {
                     : '$kelimeSayisi kelime · güç kovalarına göre',
                 onTap: () => context.push('/kelimelerim'),
               ),
-              kart(
-                anahtar: const ValueKey('pratik-hatalarim'),
-                simge: Icons.rule,
-                baslik: 'Hatalarım',
-                ayrinti: hataSayisi == 0
-                    ? 'Hata defteri boş'
-                    : 'Hata defterinde $hataSayisi kayıt',
-                onTap: () => context.push('/tekrar'),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      key: const ValueKey('pratik-hatalarim'),
+                      minVerticalPadding: Olcu.b1,
+                      leading: Icon(Icons.rule, color: context.renkler.ana),
+                      title: const Text('Hatalarım'),
+                      subtitle: Text(
+                        hataSayisi == 0
+                            ? 'Hata defteri boş'
+                            : 'Hata defterinde $hataSayisi kayıt',
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/tekrar'),
+                    ),
+                    if (yanlisVar)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: Olcu.b2,
+                            bottom: Olcu.b1,
+                          ),
+                          child: OutlinedButton.icon(
+                            key: const ValueKey('pratik-yanlislari-coz'),
+                            icon: const Icon(Icons.check_circle_outline),
+                            label: const Text('Yanlışları çöz'),
+                            onPressed: () => context.push('/mikro?mod=yanlis'),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               kart(
                 anahtar: const ValueKey('pratik-eslestirme'),
