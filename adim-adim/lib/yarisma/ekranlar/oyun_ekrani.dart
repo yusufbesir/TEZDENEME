@@ -6,7 +6,9 @@
 /// Tüm animasyonlar `Olcu.sure` ile ≤250 ms; tek istisna çark (1.200 ms).
 /// Oyun bitince sonuç bir kez kaydedilir: `yarismaKayitProvider.oyunuIsle` ve
 /// `durumProvider.yarismaBitir` (yanlış bilinen sorular hata defterine gider).
-/// Çıkışta (X) puan kaydedilmez.
+/// Çıkışta (X) puan kaydedilmez. Kayıt sonrası yeni rozetler
+/// (`durumProvider.rozetleriIsle`) sonuç ekranında çip olarak gösterilir
+/// (yazan: [Claude#yarisma-rozet]).
 /// Yerleşim esnektir: taç ızgarası en çok 240 px'lik hücrelerle akar, kategori
 /// adı iki satıra kadar sarılır.
 library;
@@ -19,6 +21,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../bilesenler/sayfa_govdesi.dart';
 import '../../durum/saglayicilar.dart';
+import '../../motor/basarimlar.dart';
 import '../../tema/kategori_renkleri.dart';
 import '../../tema/tema.dart';
 import '../model.dart';
@@ -88,6 +91,9 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
 
   bool _kaydedildi = false;
 
+  /// Bu turun kaydıyla yeni kazanılan rozet kimlikleri (sonuç çipleri).
+  List<String> _yeniRozetler = const [];
+
   @override
   void initState() {
     super.initState();
@@ -109,6 +115,7 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
     _cevap = null;
     _hakMesaji = false;
     _kaydedildi = false;
+    _yeniRozetler = const [];
     try {
       _oyun = _motor.basla(sorulariBul(widget.alan, widget.kursId));
       _hata = null;
@@ -254,20 +261,35 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
     final durum = ref.read(durumProvider.notifier);
     final alan = widget.alan;
     final kursId = widget.kursId;
+    final kurslar = ref.read(kurslarProvider);
     unawaited(() async {
       // Yüklenmeden yazılırsa eski kayıt ezilirdi: önce yüklemeyi bekle.
       try {
         await kayitHazir;
         await kayit.oyunuIsle(alan, kursId, oyun);
       } catch (_) {}
+      // Rozet farkı için kayıttan önceki rozetler.
+      var onceki = const <String>[];
       try {
-        await durumHazir;
+        onceki = (await durumHazir).rozetler.toList();
         await durum.yarismaBitir(
           oyun.puan,
           yanlisSorular: oyun.sonuc.yanlisBilinenler,
           dogru: oyun.cevapGecmisi.where((c) => c.dogru).length,
           toplam: oyun.cevapGecmisi.length,
         );
+      } catch (_) {}
+      // Rozet işleme puan/kayıttan ayrı: hatası kaydı etkilemez.
+      try {
+        // Rozetler kalıcı kayda bu akışta geçer; yeni olanlar çip olur.
+        final sonra = await durum.rozetleriIsle(kurslar);
+        final yeni = [
+          for (final t in Basarimlar.tanimlar)
+            if (sonra.rozetler.contains(t.id) && !onceki.contains(t.id)) t.id,
+        ];
+        if (yeni.isNotEmpty && mounted) {
+          setState(() => _yeniRozetler = yeni);
+        }
       } catch (_) {}
     }());
   }
@@ -385,10 +407,17 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
     }
     if (_cevap != null) return _soruGorunumu(o);
     if (o.bittiMi) {
+      final enIyi = ref
+          .watch(yarismaKayitProvider)
+          .value
+          ?.istatistik(widget.alan, widget.kursId)
+          .enIyiPuan;
       return SonucGorunumu(
         oyun: o,
         onTekrar: () => setState(_yeniOyun),
         onLobi: () => Navigator.of(context).pop(),
+        enIyiPuan: enIyi,
+        yeniRozetler: _yeniRozetler,
       );
     }
     return switch (o.asama) {
