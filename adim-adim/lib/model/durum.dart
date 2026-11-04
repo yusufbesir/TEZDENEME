@@ -21,6 +21,9 @@
 /// alanları (ÖZELLİK 70), boş liste; `alinanGorevler`/`rozetler`: ödülü
 /// alınan günlük-haftalık görevler ve kazanılmış başarım rozetleri, boş küme;
 /// `oturumKartSayisi`: oturum başına kart sayısı, 5/10/20 dışı ya da yoksa 5;
+/// `kilit`: uygulama kilidi PIN karması (model/kilit.dart), yoksa/bozuksa null)
+/// `akilliHatirlaticiAcik`/`sonHatirlatmaGunu`/`calismaSaatleri`: akıllı
+/// hatırlatıcı (SADE 6), kapalı, hiç gönderilmemiş, boş liste;
 /// `sesHizi`: dinleme konuşma hızı çarpanı 0,7..1,2, yoksa 1,0, aralık dışı kırpılır)
 /// (kartta yarı ömür eski Leitner kutusundan türetilir, hata defteri boş,
 /// haftalık hedef 5, son ders yok, günlük boş, not yok, bilmece cevaplanmamış;
@@ -29,6 +32,7 @@
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla.
 library;
 
+import 'kilit.dart';
 import 'kod_projesi.dart';
 import 'satranc_durumu.dart';
 
@@ -433,6 +437,10 @@ class OgrenciDurumu {
     this.haftalikNotlar = const {},
     this.kelimeEklenme = const {},
     this.oturumKartSayisi = varsayilanOturumKarti,
+    this.kilit,
+    this.akilliHatirlaticiAcik = false,
+    this.sonHatirlatmaGunu,
+    this.calismaSaatleri = const [],
     this.sesHizi = varsayilanSesHizi,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
@@ -652,6 +660,21 @@ class OgrenciDurumu {
   /// kart sayısı: yalnız [oturumKartSecenekleri] değerleri (varsayılan 5).
   final int oturumKartSayisi;
 
+  /// Uygulama kilidi (PIN karması; düz metin yok). null: kilit kapalı
+  /// (eski kayıtlar ve bozuk alan). Ayrıntı: model/kilit.dart.
+  final KilitAyari? kilit;
+  /// Akıllı hatırlatıcı (SADE 6; günde en çok bir bildirim); varsayılan kapalı.
+  final bool akilliHatirlaticiAcik;
+
+  /// Akıllı hatırlatıcının en son gönderildiği gün 'YYYY-MM-DD'; null: hiç.
+  final String? sonHatirlatmaGunu;
+
+  /// XP kazanılan son çalışmaların saati (0..23), eskiden yeniye; en çok
+  /// [calismaSaatiEnCok] kayıt. Hatırlatma saati bunların ortancasıdır.
+  final List<int> calismaSaatleri;
+
+  static const int calismaSaatiEnCok = 14;
+
   static const List<int> oturumKartSecenekleri = [5, 10, 20];
   static const int varsayilanOturumKarti = 5;
 
@@ -792,6 +815,11 @@ class OgrenciDurumu {
     Map<String, String>? haftalikNotlar,
     Map<String, String>? kelimeEklenme,
     int? oturumKartSayisi,
+    KilitAyari? kilit,
+    bool kilitSil = false,
+    bool? akilliHatirlaticiAcik,
+    String? sonHatirlatmaGunu,
+    List<int>? calismaSaatleri,
     double? sesHizi,
   }) {
     return OgrenciDurumu(
@@ -862,6 +890,11 @@ class OgrenciDurumu {
       haftalikNotlar: haftalikNotlar ?? this.haftalikNotlar,
       kelimeEklenme: kelimeEklenme ?? this.kelimeEklenme,
       oturumKartSayisi: oturumKartSayisi ?? this.oturumKartSayisi,
+      kilit: kilitSil ? null : (kilit ?? this.kilit),
+      akilliHatirlaticiAcik:
+          akilliHatirlaticiAcik ?? this.akilliHatirlaticiAcik,
+      sonHatirlatmaGunu: sonHatirlatmaGunu ?? this.sonHatirlatmaGunu,
+      calismaSaatleri: calismaSaatleri ?? this.calismaSaatleri,
       sesHizi: sesHizi ?? this.sesHizi,
     );
   }
@@ -930,6 +963,10 @@ class OgrenciDurumu {
     'haftalikNotlar': haftalikNotlar,
     'kelimeEklenme': kelimeEklenme,
     'oturumKartSayisi': oturumKartSayisi,
+    'kilit': kilit?.toJson(),
+    'akilliHatirlaticiAcik': akilliHatirlaticiAcik,
+    'sonHatirlatmaGunu': sonHatirlatmaGunu,
+    'calismaSaatleri': calismaSaatleri,
     'sesHizi': sesHizi,
   };
 
@@ -1270,9 +1307,33 @@ class OgrenciDurumu {
               oturumKartSecenekleri.contains(j['oturumKartSayisi']))
           ? j['oturumKartSayisi'] as int
           : varsayilanOturumKarti,
+      // Eski kayıtta yoksa ya da bozuksa kilit yok (kilitsiz açılış).
+      kilit: KilitAyari.fromJson(j['kilit']),
+      // Eski kayıtta yoksa: kapalı, hiç gönderilmedi, saat kaydı yok.
+      akilliHatirlaticiAcik: j['akilliHatirlaticiAcik'] is bool
+          ? j['akilliHatirlaticiAcik'] as bool
+          : false,
+      sonHatirlatmaGunu:
+          (j['sonHatirlatmaGunu'] is String &&
+              gunGecerli(j['sonHatirlatmaGunu'] as String))
+          ? j['sonHatirlatmaGunu'] as String
+          : null,
+      calismaSaatleri: calismaSaatleriCoz(j['calismaSaatleri']),
       // Eski kayıtta yoksa 1,0; aralık dışıysa kırpılır.
       sesHizi: sesHiziKirp(j['sesHizi']),
     );
+  }
+
+  /// Çalışma saatleri: 0..23 dışı ve sayı olmayan girdiler atılır, en yeni
+  /// [calismaSaatiEnCok] kayıt tutulur.
+  static List<int> calismaSaatleriCoz(Object? ham) {
+    if (ham is! List) return const [];
+    final saatler = [
+      for (final e in ham)
+        if (e is int && e >= 0 && e <= 23) e,
+    ];
+    final fazla = saatler.length - calismaSaatiEnCok;
+    return List.unmodifiable(fazla > 0 ? saatler.sublist(fazla) : saatler);
   }
 
   /// Haftalık notlar: geçersiz hafta anahtarı, boş/metin olmayan değer atılır,

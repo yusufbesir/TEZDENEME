@@ -16,10 +16,12 @@ import '../depo/depo.dart';
 import '../icerik/icerik.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../model/kilit.dart';
 import '../model/satranc_durumu.dart';
 import '../motor/basarimlar.dart';
 import '../motor/efsanevi.dart';
 import '../motor/haftalik_odev.dart';
+import '../motor/hatirlatici.dart';
 import '../motor/gorevler.dart';
 import '../motor/kod_calistirici.dart';
 import '../motor/kod_projesi.dart';
@@ -121,6 +123,9 @@ final secilenKursProvider = NotifierProvider<SecilenKurs, String?>(
   SecilenKurs.new,
 );
 
+/// Akıllı hatırlatıcının saati; testlerde sabit saatle değiştirilir.
+final saatProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   @override
   Future<OgrenciDurumu> build() async {
@@ -180,7 +185,40 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             .catchError((_) => false),
       );
     }
+    // Akıllı hatırlatıcı (SADE 6): ayar açıksa, bugün XP yoksa, saat
+    // geldiyse, günde en çok bir kez. Ön plana dönüşte de denetlenir
+    // (akilliHatirlaticiKontrol).
+    d = await _akilliHatirlat(d, ref.read(saatProvider)());
     return d;
+  }
+
+  /// Gerekiyorsa akıllı hatırlatıcıyı gösterir; gün hemen işaretlenip
+  /// kaydedilir (başarısız olsa da aynı gün yeniden denenmez).
+  Future<OgrenciDurumu> _akilliHatirlat(OgrenciDurumu d, DateTime simdi) async {
+    if (!Hatirlatici.gerekli(d, simdi)) return d;
+    d = d.copyWith(sonHatirlatmaGunu: Motor.bugun(simdi));
+    try {
+      await ref.read(depoProvider).kaydet(d);
+    } catch (e) {
+      debugPrint('Akıllı hatırlatıcı günü kaydedilemedi: $e');
+    }
+    unawaited(
+      ref
+          .read(bildirimProvider)
+          .akilliHatirlatma(Hatirlatici.metin)
+          .catchError((_) => false),
+    );
+    return d;
+  }
+
+  /// Uygulama ön plana gelince çağrılır: akıllı hatırlatıcı gerekiyorsa
+  /// gösterir. Durum yüklenmemişse bir şey yapmaz.
+  Future<void> akilliHatirlaticiKontrol([DateTime? simdi]) async {
+    final d = state.value;
+    if (d == null) return;
+    final an = simdi ?? ref.read(saatProvider)();
+    final yeni = await _akilliHatirlat(d, an);
+    if (!identical(yeni, d)) state = AsyncData(yeni);
   }
 
   OgrenciDurumu get _simdiki => state.value ?? const OgrenciDurumu();
@@ -188,7 +226,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
   Future<OgrenciDurumu> _uygula(
     OgrenciDurumu Function(OgrenciDurumu) donustur,
   ) async {
-    final yeni = donustur(_simdiki);
+    final eski = _simdiki;
+    var yeni = donustur(eski);
+    // XP kazanıldıysa çalışma saati kaydedilir (akıllı hatırlatıcı saati).
+    if (yeni.xp > eski.xp) {
+      yeni = Hatirlatici.calismaKaydet(yeni, ref.read(saatProvider)().hour);
+    }
     state = AsyncData(yeni);
     try {
       await ref.read(depoProvider).kaydet(yeni);
@@ -535,7 +578,8 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
 
   /// Verilen ayarları günceller. `koyuTemaSil`: sistem temasına dön;
   /// `hatirlatmaSil`: hatırlatmayı kapat; `tekrarBildirimiAcik`: açılıştaki
-  /// bekleyen tekrar bildirimi. Hatırlatma açılırken bildirim izni
+  /// bekleyen tekrar bildirimi; `akilliHatirlaticiAcik`: günde en çok bir
+  /// akıllı hatırlatıcı (SADE 6). Hatırlatma açılırken bildirim izni
   /// verilmezse hatırlatma geri kapatılır ve false döner.
   Future<bool> ayarGuncelle({
     String? ad,
@@ -550,6 +594,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? konusmaAcik,
     bool? gunDersiBildirimiAcik,
     int? oturumKartSayisi,
+    bool? akilliHatirlaticiAcik,
     double? sesHizi,
   }) async {
     await _uygula(
@@ -568,6 +613,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
         tekrarBildirimiAcik: tekrarBildirimiAcik,
         konusmaAcik: konusmaAcik,
         gunDersiBildirimiAcik: gunDersiBildirimiAcik,
+        akilliHatirlaticiAcik: akilliHatirlaticiAcik,
         // Yalnız 5/10/20 kabul edilir; başka değer yok sayılır.
         oturumKartSayisi:
             (oturumKartSayisi != null &&
@@ -594,6 +640,12 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     }
     return true;
   }
+
+  /// Uygulama kilidi: [kilit] verilirse açılır (PIN karması saklanır), null
+  /// ise kapatılır. PIN doğrulaması çağıranda yapılır (ayarlar ekranı).
+  Future<OgrenciDurumu> kilitAyarla(KilitAyari? kilit) => _uygula(
+    (d) => kilit == null ? d.copyWith(kilitSil: true) : d.copyWith(kilit: kilit),
+  );
 
   Future<void> sifirla() async {
     try {

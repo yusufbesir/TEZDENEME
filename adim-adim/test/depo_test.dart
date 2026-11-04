@@ -256,6 +256,9 @@ void main() {
     test('tüm alanlar bozuksa sonuç varsayılan durumla aynıdır', () {
       final hepsiBozuk = {
         for (final k in const OgrenciDurumu().toJson().keys) k: [1, 2],
+        // [1, 2] çalışma saatleri için geçerli bir değerdir (0..23); bu alan
+        // için aralık dışı ve türü yanlış girdilerden oluşan bozuk liste verilir.
+        'calismaSaatleri': [24, -1, 'x', 2.5],
       };
       ayniMi(OgrenciDurumu.fromJson(hepsiBozuk), const OgrenciDurumu());
       ayniMi(OgrenciDurumu.fromJson(null), const OgrenciDurumu());
