@@ -1,5 +1,5 @@
 'use strict';
-// Dar köprü: sayfaya yalnız window.piril.{komutGonder, onIlerleme, durum, sohbetAc} verilir. Ham ipcRenderer sızdırılmaz.
+// Dar köprü: sayfaya yalnız window.piril.{komutGonder, onIlerleme, onVade, durum, sohbetAc} verilir. Ham ipcRenderer sızdırılmaz.
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('piril', Object.freeze({
@@ -16,6 +16,16 @@ contextBridge.exposeInMainWorld('piril', Object.freeze({
     };
     ipcRenderer.on('piril:ilerleme', dinleyici);
     return () => ipcRenderer.removeListener('piril:ilerleme', dinleyici);
+  },
+  // cb({ tur, metin }) : vadesi gelen hatırlatıcı/alarm (ana süreç bildirimi gösterdikten sonra)
+  onVade(cb) {
+    if (typeof cb !== 'function') return () => {};
+    const dinleyici = (_olay, ileti) => {
+      if (!ileti || typeof ileti.metin !== 'string') return;
+      cb({ tur: ileti.tur === 'alarm' ? 'alarm' : 'hatirlatici', metin: ileti.metin.slice(0, 500) });
+    };
+    ipcRenderer.on('piril:vade', dinleyici);
+    return () => ipcRenderer.removeListener('piril:vade', dinleyici);
   },
   durum() { return ipcRenderer.invoke('piril:durum'); },
   sohbetAc() { return ipcRenderer.invoke('piril:sohbetAc'); }

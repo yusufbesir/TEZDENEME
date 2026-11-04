@@ -120,7 +120,24 @@ function logoYamala(ana, logoDizin, degisen) {
 }
 
 // androidDizin: `cap add android` ile üretilen android/ ; yamalarDizin: bu pakettaki yamalar/ ; logoDizin: logo/android (isteğe bağlı)
-function yamala({ androidDizin, yamalarDizin, ipler = [], logoDizin }) {
+// Sürüm: Capacitor şablonu app/build.gradle içinde versionName "1.0" / versionCode 1 bırakır;
+// package.json sürümü buraya yazılır. versionCode = büyük*10000 + küçük*100 + yama (0.1.2 -> 102).
+function surumKodu(surum) {
+  const p = String(surum).split('.').map((x) => parseInt(x, 10) || 0);
+  return (p[0] || 0) * 10000 + (p[1] || 0) * 100 + (p[2] || 0);
+}
+function surumYamala(androidDizin, surum, degisen) {
+  if (!/^\d+\.\d+\.\d+$/.test(String(surum))) return;
+  const yol = path.join(androidDizin, 'app', 'build.gradle');
+  if (!fs.existsSync(yol)) return;
+  const eski = fs.readFileSync(yol, 'utf8');
+  const yeni = eski
+    .replace(/versionName\s+"[^"]*"/, `versionName "${surum}"`)
+    .replace(/versionCode\s+\d+/, `versionCode ${surumKodu(surum)}`);
+  if (yaz(yol, yeni)) degisen.push('app/build.gradle');
+}
+
+function yamala({ androidDizin, yamalarDizin, ipler = [], logoDizin, surum }) {
   const ana = path.join(androidDizin, 'app', 'src', 'main');
   const manifestYol = path.join(ana, 'AndroidManifest.xml');
   if (!fs.existsSync(manifestYol)) hataFirlat(manifestYol + ' yok. Önce `npx cap add android` çalıştırın.');
@@ -141,10 +158,11 @@ function yamala({ androidDizin, yamalarDizin, ipler = [], logoDizin }) {
   const yeni = manifestYamala(manifest, izinleriOku(yamalarDizin));
   if (yaz(manifestYol, yeni)) degisen.push('AndroidManifest.xml');
   if (logoDizin) logoYamala(ana, logoDizin, degisen);
+  if (surum) surumYamala(androidDizin, surum, degisen);
   return { degisen };
 }
 
-module.exports = { yamala, logoYamala, manifestYamala, YEDEK_OZNITELIKLERI, ipEkle, ipBloguOku, ozelIpv4 };
+module.exports = { yamala, logoYamala, surumYamala, surumKodu, manifestYamala, YEDEK_OZNITELIKLERI, ipEkle, ipBloguOku, ozelIpv4 };
 
 if (require.main === module) {
   const arg = process.argv.slice(2);
@@ -153,7 +171,8 @@ if (require.main === module) {
     const ipler = (al('--ip') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const androidDizin = path.resolve(al('--android') || path.join(__dirname, '..', 'android'));
     const logoDizin = path.join(__dirname, '..', '..', 'logo', 'android');
-    const s = yamala({ androidDizin, yamalarDizin: path.join(__dirname, '..', 'yamalar'), ipler, logoDizin: fs.existsSync(logoDizin) ? logoDizin : undefined });
+    const surum = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')).version;
+    const s = yamala({ androidDizin, yamalarDizin: path.join(__dirname, '..', 'yamalar'), ipler, logoDizin: fs.existsSync(logoDizin) ? logoDizin : undefined, surum });
     console.log(s.degisen.length ? 'Yamalandı: ' + s.degisen.join(', ') : 'Zaten yamalı, değişiklik yok.');
   } catch (e) {
     console.error(e.message);
