@@ -27,6 +27,7 @@ import '../bilesenler/oturum_ozeti.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../motor/cekim_turu.dart';
 import '../motor/motor.dart';
 import '../motor/oturum_ozeti.dart';
 import '../motor/pratik.dart';
@@ -71,7 +72,8 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
   /// Ekran açıldığından beri geçen süre (günlük süre takibi, ÖZELLİK 80).
   final Stopwatch _sure = Stopwatch()..start();
 
-  bool get _quiz => widget.mod == 'quiz';
+  /// 'quiz' ve 'cekim' (çekim turu) aynı akışı paylaşır: kartlar değişmez, küçük XP.
+  bool get _quiz => widget.mod == 'quiz' || widget.mod == 'cekim';
 
   /// Dönem dersi kipi ve geçerli dönem türü (aksi halde null).
   String? get _donem =>
@@ -108,6 +110,8 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
       final ders = widget.dersId == null ? null : _dersBul(widget.dersId!);
       _liste = ders == null
           ? const []
+          : widget.mod == 'cekim'
+          ? CekimTuru.sec(ders, Motor.yanlisListesiCoz(widget.yanlis))
           : Motor.quizSec(ders, Motor.yanlisListesiCoz(widget.yanlis));
     } else if (widget.mod == 'karisik' && widget.dersId != null) {
       _liste = Motor.serpistirmeSec(
@@ -233,6 +237,7 @@ class _MikroDurumu extends ConsumerState<MikroDersEkrani> {
                   'zayif' => 'Zayıf noktalar dersi tamamlandı',
                   'karisik' => 'Karışık tekrar tamamlandı',
                   'quiz' => 'Quiz tamamlandı',
+                  'cekim' => 'Çekim turu tamamlandı',
                   'donem' => '${Motor.donemAdi(_donem ?? '')} tamamlandı',
                   'karisim' => 'Günlük karışım tamamlandı',
                   'yanlis' => 'Yanlışlar çözüldü',

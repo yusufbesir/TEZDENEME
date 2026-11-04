@@ -34,6 +34,9 @@ class DersOzeti extends StatelessWidget {
     this.ek3Etiket,
     this.onEk3,
     this.ek3Simge = Icons.style_outlined,
+    this.ek4Etiket,
+    this.onEk4,
+    this.ek4Simge = Icons.replay,
     this.bilgi,
     this.oturum,
   });
@@ -62,6 +65,11 @@ class DersOzeti extends StatelessWidget {
   final String? ek3Etiket;
   final VoidCallback? onEk3;
   final IconData ek3Simge;
+
+  /// Dördüncü isteğe bağlı ek eylem (ör. "5 soruluk çekim turu").
+  final String? ek4Etiket;
+  final VoidCallback? onEk4;
+  final IconData ek4Simge;
 
   /// İsteğe bağlı bilgi bölümü (ör. ustalık kartı); özet kartının altında.
   final Widget? bilgi;
@@ -206,6 +214,15 @@ class DersOzeti extends StatelessWidget {
                         icon: Icon(ek3Simge),
                         label: Text(ek3Etiket!),
                         onPressed: onEk3,
+                      ),
+                      const SizedBox(height: Olcu.b2),
+                    ],
+                    if (ek4Etiket != null && onEk4 != null) ...[
+                      OutlinedButton.icon(
+                        key: const Key('ozet-ek4'),
+                        icon: Icon(ek4Simge),
+                        label: Text(ek4Etiket!),
+                        onPressed: onEk4,
                       ),
                       const SizedBox(height: Olcu.b2),
                     ],
