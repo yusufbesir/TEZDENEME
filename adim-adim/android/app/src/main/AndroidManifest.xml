@@ -2,6 +2,8 @@
     <!-- Bildirim (Android 13+) ve cihaz yeniden başlayınca hatırlatmayı yeniden kurmak için. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Mikrofon: yalnız kullanım anında istenir (açılışta istenmez). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:label="Adım Adım"
         android:allowBackup="false"
