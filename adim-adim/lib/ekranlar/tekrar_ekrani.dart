@@ -272,18 +272,19 @@ class _HataDefteri extends StatelessWidget {
 
   static const int _enCokSatir = 20;
 
+  /// Hata türü etiketi (yazım / anlam / dinleme); ayar kapalıysa ya da kayıt
+  /// bir kart değilse boş.
+  String _turEtiketi(HataKaydi h) {
+    if (!durum.hataTuruAcik || h.tur != HataKaydi.turKart) return '';
+    final a = Motor.kartCoz(kurslar, h.id);
+    return a == null ? '' : ' · ${Motor.hataTuru(a.tur)}';
+  }
+
   /// Kayıt metni ve (yarışmada) kategori; alanda çözülemiyorsa null.
   ({String metin, YarismaKategori? kategori})? _coz(HataKaydi h) {
     if (h.tur == HataKaydi.turKart) {
       final a = Motor.kartCoz(kurslar, h.id);
-      return a == null
-          ? null
-          : (
-              metin: durum.hataTuruAcik
-                  ? '[${Motor.hataTuru(a.tur)}] ${a.soru}'
-                  : a.soru,
-              kategori: null,
-            );
+      return a == null ? null : (metin: a.soru, kategori: null);
     }
     for (final q in tumSorular) {
       if (q.id == h.id && q.alan == durum.alan) {
@@ -333,6 +334,7 @@ class _HataDefteri extends StatelessWidget {
               ayrinti:
                   '${s.kat?.ad ?? 'Alıştırma'} · ${s.hata.seviye} · ${s.hata.gun}'
                   '${(durum.kartlar[s.hata.id]?.sakin == true && durum.kartlar[s.hata.id]!.sonraki.compareTo(bugun) > 0) ? ' · İpucu kelime (14 gün dinleniyor)' : ''}'
+                  '${_turEtiketi(s.hata)}'
                   '${durum.kelimeNotlari[s.hata.id] != null ? ' · Not: ${durum.kelimeNotlari[s.hata.id]}' : ''}',
               renk: s.kat == null
                   ? r.ana
