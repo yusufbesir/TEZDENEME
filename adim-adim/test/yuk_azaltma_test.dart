@@ -56,6 +56,7 @@ void main() {
     });
     test('kartIsle ayarı kullanır; JSON gidiş-dönüş, eski kayıt', () {
       var d = const OgrenciDurumu(
+        emekliAcik: true,
         kartlar: {
           'k.u1.d1#0': Kart(kutu: 5, sonraki: '2026-11-04', yariOmurGun: 40),
         },
