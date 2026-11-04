@@ -11,6 +11,8 @@
 /// [1,0 ; 1,3] aralığına kıstırır.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -447,11 +449,37 @@ final yonlendiriciProvider = Provider<GoRouter>((ref) {
   return yonlendirici;
 });
 
-class AdimAdimUygulama extends ConsumerWidget {
+class AdimAdimUygulama extends ConsumerStatefulWidget {
   const AdimAdimUygulama({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdimAdimUygulama> createState() => _AdimAdimUygulamaState();
+}
+
+class _AdimAdimUygulamaState extends ConsumerState<AdimAdimUygulama>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Arka plana geçişte bekleyen ilerleme diske indirilir (mevcut yazma kuyruğu).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      unawaited(ref.read(durumProvider.notifier).arkaPlanaGecti());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final durum = ref.watch(durumProvider);
     final koyu = durum.value?.koyuTema;
     return MaterialApp.router(

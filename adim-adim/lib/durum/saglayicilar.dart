@@ -185,6 +185,17 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
 
   OgrenciDurumu get _simdiki => state.value ?? const OgrenciDurumu();
 
+  /// Uygulama arka plana geçince çağrılır: her değişiklik [_uygula] ile
+  /// zaten yazma kuyruğuna girer; burada yeni yazma açılmaz (çift yazma yok),
+  /// yalnızca kuyruktaki bekleyen yazmaların diske inmesi beklenir.
+  Future<void> arkaPlanaGecti() async {
+    try {
+      await ref.read(depoProvider).bosalt();
+    } catch (e) {
+      debugPrint('Bekleyen ilerleme diske yazılamadı: $e');
+    }
+  }
+
   Future<OgrenciDurumu> _uygula(
     OgrenciDurumu Function(OgrenciDurumu) donustur,
   ) async {
