@@ -4,10 +4,14 @@
 /// Sahibi Yusuf (yusufbesir). Değiştirme kuralı: testler geçmeden değişmez;
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 /// Yalnızca gösterir; kaydetme işi `oyun_ekrani.dart`ta bir kez yapılır.
+/// Puan/en iyi satırı ve bu turda kazanılan rozet çipleri yazan: [Claude#yarisma-rozet].
 library;
+
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../motor/basarimlar.dart';
 import '../../tema/kategori_renkleri.dart';
 import '../../tema/tema.dart';
 import '../model.dart';
@@ -20,11 +24,27 @@ class SonucGorunumu extends StatelessWidget {
     required this.oyun,
     required this.onTekrar,
     required this.onLobi,
+    this.enIyiPuan,
+    this.yeniRozetler = const [],
   });
 
   final YarismaOyunu oyun;
   final VoidCallback onTekrar;
   final VoidCallback onLobi;
+
+  /// Bu alan + seviyede kayıtlı en iyi puan (bilinmiyorsa null; bu turun puanı
+  /// daha yüksekse satırda o gösterilir).
+  final int? enIyiPuan;
+
+  /// Bu turda yeni kazanılan rozet kimlikleri ([Basarimlar.tanimlar]);
+  /// tanımsız kimlik gösterilmez.
+  final List<String> yeniRozetler;
+
+  /// "Puan: X · En iyi: Y" satırı; Y = max(kayıtlı en iyi, bu tur).
+  String get puanSatiri {
+    final enIyi = math.max(enIyiPuan ?? 0, oyun.puan);
+    return 'Puan: ${oyun.puan} · En iyi: $enIyi';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +93,17 @@ class SonucGorunumu extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: Olcu.b1),
+                Center(
+                  child: Text(
+                    puanSatiri,
+                    style: yazi.bodyMedium?.copyWith(color: r.metinIkincil),
+                  ),
+                ),
+                if (yeniRozetler.isNotEmpty) ...[
+                  const SizedBox(height: Olcu.b1),
+                  _RozetCipleri(idler: yeniRozetler),
+                ],
                 const SizedBox(height: Olcu.b2),
                 Center(child: TacSirasi(taclar: oyun.taclar, boyut: 30)),
                 Center(
@@ -164,6 +195,57 @@ class _Olcut extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bu turda kazanılan rozetler: küçük çipler, animasyonsuz.
+class _RozetCipleri extends StatelessWidget {
+  const _RozetCipleri({required this.idler});
+  final List<String> idler;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    final yazi = Theme.of(context).textTheme;
+    final tanimlar = [
+      for (final id in idler)
+        for (final t in Basarimlar.tanimlar)
+          if (t.id == id) t,
+    ];
+    if (tanimlar.isEmpty) return const SizedBox.shrink();
+    return Semantics(
+      container: true,
+      label: 'Yeni rozet: ${tanimlar.map((t) => t.ad).join(', ')}',
+      child: ExcludeSemantics(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: Olcu.b1,
+          runSpacing: Olcu.b1,
+          children: [
+            for (final t in tanimlar)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Olcu.b2,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: r.yuzey,
+                  borderRadius: BorderRadius.circular(Olcu.kose),
+                  border: Border.all(color: r.kenar),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.emoji_events, size: 16, color: r.vurgu),
+                    const SizedBox(width: 4),
+                    Text(t.ad, style: yazi.bodyMedium),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
