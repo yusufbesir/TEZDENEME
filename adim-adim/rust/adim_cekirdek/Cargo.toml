@@ -6,6 +6,7 @@ description = "Adım Adım hesap çekirdeği (saf, yan etkisiz); Dart ile eşde�
 license = "UNLICENSED"
 
 [dependencies]
+unicode-properties = "0.1"
 
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }
