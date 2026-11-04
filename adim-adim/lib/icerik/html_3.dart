@@ -271,6 +271,9 @@ const Kurs html3 = Kurs(
                 'src="urun.jpg"',
               ],
               dogru: ['<img', 'src="urun.jpg"', 'loading="lazy"', 'alt="Süt">'],
+              kabul: [
+                ['<img', 'loading="lazy"', 'src="urun.jpg"', 'alt="Süt">'],
+              ],
               aciklama:
                   'Etiket adı, kaynak, yükleme davranışı ve alt metin yazıldı.',
             ),

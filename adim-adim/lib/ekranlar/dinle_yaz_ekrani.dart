@@ -6,7 +6,7 @@
 /// [DinleYaz.kontrol] ile yapılır. Durum değiştirmez: SRS, XP ve hata defteri
 /// aynen kalır, ceza yoktur.
 /// Sahibi: Yusuf (yusufbesir). Testler geçmeden değişmez; silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
-/// yazan: [Claude#dalga3]
+/// yazan: [Claude#dalga3]; hız seçici (ayar `sesHizi`): [Claude#tts-hiz]
 library;
 
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bilesenler/sayfa_govdesi.dart';
+import '../bilesenler/ses_hiz_secici.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../motor/dinle_yaz.dart';
@@ -79,7 +80,12 @@ class _DinleYazDurumu extends ConsumerState<DinleYazEkrani> {
   Future<void> _oku() async {
     if (_deste.isEmpty || _bitti) return;
     final k = _deste[_indeks];
-    final tamam = await ref.read(sesProvider).oku(k.metin, dil: k.sesDili);
+    final carpan =
+        ref.read(durumProvider).value?.sesHizi ??
+        OgrenciDurumu.varsayilanSesHizi;
+    final tamam = await ref
+        .read(sesProvider)
+        .okuHizla(k.metin, dil: k.sesDili, carpan: carpan);
     if (!mounted) return;
     if (!tamam && !_sesYok) {
       setState(() {
@@ -226,6 +232,10 @@ class _DinleYazDurumu extends ConsumerState<DinleYazEkrani> {
                 label: const Text('Dinle'),
               ),
             ),
+            if (!_sesYok) ...[
+              const SizedBox(height: Olcu.b1),
+              const SesHizSecici(),
+            ],
             if (_sesYok) ...[
               const SizedBox(height: Olcu.b1),
               Text(

@@ -283,22 +283,38 @@ $kod
 })()
 ''';
 
+  /// Kullanıcıya gösterilen zaman aşımı iletisi.
+  static const String zamanAsimiAciklamasi =
+      'Süre sınırı aşıldı (sonsuz döngü olabilir)';
+
+  /// Hata iletisi üst sınırı (ör. `throw new Error("x".repeat(1e6))`).
+  static const int hataEnCokKarakter = 2000;
+  static const String _kisaltmaEki = '… (çıktı kısaltıldı)';
+
   /// Betiğin döndürdüğü JSON'u sonuca çevirir (geçersizse hata sonucu).
+  /// Dart tarafı ikinci bir güvenlik ağıdır: çıktı ve hata iletisi, JS
+  /// bekçisi atlatılmış olsa bile burada da kısaltılır.
   static KodCalismaSonucu sonucCoz(String kod, Object? ham) {
     if (ham is! Map) {
       return KodCalismaSonucu(kod: kod, hata: 'Motor geçersiz sonuç döndürdü');
     }
-    final cikti = ham['c'] is String ? ham['c'] as String : '';
+    var cikti = ham['c'] is String ? ham['c'] as String : '';
+    // JS tarafı tek satırlık payla (kısaltma eki) sınırı aşabilir; üstü
+    // bozuk/atlatılmış sayılır ve kırpılır.
+    if (cikti.length > ciktiEnCokKarakter + _kisaltmaEki.length + 1) {
+      cikti = '${cikti.substring(0, ciktiEnCokKarakter)}\n$_kisaltmaEki';
+    }
     final z = ham['z'] == true || ham['h'] == zamanIletisi;
     final h = ham['h'];
-    return KodCalismaSonucu(
-      kod: kod,
-      cikti: cikti,
-      zamanAsimi: z,
-      hata: z
-          ? 'Süre sınırı aşıldı (sonsuz döngü olabilir)'
-          : (h is String ? h : null),
-    );
+    String? hata;
+    if (z) {
+      hata = zamanAsimiAciklamasi;
+    } else if (h is String) {
+      hata = h.length > hataEnCokKarakter
+          ? '${h.substring(0, hataEnCokKarakter)}…'
+          : h;
+    }
+    return KodCalismaSonucu(kod: kod, cikti: cikti, zamanAsimi: z, hata: hata);
   }
 }
 

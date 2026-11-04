@@ -987,6 +987,12 @@ const Kurs ingilizceA1 = Kurs(
               aciklama:
                   "'Friday' 'fraydey' gibi okunur; 'see you on' ile bir sonraki buluşma günü söylenir.",
             ),
+            Dikte(
+              soru: 'Dinle ve duyduğun cümleyi yaz.',
+              metin: 'I have English class on Friday.',
+              aciklama:
+                  'Günlerin önünde on gelir: on Friday. English ve Friday büyük harfle yazılır.',
+            ),
           ],
         ),
       ],
@@ -1250,6 +1256,12 @@ const Kurs ingilizceA1 = Kurs(
               dogru: 1,
               aciklama:
                   "'try this on' bir kıyafeti denemek demektir; 'Can I' 'kenay' gibi bitişik okunur ve izin ister.",
+            ),
+            Dikte(
+              soru: 'Dinle ve duyduğun cümleyi yaz.',
+              metin: 'I want to buy a cheaper shirt.',
+              aciklama:
+                  'want to + fiil: istemek; cheaper daha ucuz demektir, a shirt bir gömlek.',
             ),
           ],
         ),
