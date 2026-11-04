@@ -17,6 +17,7 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../motor/karisik_sira.dart';
 import '../motor/motor.dart';
 import '../tema/kategori_renkleri.dart';
 import '../tema/tema.dart';
@@ -51,6 +52,16 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
           (kartId: id, alistirma: a),
     ];
   }
+
+  /// Yeni oturum sırası: aynı kart/tür art arda gelmesin (günlük sabit tohum).
+  List<({String kartId, Alistirma alistirma})> _karisik(
+    List<({String kartId, Alistirma alistirma})> liste,
+  ) => KarisikSira.diz(
+    liste,
+    kimlik: (o) => o.kartId,
+    tur: (o) => o.alistirma.tur,
+    tohum: KarisikSira.tohumDan(ref.read(bugunProvider)),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +150,7 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                                       'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
                                   dugme: 'Tekrara başla',
                                   onTap: () => setState(() {
-                                    _oturum = bekleyen;
+                                    _oturum = _karisik(bekleyen);
                                     _onceki.clear();
                                     _sonuc = null;
                                   }),

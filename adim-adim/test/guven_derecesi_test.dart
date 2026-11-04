@@ -50,11 +50,10 @@ void main() {
       expect(zor.yariOmurGun, closeTo(5.2, 1e-9));
       expect(iyi.yariOmurGun, 8);
       expect(kolay.yariOmurGun, 12);
-      expect([zor.sonDerece, iyi.sonDerece, kolay.sonDerece], [
-        'zor',
-        'iyi',
-        'kolay',
-      ]);
+      expect(
+        [zor.sonDerece, iyi.sonDerece, kolay.sonDerece],
+        ['zor', 'iyi', 'kolay'],
+      );
       expect(zor.sonraki.compareTo(kolay.sonraki) < 0, isTrue);
     });
 
@@ -104,15 +103,18 @@ void main() {
   });
 
   group('Motor.kartDerecele', () {
-    test('kartIsle x2 yazdıktan sonra dereceyi öncekinden yeniden hesaplar', () {
-      var d = const OgrenciDurumu(kartlar: {'a#0': _onceki});
-      d = Motor.kartIsle(d, 'a#0', true, _bugun);
-      expect(d.kartlar['a#0']!.yariOmurGun, 8);
-      d = Motor.kartDerecele(d, 'a#0', _onceki, GuvenDerecesi.zor, _bugun);
-      expect(d.kartlar['a#0']!.yariOmurGun, closeTo(5.2, 1e-9));
-      expect(d.kartlar['a#0']!.sonDerece, 'zor');
-      expect(d.hatalar, isEmpty);
-    });
+    test(
+      'kartIsle x2 yazdıktan sonra dereceyi öncekinden yeniden hesaplar',
+      () {
+        var d = const OgrenciDurumu(kartlar: {'a#0': _onceki});
+        d = Motor.kartIsle(d, 'a#0', true, _bugun);
+        expect(d.kartlar['a#0']!.yariOmurGun, 8);
+        d = Motor.kartDerecele(d, 'a#0', _onceki, GuvenDerecesi.zor, _bugun);
+        expect(d.kartlar['a#0']!.yariOmurGun, closeTo(5.2, 1e-9));
+        expect(d.kartlar['a#0']!.sonDerece, 'zor');
+        expect(d.hatalar, isEmpty);
+      },
+    );
 
     test('kart yoksa durum aynen döner', () {
       const d = OgrenciDurumu();
