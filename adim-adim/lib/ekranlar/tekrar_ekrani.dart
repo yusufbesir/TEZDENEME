@@ -17,6 +17,7 @@ import '../bilesenler/sayfa_govdesi.dart';
 import '../durum/saglayicilar.dart';
 import '../model/durum.dart';
 import '../model/icerik.dart';
+import '../motor/karisik_sira.dart';
 import '../motor/motor.dart';
 import '../tema/kategori_renkleri.dart';
 import '../tema/tema.dart';
@@ -35,6 +36,9 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
   List<({String kartId, Alistirma alistirma})>? _oturum;
   ({int dogru, int toplam})? _sonuc;
 
+  /// Güven derecesi için: cevaptan ÖNCEKİ kart hâli (kartIsle x2 yazar).
+  final Map<String, Kart?> _onceki = {};
+
   List<({String kartId, Alistirma alistirma})> _bekleyenler() {
     final durum = ref.read(durumProvider).value;
     if (durum == null) return const [];
@@ -48,6 +52,16 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
           (kartId: id, alistirma: a),
     ];
   }
+
+  /// Yeni oturum sırası: aynı kart/tür art arda gelmesin (günlük sabit tohum).
+  List<({String kartId, Alistirma alistirma})> _karisik(
+    List<({String kartId, Alistirma alistirma})> liste,
+  ) => KarisikSira.diz(
+    liste,
+    kimlik: (o) => o.kartId,
+    tur: (o) => o.alistirma.tur,
+    tohum: KarisikSira.tohumDan(ref.read(bugunProvider)),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +78,16 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
           // Kişisel kelime notu: cevaptan sonra bantta gösterilir.
           notGetir: (i) =>
               ref.read(durumProvider).value?.kelimeNotlari[oturum[i].kartId],
-          onSonuc: (i, dogru) => ref
-              .read(durumProvider.notifier)
-              .kartIsle(oturum[i].kartId, dogru),
+          guvenSor: true,
+          onSonuc: (i, dogru) {
+            final id = oturum[i].kartId;
+            _onceki[id] = ref.read(durumProvider).value?.kartlar[id];
+            ref.read(durumProvider.notifier).kartIsle(id, dogru);
+          },
+          onGuven: (i, g) {
+            final id = oturum[i].kartId;
+            ref.read(durumProvider.notifier).kartDerecele(id, _onceki[id], g);
+          },
           onBitti: (d, t) {
             // Oturum sonu: öğrenme günlüğüne tek 'tekrar' kaydı.
             ref.read(durumProvider.notifier).tekrarBitir(d, t);
@@ -129,7 +150,8 @@ class _TekrarDurumu extends ConsumerState<TekrarEkrani> {
                                       'Kısa bir tekrar, öğrendiklerini kalıcı yapar.',
                                   dugme: 'Tekrara başla',
                                   onTap: () => setState(() {
-                                    _oturum = bekleyen;
+                                    _oturum = _karisik(bekleyen);
+                                    _onceki.clear();
                                     _sonuc = null;
                                   }),
                                 ),

@@ -1404,9 +1404,18 @@ abstract final class Motor {
   /// ortak kullanır): doğruda x2, yanlışta /2 (0,5..180 gün); sonraki tekrar
   /// yarı ömrün yuvarlanmışı kadar gün sonra (en az 1). [onceki] null ise
   /// başlangıç yarı ömrü 1 gündür.
-  static Kart kartHesapla(Kart? onceki, bool dogruMu, String bugun) {
+  ///
+  /// [derece] yalnız doğru cevapta anlamlıdır (SM-2 üç kalitesi): yarı ömür
+  /// çarpanı [GuvenDerecesi.carpan]; null ya da iyi = eski x2 davranışı.
+  static Kart kartHesapla(
+    Kart? onceki,
+    bool dogruMu,
+    String bugun, {
+    GuvenDerecesi? derece,
+  }) {
     final mevcut = onceki?.yariOmurGun ?? 1.0;
-    final ham = dogruMu ? mevcut * 2 : mevcut / 2;
+    final d = dogruMu ? derece : null;
+    final ham = dogruMu ? mevcut * (d?.carpan ?? 2.0) : mevcut / 2;
     final yariOmur = ham < Kart.enAzYariOmur
         ? Kart.enAzYariOmur
         : (ham > Kart.enCokYariOmur ? Kart.enCokYariOmur : ham);
@@ -1416,6 +1425,27 @@ abstract final class Motor {
       sonraki: _gunEkle(bugun, aralik),
       yariOmurGun: yariOmur,
       sonCevap: dogruMu,
+      sonDerece: d?.kod,
+    );
+  }
+
+  /// Doğru cevaptan sonra seçilen güven derecesini uygular: kartı, cevaptan
+  /// ÖNCEKİ hâli [onceki] üzerinden [derece] ile yeniden hesaplar (kartIsle
+  /// zaten x2 yazmıştır; iyi = aynı sonuç). Hata defterine, XP'ye ve yeni kart
+  /// sayacına dokunmaz. Kart yoksa durum aynen döner.
+  static OgrenciDurumu kartDerecele(
+    OgrenciDurumu d,
+    String kartId,
+    Kart? onceki,
+    GuvenDerecesi derece,
+    String bugun,
+  ) {
+    if (!d.kartlar.containsKey(kartId)) return d;
+    return d.copyWith(
+      kartlar: {
+        ...d.kartlar,
+        kartId: kartHesapla(onceki, true, bugun, derece: derece),
+      },
     );
   }
 

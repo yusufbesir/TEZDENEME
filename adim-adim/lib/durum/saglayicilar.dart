@@ -420,6 +420,17 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     return _uygula((d) => Motor.kartIsle(d, kartId, dogruMu, bugun));
   }
 
+  /// Tekrar ekranı güven derecesi: kartı cevaptan önceki hâli [onceki]
+  /// üzerinden [derece] ile yeniden hesaplar (bkz. Motor.kartDerecele).
+  Future<OgrenciDurumu> kartDerecele(
+    String kartId,
+    Kart? onceki,
+    GuvenDerecesi derece,
+  ) {
+    final bugun = ref.read(bugunProvider);
+    return _uygula((d) => Motor.kartDerecele(d, kartId, onceki, derece, bugun));
+  }
+
   /// Pratik merkezi eşleştirme süresi: yalnız daha iyiyse en iyi süre olur.
   /// Kartlara, hata defterine ve XP'ye dokunmaz.
   Future<OgrenciDurumu> eslestirmeBitir(int ms) =>
