@@ -123,7 +123,16 @@ abstract final class Motor {
   /// Seri koruma hakkı: [sonGun]'den sonra atlanan tek gün için, o günün
   /// haftasında hak daha önce kullanılmadıysa true (haftada bir gün atlanabilir).
   static bool seriKorumaVar(OgrenciDurumu d, String sonGun) =>
+      d.seriKorumaAcik &&
       d.seriKorumaHafta != haftaBaslangici(_gunEkle(sonGun, 1));
+
+  /// Hata türü etiketi (alıştırma türünden türetilir): yazarak cevaplananlar
+  /// "yazım", dinleme/konuşma "dinleme", geri kalanı "anlam".
+  static String hataTuru(String alistirmaTuru) => switch (alistirmaTuru) {
+    'yaz' || 'dikte' || 'bosluk' || 'kodyaz' || 'kodbosluk' => 'yazım',
+    'dinle' || 'soyle' => 'dinleme',
+    _ => 'anlam',
+  };
 
   /// Günün haftasının Pazartesi'si 'YYYY-MM-DD'; geçersiz günde aynı metin.
   static String haftaBaslangici(String gun) {

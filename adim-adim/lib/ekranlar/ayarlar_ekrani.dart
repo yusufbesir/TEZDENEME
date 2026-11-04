@@ -567,6 +567,26 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                     notifier.ayarGuncelle(akilliHatirlaticiAcik: v),
               ),
               SwitchListTile(
+                key: const ValueKey('ayar-seri-koruma'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.beach_access_outlined, color: r.ana),
+                title: const Text('Seri koruma (tatil günü)'),
+                subtitle: const Text('Haftada bir atlanan gün serini bozmaz'),
+                value: durum.seriKorumaAcik,
+                onChanged: (v) => notifier.ayarGuncelle(seriKorumaAcik: v),
+              ),
+              SwitchListTile(
+                key: const ValueKey('ayar-hata-turu'),
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.label_outline, color: r.ana),
+                title: const Text('Hata türü etiketi'),
+                subtitle: const Text(
+                  'Hata defterinde yazım / anlam / dinleme ayrımını gösterir',
+                ),
+                value: durum.hataTuruAcik,
+                onChanged: (v) => notifier.ayarGuncelle(hataTuruAcik: v),
+              ),
+              SwitchListTile(
                 key: const ValueKey('ayar-kardes-ertele'),
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(Icons.layers_outlined, color: r.ana),

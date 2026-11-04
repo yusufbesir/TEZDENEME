@@ -276,7 +276,14 @@ class _HataDefteri extends StatelessWidget {
   ({String metin, YarismaKategori? kategori})? _coz(HataKaydi h) {
     if (h.tur == HataKaydi.turKart) {
       final a = Motor.kartCoz(kurslar, h.id);
-      return a == null ? null : (metin: a.soru, kategori: null);
+      return a == null
+          ? null
+          : (
+              metin: durum.hataTuruAcik
+                  ? '[${Motor.hataTuru(a.tur)}] ${a.soru}'
+                  : a.soru,
+              kategori: null,
+            );
     }
     for (final q in tumSorular) {
       if (q.id == h.id && q.alan == durum.alan) {
