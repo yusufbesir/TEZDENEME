@@ -40,8 +40,10 @@ void main() {
 
     test('DuelloBasla', () {
       final m = coz(
-        const DuelloBasla(soruIdleri: ['x.1', 'x.2'], ilkSiraSende: true)
-            .kodla(),
+        const DuelloBasla(
+          soruIdleri: ['x.1', 'x.2'],
+          ilkSiraSende: true,
+        ).kodla(),
       );
       final b = m! as DuelloBasla;
       expect(b.soruIdleri, ['x.1', 'x.2']);
@@ -84,15 +86,14 @@ void main() {
     test('nesne değil', () => expect(hata('[1,2]'), 'nesne_degil'));
     test('tür yok', () => expect(hata('{}'), 'tur_yok'));
     test('tür yanlış tipli', () => expect(hata('{"t":5}'), 'tur_yok'));
-    test('bilinmeyen tür', () => expect(hata('{"t":"hile"}'), 'bilinmeyen_tur'));
+    test(
+      'bilinmeyen tür',
+      () => expect(hata('{"t":"hile"}'), 'bilinmeyen_tur'),
+    );
 
     test('Merhaba: takma ad 24 sınırı', () {
-      String yap(String ad) => jsonEncode({
-        't': 'merhaba',
-        'surum': 1,
-        'ozet': ozet,
-        'takmaAd': ad,
-      });
+      String yap(String ad) =>
+          jsonEncode({'t': 'merhaba', 'surum': 1, 'ozet': ozet, 'takmaAd': ad});
       expect(coz(yap('a' * 24)), isA<Merhaba>());
       expect(hata(yap('a' * 25)), 'takma_ad_hatali');
       expect(hata(yap('   ')), 'takma_ad_hatali');
@@ -101,15 +102,31 @@ void main() {
     test('Merhaba: eksik ya da yanlış tipli alanlar', () {
       expect(hata('{"t":"merhaba"}'), 'surum_hatali');
       expect(
-        hata(jsonEncode({'t': 'merhaba', 'surum': '1', 'ozet': ozet, 'takmaAd': 'a'})),
+        hata(
+          jsonEncode({
+            't': 'merhaba',
+            'surum': '1',
+            'ozet': ozet,
+            'takmaAd': 'a',
+          }),
+        ),
         'surum_hatali',
       );
       expect(
-        hata(jsonEncode({'t': 'merhaba', 'surum': 1, 'ozet': 'kisa', 'takmaAd': 'a'})),
+        hata(
+          jsonEncode({
+            't': 'merhaba',
+            'surum': 1,
+            'ozet': 'kisa',
+            'takmaAd': 'a',
+          }),
+        ),
         'ozet_hatali',
       );
       expect(
-        hata(jsonEncode({'t': 'merhaba', 'surum': 1, 'ozet': ozet, 'takmaAd': 7})),
+        hata(
+          jsonEncode({'t': 'merhaba', 'surum': 1, 'ozet': ozet, 'takmaAd': 7}),
+        ),
         'takma_ad_hatali',
       );
     });
@@ -117,14 +134,8 @@ void main() {
     test('DuelloBasla: öğe sayısı ve id uzunluğu sınırı', () {
       String yap(Object idler, [Object? sira = true]) =>
           jsonEncode({'t': 'basla', 'soruIdleri': idler, 'ilkSiraSende': sira});
-      expect(
-        coz(yap(List.generate(20, (i) => 'id$i'))),
-        isA<DuelloBasla>(),
-      );
-      expect(
-        hata(yap(List.generate(21, (i) => 'id$i'))),
-        'soru_idleri_hatali',
-      );
+      expect(coz(yap(List.generate(20, (i) => 'id$i'))), isA<DuelloBasla>());
+      expect(hata(yap(List.generate(21, (i) => 'id$i'))), 'soru_idleri_hatali');
       expect(hata(yap(<String>[])), 'soru_idleri_hatali');
       expect(hata(yap(['a' * 65])), 'soru_id_hatali');
       expect(coz(yap(['a' * 64])), isA<DuelloBasla>());
@@ -175,7 +186,16 @@ void main() {
     });
 
     test('rastgele çöp girdiler çökmez', () {
-      for (final s in ['', ' ', 'null', 'true', '"x"', '{"t":null}', '\u0000', '{{{{']) {
+      for (final s in [
+        '',
+        ' ',
+        'null',
+        'true',
+        '"x"',
+        '{"t":null}',
+        '\u0000',
+        '{{{{',
+      ]) {
         expect(() => ProtokolMesaji.coz(s), returnsNormally);
         expect(ProtokolMesaji.coz(s), isA<ProtokolHatasi>());
       }

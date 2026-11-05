@@ -90,23 +90,106 @@ class Ses {
   /// flutter_tts bazı platformlarda başarısızlığı 0/false döndürür.
   static bool _basarisiz(Object? sonuc) => sonuc == 0 || sonuc == false;
 
+  /// Son okumada olağandışı bir durum olduysa kısa not (tanı ekranı gösterir).
+  String? sonUyari;
+
   /// Motoru ve [dil]'i hazırlar. Motor ya da dil yoksa istisna fırlatmadan
   /// false döner (çağıran false'u "ses yok" olarak gösterir).
+  ///
+  /// Windows eklentisi `isLanguageAvailable` yöntemini hiç bilmez
+  /// (MissingPluginException); bu "motor yok" demek DEĞİLDİR. Önceki sürümde
+  /// bu istisna ses motorunu kalıcı "yok" işaretleyip hoparlörü tamamen
+  /// susturuyordu. Şimdi bilinmiyor sayılır, doğrudan `setLanguage` denenir;
+  /// tam dil bulunamazsa aynı dil ailesinden ("en-GB") ya da varsayılan
+  /// sesten yararlanılır.
   Future<bool> _dilHazirla(FlutterTts tts, String dil) async {
     if (_motorYok || _dilYok.contains(dil)) return false;
     try {
-      final uygun = await tts.isLanguageAvailable(dil);
-      if (_basarisiz(uygun) || await tts.setLanguage(dil) == 0) {
+      var bilinmiyor = false;
+      Object? uygun;
+      try {
+        uygun = await tts.isLanguageAvailable(dil);
+      } on MissingPluginException {
+        bilinmiyor = true;
+      }
+      if (!bilinmiyor && _basarisiz(uygun)) {
         _dilYok.add(dil);
         debugPrint('Ses dili yok, sessiz geçildi: $dil');
         return false;
       }
+      if (_basarisiz(await tts.setLanguage(dil))) {
+        if (!bilinmiyor) {
+          _dilYok.add(dil);
+          debugPrint('Ses dili yok, sessiz geçildi: $dil');
+          return false;
+        }
+        // Windows: tam eşleşme yok; aynı aileden bir dil ara.
+        final aile = dil.split(RegExp('[-_]')).first.toLowerCase();
+        String? yedek;
+        try {
+          final diller = await tts.getLanguages;
+          if (diller is List) {
+            for (final d in diller) {
+              final ad = d.toString();
+              if (ad.toLowerCase().startsWith(aile)) {
+                yedek = ad;
+                break;
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('Ses dilleri okunamadı: $e');
+        }
+        if (yedek != null && !_basarisiz(await tts.setLanguage(yedek))) {
+          sonUyari = '$dil yok, $yedek kullanıldı';
+          return true;
+        }
+        // Hiç eşleşme yok: sessiz kalmak yerine varsayılan sesle oku.
+        sonUyari = '$dil sesi yok; varsayılan ses kullanıldı';
+        debugPrint(sonUyari);
+        return true;
+      }
+      sonUyari = null;
       return true;
     } on MissingPluginException {
       _motorYok = true;
       debugPrint('Ses motoru yok, sessiz geçildi');
       return false;
     }
+  }
+
+  /// Sorun giderme: motor, sesler, diller ve deneme okumasının sonucu.
+  Future<String> tani({String dil = 'en-US'}) async {
+    final b = StringBuffer();
+    try {
+      final tts = _tts ??= FlutterTts();
+      b.writeln('Motor işaretli yok: $_motorYok');
+      try {
+        final diller = await tts.getLanguages;
+        b.writeln('Diller: ${diller is List ? diller.join(', ') : diller}');
+      } catch (e) {
+        b.writeln('Diller okunamadı: $e');
+      }
+      try {
+        final sesler = await tts.getVoices;
+        final adlar = sesler is List
+            ? sesler
+                  .map((v) => v is Map ? '${v['name']} (${v['locale']})' : '$v')
+                  .toList()
+            : [sesler];
+        b.writeln('Sesler (${adlar.length}): ${adlar.take(8).join('; ')}');
+      } catch (e) {
+        b.writeln('Sesler okunamadı: $e');
+      }
+      _motorYok = false;
+      _dilYok.remove(dil);
+      final ok = await oku('Sound test. One, two, three.', dil: dil);
+      b.writeln('Deneme okuması ($dil): ${ok ? 'başlatıldı' : 'BAŞARISIZ'}');
+      if (sonUyari != null) b.writeln('Uyarı: $sonUyari');
+    } catch (e) {
+      b.writeln('Tanı hatası: $e');
+    }
+    return b.toString().trim();
   }
 
   /// Başarıyla konuşma başlatıldıysa true; motor/dil yoksa ya da hata olursa
