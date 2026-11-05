@@ -82,3 +82,4 @@
 | 2026-11-02 | Denetmen takibi 02.11 + pazartesi LibreOffice/FFmpeg [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 + Haiku | ~20 bin | Geçti: yeni açık doğrulanamadı (resmi siteler erişilemedi), açık maddeler değişmedi |
 | 2026-11-03 | Denetmen takibi 03.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: değişiklik yok, koordinatör oturumu etkin değil |
 | 2026-11-04 | Denetmen takibi 04.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-fable-5-1 | ~8 bin | Geçti: Tutaa maddeleri açık, yeni koordinatöre hatırlatma gönderildi |
+| 2026-11-05 | Denetmen takibi 05.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: değişiklik yok, hatırlatma dün gitti |
