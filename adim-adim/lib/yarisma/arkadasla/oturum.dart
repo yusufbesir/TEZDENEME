@@ -29,9 +29,11 @@ class DuelloOturumu {
     Saat saat = _simdiMs,
   }) : _saat = saat,
        _ozet = soruBankasiOzetiHesapla(
-         (List<YarismaSorusu>.of(havuz.where((s) => s.gecerliMi))
-               ..sort((a, b) => a.id.compareTo(b.id)))
-             .map((s) => '${s.id}|${s.soru}|${s.secenekler.join('/')}|${s.dogru}'),
+         (List<YarismaSorusu>.of(
+           havuz.where((s) => s.gecerliMi),
+         )..sort((a, b) => a.id.compareTo(b.id))).map(
+           (s) => '${s.id}|${s.soru}|${s.secenekler.join('/')}|${s.dogru}',
+         ),
        );
 
   final DuelloAktarimi aktarim;
@@ -101,7 +103,9 @@ class DuelloOturumu {
           if (_merhabaAlindi) return _hataVer('tekrar_merhaba');
           _merhabaAlindi = true;
           if (m.surum != protokolSurumu) return _hataVer('surum_uyusmuyor');
-          if (m.soruBankasiOzeti != _ozet) return _hataVer('soru_bankasi_uyusmuyor');
+          if (m.soruBankasiOzeti != _ozet) {
+            return _hataVer('soru_bankasi_uyusmuyor');
+          }
           rakipAdi = m.takmaAd;
           durum = OturumDurumu.hazir;
           _bildir();
@@ -185,7 +189,11 @@ class DuelloOturumu {
     if (!s.basarili) return s.hata;
     // Sıra önemli: Cevap, bitişte gönderilen Sonuc'tan önce gitmelidir.
     await aktarim.gonder(
-      Cevap(soruId: id, secenek: secenek, gecenMs: gecen.clamp(0, enFazlaGecenMs)).kodla(),
+      Cevap(
+        soruId: id,
+        secenek: secenek,
+        gecenMs: gecen.clamp(0, enFazlaGecenMs),
+      ).kodla(),
     );
     _ilerle(s.durum!);
     return null;

@@ -237,9 +237,7 @@ ProtokolSonucu _coz(Map<Object?, Object?> ham) {
       return const ProtokolTamam(Hazir());
     case 'basla':
       final idler = ham['soruIdleri'];
-      if (idler is! List ||
-          idler.isEmpty ||
-          idler.length > enFazlaSoruSayisi) {
+      if (idler is! List || idler.isEmpty || idler.length > enFazlaSoruSayisi) {
         return const ProtokolHatasi('soru_idleri_hatali');
       }
       final liste = <String>[];

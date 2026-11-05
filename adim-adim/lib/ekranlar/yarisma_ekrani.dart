@@ -10,6 +10,7 @@
 /// docs/SADE-ARAYUZ-VE-YARISMA.md bölüm 5 ve 7.
 library;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,6 +19,7 @@ import '../durum/saglayicilar.dart';
 import '../model/icerik.dart';
 import '../tema/kategori_renkleri.dart';
 import '../tema/tema.dart';
+import '../yarisma/arkadasla/arkadasla_ekrani.dart';
 import '../yarisma/depo.dart';
 import '../yarisma/ekranlar/bilesenler/tac.dart';
 import '../yarisma/ekranlar/oyun_ekrani.dart';
@@ -61,6 +63,15 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
       MaterialPageRoute<void>(
         fullscreenDialog: true,
         builder: (_) => YarismaOyunEkrani(alan: alan, kursId: kursId),
+      ),
+    );
+  }
+
+  void _arkadaslaOyna() {
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => const ArkadaslaEkrani(),
       ),
     );
   }
@@ -187,9 +198,20 @@ class _YarismaEkraniDurumu extends ConsumerState<YarismaEkrani> {
               ),
               child: SizedBox(
                 width: double.infinity,
-                child: FilledButton(
-                  onPressed: secili == null ? null : () => _oyna(alan, secili),
-                  child: const Text('Oyna'),
+                child: Column(
+                  children: [
+                    FilledButton(
+                      onPressed: secili == null
+                          ? null
+                          : () => _oyna(alan, secili),
+                      child: const Text('Oyna'),
+                    ),
+                    if (!kIsWeb)
+                      TextButton(
+                        onPressed: _arkadaslaOyna,
+                        child: const Text('Arkadaşla oyna'),
+                      ),
+                  ],
                 ),
               ),
             ),
