@@ -336,6 +336,10 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     );
   }
 
+  /// Yol sekmesindeki kurs grubunu seçer ('' = hepsi).
+  Future<OgrenciDurumu> yolGrubuSec(String grup) =>
+      _uygula((d) => d.copyWith(yolGrubu: grup));
+
   /// İlk açılış ("Hoş geldin") akışı bitti; bir daha gösterilmez.
   Future<OgrenciDurumu> ilkAcilisTamamla() =>
       _uygula((d) => d.copyWith(ilkAcilisTamam: true));
