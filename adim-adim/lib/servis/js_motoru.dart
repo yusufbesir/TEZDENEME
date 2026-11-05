@@ -23,6 +23,7 @@ import 'package:flutter_js/flutter_js.dart';
 
 import '../model/kod_calisma.dart';
 import '../motor/kod_calistirici.dart';
+import 'package:flutter/foundation.dart';
 
 class QuickJsCalistirici extends KodCalistirici {
   const QuickJsCalistirici({this.sureMs = JsKoruma.varsayilanSureMs});
@@ -117,7 +118,10 @@ String? _calistirSenkron(String betik) {
   } finally {
     try {
       rt.dispose();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('js_motoru.dart: çalışma zamanı kapatma hatası: $e');
+    }
   }
 }
 

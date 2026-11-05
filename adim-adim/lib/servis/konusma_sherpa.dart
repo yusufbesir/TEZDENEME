@@ -201,13 +201,22 @@ class SherpaKonusma implements KonusmaTanima {
     _sesAboneligi = null;
     try {
       await abonelik?.cancel();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: abonelik iptali hatası: $e');
+    }
     try {
       if (await _kayit?.isRecording() ?? false) await _kayit?.stop();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: kayıt durdurma hatası: $e');
+    }
     try {
       _akis?.free();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: akış serbest bırakma hatası: $e');
+    }
     _akis = null;
     final kontrol = _kontrol;
     _kontrol = null;
@@ -219,11 +228,17 @@ class SherpaKonusma implements KonusmaTanima {
     await durdur();
     try {
       _tanici?.free();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: tanıyıcı serbest bırakma hatası: $e');
+    }
     _tanici = null;
     try {
       await _kayit?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: kayıt kapatma hatası: $e');
+    }
     _kayit = null;
   }
 }
