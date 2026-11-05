@@ -423,6 +423,7 @@ class OgrenciDurumu {
     this.sesAcik = true,
     this.hatirlatmaSaati,
     this.alan,
+    this.yolGrubu = '',
     this.hatalar = const [],
     this.haftalikHedefGun = varsayilanHaftalikHedef,
     this.sonDersId,
@@ -534,6 +535,10 @@ class OgrenciDurumu {
   final bool sesAcik;
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
   final String? alan; // 'dil' | 'kod' | 'oyun'; null: henüz seçilmedi
+
+  /// Yol sekmesinde gösterilen kurs grubu (kurs kimliği öneki: 'almanca',
+  /// 'python'...). Boş: alandaki tüm kurslar tek yolda (eski davranış).
+  final String yolGrubu;
 
   /// Hata defteri, eskiden yeniye; en çok [HataKaydi.enCok] kayıt.
   final List<HataKaydi> hatalar;
@@ -827,6 +832,7 @@ class OgrenciDurumu {
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
     String? alan,
+    String? yolGrubu,
     List<HataKaydi>? hatalar,
     int? haftalikHedefGun,
     String? sonDersId,
@@ -902,6 +908,7 @@ class OgrenciDurumu {
           ? null
           : (hatirlatmaSaati ?? this.hatirlatmaSaati),
       alan: alan ?? this.alan,
+      yolGrubu: yolGrubu ?? this.yolGrubu,
       hatalar: hatalar ?? this.hatalar,
       haftalikHedefGun: haftalikHedefGun ?? this.haftalikHedefGun,
       sonDersId: sonDersId ?? this.sonDersId,
@@ -983,6 +990,7 @@ class OgrenciDurumu {
     'sesAcik': sesAcik,
     'hatirlatmaSaati': hatirlatmaSaati,
     'alan': alan,
+    'yolGrubu': yolGrubu,
     'hatalar': [for (final h in hatalar) h.toJson()],
     'haftalikHedefGun': haftalikHedefGun,
     'sonDersId': sonDersId,
@@ -1218,6 +1226,10 @@ class OgrenciDurumu {
       alan: (alan == 'dil' || alan == 'kod' || alan == 'oyun')
           ? alan as String
           : null,
+      yolGrubu:
+          (j['yolGrubu'] is String && (j['yolGrubu'] as String).length <= 32)
+          ? j['yolGrubu'] as String
+          : '',
       hatalar: List.unmodifiable(sonHatalar),
       haftalikHedefGun: tamsayi(
         j['haftalikHedefGun'],
