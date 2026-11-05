@@ -7,3 +7,4 @@ pub mod dikte;
 pub mod kart;
 pub mod metin_kelime;
 pub mod sozluk;
+pub mod yerlestirme;
