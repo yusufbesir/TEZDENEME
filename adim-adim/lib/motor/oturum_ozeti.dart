@@ -43,6 +43,7 @@ class OturumOzetiVeri {
     required this.kilometreler,
     this.yeniKelime = 0,
     this.enSikHece,
+    this.zayifKonu,
   });
 
   final int dogru;
@@ -62,6 +63,9 @@ class OturumOzetiVeri {
 
   /// Oturumda en sık hatalı çıkan hece (telaffuz tahmini); veri yoksa null.
   final String? enSikHece;
+
+  /// Bugünkü hataların en çok toplandığı konu (ünite/kategori adı); hata yoksa null.
+  final String? zayifKonu;
 
   /// Bu oturumdaki yanlış sayısı (toplam - doğru, en az 0).
   int get yanlis => (toplam - dogru).clamp(0, toplam < 0 ? 0 : toplam);
@@ -261,6 +265,7 @@ abstract final class OturumOzetiMotoru {
     required int xp,
     int yeniKelime = 0,
     Iterable<Iterable<String>> hataliHeceler = const [],
+    String? bugun,
   }) => OturumOzetiVeri(
     dogru: dogru,
     toplam: toplam,
@@ -271,5 +276,8 @@ abstract final class OturumOzetiMotoru {
     kilometreler: kilometreler(onceki, sonraki, kurslar),
     yeniKelime: yeniKelime,
     enSikHece: enSikHece(hataliHeceler),
+    zayifKonu: bugun == null
+        ? null
+        : zayifKonu(sonraki, bugun, kurslar: kurslar),
   );
 }

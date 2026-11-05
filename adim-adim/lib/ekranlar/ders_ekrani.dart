@@ -121,6 +121,7 @@ class _DersDurumu extends ConsumerState<DersEkrani> {
             toplam: toplam,
             xp: xp,
             yeniKelime: yeniKelime,
+            bugun: ref.read(bugunProvider),
           );
     setState(
       () => _ozet = (dogru: dogru, toplam: toplam, xp: xp, seri: yeni.seri),

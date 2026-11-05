@@ -157,6 +157,15 @@ class OturumOzeti extends StatelessWidget {
                     ),
                   ),
                 ],
+                if (veri.zayifKonu != null) ...[
+                  const SizedBox(height: Olcu.b1 / 2),
+                  Text(
+                    'Bugün en çok hata: ${veri.zayifKonu}',
+                    key: const ValueKey('oturum-zayif-konu'),
+                    style: yazi.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 if (veri.enSikHece != null) ...[
                   const SizedBox(height: Olcu.b1 / 2),
                   Text(
