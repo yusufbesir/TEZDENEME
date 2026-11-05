@@ -59,3 +59,27 @@ Windows'ta uygulama destek dizini altında:
 - Tanıma sonucu büyük harfli ve noktalamasız gelebilir; puanlama bunu
   normalleştirir. Kısaltmalar ("I'm" / "I AM") farklı yazıldığında eşleşmeyebilir.
 - Mikrofon akışı (`record` + Windows) cihazda denenmedi.
+
+## Diğer diller (2026-11-05)
+
+Uygulama artık alıştırmanın diline göre model klasörü arar (`SherpaKonusma.modelKlasorAdi`):
+
+| Dil | Klasör (`<uygulama destek dizini>/modeller/` altında) |
+|---|---|
+| İngilizce | `sherpa-onnx-streaming-zipformer-en` (eski ad) |
+| Almanca | `sherpa-onnx-streaming-zipformer-de` |
+| Fransızca | `sherpa-onnx-streaming-zipformer-fr` |
+| Rusça | `sherpa-onnx-streaming-zipformer-ru` |
+| Arapça | `sherpa-onnx-streaming-zipformer-ar` |
+| Korece | `sherpa-onnx-streaming-zipformer-ko` |
+| Japonca | `sherpa-onnx-streaming-zipformer-ja` |
+| Çince | `sherpa-onnx-streaming-zipformer-zh` |
+
+İçerik İngilizcedekiyle aynı: `encoder-*.onnx`, `decoder-*.onnx`, `joiner-*.onnx`, `tokens.txt`
+(yalnız akışlı transducer/zipformer biçimi desteklenir). Çok dilli tek bir model birden çok dil
+klasörüne kopyalanabilir. Klasör yoksa o dilde konuşma alıştırması "Bu alıştırmayı atla" gösterir;
+Ayarlar > Erişilebilirlik ve tanı > "Ses ve mikrofon testi" hangi dilin modelinin eksik olduğunu listeler.
+
+**Model seçimi doğrulanmadı:** bulut oturumunun ağı sherpa-onnx model sayfalarına izin vermedi, bu
+yüzden her dil için hangi hazır modelin var olduğu burada kontrol edilemedi. Bilinen kural: akışsız
+(yalnız çevrimdışı) modeller bu motorla çalışmaz; böyle bir dil için ayrı bir tanıyıcı yazılmalıdır.
