@@ -53,60 +53,79 @@ YarismaSorusu soru(String id, {int dogru = 0}) => YarismaSorusu(
   aciklama: 'Açıklama',
 );
 
-List<YarismaSorusu> havuz([int n = 12]) =>
-    [for (var i = 0; i < n; i++) soru('q${i.toString().padLeft(2, '0')}')];
+List<YarismaSorusu> havuz([int n = 12]) => [
+  for (var i = 0; i < n; i++) soru('q${i.toString().padLeft(2, '0')}'),
+];
 
 Future<void> bos() => Future<void>.delayed(Duration.zero);
 
 void main() {
-  test('tam düello: iki uç aynı soruları görür, sıra ve puan tutarlı', () async {
-    final (a, b) = BellekAktarimi.cift();
-    var t = 0;
-    final ev = DuelloOturumu(
-      aktarim: a, havuz: havuz(), takmaAd: 'Ev', evSahibi: true, tohum: 2,
-      saat: () => t,
-    );
-    final konuk = DuelloOturumu(
-      aktarim: b, havuz: havuz(), takmaAd: 'Konuk', evSahibi: false,
-      saat: () => t,
-    );
-    await ev.baslat();
-    await konuk.baslat();
-    await bos();
-    expect(ev.durum, OturumDurumu.oynaniyor);
-    expect(konuk.durum, OturumDurumu.oynaniyor);
-    expect(konuk.rakipAdi, 'Ev');
-    expect(
-      [for (final s in ev.duello!.sorular) s.id],
-      [for (final s in konuk.duello!.sorular) s.id],
-    );
-    // tohum çift: ilk sıra ev sahibinde; konukta ters.
-    expect(ev.duello!.sira, Taraf.ben);
-    expect(konuk.duello!.sira, Taraf.rakip);
-
-    while (!ev.duello!.bitti) {
-      final evSirada = ev.duello!.sira == Taraf.ben;
-      final oyuncu = evSirada ? ev : konuk;
-      t += 1000;
-      expect(await oyuncu.cevapla(0), isNull);
+  test(
+    'tam düello: iki uç aynı soruları görür, sıra ve puan tutarlı',
+    () async {
+      final (a, b) = BellekAktarimi.cift();
+      var t = 0;
+      final ev = DuelloOturumu(
+        aktarim: a,
+        havuz: havuz(),
+        takmaAd: 'Ev',
+        evSahibi: true,
+        tohum: 2,
+        saat: () => t,
+      );
+      final konuk = DuelloOturumu(
+        aktarim: b,
+        havuz: havuz(),
+        takmaAd: 'Konuk',
+        evSahibi: false,
+        saat: () => t,
+      );
+      await ev.baslat();
+      await konuk.baslat();
       await bos();
-    }
-    await bos();
-    expect(ev.durum, OturumDurumu.bitti);
-    expect(konuk.durum, OturumDurumu.bitti);
-    expect(ev.duello!.benimPuan, konuk.duello!.rakipPuan);
-    expect(ev.duello!.rakipPuan, konuk.duello!.benimPuan);
-  });
+      expect(ev.durum, OturumDurumu.oynaniyor);
+      expect(konuk.durum, OturumDurumu.oynaniyor);
+      expect(konuk.rakipAdi, 'Ev');
+      expect(
+        [for (final s in ev.duello!.sorular) s.id],
+        [for (final s in konuk.duello!.sorular) s.id],
+      );
+      // tohum çift: ilk sıra ev sahibinde; konukta ters.
+      expect(ev.duello!.sira, Taraf.ben);
+      expect(konuk.duello!.sira, Taraf.rakip);
+
+      while (!ev.duello!.bitti) {
+        final evSirada = ev.duello!.sira == Taraf.ben;
+        final oyuncu = evSirada ? ev : konuk;
+        t += 1000;
+        expect(await oyuncu.cevapla(0), isNull);
+        await bos();
+      }
+      await bos();
+      expect(ev.durum, OturumDurumu.bitti);
+      expect(konuk.durum, OturumDurumu.bitti);
+      expect(ev.duello!.benimPuan, konuk.duello!.rakipPuan);
+      expect(ev.duello!.rakipPuan, konuk.duello!.benimPuan);
+    },
+  );
 
   test('rakibin bildirdiği süre yok sayılır, yerel saat kullanılır', () async {
     final (a, b) = BellekAktarimi.cift();
     var t = 0;
     final ev = DuelloOturumu(
-      aktarim: a, havuz: havuz(), takmaAd: 'Ev', evSahibi: true, tohum: 3,
+      aktarim: a,
+      havuz: havuz(),
+      takmaAd: 'Ev',
+      evSahibi: true,
+      tohum: 3,
       saat: () => t,
     );
     final konuk = DuelloOturumu(
-      aktarim: b, havuz: havuz(), takmaAd: 'K', evSahibi: false, saat: () => t,
+      aktarim: b,
+      havuz: havuz(),
+      takmaAd: 'K',
+      evSahibi: false,
+      saat: () => t,
     );
     await ev.baslat();
     await konuk.baslat();
@@ -125,46 +144,66 @@ void main() {
   test('yerelde olmayan soru kimliği düelloyu reddeder', () async {
     final (a, b) = BellekAktarimi.cift();
     final konuk = DuelloOturumu(
-      aktarim: b, havuz: havuz(), takmaAd: 'K', evSahibi: false,
+      aktarim: b,
+      havuz: havuz(),
+      takmaAd: 'K',
+      evSahibi: false,
     );
     await konuk.baslat();
-    b.enjekte(Merhaba(
-      surum: protokolSurumu,
-      soruBankasiOzeti: soruBankasiOzetiHesapla(
-        (havuz()..sort((x, y) => x.id.compareTo(y.id)))
-            .map((s) => '${s.id}|${s.soru}|${s.secenekler.join('/')}|${s.dogru}'),
-      ),
-      takmaAd: 'Ev',
-    ).kodla());
+    b.enjekte(
+      Merhaba(
+        surum: protokolSurumu,
+        soruBankasiOzeti: soruBankasiOzetiHesapla(
+          (havuz()..sort((x, y) => x.id.compareTo(y.id))).map(
+            (s) => '${s.id}|${s.soru}|${s.secenekler.join('/')}|${s.dogru}',
+          ),
+        ),
+        takmaAd: 'Ev',
+      ).kodla(),
+    );
     await bos();
-    b.enjekte(const DuelloBasla(soruIdleri: ['yok'], ilkSiraSende: true).kodla());
+    b.enjekte(
+      const DuelloBasla(soruIdleri: ['yok'], ilkSiraSende: true).kodla(),
+    );
     await bos();
     expect(konuk.durum, OturumDurumu.hata);
     expect(konuk.hata, 'bilinmeyen_soru');
     expect(b.gidenler, isNotEmpty);
   });
 
-  test('farklı soru bankası içeriği (aynı kimlik) uyuşmazlık sayılır', () async {
-    final (a, b) = BellekAktarimi.cift();
-    final ev = DuelloOturumu(
-      aktarim: a, havuz: havuz(), takmaAd: 'Ev', evSahibi: true,
-    );
-    final yabanci = [for (final s in havuz()) soru(s.id, dogru: 1)];
-    final konuk = DuelloOturumu(
-      aktarim: b, havuz: yabanci, takmaAd: 'K', evSahibi: false,
-    );
-    await ev.baslat();
-    await konuk.baslat();
-    await bos();
-    expect(ev.durum, OturumDurumu.hata);
-    expect(ev.hata, 'soru_bankasi_uyusmuyor');
-    expect(konuk.durum, OturumDurumu.hata);
-  });
+  test(
+    'farklı soru bankası içeriği (aynı kimlik) uyuşmazlık sayılır',
+    () async {
+      final (a, b) = BellekAktarimi.cift();
+      final ev = DuelloOturumu(
+        aktarim: a,
+        havuz: havuz(),
+        takmaAd: 'Ev',
+        evSahibi: true,
+      );
+      final yabanci = [for (final s in havuz()) soru(s.id, dogru: 1)];
+      final konuk = DuelloOturumu(
+        aktarim: b,
+        havuz: yabanci,
+        takmaAd: 'K',
+        evSahibi: false,
+      );
+      await ev.baslat();
+      await konuk.baslat();
+      await bos();
+      expect(ev.durum, OturumDurumu.hata);
+      expect(ev.hata, 'soru_bankasi_uyusmuyor');
+      expect(konuk.durum, OturumDurumu.hata);
+    },
+  );
 
   test('bozuk mesaj ve sırası olmayan cevap oturumu sonlandırır', () async {
     final (a, b) = BellekAktarimi.cift();
     final ev = DuelloOturumu(
-      aktarim: a, havuz: havuz(), takmaAd: 'Ev', evSahibi: true,
+      aktarim: a,
+      havuz: havuz(),
+      takmaAd: 'Ev',
+      evSahibi: true,
     );
     await ev.baslat();
     a.enjekte('{bozuk');
@@ -177,7 +216,10 @@ void main() {
   test('düello başlamadan gelen cevap reddedilir', () async {
     final (a, _) = BellekAktarimi.cift();
     final ev = DuelloOturumu(
-      aktarim: a, havuz: havuz(), takmaAd: 'Ev', evSahibi: true,
+      aktarim: a,
+      havuz: havuz(),
+      takmaAd: 'Ev',
+      evSahibi: true,
     );
     await ev.baslat();
     a.enjekte(const Cevap(soruId: 'q00', secenek: 0, gecenMs: 1).kodla());

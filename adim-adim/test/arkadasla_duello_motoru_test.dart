@@ -5,40 +5,51 @@ import 'package:adim_adim/yarisma/arkadasla/duello_motoru.dart';
 import 'package:adim_adim/yarisma/model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-YarismaSorusu soru(int n, {int dogru = 0, bool gecerli = true}) => YarismaSorusu(
-  id: 'k.t.${n.toString().padLeft(3, '0')}',
-  alan: 'dil',
-  seviyeKursId: 'ingilizce-1',
-  kategori: YarismaKategori.tarih,
-  soru: 'Soru $n?',
-  secenekler: gecerli ? ['a$n', 'b$n', 'c$n', 'd$n'] : ['x', 'x', 'c', 'd'],
-  dogru: dogru,
-  aciklama: 'Açıklama $n',
-);
+YarismaSorusu soru(int n, {int dogru = 0, bool gecerli = true}) =>
+    YarismaSorusu(
+      id: 'k.t.${n.toString().padLeft(3, '0')}',
+      alan: 'dil',
+      seviyeKursId: 'ingilizce-1',
+      kategori: YarismaKategori.tarih,
+      soru: 'Soru $n?',
+      secenekler: gecerli ? ['a$n', 'b$n', 'c$n', 'd$n'] : ['x', 'x', 'c', 'd'],
+      dogru: dogru,
+      aciklama: 'Açıklama $n',
+    );
 
 List<YarismaSorusu> havuz(int adet) => [for (var i = 0; i < adet; i++) soru(i)];
 
-DuelloDurumu uygula(
-  DuelloDurumu d,
-  Taraf t,
-  String id,
-  int sec,
-  int ms,
-) {
+DuelloDurumu uygula(DuelloDurumu d, Taraf t, String id, int sec, int ms) {
   final s = cevapUygula(d, t, id, sec, ms);
   expect(s.basarili, isTrue, reason: 'hata: ${s.hata}');
   return s.durum!;
 }
 
 /// Her iki taraf da sırayla mevcut soruyu cevaplar.
-DuelloDurumu turOyna(DuelloDurumu d, {int benSec = 0, int rakipSec = 0, int benMs = 1000, int rakipMs = 1000}) {
+DuelloDurumu turOyna(
+  DuelloDurumu d, {
+  int benSec = 0,
+  int rakipSec = 0,
+  int benMs = 1000,
+  int rakipMs = 1000,
+}) {
   final id = d.mevcutSoru!.id;
   final ilk = d.sira;
-  var y = uygula(d, ilk, id, ilk == Taraf.ben ? benSec : rakipSec,
-      ilk == Taraf.ben ? benMs : rakipMs);
+  var y = uygula(
+    d,
+    ilk,
+    id,
+    ilk == Taraf.ben ? benSec : rakipSec,
+    ilk == Taraf.ben ? benMs : rakipMs,
+  );
   final ikinci = ilk.tersi;
-  y = uygula(y, ikinci, id, ikinci == Taraf.ben ? benSec : rakipSec,
-      ikinci == Taraf.ben ? benMs : rakipMs);
+  y = uygula(
+    y,
+    ikinci,
+    id,
+    ikinci == Taraf.ben ? benSec : rakipSec,
+    ikinci == Taraf.ben ? benMs : rakipMs,
+  );
   return y;
 }
 
@@ -115,7 +126,9 @@ void main() {
       expect(d.mevcutSoru, isNull);
     });
     test('geçersiz sorular başlangıçta elenir', () {
-      final d = duelloBaslat(sorular: [soru(1), soru(2, gecerli: false), soru(3)]);
+      final d = duelloBaslat(
+        sorular: [soru(1), soru(2, gecerli: false), soru(3)],
+      );
       expect(d.sorular, hasLength(2));
     });
   });
@@ -148,13 +161,22 @@ void main() {
     });
     test('bilinmeyen soru reddedilir', () {
       final d = duelloBaslat(sorular: havuz(2));
-      expect(cevapUygula(d, Taraf.ben, 'yok', 0, 100).hata, DuelloHatasi.bilinmeyenSoru);
+      expect(
+        cevapUygula(d, Taraf.ben, 'yok', 0, 100).hata,
+        DuelloHatasi.bilinmeyenSoru,
+      );
     });
     test('geçersiz seçenek reddedilir', () {
       final d = duelloBaslat(sorular: havuz(2));
       final id = d.mevcutSoru!.id;
-      expect(cevapUygula(d, Taraf.ben, id, 4, 100).hata, DuelloHatasi.gecersizSecenek);
-      expect(cevapUygula(d, Taraf.ben, id, -1, 100).hata, DuelloHatasi.gecersizSecenek);
+      expect(
+        cevapUygula(d, Taraf.ben, id, 4, 100).hata,
+        DuelloHatasi.gecersizSecenek,
+      );
+      expect(
+        cevapUygula(d, Taraf.ben, id, -1, 100).hata,
+        DuelloHatasi.gecersizSecenek,
+      );
     });
     test('negatif süre reddedilir', () {
       final d = duelloBaslat(sorular: havuz(2));
@@ -166,7 +188,10 @@ void main() {
     test('bitmiş oyuna cevap reddedilir', () {
       var d = duelloBaslat(sorular: havuz(1));
       d = turOyna(d);
-      expect(cevapUygula(d, Taraf.ben, 'k.t.000', 0, 100).hata, DuelloHatasi.bitti);
+      expect(
+        cevapUygula(d, Taraf.ben, 'k.t.000', 0, 100).hata,
+        DuelloHatasi.bitti,
+      );
     });
     test('reddedilen cevap durumu değiştirmez', () {
       final d = duelloBaslat(sorular: havuz(2));

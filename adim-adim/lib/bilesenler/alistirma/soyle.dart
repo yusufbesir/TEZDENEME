@@ -158,7 +158,14 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
   /// "Dinlemeyi bitir": akışı kapatıp o ana kadar tanınanı değerlendirir.
   void _bitir() {
     final b = _bitis;
-    if (b != null && !b.isCompleted) b.complete();
+    if (b == null || b.isCompleted) return;
+    // Önce motor durdurulur: son kelimeler boşaltılıp akış kapanınca
+    // (onDone) değerlendirme tam metinle yapılır. Kapanmazsa 2 sn sonra yine
+    // eldeki metinle bitirilir.
+    unawaited(_konusma.durdur().catchError((Object _) {}));
+    Timer(const Duration(seconds: 2), () {
+      if (!b.isCompleted) b.complete();
+    });
   }
 
   void _degerlendir(String soylenen) {

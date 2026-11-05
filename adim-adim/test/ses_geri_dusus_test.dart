@@ -74,4 +74,22 @@ void main() {
     mesgul.setMockMethodCallHandler(kanal, (c) async => 1);
     expect(await Ses().oku('hello'), isTrue);
   });
+
+  test(
+    'Windows: isLanguageAvailable yok ama setLanguage/speak var: ses çalar',
+    () async {
+      final cagrilar = <String>[];
+      mesgul.setMockMethodCallHandler(kanal, (c) async {
+        cagrilar.add(c.method);
+        if (c.method == 'isLanguageAvailable') {
+          throw MissingPluginException();
+        }
+        return 1;
+      });
+      final ses = Ses();
+      expect(await ses.oku('hello'), isTrue);
+      expect(cagrilar.contains('speak'), isTrue);
+      expect(await ses.oku('hello again'), isTrue);
+    },
+  );
 }
