@@ -2,6 +2,7 @@
 //! Davranış Dart karşılığıyla birebir aynı olmak zorundadır
 //! (bkz. `tests/altin/*.json`, `adim-adim/tool/altin_*.dart`).
 
+pub mod dart_random;
 pub mod dikte;
 pub mod kart;
 pub mod metin_kelime;
