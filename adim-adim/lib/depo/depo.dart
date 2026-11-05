@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import '../model/durum.dart';
+import 'package:flutter/foundation.dart';
 
 abstract class Depo {
   Future<OgrenciDurumu> yukle();
@@ -164,7 +165,10 @@ class DosyaDepo implements Depo {
   Future<void> bosalt() async {
     try {
       await _kuyruk;
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('depo.dart: yazma kuyruğu boşaltma hatası: $e');
+    }
   }
 
   @override

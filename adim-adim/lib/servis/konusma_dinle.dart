@@ -12,6 +12,7 @@ import 'dart:async';
 
 import '../motor/telaffuz.dart';
 import 'konusma.dart';
+import 'package:flutter/foundation.dart';
 
 Future<String> konusmayiDinle(
   KonusmaTanima konusma, {
@@ -53,6 +54,9 @@ Future<String> konusmayiDinle(
   unawaited(abone?.cancel().catchError((Object _) {}) ?? Future<void>.value());
   try {
     await konusma.durdur();
-  } catch (_) {}
+  } catch (e) {
+    // Bilerek yutulur (temizlik); iz için kaydedilir.
+    debugPrint('konusma_dinle.dart: konuşma durdurma hatası: $e');
+  }
   return son;
 }

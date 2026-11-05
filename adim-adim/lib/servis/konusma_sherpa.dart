@@ -262,10 +262,16 @@ class SherpaKonusma implements KonusmaTanima {
     _sesAboneligi = null;
     try {
       await abonelik?.cancel();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: abonelik iptali hatası: $e');
+    }
     try {
       if (await _kayit?.isRecording() ?? false) await _kayit?.stop();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: kayıt durdurma hatası: $e');
+    }
     // Akış açıkken: konuşmanın son kelimeleri çözücüde bekliyor olabilir.
     // Sessizlik doldurulup girdi bitirilerek tamamı alınır, sonra kapanır.
     final akis = _akis;
@@ -295,7 +301,10 @@ class SherpaKonusma implements KonusmaTanima {
       }
       try {
         akis.free();
-      } catch (_) {}
+      } catch (e) {
+        // Bilerek yutulur (temizlik); iz için kaydedilir.
+        debugPrint('konusma_sherpa.dart: akış serbest bırakma hatası: $e');
+      }
     }
     if (kontrol != null && !kontrol.isClosed) await kontrol.close();
   }
@@ -325,11 +334,17 @@ class SherpaKonusma implements KonusmaTanima {
     await durdur();
     try {
       _tanici?.free();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: tanıyıcı serbest bırakma hatası: $e');
+    }
     _tanici = null;
     try {
       await _kayit?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('konusma_sherpa.dart: kayıt kapatma hatası: $e');
+    }
     _kayit = null;
   }
 }

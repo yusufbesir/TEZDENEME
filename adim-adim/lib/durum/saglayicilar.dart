@@ -691,7 +691,10 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     }
     try {
       await ref.read(bildirimProvider).iptal();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('saglayicilar.dart: bildirim iptali hatası: $e');
+    }
     state = const AsyncData(OgrenciDurumu());
   }
 }

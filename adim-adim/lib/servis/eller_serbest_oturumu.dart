@@ -16,6 +16,7 @@ import '../motor/telaffuz.dart';
 import 'konusma.dart';
 import 'konusma_dinle.dart';
 import 'ses.dart';
+import 'package:flutter/foundation.dart';
 
 /// Oturumun o anki adımı (arayüz ve ekran okuyucu durum satırı için).
 enum ElleriSerbestAsama { okuyor, dinliyor, degerlendirdi, yalnizDinledi }
@@ -68,7 +69,10 @@ class ElleriSerbestOturumu {
     if (b != null && !b.isCompleted) b.complete();
     try {
       await konusma.durdur();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('eller_serbest_oturumu.dart: konuşma durdurma hatası: $e');
+    }
   }
 
   /// Duraklatmadan sonra devam için bayrağı sıfırlar.

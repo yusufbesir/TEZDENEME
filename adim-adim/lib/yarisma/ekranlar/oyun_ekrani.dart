@@ -267,7 +267,10 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
       try {
         await kayitHazir;
         await kayit.oyunuIsle(alan, kursId, oyun);
-      } catch (_) {}
+      } catch (e) {
+        // Bilerek yutulur (temizlik); iz için kaydedilir.
+        debugPrint('oyun_ekrani.dart: oyun kaydı yazma hatası: $e');
+      }
       // Rozet farkı için kayıttan önceki rozetler.
       var onceki = const <String>[];
       try {
@@ -278,7 +281,10 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
           dogru: oyun.cevapGecmisi.where((c) => c.dogru).length,
           toplam: oyun.cevapGecmisi.length,
         );
-      } catch (_) {}
+      } catch (e) {
+        // Bilerek yutulur (temizlik); iz için kaydedilir.
+        debugPrint('oyun_ekrani.dart: günlük/istatistik yazma hatası: $e');
+      }
       // Rozet işleme puan/kayıttan ayrı: hatası kaydı etkilemez.
       try {
         // Rozetler kalıcı kayda bu akışta geçer; yeni olanlar çip olur.
@@ -290,7 +296,10 @@ class _YarismaOyunDurumu extends ConsumerState<YarismaOyunEkrani> {
         if (yeni.isNotEmpty && mounted) {
           setState(() => _yeniRozetler = yeni);
         }
-      } catch (_) {}
+      } catch (e) {
+        // Bilerek yutulur (temizlik); iz için kaydedilir.
+        debugPrint('oyun_ekrani.dart: rozet hesabı hatası: $e');
+      }
     }());
   }
 

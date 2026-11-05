@@ -149,10 +149,16 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
   ) async {
     try {
       await abone?.cancel();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('soyle.dart: abonelik iptali hatası: $e');
+    }
     try {
       await konusma.durdur();
-    } catch (_) {}
+    } catch (e) {
+      // Bilerek yutulur (temizlik); iz için kaydedilir.
+      debugPrint('soyle.dart: konuşma durdurma hatası: $e');
+    }
   }
 
   /// "Dinlemeyi bitir": akışı kapatıp o ana kadar tanınanı değerlendirir.
