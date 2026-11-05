@@ -70,3 +70,10 @@
 - Analyze/format temiz, tam paket 1202 geçti (7 gerçek-JS testi LIBQUICKJSC_TEST_PATH olmadan atlanır; motorla 41 test geçti).
 - JS çalıştırıcı sınırları: döngü bekçisi dürüst kod içindir; kullanıcı kodu bekçi değişkenlerini değiştirip atlatabilir, süslü parantezsiz ok fonksiyonu özyinelemesi ve ReDoS bekçisizdir (Dart 5 sn zaman aşımı, arka plan isolate bitene kadar sürer); `.constructor` engeli dize birleştirmeyle aşılabilir. Ağ ve dosya erişimi yoktur. Tek kullanıcılı yerel uygulama olduğu için kabul edildi; sertleştirme istenirse ayrı iş.
 - SOZLESME.md "yeni paket ekleme" kuralına flutter_js ile aykırı gidildi (görev gereği); Yusuf onayı bekliyor. Android derlemesi jitpack'ten bağımlılık çeker (denenmedi).
+
+## Güncel durum (2026-11-05) [İP:Adım Adım geliştirmesine devam]
+- Adım Adım main'de: #86–#98 (özellik dalları, kilit, yanlışları çöz, çekim turu, güven derecesi, dayanıklılık, performans), #102 sorunlu kelime sakinleştirme (8 yanlış → 14 gün dinlenme), #103 kardeş erteleme / emekli etme / günlük yük bütçesi / 2 dk mini oturum / hata defterinde not, #105 hata türü etiketi + seri korumayı kapatma. Tam paket son 1836 geçti, 7 atlandı, analyze temiz. Kardeş erteleme ve emekli etme varsayılan KAPALI (açıkken 2 eski test kırıldı; test zayıflatılmadı); hepsi Ayarlar'dan kapatılır.
+- Rust çekirdek (adim-adim/rust, plan docs/PLAN-RUST-PYTHON-GECIS.md): #99 iskelet + normalize, #100 dikte farkı, #101 kart yarı ömrü + gün işlemleri, #104 metin kelime ayırma; hepsi Dart ile altın vektörde birebir. Uygulama henüz Rust'ı çağırmıyor. Kalan: yerleştirme seçimi, karışık sıra (Dart Random portu), köprü, Android derleme zinciri (cihaz).
+- Cihaz oturumu: Arkadaşla oyna çekirdeği (protokol, düello motoru, LAN taşıması, oturum katmanı) main'e doğrudan alındı (PR'sız); arayüz, Bluetooth yedeği, manifest izinleri henüz yok. Telaffuz karşılaştırma (gerçek mikrofon) cihazda.
+- Yusuf kararı bekleyen: arayüz Dart'ta kalsın mı (Rust planı sorusu), `sifirla` sonrası `.geri-*` yedeklerinin silinmesi (yalnız Yusuf), audio_service paketi, Gemini/Copilot .tmp kopyaları Geri Dönüşüm Kutusu'na.
+
