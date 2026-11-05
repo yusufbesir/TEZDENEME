@@ -622,6 +622,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? emekliAcik,
     int? yukButcesi,
     double? sesHizi,
+    double? yaziOlcegi,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -653,6 +654,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             : null,
         // Dinleme hızı 0,7..1,2 aralığına kırpılır.
         sesHizi: sesHizi == null ? null : OgrenciDurumu.sesHiziKirp(sesHizi),
+        yaziOlcegi: yaziOlcegi == null
+            ? null
+            : OgrenciDurumu.yaziOlcegiKirp(yaziOlcegi),
       ),
     );
     final bildirim = ref.read(bildirimProvider);
