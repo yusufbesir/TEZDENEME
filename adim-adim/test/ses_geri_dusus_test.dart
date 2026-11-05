@@ -15,7 +15,7 @@ void main() {
     'eklenti/motor yok: fırlatmaz, false döner (okuma ve okuBekle)',
     () async {
       // Kanal için işleyici yok => MissingPluginException.
-      final ses = Ses();
+      final ses = Ses(windowsYedek: false);
       expect(await ses.oku('hello'), isFalse);
       expect(await ses.okuBekle('hello'), isFalse);
       expect(await ses.okuYavas('hello'), isFalse);
@@ -33,7 +33,7 @@ void main() {
       }
       return 1;
     });
-    final ses = Ses();
+    final ses = Ses(windowsYedek: false);
     expect(await ses.oku('merhaba', dil: 'tr-TR'), isFalse);
     expect(cagrilar.contains('speak'), isFalse);
     expect(await ses.oku('hello', dil: 'en-US'), isTrue);
@@ -49,7 +49,7 @@ void main() {
       }
       return 1;
     });
-    final ses = Ses();
+    final ses = Ses(windowsYedek: false);
     expect(await ses.okuBekle('x', dil: 'tr-TR'), isFalse);
     expect(await ses.okuBekle('x', dil: 'tr-TR'), isFalse);
     expect(soru, 1);
@@ -60,18 +60,18 @@ void main() {
       if (c.method == 'speak') return 0;
       return 1;
     });
-    expect(await Ses().oku('hello'), isFalse);
+    expect(await Ses(windowsYedek: false).oku('hello'), isFalse);
   });
 
   test('platform hatası fırlatmaz', () async {
     mesgul.setMockMethodCallHandler(kanal, (c) async {
       throw PlatformException(code: 'tts_yok');
     });
-    expect(await Ses().oku('hello'), isFalse);
+    expect(await Ses(windowsYedek: false).oku('hello'), isFalse);
   });
 
   test('normal akış true', () async {
     mesgul.setMockMethodCallHandler(kanal, (c) async => 1);
-    expect(await Ses().oku('hello'), isTrue);
+    expect(await Ses(windowsYedek: false).oku('hello'), isTrue);
   });
 }

@@ -2,14 +2,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_tts/flutter_tts.dart';
 
+import 'ses_windows_yedek.dart';
+
 /// flutter_tts sarmalayıcısı. Hatalar yutulur; ses yoksa uygulama çalışmaya devam eder.
 /// Testte bu sınıf genişletilip `oku` geçersiz kılınır.
 /// Dinleme hızı (SADE 8): [hizCarpani] temel hızı ölçekler; [okuHizla]
 /// çarpanı yalnız o çağrı için uygular. yazan: [Claude#tts-hiz]
 class Ses {
-  Ses();
+  Ses({this.windowsYedek = true});
+
+  /// false ise Windows SAPI yedeği kullanılmaz (testler).
+  final bool windowsYedek;
 
   FlutterTts? _tts;
+
+  /// flutter_tts dili/motoru bulamazsa Windows'ta yüklü SAPI sesi (ses_windows_yedek.dart).
+  final SesWindowsYedek _yedek = SesWindowsYedek();
 
   /// Konuşma hızı (0..1; flutter_tts ölçeği). Kelime defteri oynatıcısı
   /// (ÖZELLİK 82) hızı değiştirir; varsayılan 0,45.
@@ -51,6 +59,7 @@ class Ses {
   /// Süren okumayı keser (oynatıcı duraklatınca). Hata yutulur.
   Future<void> durdur() async {
     try {
+      await _yedek.durdur();
       await _tts?.stop();
     } catch (e) {
       debugPrint('Ses durdurulamadı: $e');
@@ -114,18 +123,32 @@ class Ses {
   Future<bool> oku(String metin, {String dil = 'en-US'}) async {
     try {
       final tts = _tts ??= FlutterTts();
-      if (!await _dilHazirla(tts, dil)) return false;
+      if (!await _dilHazirla(tts, dil))
+        return await _yedekOku(metin, dil, false);
       await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
-      if (_basarisiz(await tts.speak(metin))) return false;
+      if (_basarisiz(await tts.speak(metin))) {
+        return await _yedekOku(metin, dil, false);
+      }
       return true;
     } on MissingPluginException {
       _motorYok = true;
-      return false;
+      return await _yedekOku(metin, dil, false);
     } catch (e) {
       debugPrint('Ses okunamadı: $e');
-      return false;
+      return await _yedekOku(metin, dil, false);
     }
+  }
+
+  /// Windows'ta flutter_tts başarısızsa SAPI yedeği; başka platformda false.
+  Future<bool> _yedekOku(String metin, String dil, bool bekle) async {
+    if (!windowsYedek) return false;
+    return _yedek.oku(
+      metin,
+      dil: dil,
+      ttsHizi: ttsHizi(konusmaHizi, hizCarpani),
+      bekle: bekle,
+    );
   }
 
   /// [oku] gibi okur ama okuma BİTENE kadar bekler (eller serbest mod ve
@@ -138,19 +161,25 @@ class Ses {
   }) async {
     try {
       final tts = _tts ??= FlutterTts();
-      if (_motorYok) return false;
+      if (_motorYok) {
+        return await _yedekOku(metin, dil, true);
+      }
       await tts.awaitSpeakCompletion(true);
-      if (!await _dilHazirla(tts, dil)) return false;
+      if (!await _dilHazirla(tts, dil)) {
+        return await _yedekOku(metin, dil, true);
+      }
       await tts.setSpeechRate(ttsHizi(konusmaHizi, hizCarpani));
       await tts.stop();
-      if (_basarisiz(await tts.speak(metin).timeout(enCok))) return false;
+      if (_basarisiz(await tts.speak(metin).timeout(enCok))) {
+        return await _yedekOku(metin, dil, true);
+      }
       return true;
     } on MissingPluginException {
       _motorYok = true;
-      return false;
+      return await _yedekOku(metin, dil, true);
     } catch (e) {
       debugPrint('Ses okunamadı: $e');
-      return false;
+      return await _yedekOku(metin, dil, true);
     }
   }
 }
