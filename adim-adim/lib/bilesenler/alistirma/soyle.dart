@@ -77,7 +77,7 @@ class _SoyleDurumu extends ConsumerState<SoyleGorunumu> {
   Future<void> _hazirligiDenetle() async {
     var hazir = false;
     try {
-      hazir = await _konusma.hazirMi();
+      hazir = await _konusma.hazirMi(dil: widget.alistirma.dil);
     } catch (_) {
       hazir = false;
     }

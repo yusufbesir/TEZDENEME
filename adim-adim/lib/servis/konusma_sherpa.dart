@@ -21,6 +21,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa;
 
+import '../sozluk/dil_tanimi.dart';
 import 'konusma.dart';
 
 /// sherpa-onnx tabanlı çevrimdışı tanıma.
@@ -76,15 +77,35 @@ class SherpaKonusma implements KonusmaTanima {
 
   AudioRecorder? _kayit;
   sherpa.OnlineRecognizer? _tanici;
+  String _taniciDili = 'en';
   sherpa.OnlineStream? _akis;
   StreamController<String>? _kontrol;
   StreamSubscription<Uint8List>? _sesAboneligi;
 
-  Future<String> _klasor() async {
+  /// 'de-DE' -> 'de'; boş ya da null -> 'en'.
+  static String modelDili(String? dil) {
+    final kod = (dil ?? '').split(RegExp('[-_]')).first.trim().toLowerCase();
+    return kod.isEmpty ? 'en' : kod;
+  }
+
+  /// Dilin model klasörü adı: İngilizce [varsayilanModelAdi]; öteki diller
+  /// `sherpa-onnx-streaming-zipformer-<kod>` (kod: de, fr, ru, ar, ko, ja,
+  /// zh...). Çok dilli bir model aynı klasöre dil kodlarıyla kopyalanır.
+  static String modelKlasorAdi(String? dil) {
+    final kod = modelDili(dil);
+    return kod == 'en'
+        ? varsayilanModelAdi
+        : 'sherpa-onnx-streaming-zipformer-$kod';
+  }
+
+  /// [dil] için model klasörü. [modelYolu] verilmişse yalnız İngilizce için
+  /// geçerlidir (eski davranış); öteki diller destek dizinindeki klasöre bakar.
+  Future<String> _klasor([String? dil]) async {
     final verilen = modelYolu;
-    if (verilen != null && verilen.isNotEmpty) return verilen;
+    final kod = modelDili(dil);
+    if (kod == 'en' && verilen != null && verilen.isNotEmpty) return verilen;
     final dizin = await getApplicationSupportDirectory();
-    return p.join(dizin.path, 'modeller', varsayilanModelAdi);
+    return p.join(dizin.path, 'modeller', modelKlasorAdi(dil));
   }
 
   /// Klasördeki model dosyalarını bulur (int8 varsa onu seçer); eksikse null.
@@ -126,10 +147,10 @@ class SherpaKonusma implements KonusmaTanima {
   }
 
   @override
-  Future<bool> hazirMi() async {
+  Future<bool> hazirMi({String? dil}) async {
     try {
       if (!Platform.isWindows) return false;
-      return dosyalariBul(await _klasor()) != null;
+      return dosyalariBul(await _klasor(dil)) != null;
     } catch (e) {
       debugPrint('Konuşma tanıma hazır değil: $e');
       return false;
@@ -151,18 +172,29 @@ class SherpaKonusma implements KonusmaTanima {
   Stream<String> dinle({required String dil}) {
     final kontrol = StreamController<String>();
     _kontrol = kontrol;
-    unawaited(_baslat(kontrol));
+    unawaited(_baslat(kontrol, dil));
     return kontrol.stream;
   }
 
-  Future<void> _baslat(StreamController<String> kontrol) async {
+  Future<void> _baslat(StreamController<String> kontrol, String dil) async {
     try {
-      final dosyalar = dosyalariBul(await _klasor());
+      final dosyalar = dosyalariBul(await _klasor(dil));
       if (dosyalar == null) throw StateError('Model dosyaları bulunamadı');
       if (!_baglandi) {
         sherpa.initBindings();
         _baglandi = true;
       }
+      // Dil değiştiyse önceki dilin tanıyıcısı bırakılıp yenisi kurulur.
+      final kod = modelDili(dil);
+      if (_tanici != null && _taniciDili != kod) {
+        try {
+          _tanici?.free();
+        } catch (e) {
+          debugPrint('konusma_sherpa.dart: tanıyıcı bırakma hatası: $e');
+        }
+        _tanici = null;
+      }
+      _taniciDili = kod;
       final tanici = _tanici ??= sherpa.OnlineRecognizer(
         sherpa.OnlineRecognizerConfig(
           model: sherpa.OnlineModelConfig(
@@ -314,15 +346,18 @@ class SherpaKonusma implements KonusmaTanima {
     final b = StringBuffer();
     try {
       b.writeln('Platform: ${Platform.operatingSystem}');
-      final klasor = await _klasor();
-      b.writeln('Model klasörü: $klasor');
-      final d = dosyalariBul(klasor);
-      b.writeln(
-        d == null ? 'Model dosyaları: EKSİK' : 'Model dosyaları: tamam',
-      );
+      b.writeln('Model klasörleri:');
+      for (final d in dilTanimlari) {
+        if (d.kodKursu) continue;
+        final klasor = await _klasor(d.ttsDili);
+        final tamam = dosyalariBul(klasor) != null;
+        b.writeln(
+          '  ${d.ad} (${d.kod}): ${tamam ? 'tamam' : 'EKSİK'} - $klasor',
+        );
+      }
       b.writeln('Mikrofon izni: ${await izinIste() ? 'var' : 'YOK'}');
       b.writeln('Son ölçüm: ${_hizNotu ?? 'henüz dinleme yapılmadı'}');
-      b.writeln('Tanıma dili: yalnız İngilizce model');
+      b.writeln('Eksik dilde konuşma alıştırması atlanabilir.');
     } catch (e) {
       b.writeln('Tanı hatası: $e');
     }

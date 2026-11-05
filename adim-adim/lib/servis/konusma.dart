@@ -8,7 +8,9 @@ library;
 /// "Bu alıştırmayı atla" yolunu sunar.
 abstract class KonusmaTanima {
   /// Tanıma bu cihazda kullanılabilir mi (motor + model + platform)?
-  Future<bool> hazirMi();
+  /// [dil] (BCP-47, örn. 'de-DE') verilirse o dilin modeli aranır; verilmezse
+  /// İngilizce.
+  Future<bool> hazirMi({String? dil});
 
   /// Mikrofon iznini ister; verildiyse true.
   Future<bool> izinIste();
@@ -43,8 +45,14 @@ class SahteKonusma implements KonusmaTanima {
   /// Sonraki `dinle` çağrıları için yanıt ekler.
   void yanitEkle(String metin) => _yanitlar.add(metin);
 
+  /// Her `hazirMi` çağrısının dili (sırayla).
+  final sorulanDiller = <String?>[];
+
   @override
-  Future<bool> hazirMi() async => hazir;
+  Future<bool> hazirMi({String? dil}) async {
+    sorulanDiller.add(dil);
+    return hazir;
+  }
 
   @override
   Future<bool> izinIste() async => izin;
@@ -69,7 +77,7 @@ class KonusmaYok implements KonusmaTanima {
   const KonusmaYok();
 
   @override
-  Future<bool> hazirMi() async => false;
+  Future<bool> hazirMi({String? dil}) async => false;
 
   @override
   Future<bool> izinIste() async => false;
