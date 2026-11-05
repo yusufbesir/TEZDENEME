@@ -19,6 +19,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'durum/saglayicilar.dart';
+import 'model/durum.dart';
 import 'ekranlar/alan_secimi_ekrani.dart';
 import 'ekranlar/ana_sayfa.dart';
 import 'ekranlar/ayarlar_ekrani.dart';
@@ -527,10 +528,17 @@ class _AdimAdimUygulamaState extends ConsumerState<AdimAdimUygulama>
         // Metin ölçeği [1,0 ; 1,3] aralığına kıstırılır: ne okunmaz küçülür
         // ne de yerleşimi bozacak kadar büyür.
         final medya = MediaQuery.of(context);
-        final olcek = medya.textScaler
+        final sistemOlcek = medya.textScaler
             .scale(1.0)
             .clamp(Olcu.metinOlcekEn, Olcu.metinOlcekEnCok)
             .toDouble();
+        // Ayarlar'dan seçilen yazı boyutu (1,0'dan büyükse) sistem ölçeğinin
+        // yerine geçer.
+        final kullanici =
+            durum.value?.yaziOlcegi ?? OgrenciDurumu.varsayilanYaziOlcegi;
+        final olcek = kullanici > OgrenciDurumu.varsayilanYaziOlcegi
+            ? kullanici
+            : sistemOlcek;
         return MediaQuery(
           data: medya.copyWith(textScaler: TextScaler.linear(olcek)),
           child: KilitKapisi(child: child ?? const SizedBox.shrink()),

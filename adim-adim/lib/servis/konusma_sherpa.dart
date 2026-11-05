@@ -37,6 +37,43 @@ class SherpaKonusma implements KonusmaTanima {
   static const int _ornekHizi = 16000;
   static bool _baglandi = false;
 
+  /// Tanıyıcıya bildirilen gerçek örnekleme hızı. `record` Windows'ta
+  /// istenen 16 kHz'i vermezse tanıma bozulur; ilk saniyede gelen bayt
+  /// miktarından hız ölçülür ve yakın standart değere oturtulur.
+  int _hiz = _ornekHizi;
+  String _sonMetin = '';
+  String? _hizNotu;
+
+  static const List<int> _standartHizlar = [
+    8000,
+    11025,
+    16000,
+    22050,
+    24000,
+    32000,
+    44100,
+    48000,
+  ];
+
+  /// [bayt] baytın [sure] içinde geldiği varsayımıyla (16-bit, tek kanal)
+  /// en yakın standart hızı verir; ölçüm standart bir hıza %12'den
+  /// yakın değilse [_ornekHizi] döner (güvenilmez ölçüm yok sayılır).
+  static int hizTahmini(int bayt, Duration sure) {
+    final sn = sure.inMicroseconds / 1e6;
+    if (sn <= 0 || bayt <= 0) return _ornekHizi;
+    final olculen = bayt / 2 / sn;
+    var en = _ornekHizi;
+    var fark = double.infinity;
+    for (final h in _standartHizlar) {
+      final d = (olculen - h).abs() / h;
+      if (d < fark) {
+        fark = d;
+        en = h;
+      }
+    }
+    return fark <= 0.12 ? en : _ornekHizi;
+  }
+
   AudioRecorder? _kayit;
   sherpa.OnlineRecognizer? _tanici;
   sherpa.OnlineStream? _akis;
@@ -138,6 +175,11 @@ class SherpaKonusma implements KonusmaTanima {
             numThreads: 2,
             debug: false,
           ),
+          // Greedy yerine beam search: aynı modelle daha az yanlış kelime.
+          decodingMethod: 'modified_beam_search',
+          maxActivePaths: 4,
+          // Cümle ortası kısa duraksamada akış erken kapanmasın.
+          rule2MinTrailingSilence: 1.6,
         ),
       );
       final akis = _akis = tanici.createStream();
@@ -149,22 +191,41 @@ class SherpaKonusma implements KonusmaTanima {
           numChannels: 1,
         ),
       );
-      var sonMetin = '';
+      _sonMetin = '';
+      _hiz = _ornekHizi;
+      _hizNotu = null;
+      DateTime? ilkBayt;
+      var toplamBayt = 0;
+      var hizKarar = false;
       _sesAboneligi = ses.listen(
         (bayt) {
           if (kontrol.isClosed) return;
           try {
-            akis.acceptWaveform(samples: _floata(bayt), sampleRate: _ornekHizi);
+            final simdi = DateTime.now();
+            ilkBayt ??= simdi;
+            toplamBayt += bayt.lengthInBytes;
+            if (!hizKarar &&
+                simdi.difference(ilkBayt!).inMilliseconds >= 1000) {
+              hizKarar = true;
+              final h = hizTahmini(toplamBayt, simdi.difference(ilkBayt!));
+              _hizNotu =
+                  'ölçülen hız ≈ ${(toplamBayt / 2 / (simdi.difference(ilkBayt!).inMicroseconds / 1e6)).round()} Hz, kullanılan $h Hz';
+              if (h != _hiz) {
+                debugPrint('Mikrofon hızı ayarlandı: $_hizNotu');
+                _hiz = h;
+              }
+            }
+            akis.acceptWaveform(samples: _floata(bayt), sampleRate: _hiz);
             while (tanici.isReady(akis)) {
               tanici.decode(akis);
             }
             final metin = tanici.getResult(akis).text;
-            if (metin != sonMetin) {
-              sonMetin = metin;
+            if (metin != _sonMetin) {
+              _sonMetin = metin;
               kontrol.add(metin);
             }
             // Konuşma arası sessizlik: son sonuç verilir, akış kapanır.
-            if (tanici.isEndpoint(akis) && sonMetin.trim().isNotEmpty) {
+            if (tanici.isEndpoint(akis) && _sonMetin.trim().isNotEmpty) {
               unawaited(durdur());
             }
           } catch (e) {
@@ -211,16 +272,61 @@ class SherpaKonusma implements KonusmaTanima {
       // Bilerek yutulur (temizlik); iz için kaydedilir.
       debugPrint('konusma_sherpa.dart: kayıt durdurma hatası: $e');
     }
-    try {
-      _akis?.free();
-    } catch (e) {
-      // Bilerek yutulur (temizlik); iz için kaydedilir.
-      debugPrint('konusma_sherpa.dart: akış serbest bırakma hatası: $e');
-    }
+    // Akış açıkken: konuşmanın son kelimeleri çözücüde bekliyor olabilir.
+    // Sessizlik doldurulup girdi bitirilerek tamamı alınır, sonra kapanır.
+    final akis = _akis;
     _akis = null;
     final kontrol = _kontrol;
     _kontrol = null;
+    if (akis != null) {
+      try {
+        final tanici = _tanici;
+        if (tanici != null) {
+          akis.acceptWaveform(
+            samples: Float32List((_hiz * 0.6).round()),
+            sampleRate: _hiz,
+          );
+          akis.inputFinished();
+          while (tanici.isReady(akis)) {
+            tanici.decode(akis);
+          }
+          final metin = tanici.getResult(akis).text;
+          if (metin != _sonMetin) {
+            _sonMetin = metin;
+            if (kontrol != null && !kontrol.isClosed) kontrol.add(metin);
+          }
+        }
+      } catch (e) {
+        debugPrint('Son sonuç alınamadı: $e');
+      }
+      try {
+        akis.free();
+      } catch (e) {
+        // Bilerek yutulur (temizlik); iz için kaydedilir.
+        debugPrint('konusma_sherpa.dart: akış serbest bırakma hatası: $e');
+      }
+    }
     if (kontrol != null && !kontrol.isClosed) await kontrol.close();
+  }
+
+  @override
+  Future<String> tani() async {
+    final b = StringBuffer();
+    try {
+      b.writeln('Platform: ${Platform.operatingSystem}');
+      final klasor = await _klasor();
+      b.writeln('Model klasörü: $klasor');
+      final d = dosyalariBul(klasor);
+      b.writeln(
+        d == null ? 'Model dosyaları: EKSİK' : 'Model dosyaları: tamam',
+      );
+      b.writeln('Mikrofon izni: ${await izinIste() ? 'var' : 'YOK'}');
+      b.writeln('Son ölçüm: ${_hizNotu ?? 'henüz dinleme yapılmadı'}');
+      b.writeln('Tanıma dili: yalnız İngilizce model');
+    } catch (e) {
+      b.writeln('Tanı hatası: $e');
+    }
+    return b.toString().trim();
   }
 
   /// Uygulama kapanırken kaynakları bırakır.

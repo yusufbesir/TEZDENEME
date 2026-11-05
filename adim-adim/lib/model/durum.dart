@@ -423,6 +423,7 @@ class OgrenciDurumu {
     this.sesAcik = true,
     this.hatirlatmaSaati,
     this.alan,
+    this.yolGrubu = '',
     this.hatalar = const [],
     this.haftalikHedefGun = varsayilanHaftalikHedef,
     this.sonDersId,
@@ -478,6 +479,7 @@ class OgrenciDurumu {
     this.sonHatirlatmaGunu,
     this.calismaSaatleri = const [],
     this.sesHizi = varsayilanSesHizi,
+    this.yaziOlcegi = varsayilanYaziOlcegi,
   }) : _ilkAcilisTamam = ilkAcilisTamam;
 
   /// Kelime notu sınırları: tek not en çok [notEnCokKarakter] karakter,
@@ -534,6 +536,10 @@ class OgrenciDurumu {
   final bool sesAcik;
   final String? hatirlatmaSaati; // 'HH:MM', null: kapalı
   final String? alan; // 'dil' | 'kod' | 'oyun'; null: henüz seçilmedi
+
+  /// Yol sekmesinde gösterilen kurs grubu (kurs kimliği öneki: 'almanca',
+  /// 'python'...). Boş: alandaki tüm kurslar tek yolda (eski davranış).
+  final String yolGrubu;
 
   /// Hata defteri, eskiden yeniye; en çok [HataKaydi.enCok] kayıt.
   final List<HataKaydi> hatalar;
@@ -742,6 +748,21 @@ class OgrenciDurumu {
   /// Ses servisi flutter_tts hızını bu çarpanla ölçekler.
   final double sesHizi;
 
+  /// Kullanıcının seçtiği yazı boyutu çarpanı (Ayarlar > Yazı boyutu):
+  /// 1,0 = sistem ayarı (en çok 1,3'e kıstırılır); daha büyük değer sistem
+  /// ölçeğinin yerine geçer ([enCokYaziOlcegi]'ne kadar).
+  final double yaziOlcegi;
+
+  static const double varsayilanYaziOlcegi = 1.0;
+  static const double enCokYaziOlcegi = 1.5;
+  static const List<double> yaziOlcegiSecenekleri = [1.0, 1.15, 1.3, 1.5];
+
+  /// Çarpanı 1,0..[enCokYaziOlcegi] aralığına kırpar; geçersizse 1,0.
+  static double yaziOlcegiKirp(Object? ham) {
+    if (ham is! num || !ham.isFinite) return varsayilanYaziOlcegi;
+    return ham.toDouble().clamp(varsayilanYaziOlcegi, enCokYaziOlcegi);
+  }
+
   static const double enAzSesHizi = 0.7;
   static const double enCokSesHizi = 1.2;
   static const double varsayilanSesHizi = 1.0;
@@ -827,6 +848,7 @@ class OgrenciDurumu {
     String? hatirlatmaSaati,
     bool hatirlatmaSil = false,
     String? alan,
+    String? yolGrubu,
     List<HataKaydi>? hatalar,
     int? haftalikHedefGun,
     String? sonDersId,
@@ -885,6 +907,7 @@ class OgrenciDurumu {
     String? sonHatirlatmaGunu,
     List<int>? calismaSaatleri,
     double? sesHizi,
+    double? yaziOlcegi,
   }) {
     return OgrenciDurumu(
       xp: xp ?? this.xp,
@@ -902,6 +925,7 @@ class OgrenciDurumu {
           ? null
           : (hatirlatmaSaati ?? this.hatirlatmaSaati),
       alan: alan ?? this.alan,
+      yolGrubu: yolGrubu ?? this.yolGrubu,
       hatalar: hatalar ?? this.hatalar,
       haftalikHedefGun: haftalikHedefGun ?? this.haftalikHedefGun,
       sonDersId: sonDersId ?? this.sonDersId,
@@ -965,6 +989,7 @@ class OgrenciDurumu {
       sonHatirlatmaGunu: sonHatirlatmaGunu ?? this.sonHatirlatmaGunu,
       calismaSaatleri: calismaSaatleri ?? this.calismaSaatleri,
       sesHizi: sesHizi ?? this.sesHizi,
+      yaziOlcegi: yaziOlcegi ?? this.yaziOlcegi,
     );
   }
 
@@ -983,6 +1008,7 @@ class OgrenciDurumu {
     'sesAcik': sesAcik,
     'hatirlatmaSaati': hatirlatmaSaati,
     'alan': alan,
+    'yolGrubu': yolGrubu,
     'hatalar': [for (final h in hatalar) h.toJson()],
     'haftalikHedefGun': haftalikHedefGun,
     'sonDersId': sonDersId,
@@ -1042,6 +1068,7 @@ class OgrenciDurumu {
     'sonHatirlatmaGunu': sonHatirlatmaGunu,
     'calismaSaatleri': calismaSaatleri,
     'sesHizi': sesHizi,
+    'yaziOlcegi': yaziOlcegi,
   };
 
   static final _ayDeseni = RegExp(r'^\d{4}-\d{2}$');
@@ -1218,6 +1245,10 @@ class OgrenciDurumu {
       alan: (alan == 'dil' || alan == 'kod' || alan == 'oyun')
           ? alan as String
           : null,
+      yolGrubu:
+          (j['yolGrubu'] is String && (j['yolGrubu'] as String).length <= 32)
+          ? j['yolGrubu'] as String
+          : '',
       hatalar: List.unmodifiable(sonHatalar),
       haftalikHedefGun: tamsayi(
         j['haftalikHedefGun'],
@@ -1408,6 +1439,7 @@ class OgrenciDurumu {
       calismaSaatleri: calismaSaatleriCoz(j['calismaSaatleri']),
       // Eski kayıtta yoksa 1,0; aralık dışıysa kırpılır.
       sesHizi: sesHiziKirp(j['sesHizi']),
+      yaziOlcegi: yaziOlcegiKirp(j['yaziOlcegi']),
     );
   }
 

@@ -336,6 +336,10 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     );
   }
 
+  /// Yol sekmesindeki kurs grubunu seçer ('' = hepsi).
+  Future<OgrenciDurumu> yolGrubuSec(String grup) =>
+      _uygula((d) => d.copyWith(yolGrubu: grup));
+
   /// İlk açılış ("Hoş geldin") akışı bitti; bir daha gösterilmez.
   Future<OgrenciDurumu> ilkAcilisTamamla() =>
       _uygula((d) => d.copyWith(ilkAcilisTamam: true));
@@ -618,6 +622,7 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
     bool? emekliAcik,
     int? yukButcesi,
     double? sesHizi,
+    double? yaziOlcegi,
   }) async {
     await _uygula(
       (d) => d.copyWith(
@@ -649,6 +654,9 @@ class DurumNotifier extends AsyncNotifier<OgrenciDurumu> {
             : null,
         // Dinleme hızı 0,7..1,2 aralığına kırpılır.
         sesHizi: sesHizi == null ? null : OgrenciDurumu.sesHiziKirp(sesHizi),
+        yaziOlcegi: yaziOlcegi == null
+            ? null
+            : OgrenciDurumu.yaziOlcegiKirp(yaziOlcegi),
       ),
     );
     final bildirim = ref.read(bildirimProvider);

@@ -26,6 +26,7 @@ import '../bilesenler/donem_dersleri.dart';
 import '../bilesenler/geri_kazanma_satiri.dart';
 import '../bilesenler/hedef_halkasi.dart';
 import '../bilesenler/hikaye_karti.dart';
+import '../bilesenler/kurs_grubu_secici.dart';
 import '../bilesenler/profil_karti.dart';
 import '../bilesenler/ust_cubuk.dart';
 import '../durum/saglayicilar.dart';
@@ -248,6 +249,8 @@ class _YolListesi extends StatelessWidget {
     final r = context.renkler;
     final yazi = Theme.of(context).textTheme;
     final parlaklik = Theme.of(context).brightness;
+    // Yol yalnız seçili kurs grubunu gösterir (Tümü: eski davranış).
+    final yolKurslari = kurslariSuz(kurslar, durum.yolGrubu);
     final alanRengi = AlanRenkleri.renk(durum.alan, parlaklik);
     final alistirmaVar = kurslar.any(
       (k) => k.tumDersler.any((d) => d.alistirmalar.isNotEmpty),
@@ -255,7 +258,7 @@ class _YolListesi extends StatelessWidget {
 
     // Sıradaki ders: alan kurslarında ilk tamamlanmamış ders.
     String? siradakiId;
-    for (final k in kurslar) {
+    for (final k in yolKurslari) {
       for (final d in k.tumDersler) {
         if (!Motor.dersBitmis(durum, d.id)) {
           siradakiId = d.id;
@@ -369,8 +372,10 @@ class _YolListesi extends StatelessWidget {
       ],
     ];
 
+    ogeler.insert(1, KursGrubuSecici(kurslar: kurslar, secili: durum.yolGrubu));
+
     var dersNo = 0;
-    for (final kurs in kurslar) {
+    for (final kurs in yolKurslari) {
       final tumu = kurs.tumDersler.toList();
       final kursBiten = tumu.where((d) => Motor.dersBitmis(durum, d.id)).length;
       // Sahanlık bandı: kurs adı, alan renginde 3 px alt çizgi, biten/toplam.

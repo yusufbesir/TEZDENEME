@@ -19,6 +19,9 @@ abstract class KonusmaTanima {
 
   /// Dinlemeyi durdurur (kayıt açıksa kapatır).
   Future<void> durdur();
+
+  /// Sorun giderme için kısa durum metni (platform, model, izin, ölçüm).
+  Future<String> tani();
 }
 
 /// Testler için: sıradaki hazır yanıtı döndürür.
@@ -55,6 +58,9 @@ class SahteKonusma implements KonusmaTanima {
 
   @override
   Future<void> durdur() async => durdurmaSayisi++;
+
+  @override
+  Future<String> tani() async => 'Sahte konuşma (test)';
 }
 
 /// Motor yok: tanıma hazır değil. Arayüz "Konuşma tanıma bu cihazda hazır
@@ -73,4 +79,7 @@ class KonusmaYok implements KonusmaTanima {
 
   @override
   Future<void> durdur() async {}
+
+  @override
+  Future<String> tani() async => 'Konuşma tanıma motoru yok';
 }
