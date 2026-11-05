@@ -14,6 +14,7 @@
 /// silme yalnız Yusuf kararıyla ve yalnızca geri dönüşüm kutusuna.
 library;
 
+import 'yol_grubu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +47,7 @@ class AnaSayfa extends ConsumerWidget {
     final durum = ref.watch(durumProvider).value ?? const OgrenciDurumu();
     final kurslar = ref.watch(alanKurslariProvider);
     final bugun = ref.watch(bugunProvider);
+    final yolKurslari = grupKurslari(kurslar, ref.watch(yolGrubuProvider));
 
     if (durum.alan == null || kurslar.isEmpty) {
       return _AlanYok(alanVar: durum.alan != null);
@@ -62,6 +64,7 @@ class AnaSayfa extends ConsumerWidget {
               kisit.maxWidth - Olcu.panelMin >= Olcu.yolMinGenislik;
           final yol = _YolListesi(
             kurslar: kurslar,
+            yolKurslari: yolKurslari,
             durum: durum,
             bugun: bugun,
             seritteHalka: !iki,
@@ -232,11 +235,15 @@ class _GunlukKart extends StatelessWidget {
 class _YolListesi extends StatelessWidget {
   const _YolListesi({
     required this.kurslar,
+    required this.yolKurslari,
     required this.durum,
     required this.bugun,
     required this.seritteHalka,
   });
   final List<Kurs> kurslar;
+
+  /// Yolda gösterilecek kurslar (grup seçimine göre); kartlar [kurslar]'ı kullanır.
+  final List<Kurs> yolKurslari;
   final OgrenciDurumu durum;
   final String bugun;
 
@@ -299,6 +306,7 @@ class _YolListesi extends StatelessWidget {
         ],
       ),
       const SizedBox(height: Olcu.b2),
+      YolGrubuSecici(kurslar: kurslar),
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -370,7 +378,7 @@ class _YolListesi extends StatelessWidget {
     ];
 
     var dersNo = 0;
-    for (final kurs in kurslar) {
+    for (final kurs in yolKurslari) {
       final tumu = kurs.tumDersler.toList();
       final kursBiten = tumu.where((d) => Motor.dersBitmis(durum, d.id)).length;
       // Sahanlık bandı: kurs adı, alan renginde 3 px alt çizgi, biten/toplam.
