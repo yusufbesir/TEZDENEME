@@ -336,37 +336,6 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   ),
                 ),
               ),
-              ListTile(
-                key: const ValueKey('ayar-ses-testi'),
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.mic_none, color: r.ana),
-                title: const Text('Ses ve mikrofon testi'),
-                subtitle: const Text('Hoparlör ve tanıma durumunu gösterir'),
-                onTap: () async {
-                  final ses = ref.read(sesProvider);
-                  final konusma = ref.read(konusmaProvider);
-                  final sonuc = StringBuffer(await ses.tani())
-                    ..writeln()
-                    ..writeln('---')
-                    ..write(await konusma.tani());
-                  if (!context.mounted) return;
-                  await showDialog<void>(
-                    context: context,
-                    builder: (c) => AlertDialog(
-                      title: const Text('Ses ve mikrofon testi'),
-                      content: SingleChildScrollView(
-                        child: SelectableText(sonuc.toString()),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(c),
-                          child: const Text('Kapat'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
               bolum('Günlük hedef'),
               Semantics(
                 label: 'Günlük hedef: ${durum.gunlukHedef} XP',
@@ -681,6 +650,63 @@ class _AyarlarDurumu extends ConsumerState<AyarlarEkrani> {
                   context: context,
                   applicationName: 'Adım Adım',
                 ),
+              ),
+              bolum('Erişilebilirlik ve tanı'),
+              ListTile(
+                key: const ValueKey('ayar-yazi-boyutu'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.text_fields, color: r.ana),
+                title: const Text('Yazı boyutu'),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Wrap(
+                      spacing: 8,
+                      children: [
+                        for (final o in OgrenciDurumu.yaziOlcegiSecenekleri)
+                          ChoiceChip(
+                            key: ValueKey('yazi-olcegi-$o'),
+                            label: Text(o == 1.0 ? 'Normal' : '${o}x'),
+                            selected: durum.yaziOlcegi == o,
+                            onSelected: (_) =>
+                                notifier.ayarGuncelle(yaziOlcegi: o),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                key: const ValueKey('ayar-ses-testi'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.mic_none, color: r.ana),
+                title: const Text('Ses ve mikrofon testi'),
+                subtitle: const Text('Hoparlör ve tanıma durumunu gösterir'),
+                onTap: () async {
+                  final ses = ref.read(sesProvider);
+                  final konusma = ref.read(konusmaProvider);
+                  final sonuc = StringBuffer(await ses.tani())
+                    ..writeln()
+                    ..writeln('---')
+                    ..write(await konusma.tani());
+                  if (!context.mounted) return;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: const Text('Ses ve mikrofon testi'),
+                      content: SingleChildScrollView(
+                        child: SelectableText(sonuc.toString()),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(c),
+                          child: const Text('Kapat'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
