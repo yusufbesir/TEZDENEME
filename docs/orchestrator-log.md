@@ -84,3 +84,4 @@
 | 2026-11-04 | Denetmen takibi 04.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-fable-5-1 | ~8 bin | Geçti: Tutaa maddeleri açık, yeni koordinatöre hatırlatma gönderildi |
 | 2026-11-05 | Denetmen takibi 05.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: değişiklik yok, hatırlatma dün gitti |
 | 2026-11-06 | Denetmen takibi 06.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~7 bin | Geçti: Tutaa maddeleri açık, koordinatöre hatırlatma gönderildi |
+| 2026-11-06 | Düzeltme: 06.11 satırındaki hatırlatma GÖNDERİLMEDİ (send_message reddedildi, Yusuf onayı soruldu) [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum | ~1 bin | Düzeltildi |
