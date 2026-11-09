@@ -88,3 +88,4 @@
 | 2026-11-06 | Koordinatör Tutaa açık maddelerini kabul etti [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum | ~1 bin | Geçti: hatırlatma gerekmiyor |
 | 2026-11-07 | Denetmen takibi 07.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: değişiklik yok, koordinatör haberdar |
 | 2026-11-08 | Denetmen takibi 08.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
+| 2026-11-09 | Haftalık Claude rehber taraması 09.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | 2 haiku alt ajan + ana oturum / claude-sonnet-5-5 | ~250 bin | Geçti: 2.1.319a kadar tarandı, 4 öneri sunuldu, ayar değişmedi |
