@@ -92,3 +92,4 @@
 | 2026-11-09 | Denetmen takibi 09.11 + LibreOffice/FFmpeg kontrolü [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | haiku alt ajan + ana oturum / claude-sonnet-5-5 | ~111 bin | Geçti: yeni dosya yok; CVE kontrolü sınırlı kanıt (resmi siteler erişilemedi), doğrulanmamış LibreOffice CVE notu Yusuf a bildirildi |
 | 2026-11-10 | Denetmen takibi 10.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
 | 2026-11-11 | Denetmen takibi 11.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
+| 2026-11-12 | Denetmen takibi 12.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
