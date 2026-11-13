@@ -93,3 +93,4 @@
 | 2026-11-10 | Denetmen takibi 10.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
 | 2026-11-11 | Denetmen takibi 11.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
 | 2026-11-12 | Denetmen takibi 12.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
+| 2026-11-13 | Denetmen takibi 13.11 [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: yeni dosya ve değişiklik yok, hatırlatma gerekmedi |
