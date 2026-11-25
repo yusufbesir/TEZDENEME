@@ -108,3 +108,4 @@
 | 2026-11-23 | Haftalık Claude rehber taraması [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 + alt ajan / claude-haiku-5-5 | ~135 bin (tahmini) | Geçti: 2.1.326-2.1.330 incelendi, 4 öneri, ayar değişmedi |
 | 2026-11-23 | Günlük denetmen takibi + pazartesi CVE denemesi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~7 bin | Geçti: yeni dosya yok; CVE karşılaştırması yapılamadı (siteler açılmadı, sürüm bilinmiyor) |
 | 2026-11-24 | Günlük denetmen takibi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: yeni dosya yok, bildirim gerekmedi |
+| 2026-11-25 | Günlük denetmen takibi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: yeni dosya yok, bildirim gerekmedi |
