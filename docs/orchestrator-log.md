@@ -109,3 +109,4 @@
 | 2026-11-23 | Günlük denetmen takibi + pazartesi CVE denemesi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~7 bin | Geçti: yeni dosya yok; CVE karşılaştırması yapılamadı (siteler açılmadı, sürüm bilinmiyor) |
 | 2026-11-24 | Günlük denetmen takibi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: yeni dosya yok, bildirim gerekmedi |
 | 2026-11-25 | Günlük denetmen takibi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~6 bin | Geçti: yeni dosya yok, bildirim gerekmedi |
+| 2026-11-26 | Günlük denetmen takibi [İP:Claude rehber takibi ve zamanlanmış görevler#V6655S] | ana oturum / claude-sonnet-5-5 | ~5 bin | Geçti: yeni dosya yok, bildirim gerekmedi |
